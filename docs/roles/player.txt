@@ -1,0 +1,41 @@
+h1. Behaviour - Players
+
+Note: there should be a distinction made between a player and a competitor. e.g. the difference between a person and their entry.
+
+h2. Enter a Tournament
+* Register
+* Update my player details
+* Get list of tournaments
+* Send application
+* Update application
+* See application status
+
+
+h2. Play in a Tournament
+* Get a game
+* Get a table
+* Get an opponent
+* Get the table layout
+* Get a mission
+* Get an opponent army list
+* Get their army list (may be different between games
+* Get the time remaining in the round
+* Submit a score
+* Submit a soft score
+* Submit a once off score - best presented - should be updateable (best opponent)
+* See their total score
+* Review previous games
+
+h2. View a Tournament
+* Search for tournaments - by player, army, club, etc.
+* View results of tournies they've played in.
+
+h2. Place Feedback
+* about players
+* about to
+* about tournie
+* about app
+* request features
+* report a bug
+* make complaint
+
