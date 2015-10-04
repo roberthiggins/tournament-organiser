@@ -1,11 +1,16 @@
 h1. Developing the Website
 
 h2. Docker
-You will need docker to run the webserver as it is in a docker container. Note that the initial install and setup of the docker image will require a lot of shit to get downloaded. Be prepared to wait and don't try this at uni behind some bullshit proxy.
+You will need docker to run the webserver as it is in a docker container. Note
+that the initial install and setup of the docker image will require a lot of
+shit to get downloaded. Be prepared to wait and don't try this at uni behind
+some bullshit proxy.
 
 * Install docker. You can do this in Windows - good luck to you sir!
 * Build the webserver image thusly:
 ** cd <to_dir>/webserver
-** sudo docker build -t webserver .  # NB '.' specifies that the Dockerfile (used to build the image) is in this dir. 'webserver' is just the name of the resulting image; you can call it whatever you want; webserver seems sane.
+** sudo docker build -t webserver .  # NB '.' specifies that the Dockerfile
+(used to build the image) is in this dir. 'webserver' is just the name of the
+resulting image; you can call it whatever you want; webserver seems sane.
 * Run the image to start the webserver:
 ** sudo docker run -t -i webserver <webserver start command TBD>
