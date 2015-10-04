@@ -11,3 +11,7 @@ RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 RUN python get-pip.py
 # End getting pip
 
+# Install flask
+# This is the python tool that will run the webserver
+RUN pip install flask
+
