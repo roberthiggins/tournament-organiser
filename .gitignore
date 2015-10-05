@@ -1,0 +1,4 @@
+# Add all the files you want git to ignore in this project
+
+# Swap files
+*.swp

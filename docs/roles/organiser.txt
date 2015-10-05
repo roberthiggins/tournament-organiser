@@ -1,0 +1,34 @@
+h1. Behaviour - Organiser
+
+h2. Create a Tournament
+* Add some details (Player pack builder?)
+* Add the tournament to the calendar
+* View applications (including lists)
+* Advertise tournament
+* Accept applications
+* Build a todo checklist
+* Organiser ringer(s)
+* Add player on the day
+* withdraw player on the day
+
+h2. On the day
+* see scores
+* enter scores by hand
+* enter per-player scores
+* inspect player
+
+h2. Feedback
+
+h2. Tournament Config
+* Name
+* Maps
+* # Tables
+* System
+* matchup strategy
+* prizes
+* Game length
+* Venue
+* scoring
+* # Rounds
+* Missions
+

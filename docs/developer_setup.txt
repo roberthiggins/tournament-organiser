@@ -1,0 +1,19 @@
+h1. Developing the Website
+
+h2. Docker
+You will need docker to run the webserver as it is in a docker container. Note
+that the initial install and setup of the docker image will require a lot of
+shit to get downloaded. Be prepared to wait and don't try this at uni behind
+some bullshit proxy.
+
+* Install docker. You can do this in Windows - good luck to you sir!
+* Build the webserver image thusly:
+** cd <to_dir>/webserver
+** sudo docker build -t webserver .  # NB '.' specifies that the Dockerfile
+(used to build the image) is in this dir. 'webserver' is just the name of the
+resulting image; you can call it whatever you want; webserver seems sane.
+* Run the image to start the webserver:
+** sudo docker run --name=webserver1 -d -p 5000:5000 -v ~/workspace/tournament-organiser/webserver:/webapp webserver:latest python webapp/app.py
+** curl -s -i http://$( sudo docker port webserver1 5000 )/; echo"" # This will
+connect to the webserver and curl whatever it is producing. Currently this
+would be the word "Welcome!".
