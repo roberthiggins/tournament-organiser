@@ -13,7 +13,11 @@ some bullshit proxy.
 (used to build the image) is in this dir. 'webserver' is just the name of the
 resulting image; you can call it whatever you want; webserver seems sane.
 * Run the image to start the webserver:
-** sudo docker run --name=webserver1 -d -p 5000:5000 -v ~/workspace/tournament-organiser/webserver:/webapp webserver:latest python webapp/app.py
-** curl -s -i http://$( sudo docker port webserver1 5000 )/; echo"" # This will
-connect to the webserver and curl whatever it is producing. Currently this
-would be the word "Welcome!".
+** sudo docker run --name=webserver -d -p 5000:5000 webserver
+
+h2. Adding new files
+
+If you want to add new files to the webserver you simply need to rebuild the
+container. Note that only the src directory gets mounted into the container.
+You can add other directories by altering the Dockerfile (c.f. the ADD commands
+at the bottom.

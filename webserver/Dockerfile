@@ -15,3 +15,6 @@ RUN python get-pip.py
 # This is the python tool that will run the webserver
 RUN pip install flask
 
+ADD src/ webapp/
+
+CMD python webapp/app.py
