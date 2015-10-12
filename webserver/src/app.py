@@ -1,7 +1,11 @@
 import os
+import yaml
 
 from flask import Flask, render_template, request, json
-app = Flask(__name__)
+
+
+app     = Flask(__name__)
+config  = yaml.safe_load(open('webapp/config.yml'))
 
 # Page rendering
 @app.route("/")

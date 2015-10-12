@@ -15,6 +15,9 @@ RUN python get-pip.py
 # This is the python tool that will run the webserver
 RUN pip install flask
 
+# Yaml for the configuration file
+RUN pip install pyyaml
+
 # We need to attach to the player db
 RUN apt-get install -y postgresql
 
