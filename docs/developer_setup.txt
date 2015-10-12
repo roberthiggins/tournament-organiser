@@ -7,6 +7,12 @@ shit to get downloaded. Be prepared to wait and don't try this at uni behind
 some bullshit proxy.
 
 * Install docker. You can do this in Windows - good luck to you sir!
+* Get the config file. This might include passwords so is not included in git
+(as that would go to github). You should get this from Higgins.
+* Run the install script: scripts/install
+* You are done. To do it manually see below.
+
+h3. Manual Installation
 * Build the webserver image thusly:
 ** cd <to_dir>/webserver
 ** sudo docker build -t webserver .  # NB '.' specifies that the Dockerfile
@@ -22,9 +28,9 @@ resulting image; you can call it whatever you want; webserver seems sane.
 h2. Adding new files
 
 If you want to add new files to the webserver you simply need to rebuild the
-container. Note that only the src directory gets mounted into the container.
-You can add other directories by altering the Dockerfile (c.f. the ADD commands
-at the bottom.
+container (manually or using scripts/install). Note that only the src directory
+gets mounted into the container. You can add other directories by altering the
+Dockerfile (c.f. the ADD commands at the bottom.
 
 h2. Connecting to the Player DB
 The recommended way to connect to the db is to enter the webserver container
