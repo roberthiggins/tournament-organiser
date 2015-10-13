@@ -22,3 +22,5 @@ popd
 
 sudo docker run -d -P --name player_db postgresql_base
 sudo docker run --name=webserver -d -p 5000:5000 --link=player_db webserver
+
+./scripts/smoketest
