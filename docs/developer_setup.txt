@@ -7,13 +7,39 @@ shit to get downloaded. Be prepared to wait and don't try this at uni behind
 some bullshit proxy.
 
 * Install docker. You can do this in Windows - good luck to you sir!
+* Get the config file. This might include passwords so is not included in git
+(as that would go to github). You should get this from Higgins.
+* Run the install script: scripts/install
+* You are done. To do it manually see below.
+
+h3. Manual Installation
 * Build the webserver image thusly:
 ** cd <to_dir>/webserver
 ** sudo docker build -t webserver .  # NB '.' specifies that the Dockerfile
 (used to build the image) is in this dir. 'webserver' is just the name of the
 resulting image; you can call it whatever you want; webserver seems sane.
-* Run the image to start the webserver:
-** sudo docker run --name=webserver1 -d -p 5000:5000 -v ~/workspace/tournament-organiser/webserver:/webapp webserver:latest python webapp/app.py
-** curl -s -i http://$( sudo docker port webserver1 5000 )/; echo"" # This will
-connect to the webserver and curl whatever it is producing. Currently this
-would be the word "Welcome!".
+* Build the db server:
+** cd <to_dir>/player_database
+** sudo docker build -t player_db .
+* Run these images to start the containers:
+** sudo docker run --name=player_db -d -P player_db
+** sudo docker run --name=webserver -d -p 5000:5000 --link=player_db webserver
+
+h2. Adding new files
+
+If you want to add new files to the webserver you simply need to rebuild the
+container (manually or using scripts/install). Note that only the src directory
+gets mounted into the container. You can add other directories by altering the
+Dockerfile (c.f. the ADD commands at the bottom.
+
+h2. Connecting to the Player DB
+The recommended way to connect to the db is to enter the webserver container
+and then connect to the player_db container from there. attach to the
+webserver and run the command:
+* sudo docker exec -i -t webserver /bin/bash
+* psql -h $PLAYER_DB_PORT_5432_TCP_ADDR -p $PLAYER_DB_PORT_5432_TCP_PORT -d docker -U docker --password
+# Notes: When we run the webserver we tell it to link to the player_db
+# container and this will insert some ENV variables into the web container
+# ('$PLAYER_DB_PORT_5432_TCP_ADDR', etc.). You will be asked the docker user
+# password to connect. You can find it in the Dockerfile of the player_database
+# directory.
