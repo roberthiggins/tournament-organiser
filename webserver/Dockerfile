@@ -31,4 +31,4 @@ RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate
 ADD src/ webapp/
 
 # Run the app by default
-CMD python webapp/app.py
+CMD python -u webapp/app.py
