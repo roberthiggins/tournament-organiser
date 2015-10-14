@@ -21,6 +21,14 @@ RUN pip install pyyaml
 # We need to attach to the player db
 RUN apt-get install -y postgresql
 
+# Docker suggests that normally you shouldn't run update manually. However it
+# is the only way to get python-dev to install.
+RUN apt-get update && apt-get install -y python-dev
+RUN apt-get install -y libpq-dev
+RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate
+
+# Add the source dir
 ADD src/ webapp/
 
+# Run the app by default
 CMD python webapp/app.py
