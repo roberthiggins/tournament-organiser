@@ -3,7 +3,7 @@
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
-RUN apt-get install -y curl
+RUN apt-get install -y curl postgresql
 
 ADD src/ tests/
 
