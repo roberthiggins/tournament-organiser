@@ -9,7 +9,8 @@ class PlayerDBConnection:
         self.con = None
         self.config  = {
             'db_host': os.environ['PLAYER_DB_PORT_5432_TCP_ADDR'],
-            'db_port': os.environ['PLAYER_DB_PORT_5432_TCP_PORT']
+            'db_port': os.environ['PLAYER_DB_PORT_5432_TCP_PORT'],
+            'db_pass': os.environ['PLAYER_DB_PASSWORD']
         }
         try:
              self.con = psycopg2.connect(
@@ -17,7 +18,7 @@ class PlayerDBConnection:
                             user='docker',
                             host=self.config['db_host'],
                             port=self.config['db_port'],
-                            password='FuEm7l003bfd6zM') 
+                            password=self.config['db_pass'])
         except psycopg2.Error as e:
             print 'psycopg Error %s' % e     
         except Exception as e:
