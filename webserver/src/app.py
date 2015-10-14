@@ -3,9 +3,10 @@ import yaml
 
 from flask import Flask, render_template, request, json
 
+from player_db import PlayerDBConnection
 
 app     = Flask(__name__)
-config  = yaml.safe_load(open('webapp/config.yml'))
+conn = PlayerDBConnection()
 
 # Page rendering
 @app.route("/")
