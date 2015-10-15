@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, json, make_response
 from player_db import PlayerDBConnection
 
 app     = Flask(__name__)
-conn = PlayerDBConnection()
+player_db_conn = PlayerDBConnection()
 
 # Page rendering
 @app.route("/")
@@ -19,7 +19,7 @@ def showRegisterForTournament():
 
 @app.route('/showPlayerSignUp')
 def showAddPlayer():
-    return render_template('player-sign-up.html')
+    return render_template('create-a-player.html')
 
 # Page actions
 @app.route('/registerForTournament', methods=['POST'])
@@ -41,10 +41,10 @@ def addPlayer():
 
     if _user_name and _email and _password:
         try:
-            if conn.usernameExists(_user_name):
+            if player_db_conn.usernameExists(_user_name):
                 return make_response("A user with the username %s already exists! Please choose another name" % _user_name, 400)
 
-            conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
+            player_db_conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
             return make_response('<p>Account Created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
         except Error as e:
             return make_response(e, 500)

@@ -21,33 +21,22 @@ fi
 # Turn off existing
 for ENV in $ENVS
 do
-    case $ENV in
-        db|player_db)
-            sudo docker kill player_db 
-            sudo docker rm player_db
-        ;;
-        web|webserver)
-            sudo docker kill webserver
-            sudo docker rm webserver
-        ;;
-        *)
-        # unknown option
-        ;;
-    esac
+    sudo docker kill $ENV
+    sudo docker rm $ENV
 done
 
 # Build replacements
 for ENV in $ENVS
 do
     case $ENV in
-        db|player_db)
+        player_db)
             pushd player_database
-            sudo docker build -t postgresql_base .
+            sudo docker build -t player_db_image .
             popd
         ;;
         web|webserver)
             pushd webserver
-            sudo docker build -t webserver .
+            sudo docker build -t webserver_image .
             popd
         ;;
         *)
@@ -61,12 +50,12 @@ done
 for ENV in $ENVS
 do
     case $ENV in
-        db|player_db)
-            sudo docker run -d -P --name player_db postgresql_base
+        player_db)
+            sudo docker run -d -P --name player_db player_db_image
             sleep 5
         ;;
         web|webserver)
-            sudo docker run --name=webserver -d -p 5000:5000 --link=player_db webserver
+            sudo docker run --name=webserver -d -p 5000:5000 --link=player_db webserver_image
         ;;
         *)
         # unknown option
