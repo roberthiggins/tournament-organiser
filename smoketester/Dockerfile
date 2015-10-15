@@ -5,6 +5,7 @@ MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
 RUN apt-get install -y curl postgresql
 ENV PLAYER_DB_PASSWORD FuEm7l003bfd6zM
+ENV TOURNAMENT_DB_PASSWORD hB2x8avSMNnvCK4T
 
 ADD src/ tests/
 

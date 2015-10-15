@@ -12,7 +12,7 @@
 #!/bin/sh
 
 #### OPTION HANDLING ####
-ENVS="player_db webserver"
+ENVS="player_db tournament_db webserver"
 if [ $# -ne 0 ]
     then
     ENVS="$@"
@@ -32,6 +32,11 @@ do
         player_db)
             pushd player_database
             sudo docker build -t player_db_image .
+            popd
+        ;;
+        tournament_db)
+            pushd tournament_database
+            sudo docker build -t tournament_db_image .
             popd
         ;;
         web|webserver)
@@ -54,8 +59,12 @@ do
             sudo docker run -d -P --name player_db player_db_image
             sleep 5
         ;;
+        tournament_db)
+            sudo docker run -d -P --name tournament_db tournament_db_image
+            sleep 5
+        ;;
         web|webserver)
-            sudo docker run --name=webserver -d -p 5000:5000 --link=player_db webserver_image
+            sudo docker run --name=webserver -d -p 5000:5000 --link=player_db --link=tournament_db webserver_image
         ;;
         *)
         # unknown option
