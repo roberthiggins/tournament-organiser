@@ -45,7 +45,7 @@ def addPlayer():
                 return make_response("A user with the username %s already exists! Please choose another name" % _user_name, 400)
 
             conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
-            return make_response('<p>Account Created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()))
+            return make_response('<p>Account Created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
         except Error as e:
             return make_response(e, 500)
     else:

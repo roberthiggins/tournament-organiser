@@ -1,8 +1,8 @@
 $(function() {
 
     function displayError(msg) {
-        $('div.errors ul').append('<li>' + msg + '</li>');
-        $('div.errors').show();
+        $('div.red ul').append('<li>' + msg + '</li>');
+        $('div.red').show();
     };
     
     $(document).ready( function addSubmitListener(){
@@ -10,7 +10,8 @@ $(function() {
 
             var errors = 0;
 
-            $('div.errors ul').empty();
+            $('div.red ul').empty();
+            $('div.green ul').empty();
 
             if ( $.trim($('input#inputPassword').val()) == '' ) {
                 displayError("Please enter a password");
@@ -31,7 +32,8 @@ $(function() {
                 data: $('form').serialize(),
                 type: 'POST',
                 success: function(response) {
-                    console.log(response);
+                    $('div.green').html(response);
+                    $('div.green').show();
                 },
                 error: function(error) {
                     displayError(error['responseText']);
