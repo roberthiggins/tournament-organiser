@@ -11,7 +11,7 @@ $(function() {
             var errors = 0;
 
             $('div.red ul').empty();
-            $('div.green ul').empty();
+            $('div.green').empty();
 
             if ( $.trim($('input#inputPassword').val()) == '' ) {
                 displayError("Please enter a password");
