@@ -24,10 +24,12 @@ class PlayerDBConnection:
         except Exception as e:
             print 'Error %s' % e
 
-    def addPlayer(self, player):
+    def addAccount(self, account):
         try:
             cur = self.con.cursor()
-            cur.execute("INSERT INTO player VALUES (default, %s)", [player['user_name']])
+            cur.execute("INSERT INTO account VALUES (default, %s) RETURNING id", [account['email']])
+            id = cur.fetchone()
+            cur.execute("INSERT INTO player VALUES (%s, %s)", [id, account['user_name']])
             self.con.commit()
 
         except psycopg2.DatabaseError as e:

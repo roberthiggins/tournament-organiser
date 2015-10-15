@@ -37,9 +37,10 @@ def applyForTournament():
 def addPlayer():
     _user_name = request.form['inputUserName']
     _email = request.form['inputEmail']
+    _password = request.form['inputPassword']
 
     if _user_name and _email:
-        conn.addPlayer({'user_name': _user_name, 'email' : _email})
+        conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
         return json.dumps({'html':'<p>You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals())})
     else:
         return json.dumps({'html':'<span>Enter the required fields</span>'})
