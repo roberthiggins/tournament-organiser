@@ -24,6 +24,16 @@ class PlayerDBConnection:
         except Exception as e:
             print 'Error %s' % e
 
+    def usernameExists(self, username):
+        try:
+            cur = self.con.cursor()
+            cur.execute("SELECT COUNT(*) FROM player WHERE username = %s", [username])
+            existing = cur.fetchone()
+            return existing[0] > 0
+        except psycopg2.DatabaseError as e:
+            self.con.rollback()
+            raise e
+
     def addAccount(self, account):
         try:
             cur = self.con.cursor()
