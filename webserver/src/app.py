@@ -1,11 +1,12 @@
 import os
 import yaml
 
-from flask import Flask, render_template, request, json
+from flask import Flask, render_template, request, json, make_response
 
+from player_db import PlayerDBConnection
 
 app     = Flask(__name__)
-config  = yaml.safe_load(open('webapp/config.yml'))
+conn = PlayerDBConnection()
 
 # Page rendering
 @app.route("/")
@@ -36,11 +37,19 @@ def applyForTournament():
 def addPlayer():
     _user_name = request.form['inputUserName']
     _email = request.form['inputEmail']
+    _password = request.form['inputPassword']
 
-    if _user_name and _email:
-        return json.dumps({'html':'<p>You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals())})
+    if _user_name and _email and _password:
+        try:
+            if conn.usernameExists(_user_name):
+                return make_response("A user with the username %s already exists! Please choose another name" % _user_name, 400)
+
+            conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
+            return make_response('<p>Account Created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
+        except Error as e:
+            return make_response(e, 500)
     else:
-        return json.dumps({'html':'<span>Enter the required fields</span>'})
+        return make_response("Please enter the required fields", 400)
 
 
 if __name__ == "__main__":

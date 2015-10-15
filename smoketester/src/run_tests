@@ -1,13 +1,26 @@
 #! /bin/bash
 
+HAS_ERROR=""
+
 printf "\n\nRunning smoke tests for Tournament Organiser Webserver\n\n"
 
 # Front page
-printf "\nTesting front page\n"
+printf "Testing Front Page\n"
 front_page_status=$(curl -sL -w "%{http_code}" http://$WEBSERVER_PORT_5000_TCP_ADDR:$WEBSERVER_PORT_5000_TCP_PORT -o /dev/null)
 if [ "$front_page_status" -ne "200" ]; then
     echo "Smoke test failed - the front page returned code $front_page_status"
+    HAS_ERROR="true"
+fi
+
+# DB Connection from the webserver
+printf "Testing DB Connection from the webserver\n"
+db_has_version=$(PGPASSWORD=$PLAYER_DB_PASSWORD psql -h $PLAYER_DB_PORT_5432_TCP_ADDR -p $PLAYER_DB_PORT_5432_TCP_PORT -d docker -U docker -c "select version();")
+if [ -z "$db_has_version" ]; then
+    echo "Smoke test failed - the connectionto the player_db returned $front_page_status"
+    HAS_ERROR="true"
 fi
 
 # Hooray
-printf "\n\nSmoke test Passed\n\n"
+if [ -z "$HAS_ERROR" ]; then
+    printf "\n\nSmoke test Passed\n\n"
+fi

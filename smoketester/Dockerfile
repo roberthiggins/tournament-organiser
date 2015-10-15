@@ -3,7 +3,8 @@
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
-RUN apt-get install -y curl
+RUN apt-get install -y curl postgresql
+ENV PLAYER_DB_PASSWORD FuEm7l003bfd6zM
 
 ADD src/ tests/
 
