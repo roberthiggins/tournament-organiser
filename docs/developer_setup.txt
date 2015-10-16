@@ -27,11 +27,12 @@ h3. Manual Installation
 ** sudo docker run --name=webserver -d -p 5000:5000 --link=player_db --link=tournament_db webserver
 
 h2. Testing
-Currently there is a smoketest only. It runs when you fire up docker-compose.
-* You can run it again and see the output
+Currently there is a smoketest and behat skeleton. They run when you fire up
+docker-compose.
+* You can run them again and see the output
 * docker start -a tournamentorganiser_smoketest_1 # Or whatever the name of
 your smoketest container is. You can find this out by running docker-compose ps
-
+* docker start -a tournamentorganiser_behat_1
 
 h2. Adding new files
 

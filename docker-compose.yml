@@ -40,3 +40,8 @@ smoketest:
         PLAYER_DB_PASSWORD: FuEm7l003bfd6zM
         TOURNAMENT_DB_PASSWORD: hB2x8avSMNnvCK4T
 
+behat:
+    build: behat
+    links:
+     - webserver
+
