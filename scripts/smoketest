@@ -1,6 +1,0 @@
-# Build a container to run smoke tests on the other containers.
-pushd smoketester
-sudo docker build -t smoketester .
-popd
-
-sudo docker run -t --rm --link webserver --link player_db --link tournament_db smoketester

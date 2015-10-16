@@ -26,8 +26,6 @@ RUN apt-get install -y postgresql
 RUN apt-get update && apt-get install -y python-dev
 RUN apt-get install -y libpq-dev
 RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate
-ENV PLAYER_DB_PASSWORD FuEm7l003bfd6zM
-ENV TOURNAMENT_DB_PASSWORD hB2x8avSMNnvCK4T
 ADD src/bash_aliases /root/.bash_aliases
 
 # Add the source dir

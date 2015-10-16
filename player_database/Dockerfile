@@ -33,7 +33,7 @@ USER postgres
 # IMPORTANT ASSUMPTION: We assume that all the files in the setup dir are
 # ordered correctly. This can be done by prefixing a number to the filename.
 RUN    /etc/init.d/postgresql start &&\
-    psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'FuEm7l003bfd6zM';" &&\
+    psql --command "CREATE USER docker WITH SUPERUSER PASSWORD '$DB_PASSWORD';" &&\
     createdb -O docker docker &&\
     for i in setup/*.sql; do psql --file=$i -d docker ;done
 

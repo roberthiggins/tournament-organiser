@@ -9,21 +9,29 @@ some bullshit proxy.
 * Install docker. You can do this in Windows - good luck to you sir!
 * Get the config file. This might include passwords so is not included in git
 (as that would go to github). You should get this from Higgins.
-* Run the install script: scripts/install
+* docker-compose up -d
 * You are done. To do it manually see below.
 
 h3. Manual Installation
-* Build the webserver image thusly:
-** cd <to_dir>/webserver
-** sudo docker build -t webserver .  # NB '.' specifies that the Dockerfile
-(used to build the image) is in this dir. 'webserver' is just the name of the
-resulting image; you can call it whatever you want; webserver seems sane.
-* Build the db server:
+* Build the db servers:
 ** cd <to_dir>/player_database
 ** sudo docker build -t player_db .
+** cd <to_dir>/tournament_database
+** sudo docker build -t tournament_db .
+* Build the webserver:
+** cd <to_dir>/webserver
+** sudo docker build -t webserver .
 * Run these images to start the containers:
 ** sudo docker run --name=player_db -d -P player_db
-** sudo docker run --name=webserver -d -p 5000:5000 --link=player_db webserver
+** sudo docker run --name=tournament_db -d -P tournament_db
+** sudo docker run --name=webserver -d -p 5000:5000 --link=player_db --link=tournament_db webserver
+
+h2. Testing
+Currently there is a smoketest only. It runs when you fire up docker-compose.
+* You can run it again and see the output
+* docker start -a tournamentorganiser_smoketest_1 # Or whatever the name of
+your smoketest container is. You can find this out by running docker-compose ps
+
 
 h2. Adding new files
 
@@ -34,12 +42,7 @@ Dockerfile (c.f. the ADD commands at the bottom.
 
 h2. Connecting to the Player DB
 The recommended way to connect to the db is to enter the webserver container
-and then connect to the player_db container from there. attach to the
+and then connect to the player_db container from there. Attach to the
 webserver and run the command:
 * sudo docker exec -i -t webserver /bin/bash
 * psql-player_db # This has been aliased
-# Notes: When we run the webserver we tell it to link to the player_db
-# container and this will insert some ENV variables into the web container
-# ('$PLAYER_DB_PORT_5432_TCP_ADDR', etc.). You will be asked the docker user
-# password to connect. You can find it in the Dockerfile of the player_database
-# directory.
