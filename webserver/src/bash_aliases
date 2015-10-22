@@ -1,2 +1,1 @@
-alias psql-player_db='PGPASSWORD=$PLAYER_DB_PASSWORD psql -h $PLAYER_DB_PORT_5432_TCP_ADDR -p $PLAYER_DB_PORT_5432_TCP_PORT -d docker -U docker'
-alias psql-tournament_db='PGPASSWORD=$TOURNAMENT_DB_PASSWORD psql -h $TOURNAMENT_DB_PORT_5432_TCP_ADDR -p $TOURNAMENT_DB_PORT_5432_TCP_PORT -d docker -U docker'
+alias psql-db='PGPASSWORD=$DB_PASSWORD psql -h $DB_PORT_5432_TCP_ADDR -p $DB_PORT_5432_TCP_PORT -d docker -U docker'

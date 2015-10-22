@@ -8,9 +8,9 @@ class TournamentDBConnection:
 
         self.con = None
         self.config  = {
-            'db_host': os.environ['TOURNAMENT_DB_PORT_5432_TCP_ADDR'],
-            'db_port': os.environ['TOURNAMENT_DB_PORT_5432_TCP_PORT'],
-            'db_pass': os.environ['TOURNAMENT_DB_PASSWORD']
+            'db_host': os.environ['DB_PORT_5432_TCP_ADDR'],
+            'db_port': os.environ['DB_PORT_5432_TCP_PORT'],
+            'db_pass': os.environ['DB_PASSWORD']
         }
         try:
              self.con = psycopg2.connect(

@@ -8,9 +8,9 @@ class PlayerDBConnection:
 
         self.con = None
         self.config  = {
-            'db_host': os.environ['PLAYER_DB_PORT_5432_TCP_ADDR'],
-            'db_port': os.environ['PLAYER_DB_PORT_5432_TCP_PORT'],
-            'db_pass': os.environ['PLAYER_DB_PASSWORD']
+            'db_host': os.environ['DB_PORT_5432_TCP_ADDR'],
+            'db_port': os.environ['DB_PORT_5432_TCP_PORT'],
+            'db_pass': os.environ['DB_PASSWORD']
         }
         try:
              self.con = psycopg2.connect(
