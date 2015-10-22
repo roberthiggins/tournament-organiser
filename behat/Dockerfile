@@ -4,7 +4,7 @@
 
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
-RUN apt-get install -y php5
+RUN apt-get install -y php5 php5-curl
 
 # Get Composer
 RUN apt-get install -y curl

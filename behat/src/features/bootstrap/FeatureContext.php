@@ -1,43 +1,58 @@
 <?php
 
-use Behat\Behat\Context\BehatContext,
+use Behat\Behat\Context\ClosuredContextInterface,
+    Behat\Behat\Context\TranslatedContextInterface,
+    Behat\Behat\Context\BehatContext,
     Behat\Behat\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode,
     Behat\Gherkin\Node\TableNode;
 
-class FeatureContext extends BehatContext
+use Behat\MinkExtension\Context\MinkContext;
+
+//
+// Require 3rd-party libraries here:
+//
+//   require_once 'PHPUnit/Autoload.php';
+//   require_once 'PHPUnit/Framework/Assert/Functions.php';
+//
+
+/**
+ * Features context.
+ */
+class FeatureContext extends MinkContext
 {
-    private $output;
-
-    /** @Given /^I am in a directory "([^"]*)"$/ */
-    public function iAmInADirectory($dir)
+    /**
+     * Initializes context.
+     * Every scenario gets its own context object.
+     *
+     * @param array $parameters context parameters (set them up through behat.yml)
+     */
+    public function __construct(array $parameters)
     {
-        if (!file_exists($dir)) {
-            mkdir($dir);
-        }
-        chdir($dir);
+        // Initialize your context here
     }
 
-    /** @Given /^I have a file named "([^"]*)"$/ */
-    public function iHaveAFileNamed($file)
+    /**
+     * @Then /^I wait for the suggestion box to appear$/
+     */
+    public function iWaitForTheSuggestionBoxToAppear()
     {
-        touch($file);
+        $this->getSession()->wait(5000,
+            "$('.suggestions-results').children().length > 0"
+        );
     }
 
-    /** @When /^I run "([^"]*)"$/ */
-    public function iRun($command)
-    {
-        exec($command, $output);
-        $this->output = trim(implode("\n", $output));
-    }
+//
+// Place your definition and hook methods here:
+//
+//    /**
+//     * @Given /^I have done something with "([^"]*)"$/
+//     */
+//    public function iHaveDoneSomethingWith($argument)
+//    {
+//        doSomethingWith($argument);
+//    }
+//
 
-    /** @Then /^I should get:$/ */
-    public function iShouldGet(PyStringNode $string)
-    {
-        if ((string) $string !== $this->output) {
-            throw new Exception(
-                "Actual output is:\n" . $this->output
-            );
-        }
-    }
 }
+
