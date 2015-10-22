@@ -11,11 +11,12 @@ RUN apt-get install -y curl
 RUN curl -sS https://getcomposer.org/installer | php
 ADD composer.json /
 RUN php /composer.phar install
+ADD behat.yml /
 
-ADD src/ src/
-WORKDIR src/
+ADD src/ /
 
 # Install and setup behat
-RUN /bin/behat --init
+RUN bin/behat --init
 
-CMD behat
+CMD export BEHAT_PARAMS='{"extensions": { "Behat\\MinkExtension\\Extension": {"selenium2": {"wd_host":"http://'$SELENIUM_PORT_4444_TCP_ADDR':'$SELENIUM_PORT_4444_TCP_PORT'/wd/hub"}}}}' && \
+behat
