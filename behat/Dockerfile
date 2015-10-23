@@ -18,5 +18,5 @@ ADD src/ /
 # Install and setup behat
 RUN bin/behat --init
 
-CMD export BEHAT_PARAMS='{"extensions": { "Behat\\MinkExtension\\Extension": {"selenium2": {"wd_host":"http://'$SELENIUM_PORT_4444_TCP_ADDR':'$SELENIUM_PORT_4444_TCP_PORT'/wd/hub"}}}}' && \
+CMD export BEHAT_PARAMS='{"extensions": { "Behat\\MinkExtension\\Extension": {"selenium2": {"wd_host":"http://'$SELENIUM_PORT_4444_TCP_ADDR':'$SELENIUM_PORT_4444_TCP_PORT'/wd/hub"}, "base_url": "http://'$WEBSERVER_PORT_5000_TCP_ADDR':'$WEBSERVER_PORT_5000_TCP_PORT'"}}}' && \
 behat
