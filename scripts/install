@@ -66,14 +66,6 @@ done
 
 ./scripts/smoketest
 
-sudo docker kill selenium behat
-sudo docker rm selenium behat
-
-pushd behat
-sudo docker build -t behat_image .
-popd
-
-sudo docker run --name=selenium -d -p 4444:4444 selenium/standalone-firefox:2.48.2
-sudo docker run --name=behat --link=selenium --link=webserver behat_image
+./scripts/behaviourtest
 
 exit
