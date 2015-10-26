@@ -33,13 +33,15 @@ class FeatureContext extends MinkContext
     }
 
     /**
-     * @Then /^I wait for the suggestion box to appear$/
+     * Wait for AJAX responses
+     * This will wait for up to 5 seconds
+     *
+     * @When /^I wait for the response$/
      */
-    public function iWaitForTheSuggestionBoxToAppear()
+    public function iWaitForTheResponse()
     {
-        $this->getSession()->wait(5000,
-            "$('.suggestions-results').children().length > 0"
-        );
+        $time = 5000; // milliseconds
+        $this->getSession()->wait($time, "(0 === jQuery.active)");
     }
 
 //

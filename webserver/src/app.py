@@ -23,7 +23,7 @@ def showCreateATournament():
 def showRegisterForTournament():
     return render_template('register-for-tournament.html')
 
-@app.route('/showPlayerSignUp')
+@app.route('/signup')
 def showAddPlayer():
     return render_template('create-a-player.html')
 
@@ -57,7 +57,7 @@ def addTournament():
 
 @app.route('/addPlayer', methods=['POST'])
 def addPlayer():
-    _user_name = request.form['inputUserName']
+    _user_name = request.form['inputUsername']
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
 
@@ -67,7 +67,7 @@ def addPlayer():
                 return make_response("A user with the username %s already exists! Please choose another name" % _user_name, 400)
 
             player_db_conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
-            return make_response('<p>Account Created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
+            return make_response('<p>Account created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
         except Error as e:
             return make_response(e, 500)
     else:

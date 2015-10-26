@@ -6,7 +6,11 @@ $(function() {
     };
     
     $(document).ready( function addSubmitListener(){
-        $('#btnRegister').click(function() {
+        $("form").submit(function (e) {
+            e.preventDefault();
+        });
+
+        $('#signup').click(function() {
 
             var errors = 0;
 
