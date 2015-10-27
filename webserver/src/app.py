@@ -7,10 +7,12 @@ from flask import Flask, render_template, request, json, make_response
 
 from player_db import PlayerDBConnection
 from tournament_db import TournamentDBConnection
+from registration_db import RegistrationDBConnection
 
 app                     = Flask(__name__)
 player_db_conn          = PlayerDBConnection()
 tournament_db_conn      = TournamentDBConnection()
+registration_db_conn    = RegistrationDBConnection()
 
 # Page rendering
 @app.route("/")
@@ -21,24 +23,31 @@ def main():
 def showCreateTournament():
     return render_template('create-a-tournament.html')
 
-@app.route('/showRegisterForTournament')
+@app.route('/registerforatournament')
 def showRegisterForTournament():
-    return render_template('register-for-tournament.html')
+    return render_template('register-for-tournament.html', tournaments=tournament_db_conn.listTournaments())
 
 @app.route('/signup')
 def showAddPlayer():
     return render_template('create-a-player.html')
 
 # Page actions
-@app.route('/registerForTournament', methods=['POST'])
+@app.route('/registerfortournament', methods=['POST'])
 def applyForTournament():
-    _name = request.form['inputName']
-    _email = request.form['inputEmail']
+    _userName = request.form['inputUserName']
+    _tournamentName = request.form['inputTournamentName']
 
-    if _name and _email:
-        return json.dumps({'html':'<p>You submitted the following fields:</p><ul><li>Name: {_name}</li><li>Email: {_email}</li></ul>'.format(**locals())})
-    else:
-        return json.dumps({'html':'<span>Enter the required fields</span>'})
+    if not _userName or not _tournamentName:
+        return make_response("Enter the required fields", 400)
+
+    try:
+        return make_response(
+                registration_db_conn.registerForTournament(
+                    _tournamentName,
+                    _userName),
+                200)
+    except Error as e:
+        return make_response(e, 200)
 
 
 @app.route('/addTournament', methods=['POST'])
