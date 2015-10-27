@@ -72,9 +72,9 @@ Feature: Sign up
         Then I should see "Please fill in the required fields"
 
         Examples:
-            | field                     |
-            | inputUsername             |
-            | inputEmail                |
+            | field             |
+            | inputUsername     |
+            | inputEmail        |
 
     @javascript
     Scenario: I miss some passwords
