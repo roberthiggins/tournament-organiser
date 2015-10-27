@@ -60,18 +60,22 @@ def addPlayer():
     _user_name = request.form['inputUsername']
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
+    _confirmPassword = request.form['inputConfirmPassword']
 
-    if _user_name and _email and _password:
-        try:
-            if player_db_conn.usernameExists(_user_name):
-                return make_response("A user with the username %s already exists! Please choose another name" % _user_name, 400)
+    if not _user_name or not _email:
+        return make_response("Please fill in the required fields", 400)
 
-            player_db_conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
-            return make_response('<p>Account created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
-        except Error as e:
-            return make_response(e, 500)
-    else:
-        return make_response("Please enter the required fields", 400)
+    if not _password or not _confirmPassword or _password != _confirmPassword:
+        return make_response("Please enter two matching passwords", 400)
+
+    try:
+        if player_db_conn.usernameExists(_user_name):
+            return make_response("A user with the username %s already exists! Please choose another name" % _user_name, 400)
+
+        player_db_conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
+        return make_response('<p>Account created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
+    except Error as e:
+        return make_response(e, 500)
 
 
 if __name__ == "__main__":

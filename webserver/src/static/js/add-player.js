@@ -12,24 +12,8 @@ $(function() {
 
         $('#signup').click(function() {
 
-            var errors = 0;
-
             $('div.red ul').empty();
             $('div.green').empty();
-
-            if ( $.trim($('input#inputPassword').val()) == '' ) {
-                displayError("Please enter a password");
-                errors++;
-            }
-
-            if ( $('input#inputPassword').val() !== $('input#inputConfirmPassword').val() ) {
-                displayError("Your passwords don't match");
-                errors++;
-            }
-
-            if (errors > 0 ) {
-                return;
-            }
 
             $.ajax({
                 url: '/addPlayer',
