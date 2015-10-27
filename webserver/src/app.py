@@ -15,8 +15,8 @@ tournament_db_conn      = TournamentDBConnection()
 def main():
     return render_template('index.html')
 
-@app.route('/createATournament')
-def showCreateATournament():
+@app.route('/createtournament')
+def showCreateTournament():
     return render_template('create-a-tournament.html')
 
 @app.route('/showRegisterForTournament')
@@ -43,16 +43,16 @@ def applyForTournament():
 def addTournament():
     _name = request.form['inputTournamentName']
 
-    if _name:
-        try:
-            if tournament_db_conn.tournamentExists(_name):
-                return make_response("A tournament with name %s already exists! Please choose another name" % _name, 400)
-            tournament_db_conn.addTournament({'name': _name})
-            return make_response('<p>Tournament Created! You submitted the following fields:</p><ul><li>Name: {_name}</li></ul>'.format(**locals()), 200)
-        except Error as e:
-            return make_response(e, 500)
-    else:
-        return make_response("Please enter the required fields", 400)
+    if not _name:
+        return make_response("Please fill in the required fields", 400)
+
+    try:
+        if tournament_db_conn.tournamentExists(_name):
+            return make_response("A tournament with name %s already exists! Please choose another name" % _name, 400)
+        tournament_db_conn.addTournament({'name': _name})
+        return make_response('<p>Tournament Created! You submitted the following fields:</p><ul><li>Name: {_name}</li></ul>'.format(**locals()), 200)
+    except Error as e:
+        return make_response(e, 500)
 
 
 @app.route('/addPlayer', methods=['POST'])

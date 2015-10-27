@@ -6,9 +6,12 @@ $(function() {
     };
     
     $(document).ready( function addSubmitListener(){
-        $('#btnRegister').click(function() {
+        $("form").submit(function (e) {
+            e.preventDefault();
+        });
 
-            var errors = 0;
+        $('#createTournament').click(function() {
+
 
             $('div.red ul').empty();
             $('div.green').empty();
