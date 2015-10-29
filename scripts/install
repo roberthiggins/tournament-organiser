@@ -63,9 +63,4 @@ do
     esac
 done
 
-
-./scripts/smoketest
-
-./scripts/behaviourtest
-
 exit
