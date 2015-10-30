@@ -46,6 +46,15 @@ class TournamentDBConnection:
             print 'Database Error %s' % e
             return e
 
+    def listTournaments(self):
+        try:
+            cur = self.con.cursor()
+            cur.execute("SELECT * FROM tournament")
+            return cur.fetchall()
+        except psycopg2.DatabaseError as e:
+            print 'Database Error %s' % e
+            return e
+
     def __del__(self):
         if self.con:
             self.con.close()
