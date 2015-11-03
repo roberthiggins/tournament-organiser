@@ -37,7 +37,7 @@ class TournamentDBConnection:
     def addTournament(self, tournament):
         try:
             cur = self.con.cursor()
-            cur.execute("INSERT INTO tournament VALUES (default, %s) RETURNING id", [tournament['name']])
+            cur.execute("INSERT INTO tournament VALUES (default, %s, %s) RETURNING id", [tournament['name'],tournament['date'] ])
             id = cur.fetchone()
             self.con.commit()
 

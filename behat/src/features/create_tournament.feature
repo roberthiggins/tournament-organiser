@@ -16,31 +16,22 @@ Feature: Create a Tournament
         Then I should see "Name"
 
     @javascript
-    Scenario: I create a valid tournament
+    Scenario Outline: Valid and invalid values
         Given I am on "/createtournament"
-        When I fill in "inputTournamentName" with "Red Harvest"
+        When I fill in "inputTournamentName" with "<name>"
+        When I fill in "inputTournamentDate" with "<date>"
         When I press "Create"
         When I wait for the response
-        Then I should see "Tournament created"
-
-    @javascript
-    Scenario: I fill in no fields
-        Given I am on "/createtournament"
-        When I press "Create"
-        When I wait for the response
-        Then I should see "Please fill in the required fields"
-
-    @javascript
-    Scenario Outline: I miss some fields
-        Given I am on "/createtournament"
-        When I fill in "inputTournamentName" with "Red Harvest"
-        When I fill in "<field>" with ""
-        When I press "Create"
-        When I wait for the response
-        Then I should see "Please fill in the required fields"
+        Then I should see "<response>"
 
         Examples:
-            | field                     |
-            | inputTournamentName       |
-
+            | name              | date          | response                                              |
+            |                   |               | Please fill in the required fields                    |
+            | Red Harvest       |               | Please fill in the required fields                    |
+            |                   | 2095-01-01    | Please fill in the required fields                    |
+            | Red Harvest       | 2095-01-011   | Enter a valid date                                    |
+            | Red Harvest       | 2095-13-01    | Enter a valid date                                    |
+            | Red Harvest       | Red Harvest   | Enter a valid date                                    |
+            | Red Harvest       | 2095-01-01    | Tournament created                                    |
+            | Red Harvest       | 2096-01-01    | A tournament with name Red Harvest already exists     |
 
