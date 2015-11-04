@@ -21,6 +21,15 @@ if [ -z "$db_has_version" ]; then
     HAS_ERROR="true"
 fi
 
+# Draw Server from the webserver
+printf "Testing Draw Server Connection from the webserver\n"
+front_page_status=$(curl -sL -w "%{http_code}" http://$DRAWSERVER_PORT_8080_TCP_ADDR:$DRAWSERVER_PORT_8080_TCP_PORT -o /dev/null)
+if [ "$front_page_status" -ne "200" ]; then
+    echo "Smoke test failed - the front page returned code $front_page_status"
+    HAS_ERROR="true"
+fi
+
+
 # Hooray
 if [ -z "$HAS_ERROR" ]; then
     printf "\n\nSmoke test Passed\n\n"
