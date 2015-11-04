@@ -6,26 +6,14 @@ $(function() {
     };
     
     $(document).ready( function addSubmitListener(){
-        $('#btnRegister').click(function() {
+        $("form").submit(function (e) {
+            e.preventDefault();
+        });
 
-            var errors = 0;
+        $('#signup').click(function() {
 
             $('div.red ul').empty();
-            $('div.green ul').empty();
-
-            if ( $.trim($('input#inputPassword').val()) == '' ) {
-                displayError("Please enter a password");
-                errors++;
-            }
-
-            if ( $('input#inputPassword').val() !== $('input#inputConfirmPassword').val() ) {
-                displayError("Your passwords don't match");
-                errors++;
-            }
-
-            if (errors > 0 ) {
-                return;
-            }
+            $('div.green').empty();
 
             $.ajax({
                 url: '/addPlayer',

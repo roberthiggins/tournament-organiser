@@ -3,4 +3,4 @@ pushd smoketester
 sudo docker build -t smoketester .
 popd
 
-sudo docker run -t --rm --link webserver --link player_db smoketester
+sudo docker run -it --rm --link=webserver --link=db smoketester

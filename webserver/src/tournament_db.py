@@ -1,9 +1,9 @@
-# This file contains code to connect to the player_db
+# This file contains code to connect to the tournament_db
 
 import os
 import psycopg2
 
-class PlayerDBConnection:
+class TournamentDBConnection:
     def __init__(self):
 
         self.con = None
@@ -24,26 +24,34 @@ class PlayerDBConnection:
         except Exception as e:
             print 'Error %s' % e
 
-    def usernameExists(self, username):
+    def tournamentExists(self, name):
         try:
             cur = self.con.cursor()
-            cur.execute("SELECT COUNT(*) FROM player WHERE username = %s", [username])
+            cur.execute("SELECT COUNT(*) FROM tournament WHERE name = %s", [name])
             existing = cur.fetchone()
             return existing[0] > 0
         except psycopg2.DatabaseError as e:
             self.con.rollback()
             raise e
 
-    def addAccount(self, account):
+    def addTournament(self, tournament):
         try:
             cur = self.con.cursor()
-            cur.execute("INSERT INTO account VALUES (default, %s) RETURNING id", [account['email']])
+            cur.execute("INSERT INTO tournament VALUES (default, %s, %s) RETURNING id", [tournament['name'],tournament['date'] ])
             id = cur.fetchone()
-            cur.execute("INSERT INTO player VALUES (%s, %s)", [id, account['user_name']])
             self.con.commit()
 
         except psycopg2.DatabaseError as e:
             self.con.rollback()
+            print 'Database Error %s' % e
+            return e
+
+    def listTournaments(self):
+        try:
+            cur = self.con.cursor()
+            cur.execute("SELECT * FROM tournament")
+            return cur.fetchall()
+        except psycopg2.DatabaseError as e:
             print 'Database Error %s' % e
             return e
 

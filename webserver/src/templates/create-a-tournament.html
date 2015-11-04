@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+    <head>
+        <title>Tournament Organiser Add a Tournament</title>
+    </head>
+
+    <body>
+        <div class="red" style="background: red; display:none"><ul></ul></div>
+        <div class="green" style="background: green; display:none"><ul></ul></div>
+        <p>You can add a tournament here:</p>
+        <form class="form-add-player">
+            <label for="inputTournamentName" class="sr-only">Tournament Name</label>
+            <input  type="username"
+                    name="inputTournamentName"
+                    id="inputTournamentName"
+                    class="form-control"
+                    placeholder="Name"
+                    required
+                    autofocus>
+            <label for="inputTournamentDate" class="sr-only">Tournament Date</label>
+            <input  type="username"
+                    name="inputTournamentDate"
+                    id="inputTournamentDate"
+                    class="form-control"
+                    placeholder="Date"
+                    required>
+            <input id="createTournament" class="btn btn-lg btn-primary btn-block" type="submit" value="Create">
+        </form>
+
+    </body>
+
+    <script type="text/javascript"
+            src="../static/js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript"
+            src="../static/js/create-tournament.js"></script>
+
+</html>
