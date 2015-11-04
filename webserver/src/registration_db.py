@@ -3,31 +3,16 @@
 import os
 import psycopg2
 
+from db_connection import DBConnection
 from player_db import PlayerDBConnection
 from tournament_db import TournamentDBConnection
 
 class RegistrationDBConnection:
     def __init__(self):
-
         self.player_db_conn     = PlayerDBConnection()
         self.tournament_db_conn = TournamentDBConnection()
-        self.con = None
-        self.config  = {
-            'db_host': os.environ['DB_PORT_5432_TCP_ADDR'],
-            'db_port': os.environ['DB_PORT_5432_TCP_PORT'],
-            'db_pass': os.environ['DB_PASSWORD']
-        }
-        try:
-             self.con = psycopg2.connect(
-                            database='docker',
-                            user='docker',
-                            host=self.config['db_host'],
-                            port=self.config['db_port'],
-                            password=self.config['db_pass'])
-        except psycopg2.Error as e:
-            print 'psycopg Error %s' % e     
-        except Exception as e:
-            print 'Error %s' % e
+        self.db_conn            = DBConnection()
+        self.con                = self.db_conn.con
 
     def registerForTournament(self, tournamentId, playerId):
         if not self.tournament_db_conn.tournamentExists(tournamentId) \
@@ -66,7 +51,3 @@ class RegistrationDBConnection:
         except psycopg2.DatabaseError as e:
             self.con.rollback()
             raise e
-
-    def __del__(self):
-        if self.con:
-            self.con.close()
