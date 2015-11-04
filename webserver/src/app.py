@@ -5,11 +5,13 @@ import yaml
 
 from flask import Flask, render_template, request, json, make_response
 
+from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
 from tournament_db import TournamentDBConnection
 from registration_db import RegistrationDBConnection
 
 app                     = Flask(__name__)
+feedback_db_conn        = FeedbackDBConnection()
 player_db_conn          = PlayerDBConnection()
 tournament_db_conn      = TournamentDBConnection()
 registration_db_conn    = RegistrationDBConnection()
@@ -110,7 +112,11 @@ def placeFeedback():
     _feedback = request.form['inputFeedback'].strip('\s\n\r\t\+')
     if re.match( r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
-    return make_response("Thanks for you help improving the site", 200)
+    try:
+        feedback_db_conn.submitFeedback(_feedback)
+        return make_response("Thanks for you help improving the site", 200)
+    except Error as e:
+        return make_response(e, 200)
 
 
 if __name__ == "__main__":

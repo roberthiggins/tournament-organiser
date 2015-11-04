@@ -1,4 +1,7 @@
 alias psql-db='PGPASSWORD=$DB_PASSWORD psql -h $DB_PORT_5432_TCP_ADDR -p $DB_PORT_5432_TCP_PORT -d docker -U docker'
+alias eit='exit'
+alias feedback='psql-db -c "select * from feedback;"'
 alias players='psql-db -c "select * from player;"'
 alias accounts='psql-db -c "select * from account;"'
+alias registrations='psql-db -c "select * from registration;"'
 alias tournaments='psql-db -c "select * from tournament;"'
