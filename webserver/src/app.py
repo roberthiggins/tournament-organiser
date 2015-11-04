@@ -23,6 +23,10 @@ def main():
 def showCreateTournament():
     return render_template('create-a-tournament.html')
 
+@app.route('/feedback')
+def showPlaceFeedback():
+    return render_template('feedback.html', title='Place Feedback', intro='Please give us feedback on your experience on the site')
+
 @app.route('/registerforatournament')
 def showRegisterForTournament():
     return render_template('register-for-tournament.html', tournaments=tournament_db_conn.listTournaments())
@@ -30,6 +34,10 @@ def showRegisterForTournament():
 @app.route('/signup')
 def showAddPlayer():
     return render_template('create-a-player.html')
+
+@app.route('/suggestimprovement')
+def showSuggestImprovement():
+    return render_template('feedback.html', title='Suggest Improvement', intro='Suggest a feature you would like to see on the site')
 
 # Page actions
 @app.route('/registerfortournament', methods=['POST'])
@@ -96,6 +104,13 @@ def addPlayer():
         return make_response('<p>Account created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
     except Error as e:
         return make_response(e, 500)
+
+@app.route('/placefeedback', methods=['POST'])
+def placeFeedback():
+    _feedback = request.form['inputFeedback'].strip('\s\n\r\t\+')
+    if re.match( r'^[\+\s]*$', _feedback) is not None:
+        return make_response("Please fill in the required fields", 400)
+    return make_response("Thanks for you help improving the site", 200)
 
 
 if __name__ == "__main__":
