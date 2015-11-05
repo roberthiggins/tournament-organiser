@@ -34,6 +34,14 @@ do
             sudo docker build -t db_image .
             popd
         ;;
+        drawserver)
+            pushd drawserver
+            pushd drawbuilder
+            mvn clean package
+            popd
+            sudo docker build -t drawserver_image .
+            popd
+        ;;
         webserver)
             pushd webserver
             sudo docker build -t webserver_image .
@@ -55,7 +63,7 @@ do
             sleep 5
         ;;
         drawserver)
-            sudo docker run --name=drawserver -d -p 8888:8080 --link=db tomcat:8.0
+            sudo docker run --name=drawserver -d -p 8888:8080 --link=db drawserver_image
         ;;
         webserver)
             sudo docker run --name=webserver -d -p 5000:5000 --link=db --link=drawserver webserver_image
