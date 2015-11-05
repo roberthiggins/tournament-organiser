@@ -3,7 +3,7 @@ import os
 import re
 import yaml
 
-from flask import Flask, render_template, request, json, make_response
+from flask import Flask, render_template, request, json, make_response, jsonify
 
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
@@ -16,32 +16,15 @@ player_db_conn          = PlayerDBConnection()
 tournament_db_conn      = TournamentDBConnection()
 registration_db_conn    = RegistrationDBConnection()
 
-# Page rendering
 @app.route("/")
 def main():
-    return render_template('index.html')
-
-@app.route('/createtournament')
-def showCreateTournament():
-    return render_template('create-a-tournament.html')
-
-@app.route('/feedback')
-def showPlaceFeedback():
-    return render_template('feedback.html', title='Place Feedback', intro='Please give us feedback on your experience on the site')
-
-@app.route('/registerforatournament')
-def showRegisterForTournament():
-    return render_template('register-for-tournament.html', tournaments=tournament_db_conn.listTournaments())
-
-@app.route('/signup')
-def showAddPlayer():
-    return render_template('create-a-player.html')
-
-@app.route('/suggestimprovement')
-def showSuggestImprovement():
-    return render_template('feedback.html', title='Suggest Improvement', intro='Suggest a feature you would like to see on the site')
+    return make_response('daoserver', 200)
 
 # Page actions
+@app.route('/listtournaments', methods=['GET'])
+def listTournaments():
+    return jsonify({'tournaments' : tournament_db_conn.listTournaments()})
+
 @app.route('/registerfortournament', methods=['POST'])
 def applyForTournament():
     _userName = request.form['inputUserName']

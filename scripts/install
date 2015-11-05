@@ -74,7 +74,7 @@ do
             sudo docker run --name=daoserver -d -p 5001:5000 --link=db --link=drawserver daoserver_image
         ;;
         webserver)
-            sudo docker run --name=webserver -d -p 5000:5000 --link=db --link=drawserver webserver_image
+            sudo docker run --name=webserver -d -p 5000:5000 --link=db --link=drawserver --link=daoserver webserver_image
         ;;
         *)
         # unknown option

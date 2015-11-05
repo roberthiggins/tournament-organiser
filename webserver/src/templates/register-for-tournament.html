@@ -14,7 +14,7 @@
             <select name="inputTournamentName" id="inputTournamentName">
                 <option value="">-- Select a Tournament --</option>
                 {% for n in tournaments %}
-                    <option value="{{ n[1] }}">{{ n[1] }}</option>
+                    <option value="{{ n }}">{{ n }}</option>
                 {% endfor %}
             </select>
             <label for="inputUserName" class="sr-only">Your Username</label>
