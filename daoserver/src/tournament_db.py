@@ -36,8 +36,8 @@ class TournamentDBConnection:
     def listTournaments(self):
         try:
             cur = self.con.cursor()
-            cur.execute("SELECT * FROM tournament")
-            return cur.fetchall()
+            cur.execute("SELECT name FROM tournament")
+            return [ x[0] for x in cur.fetchall() ]
         except psycopg2.DatabaseError as e:
             print 'Database Error %s' % e
             return e
