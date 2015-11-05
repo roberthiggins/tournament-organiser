@@ -1,15 +1,15 @@
 h1. Developing the Website
 
-h2. Docker
-You will need docker to run the webserver as it is in a docker container. Note
-that the initial install and setup of the docker image will require a lot of
-shit to get downloaded. Be prepared to wait and don't try this at uni behind
-some bullshit proxy.
+h2. Initial packages you'll need
+* sudo apt-get install -y git maven docker-engine openjdk-7-jdk
 
-* Install docker. You can do this in Windows - good luck to you sir!
+h3. Bandwidth
+The initial build will require a lot of guff to be downloaded (~2GB maybe).
+
+h2. Setup
 * Get the config file. This might include passwords so is not included in git
-(as that would go to github). You should get this from Higgins.
-* docker-compose up -d
+(as that would go to github). You should get this from Higgins/an adult
+* ./scripts/install
 * You are done. To do it manually see below.
 
 h3. Manual Installation
@@ -62,3 +62,22 @@ webserver and run the command:
 # ('$DB_PORT_5432_TCP_ADDR', etc.). You will be asked the docker user
 # password to connect. You can find it in the Dockerfile of the player_database
 # directory.
+
+h2. Handy Commands
+
+h3. From your machine
+$ sudo docker exec -it webserver bash # Attach to a running box (webserver in this case)
+
+h3. From inside a container
+$ env # See the environment variables. This includes IPs, ports, passwords for linked containers.
+
+h2. How Java App is Built
+
+The install script builds the war.
+cd drawserver/drawbuilder
+mvn clean package
+# this creates a file at drawserver/drawbuilder/target/drawbuilder.war
+
+The Dockerfile takes the tomcat:8.0 image and adds another layer. This layer includes the newly minted war file in it's tomcat webapps dir (/usr/local/tomcat/webapps/drawbuilder.war)
+
+When you run the container from this new image, tomcat picks up that a war is in it dir and serves it for you. Thus you can visit it at <url>:<port>/drawbuilder
