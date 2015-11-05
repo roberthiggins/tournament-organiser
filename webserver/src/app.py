@@ -1,7 +1,6 @@
 import datetime
 import os
 import re
-import yaml
 import urllib2
 import urllib
 

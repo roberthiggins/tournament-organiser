@@ -1,7 +1,6 @@
 import datetime
 import os
 import re
-import yaml
 
 from flask import Flask, render_template, request, json, make_response, jsonify
 
