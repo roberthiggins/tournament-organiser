@@ -4,3 +4,5 @@ sudo docker build -t smoketester .
 popd
 
 sudo docker run -it --rm --link=webserver --link=daoserver --link=db --link=drawserver smoketester
+
+exit $?

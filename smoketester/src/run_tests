@@ -41,4 +41,8 @@ fi
 # Hooray
 if [ -z "$HAS_ERROR" ]; then
     printf "\n\nSmoke test Passed\n\n"
+    exit 0
 fi
+
+printf "\n\nSmoke test Failed!\n\n"
+exit 1
