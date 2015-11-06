@@ -2,6 +2,7 @@
 
 import os
 import psycopg2
+from passlib.hash import sha256_crypt
 
 from db_connection import DBConnection
 
@@ -25,6 +26,8 @@ class PlayerDBConnection:
             cur = self.con.cursor()
             cur.execute("INSERT INTO account VALUES (default, %s) RETURNING id", [account['email']])
             id = cur.fetchone()
+            cur.execute("INSERT INTO account_security VALUES (%s, %s)",
+                        [id, sha256_crypt.encrypt(account['password']) ] )
             cur.execute("INSERT INTO player VALUES (%s, %s)", [id, account['user_name']])
             self.con.commit()
 
