@@ -66,16 +66,27 @@ def addTournament():
     except Error as e:
         return make_response(e, 500)
 
+def validateEmail( email ):
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+    try:
+        validate_email( email )
+        return True
+    except ValidationError:
+        return False
 
 @app.route('/addPlayer', methods=['POST'])
 def addPlayer():
-    _user_name = request.form['inputUsername']
-    _email = request.form['inputEmail']
-    _password = request.form['inputPassword']
-    _confirmPassword = request.form['inputConfirmPassword']
+    _user_name = request.form['inputUsername'].strip()
+    _email = request.form['inputEmail'].strip()
+    _password = request.form['inputPassword'].strip()
+    _confirmPassword = request.form['inputConfirmPassword'].strip()
 
-    if not _user_name or not _email:
+    if not _user_name:
         return make_response("Please fill in the required fields", 400)
+
+    if not validateEmail(_email):
+        return make_response("This email does not appear valid", 400)
 
     if not _password or not _confirmPassword or _password != _confirmPassword:
         return make_response("Please enter two matching passwords", 400)
