@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>Tournament Organiser Login</title>
+    </head>
+
+    <body>
+        <div class="red" style="background: red; display:none"><ul></ul></div>
+        <div class="green" style="background: green; display:none"><ul></ul></div>
+        <p>You can add/change your details here:</p>
+        <form class="form-add-player">
+            <label for="inputUsername" class="sr-only">Username</label>
+            <input  type="username"
+                    name="inputUsername"
+                    id="inputUsername"
+                    class="form-control"
+                    placeholder="User Name"
+                    autofocus>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input  type="text"
+                    name="inputPassword"
+                    id="inputPassword"
+                    class="form-control"
+                    placeholder="Enter a password"
+                    autofocus>
+
+            <input id="login" class="btn btn-lg btn-primary btn-block submit" value="Login" type="submit">
+            <a href="/resetpassword">Forgot Password</a>
+        </form>
+
+    </body>
+
+    <script type="text/javascript"
+            src="../static/js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript"
+            src="../static/js/login.js"></script>
+</html>

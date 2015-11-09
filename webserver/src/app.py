@@ -27,6 +27,10 @@ def showPlaceFeedback():
         title='Place Feedback',
         intro='Please give us feedback on your experience on the site')
 
+@app.route('/login')
+def showLogin():
+    return render_template('login.html')
+
 @app.route('/registerforatournament')
 def showRegisterForTournament():
     tList = json.load(getFromDao('/listtournaments'))['tournaments']
@@ -71,6 +75,10 @@ def addTournament():
 @app.route('/addPlayer', methods=['POST'])
 def addPlayer():
     return postToDao('/addPlayer')
+
+@app.route('/loginAccount', methods=['POST'])
+def loginAccount():
+    return postToDao('/login')
 
 @app.route('/placefeedback', methods=['POST'])
 def placeFeedback():
