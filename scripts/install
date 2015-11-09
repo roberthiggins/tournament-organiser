@@ -22,7 +22,7 @@ fi
 for ENV in $ENVS
 do
     sudo docker kill $ENV
-    sudo docker rm $ENV
+    sudo docker rm -v $ENV
 done
 
 # Build replacements
