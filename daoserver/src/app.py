@@ -100,6 +100,20 @@ def addPlayer():
     except Error as e:
         return make_response(e, 500)
 
+@app.route('/login', methods=['POST'])
+def login():
+    _user_name = request.form['inputUsername'].strip()
+    _password = request.form['inputPassword'].strip()
+
+    try:
+        return make_response(player_db_conn.login(_user_name, _password), 200)
+    except RuntimeError as e:
+        return make_response(str(e), 400)
+    except Exception as e:
+        print e
+        return make_response(str(e), 500)
+
+
 @app.route('/placefeedback', methods=['POST'])
 def placeFeedback():
     _feedback = request.form['inputFeedback'].strip('\s\n\r\t\+')

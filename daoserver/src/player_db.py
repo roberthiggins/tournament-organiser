@@ -35,4 +35,27 @@ class PlayerDBConnection:
             self.con.rollback()
             print 'Database Error %s' % e
             return e
+        except Exception as e:
+            print "Exception in addAccount: " + e
+
+    def login(self, username, password):
+        if not username or not password:
+            raise RuntimeError("Enter username and password")
+        try:
+            cur = self.con.cursor()
+            cur.execute("SELECT s.password FROM account_security s INNER JOIN player p ON s.id = p.id WHERE p.username = %s",
+                        [username] )
+            creds = cur.fetchone()
+            if not creds or not sha256_crypt.verify(password, creds[0]):
+                raise RuntimeError("Username or password incorrect")
+            return "Login successful"
+        except psycopg2.DatabaseError as e:
+            self.con.rollback()
+            print 'Database Error %s' % e
+            raise e
+        except RuntimeError:
+            raise
+        except Exception as e:
+            print e
+            raise
 
