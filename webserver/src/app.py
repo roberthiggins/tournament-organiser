@@ -56,7 +56,7 @@ def postToDao(url):
         return make_response(r.read(), 200)
     except urllib2.HTTPError, err:
         if err.code == 400:
-            return make_response(err.read())
+            return make_response(err.read(), 400)
         else:
             raise
 
