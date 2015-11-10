@@ -1,133 +1,176 @@
-import datetime
+"""
+Entrypoint for the DAO
+
+This is the public API for the Tournament Organiser. The website, and apps
+should talk to this for functionality wherever possible.
+"""
+
 import os
 import re
 
-from flask import Flask, render_template, request, json, make_response, jsonify
+from flask import Flask, request, make_response
 
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
 from tournament_db import TournamentDBConnection
 from registration_db import RegistrationDBConnection
 
-app                     = Flask(__name__)
-feedback_db_conn        = FeedbackDBConnection()
-player_db_conn          = PlayerDBConnection()
-tournament_db_conn      = TournamentDBConnection()
-registration_db_conn    = RegistrationDBConnection()
+APP = Flask(__name__)
+FEEDBACK_DB_CONN = FeedbackDBConnection()
+PLAYER_DB_CONN = PlayerDBConnection()
+TOURNAMENT_DB_CONN = TournamentDBConnection()
+REGISTRATION_DB_CONN = RegistrationDBConnection()
 
-@app.route("/")
+@APP.route("/")
 def main():
+    """Index page. Used to verify the server is running."""
     return make_response('daoserver', 200)
 
 # Page actions
-@app.route('/listtournaments', methods=['GET'])
-def listTournaments():
-    return jsonify({'tournaments' : tournament_db_conn.listTournaments()})
+@APP.route('/listtournaments', methods=['GET'])
+def list_tournaments():
+    """
+    GET a list of tournaments
+    Returns json. The only key is 'tournaments' and the value is a list of
+    tournament names
+    """
+    from flask import jsonify
+    return jsonify({'tournaments' : TOURNAMENT_DB_CONN.listTournaments()})
 
-@app.route('/registerfortournament', methods=['POST'])
-def applyForTournament():
-    _userName = request.form['inputUserName']
-    _tournamentName = request.form['inputTournamentName']
+@APP.route('/registerfortournament', methods=['POST'])
+def apply_for_tournament():
+    """
+    POST to apply for entry to a tournament.
+    Expects:
+        - inputUserName - Username of player applying
+        - inputTournamentName - Tournament as returned by GET /listtournaments
+    """
+    username = request.form['inputUserName']
+    tournament_name = request.form['inputTournamentName']
 
-    if not _userName or not _tournamentName:
+    if not username or not tournament_name:
         return make_response("Enter the required fields", 400)
 
-    try:
-        return make_response(
-                registration_db_conn.registerForTournament(
-                    _tournamentName,
-                    _userName),
-                200)
-    except Error as e:
-        return make_response(e, 200)
+    return make_response(
+            REGISTRATION_DB_CONN.registerForTournament(
+                tournament_name,
+                username),
+            200)
 
+@APP.route('/addTournament', methods=['POST'])
+def add_tournament():
+    """
+    POST to add a tournament
+    Expects:
+        - inputTournamentName - Tournament name. Must be unique.
+        - inputTournamentDate - Tournament Date. YYYY-MM-DD
+    """
+    import datetime
+    name = request.form['inputTournamentName']
+    date = request.form['inputTournamentDate']
 
-@app.route('/addTournament', methods=['POST'])
-def addTournament():
-    _name = request.form['inputTournamentName']
-    _date = request.form['inputTournamentDate']
-
-    if not _name or not _date:
+    if not name or not date:
         return make_response("Please fill in the required fields", 400)
 
     try:
-        _date = datetime.datetime.strptime(
+        date = datetime.datetime.strptime(
                     request.form['inputTournamentDate'],
                     "%Y-%m-%d")
-        assert _date.date() >= datetime.date.today()
-    except Exception as e:
+        assert date.date() >= datetime.date.today()
+    except ValueError:
         return make_response("Enter a valid date", 400)
 
-    try:
-        if tournament_db_conn.tournamentExists(_name):
-            return make_response("A tournament with name %s already exists! Please choose another name" % _name, 400)
-        tournament_db_conn.addTournament({'name' : _name, 'date' : _date})
-        return make_response('<p>Tournament Created! You submitted the following fields:</p><ul><li>Name: {_name}</li><li>Date: {_date}</li></ul>'.format(**locals()), 200)
-    except Error as e:
-        return make_response(e, 500)
+    if TOURNAMENT_DB_CONN.tournamentExists(name):
+        return make_response("A tournament with name %s already exists! \
+        Please choose another name" % name, 400)
+    TOURNAMENT_DB_CONN.addTournament({'name' : name, 'date' : date})
+    return make_response('<p>Tournament Created! You submitted the \
+        following fields:</p><ul><li>Name: {name}</li><li>Date: {date} \
+        </li></ul>'.format(**locals()), 200)
 
-def validateEmail( email ):
-    from django.core.validators import validate_email
+def validate_user_email(email):
+    """
+    Validates email based on django validator
+    """
     from django.core.exceptions import ValidationError
+    from django.core.validators import validate_email
     try:
-        validate_email( email )
+        validate_email(email)
         return True
     except ValidationError:
         return False
 
-@app.route('/addPlayer', methods=['POST'])
-def addPlayer():
-    _user_name = request.form['inputUsername'].strip()
-    _email = request.form['inputEmail'].strip()
-    _password = request.form['inputPassword'].strip()
-    _confirmPassword = request.form['inputConfirmPassword'].strip()
+@APP.route('/addPlayer', methods=['POST'])
+def add_account():
+    """
+    POST to add an account
+    Expects:
+        - inputUsername
+        - inputEmail
+        - inputPassword
+        - inputConfirmPassword
+    """
+    username = request.form['inputUsername'].strip()
+    email = request.form['inputEmail'].strip()
+    password = request.form['inputPassword'].strip()
+    confirm = request.form['inputConfirmPassword'].strip()
 
-    if not _user_name:
+    if not username:
         return make_response("Please fill in the required fields", 400)
 
-    if not validateEmail(_email):
+    if not validate_user_email(email):
         return make_response("This email does not appear valid", 400)
 
-    if not _password or not _confirmPassword or _password != _confirmPassword:
+    if not password or not confirm or password != confirm:
         return make_response("Please enter two matching passwords", 400)
 
-    try:
-        if player_db_conn.usernameExists(_user_name):
-            return make_response("A user with the username %s already exists! Please choose another name" % _user_name, 400)
+    if PLAYER_DB_CONN.usernameExists(username):
+        return make_response("A user with the username %s already exists! \
+            Please choose another name" % username, 400)
 
-        player_db_conn.addAccount({'user_name': _user_name, 'email' : _email, 'password': _password})
-        return make_response('<p>Account created! You submitted the following fields:</p><ul><li>User Name: {_user_name}</li><li>Email: {_email}</li></ul>'.format(**locals()), 200)
-    except Error as e:
-        return make_response(e, 500)
+    PLAYER_DB_CONN.addAccount({'user_name': username,
+                               'email' : email,
+                               'password': password})
+    return make_response('<p>Account created! You submitted the following \
+        fields:</p><ul><li>User Name: {username}</li><li>Email: {email}\
+        </li></ul>'.format(**locals()), 200)
 
-@app.route('/login', methods=['POST'])
+@APP.route('/login', methods=['POST'])
 def login():
-    _user_name = request.form['inputUsername'].strip()
-    _password = request.form['inputPassword'].strip()
+    """
+    POST to login
+    Expects:
+        - inputUsername
+        - inputPassword
+    """
+    username = request.form['inputUsername'].strip()
+    password = request.form['inputPassword'].strip()
 
     try:
-        return make_response(player_db_conn.login(_user_name, _password), 200)
-    except RuntimeError as e:
-        return make_response(str(e), 400)
-    except Exception as e:
-        print e
-        return make_response(str(e), 500)
+        return make_response(PLAYER_DB_CONN.login(username, password), 200)
+    except RuntimeError as err:
+        return make_response(str(err), 400)
+    except Exception as err:
+        print err
+        return make_response(str(err), 500)
 
 
-@app.route('/placefeedback', methods=['POST'])
-def placeFeedback():
-    _feedback = request.form['inputFeedback'].strip('\s\n\r\t\+')
-    if re.match( r'^[\+\s]*$', _feedback) is not None:
+@APP.route('/placefeedback', methods=['POST'])
+def place_feedback():
+    """
+    POST to add feedback or submit suggestion.
+    Expects:
+        - inputFeedback - A string
+    """
+    _feedback = request.form['inputFeedback'].strip('\n\r\t+')
+    if re.match(r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
-    try:
-        feedback_db_conn.submitFeedback(_feedback)
-        return make_response("Thanks for you help improving the site", 200)
-    except Error as e:
-        return make_response(e, 200)
+    FEEDBACK_DB_CONN.submitFeedback(_feedback)
+    return make_response("Thanks for you help improving the site", 200)
 
 
 if __name__ == "__main__":
     # Bind to PORT if defined, otherwise default to 5000.
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    PORT = int(os.environ.get('PORT', 5000))
+    APP.run(host='0.0.0.0', port=PORT)
 
