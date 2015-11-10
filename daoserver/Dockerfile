@@ -37,4 +37,4 @@ ADD src/bash_aliases /root/.bash_aliases
 ADD src/ webapp/
 
 # Run the app by default
-CMD python -u webapp/app.py
+CMD python -u webapp/dao.py
