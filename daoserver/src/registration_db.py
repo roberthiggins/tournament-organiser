@@ -16,23 +16,24 @@ class RegistrationDBConnection:
 
     def registerForTournament(self, tournamentId, playerId):
         if not self.tournament_db_conn.tournamentExists(tournamentId) \
-        or not self.player_db_conn.usernameExists(playerId):
-            return "Check username and tournament"
+        or not self.player_db_conn.username_exists(playerId):
+            raise RuntimeError("Check username and tournament")
 
         clash = self.clashesWithAnotherRegistration(tournamentId, playerId)
         if clash is not None and clash[0] == tournamentId:
-            return "You've already applied to %s" % tournamentId
+            raise RuntimeError("You've already applied to %s" % tournamentId)
         elif clash is not None:
-            return "%s clashes with %s that you are registered for already" % (tournamentId, clash[0])
+            raise RuntimeError("%s clashes with %s that you are registered \
+                for already" % (tournamentId, clash[0]))
 
         try:
             cur = self.con.cursor()
-            cur.execute("INSERT INTO registration VALUES(%s, %s)", [playerId, tournamentId])
+            cur.execute("INSERT INTO registration VALUES(%s, %s)",
+                        [playerId, tournamentId])
             self.con.commit()
         except psycopg2.DatabaseError as e:
             self.con.rollback()
             raise e
-
 
         return "Application Submitted"
 

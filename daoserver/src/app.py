@@ -51,11 +51,14 @@ def apply_for_tournament():
     if not username or not tournament_name:
         return make_response("Enter the required fields", 400)
 
-    return make_response(
+    try:
+        return make_response(
             REGISTRATION_DB_CONN.registerForTournament(
                 tournament_name,
                 username),
             200)
+    except RuntimeError as err:
+        return make_response(str(err), 400)
 
 @APP.route('/addTournament', methods=['POST'])
 def add_tournament():
@@ -124,11 +127,11 @@ def add_account():
     if not password or not confirm or password != confirm:
         return make_response("Please enter two matching passwords", 400)
 
-    if PLAYER_DB_CONN.usernameExists(username):
+    if PLAYER_DB_CONN.username_exists(username):
         return make_response("A user with the username %s already exists! \
             Please choose another name" % username, 400)
 
-    PLAYER_DB_CONN.addAccount({'user_name': username,
+    PLAYER_DB_CONN.add_account({'user_name': username,
                                'email' : email,
                                'password': password})
     return make_response('<p>Account created! You submitted the following \
