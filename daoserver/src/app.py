@@ -168,7 +168,7 @@ def place_feedback():
     _feedback = request.form['inputFeedback'].strip('\n\r\t+')
     if re.match(r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
-    FEEDBACK_DB_CONN.submitFeedback(_feedback)
+    FEEDBACK_DB_CONN.submit_feedback(_feedback)
     return make_response("Thanks for you help improving the site", 200)
 
 
