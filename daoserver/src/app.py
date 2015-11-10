@@ -35,7 +35,7 @@ def list_tournaments():
     tournament names
     """
     from flask import jsonify
-    return jsonify({'tournaments' : TOURNAMENT_DB_CONN.listTournaments()})
+    return jsonify({'tournaments' : TOURNAMENT_DB_CONN.list_tournaments()})
 
 @APP.route('/registerfortournament', methods=['POST'])
 def apply_for_tournament():
@@ -83,10 +83,10 @@ def add_tournament():
     except ValueError:
         return make_response("Enter a valid date", 400)
 
-    if TOURNAMENT_DB_CONN.tournamentExists(name):
+    if TOURNAMENT_DB_CONN.tournament_exists(name):
         return make_response("A tournament with name %s already exists! \
         Please choose another name" % name, 400)
-    TOURNAMENT_DB_CONN.addTournament({'name' : name, 'date' : date})
+    TOURNAMENT_DB_CONN.add_tournament({'name' : name, 'date' : date})
     return make_response('<p>Tournament Created! You submitted the \
         following fields:</p><ul><li>Name: {name}</li><li>Date: {date} \
         </li></ul>'.format(**locals()), 200)

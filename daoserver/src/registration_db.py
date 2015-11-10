@@ -15,7 +15,7 @@ class RegistrationDBConnection:
         self.con                = self.db_conn.con
 
     def registerForTournament(self, tournamentId, playerId):
-        if not self.tournament_db_conn.tournamentExists(tournamentId) \
+        if not self.tournament_db_conn.tournament_exists(tournamentId) \
         or not self.player_db_conn.username_exists(playerId):
             raise RuntimeError("Check username and tournament")
 
