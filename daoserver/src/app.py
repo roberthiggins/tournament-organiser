@@ -53,7 +53,7 @@ def apply_for_tournament():
 
     try:
         return make_response(
-            REGISTRATION_DB_CONN.registerForTournament(
+            REGISTRATION_DB_CONN.register_for_tournament(
                 tournament_name,
                 username),
             200)
