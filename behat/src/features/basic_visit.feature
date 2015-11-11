@@ -7,3 +7,6 @@ Feature: Front page of the website
     Given I am on "/"
     Then I should see "Basic behaviour"
 
+  Scenario: Hit the API
+    When I GET "/" from the API
+    Then the response status code should be 200
