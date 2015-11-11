@@ -176,4 +176,51 @@ class RestContext extends BehatContext
             ->request('GET', $this->_requestUrl.'?'.http_build_query((array)$this->_restObject));
         $this->_response = $response;
     }
+    /**
+     * @When /^I POST "([^"]*)" to "([^"]*)" from the API$/
+     */
+    public function iPostToApi($value,$pageUrl)
+    {
+        $baseUrl = $this->getParameter('api_url');
+        $this->_requestUrl = $baseUrl.$pageUrl;
+        try {
+            $response = $this->_client->request(
+                            'POST',
+                            $this->_requestUrl.'?'.$value);
+        }
+        catch (GuzzleHttp\Exception\ClientException $e) {
+            $this->_response = $e->getResponse();
+        }
+    }
+    /**
+     * @Then /^the API response should contain "([^"]*)"$/
+     */
+    public function theRequestShouldContain($value){
+        $data = $this->_response->getBody(true);
+        if (!empty($data)) {
+            if (strpos($data,$value) === false) {
+                throw new Exception("Response doesn't include " .
+                    $value . "\n".$this->_response->getBody(true));
+            }
+        } else {
+            throw new Exception("Response empty\n" .
+                $this->_response->getBody(true));
+        }
+    }
+
+    /**
+     * @Then /^the API response status code should be (?P<code>\d+)$/
+     */
+    public function theApiResponseStatusCodeShouldBe($value){
+        $data = $this->_response->getStatusCode();
+        if (!empty($data)) {
+            if (intval($data) !== intval($value)) {
+                throw new Exception("Response status code wasn't " .
+                    $value . "\n" . $data);
+            }
+        } else {
+            throw new Exception("No Response\n" .
+                $this->_response);
+        }
+    }
 }

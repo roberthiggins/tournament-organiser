@@ -65,6 +65,7 @@ do
     case $ENV in
         db)
             sudo docker run -d -P --name db db_image
+            sleep 10    # wait for db to finish startup
         ;;
         drawserver)
             sudo docker run --name=drawserver -d -p 8888:8080 --link=db drawserver_image

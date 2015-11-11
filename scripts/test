@@ -1,5 +1,4 @@
 ./scripts/install $@
-sleep 5
 
 ./scripts/smoketest
 if [ $? -ne 0 ]

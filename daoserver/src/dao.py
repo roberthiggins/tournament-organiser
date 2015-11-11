@@ -138,6 +138,53 @@ def add_account():
         fields:</p><ul><li>User Name: {username}</li><li>Email: {email}\
         </li></ul>'.format(**locals()), 200)
 
+@APP.route('/entergamescore', methods=['POST'])
+def enter_game_score():
+    """
+    POST to enter the scores for a single game.
+
+    Expects:
+        - json blob. It should include:
+            {
+            'scores': { 'username':{}, 'username': {} },
+            'tournament_name': 'some_tournament_id',
+            'round': '1'
+            }
+    """
+    raise NotImplementedError('enter_game_score not implemented')
+
+
+@APP.route('/entertournamentscore', methods=['POST'])
+def enter_tournament_score():
+    """
+    POST to enter a one-time score for a player in a tournament. An example
+    might be a painting score.
+
+    Expects:
+        - username
+        - tournament - the tournament name
+        - key - the category e.g. painting
+        - value - the score
+    """
+
+    user = request.args.get('username')
+    tournament = request.args.get('tournament')
+    category = request.args.get('key')
+    score = request.args.get('value')
+
+    if not user or not tournament or not category or not score:
+        return make_response('Enter the required fields', 400)
+
+    if not PLAYER_DB_CONN.username_exists(user):
+        return make_response('Unknown user: ' + user, 400)
+
+    try:
+        return make_response(
+            TOURNAMENT_DB_CONN.enter_score(tournament, user, category, score),
+            200)
+    except RuntimeError as err:
+        return make_response(str(err), 400)
+
 @APP.route('/login', methods=['POST'])
 def login():
     """
