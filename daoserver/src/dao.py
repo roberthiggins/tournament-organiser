@@ -8,7 +8,7 @@ should talk to this for functionality wherever possible.
 import os
 import re
 
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, json
 
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
@@ -144,15 +144,38 @@ def enter_game_score():
     POST to enter the scores for a single game.
 
     Expects:
-        - json blob. It should include:
+        - json blob named 'gamescore' e.g. gamescore={blah}.It should include:
             {
             'scores': { 'username':{}, 'username': {} },
             'tournament_name': 'some_tournament_id',
             'round': '1'
             }
     """
-    raise NotImplementedError('enter_game_score not implemented')
+    if not request.args.get('gamescore'):
+        return make_response('Enter the required fields', 400)
 
+    data = json.loads(request.args.get('gamescore'))
+
+    if not data \
+    or not 'tournament_name' in data \
+    or not 'round' in data \
+    or not 'scores' in data:
+        return make_response('Enter the required fields', 400)
+
+    unknown_players = [x for x in data['scores'].keys() \
+                        if not PLAYER_DB_CONN.username_exists(x)]
+    if len(unknown_players) > 0:
+        return make_response('Unknown player: ' + unknown_players[0], 400)
+
+    try:
+        return make_response(
+            TOURNAMENT_DB_CONN.enter_game_score(
+                data['tournament_name'],
+                data['round'],
+                data['scores']),
+            200)
+    except RuntimeError as err:
+        return make_response(str(err), 400)
 
 @APP.route('/entertournamentscore', methods=['POST'])
 def enter_tournament_score():

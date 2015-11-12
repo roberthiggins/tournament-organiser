@@ -14,6 +14,22 @@ class TournamentDBConnection(object):
         self.db_conn = DBConnection()
         self.con = self.db_conn.con
 
+    def enter_game_score(self, tournament, round_num, scores):
+        """
+        Enters a score for a game into tournament for all entries involved
+
+        Expects: All fields required
+
+        Assumption: That the entries in scores exist
+        """
+        if not tournament or not round_num or len(scores) < 2:
+            raise RuntimeError('Enter the required fields')
+
+        if not self.tournament_exists(tournament):
+            raise RuntimeError('Unknown tournament: ' + tournament)
+
+        raise NotImplementedError("enter game score not implemented")
+
     def enter_score(self, tournament_id, player_id, category, score):
         """
         Enters a score for category into tournament for player
