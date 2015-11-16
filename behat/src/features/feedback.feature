@@ -25,8 +25,8 @@ Feature: Place feedback to improve the sight
 
         Examples:
             |url                |content         |response                                      |
-            |feedback           |                |Please fill in the required fields            |
+            |feedback           |                |Enter the required fields                     |
             |feedback           |lkjsdflkjsdflkj |Thanks for you help improving the site        |
-            |suggestimprovement |                |Please fill in the required fields            |
+            |suggestimprovement |                |Enter the required fields                     |
             |suggestimprovement |lkjsdflkffffffj |Thanks for you help improving the site        |
             |suggestimprovement |lkjsdflkffffffj |Thanks for you help improving the site        |

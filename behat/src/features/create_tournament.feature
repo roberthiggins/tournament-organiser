@@ -18,17 +18,17 @@ Feature: Create a Tournament
     @javascript
     Scenario Outline: Valid and invalid values
         Given I am on "/createtournament"
-        When I fill in "inputTournamentName" with "<name>"
-        When I fill in "inputTournamentDate" with "<date>"
+        When I fill in "id_inputTournamentName" with "<name>"
+        When I fill in "id_inputTournamentDate" with "<date>"
         When I press "Create"
         When I wait for the response
         Then I should see "<response>"
 
         Examples:
             | name              | date          | response                                              |
-            |                   |               | Please fill in the required fields                    |
-            | Red Harvest       |               | Please fill in the required fields                    |
-            |                   | 2095-01-01    | Please fill in the required fields                    |
+            |                   |               | Enter the required fields                             |
+            | Red Harvest       |               | Enter the required fields                             |
+            |                   | 2095-01-01    | Enter the required fields                             |
             | Red Harvest       | 2095-01-011   | Enter a valid date                                    |
             | Red Harvest       | 2095-13-01    | Enter a valid date                                    |
             | Red Harvest       | Red Harvest   | Enter a valid date                                    |

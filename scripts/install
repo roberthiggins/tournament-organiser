@@ -12,7 +12,7 @@
 #!/bin/sh
 
 #### OPTION HANDLING ####
-ENVS="db drawserver daoserver webserver"
+ENVS="db drawserver daoserver webserver web"
 if [ $# -ne 0 ]
     then
     ENVS="$@"
@@ -47,9 +47,17 @@ do
             sudo docker build -t daoserver_image .
             popd
         ;;
+        web)
+            pushd web
+            sudo docker build -t web_image .
+            popd
+        ;;
         webserver)
             pushd webserver
             sudo docker build -t webserver_image .
+            popd
+            pushd web
+            sudo docker build -t web_image .
             popd
         ;;
         *)
@@ -72,6 +80,9 @@ do
         ;;
         daoserver)
             sudo docker run --name=daoserver -d -p 5001:5000 --link=db --link=drawserver daoserver_image
+        ;;
+        web)
+            sudo docker run --name=web -d -p 8000:8000 --link=db --link=drawserver --link=daoserver web_image
         ;;
         webserver)
             sudo docker run --name=webserver -d -p 5000:5000 --link=db --link=drawserver --link=daoserver webserver_image

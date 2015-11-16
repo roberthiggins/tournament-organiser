@@ -30,7 +30,6 @@ Feature: Register for a Tournament
             | tournament        | username      | response                                   |
             |                   |               | Enter the required fields                  |
             | southcon_2095     |               | Enter the required fields                  |
-            |                   | steve         | Enter the required fields                  |
             | conquest_2095     | bud           | Check username and tournament              |
             | conquest_2095     | stevemcqueen  | Application submitted                      |
             | southcon_2095     | stevemcqueen  | Application submitted                      |

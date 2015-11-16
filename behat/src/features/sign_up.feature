@@ -21,10 +21,10 @@ Feature: Sign up
     @javascript
     Scenario Outline: I sign up with some new usernames
         Given I am on "/signup"
-        When I fill in "inputUsername" with "<username>"
-        When I fill in "inputEmail" with "<email>"
-        When I fill in "inputPassword" with "<password>"
-        When I fill in "inputConfirmPassword" with "<confirm>"
+        When I fill in "id_inputUsername" with "<username>"
+        When I fill in "id_inputEmail" with "<email>"
+        When I fill in "id_inputPassword" with "<password>"
+        When I fill in "id_inputConfirmPassword" with "<confirm>"
         When I press "signup"
         When I wait for the response
         Then I should see "<response>"
@@ -36,11 +36,11 @@ Feature: Sign up
             | jerry     |foo@bar.com  | password123 | password123 | Account created                     |
             | jerry     |foo@bar.com  | password123 | password123 | Please choose another name          |
             | good      |@bar.com     | password123 | password123 | This email does not appear valid    |
-            |           |             |             |             | Please fill in the required fields  |
-            |           |foo@bar.com  |             |             | Please fill in the required fields  |
-            | good      |foo@bar.com  |             |             | Please enter two matching passwords |
-            | good      |foo@bar.com  | password123 |             | Please enter two matching passwords |
-            | good      |foo@bar.com  |             | password123 | Please enter two matching passwords |
+            |           |             |             |             | Enter the required fields           |
+            |           |foo@bar.com  |             |             | Enter the required fields           |
+            | good      |foo@bar.com  |             |             | Enter the required fields           |
+            | good      |foo@bar.com  | password123 |             | Enter the required fields           |
+            | good      |foo@bar.com  |             | password123 | Enter the required fields           |
             | mr        |foo@bar.com  | chulmondley | warner      | Please enter two matching passwords |
             | mr        |foo@bar.com  | password123 | password12  | Please enter two matching passwords |
             | mr        |foo@bar.com  | password123 | password1234| Please enter two matching passwords |
