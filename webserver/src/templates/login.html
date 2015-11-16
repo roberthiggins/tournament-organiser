@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
     <head>
-        <title>Tournament Organiser Modify Player</title>
+        <title>Tournament Organiser Login</title>
     </head>
 
     <body>
@@ -10,19 +10,12 @@
         <div class="green" style="background: green; display:none"><ul></ul></div>
         <p>You can add/change your details here:</p>
         <form class="form-add-player">
-            <label for="inputUsername" class="sr-only">User Name</label>
+            <label for="inputUsername" class="sr-only">Username</label>
             <input  type="username"
                     name="inputUsername"
                     id="inputUsername"
                     class="form-control"
                     placeholder="User Name"
-                    autofocus>
-            <label for="inputEmail" class="sr-only">Email address</label>
-            <input  type="email"
-                    name="inputEmail"
-                    id="inputEmail"
-                    class="form-control"
-                    placeholder="Email address"
                     autofocus>
             <label for="inputPassword" class="sr-only">Password</label>
             <input  type="text"
@@ -31,15 +24,9 @@
                     class="form-control"
                     placeholder="Enter a password"
                     autofocus>
-            <label for="inputConfirmPassword" class="sr-only">Confirm password</label>
-            <input  type="text"
-                    name="inputConfirmPassword"
-                    id="inputConfirmPassword"
-                    class="form-control"
-                    placeholder="Enter the password again"
-                    autofocus>
-             
-            <input id="signup" class="btn btn-lg btn-primary btn-block submit" value="Sign Up" type="submit">
+
+            <input id="login" class="btn btn-lg btn-primary btn-block submit" value="Login" type="submit">
+            <a href="/resetpassword">Forgot Password</a>
         </form>
 
     </body>
@@ -47,6 +34,5 @@
     <script type="text/javascript"
             src="../static/js/jquery-2.1.4.min.js"></script>
     <script type="text/javascript"
-            src="../static/js/add-player.js"></script>
-
+            src="../static/js/login.js"></script>
 </html>

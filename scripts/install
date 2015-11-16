@@ -22,7 +22,7 @@ fi
 for ENV in $ENVS
 do
     sudo docker kill $ENV
-    sudo docker rm $ENV
+    sudo docker rm -v $ENV
 done
 
 # Build replacements
@@ -65,7 +65,7 @@ do
     case $ENV in
         db)
             sudo docker run -d -P --name db db_image
-            sleep 5
+            sleep 10    # wait for db to finish startup
         ;;
         drawserver)
             sudo docker run --name=drawserver -d -p 8888:8080 --link=db drawserver_image

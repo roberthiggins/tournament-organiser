@@ -12,6 +12,11 @@ Feature: Register for a Tournament
         Given I am on "/registerforatournament"
         Then I should see "Select a tournament to register for"
 
+    Scenario: I use the API to list tournaments
+        When I GET "/listtournaments" from the API
+        Then the response is JSON
+        Then the response has a "tournaments" property
+
     @javascript
     Scenario Outline: I miss some fields
         Given I am on "/registerforatournament"

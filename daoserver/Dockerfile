@@ -15,17 +15,21 @@ RUN python get-pip.py
 # This is the python tool that will run the webserver
 RUN pip install flask
 
-# Yaml for the configuration file
-RUN pip install pyyaml
+# passlib for passwords
+RUN pip install passlib
 
-# We need to attach to the player db
-RUN apt-get install -y postgresql
+# We need to attach to the player db Docker suggests that normally you
+# shouldn't run update manually. However it is the only way to get
+# python-dev or postgresql to install
+RUN apt-get update && apt-get install -y postgresql
 
-# Docker suggests that normally you shouldn't run update manually. However it
-# is the only way to get python-dev to install.
-RUN apt-get update && apt-get install -y python-dev
+RUN apt-get install -y python-dev
 RUN apt-get install -y libpq-dev
 RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate
+
+# Django is used for email validation
+RUN pip install django
+
 ENV DB_PASSWORD FuEm7l003bfd6zM
 ADD src/bash_aliases /root/.bash_aliases
 
@@ -33,4 +37,4 @@ ADD src/bash_aliases /root/.bash_aliases
 ADD src/ webapp/
 
 # Run the app by default
-CMD python -u webapp/app.py
+CMD python -u webapp/dao.py

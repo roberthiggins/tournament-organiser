@@ -1,7 +1,8 @@
 h1. Developing the Website
 
 h2. Initial packages you'll need
-* sudo apt-get install -y git maven docker-engine openjdk-7-jdk
+* sudo apt-get install -y git maven openjdk-7-jdk pylint
+* go install docker - see their website
 
 h3. Bandwidth
 The initial build will require a lot of guff to be downloaded (~2GB maybe).

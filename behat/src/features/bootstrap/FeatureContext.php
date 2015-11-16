@@ -16,6 +16,9 @@ use Behat\MinkExtension\Context\MinkContext;
 //   require_once 'PHPUnit/Framework/Assert/Functions.php';
 //
 
+require 'vendor/autoload.php';
+require_once 'RestContext.php';
+
 /**
  * Features context.
  */
@@ -30,6 +33,7 @@ class FeatureContext extends MinkContext
     public function __construct(array $parameters)
     {
         // Initialize your context here
+        $this->useContext('RestContext', new RestContext($parameters));
     }
 
     /**
