@@ -2,7 +2,8 @@
 
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
-RUN apt-get update && apt-get install -y python
+
+RUN apt-get update && apt-get install -y python python-django python-dev libpq-dev build-essential
 
 # Getting pip.
 # For some reason I can get it via apt-get. So we do it the hard way.
@@ -11,12 +12,12 @@ RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 RUN python get-pip.py
 # End getting pip
 
-# Install flask
-# This is the python tool that will run the webserver
-RUN pip install flask
+ADD ./requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
 
-# Add the source dir
+# Setup Django
 ADD src/ webapp/
+WORKDIR webapp/
 
-# Run the app by default
-CMD python -u webapp/app.py
+ADD ./init.sh ./
+CMD bash ./init.sh && python manage.py runserver 0.0.0.0:8000

@@ -11,7 +11,7 @@ $(function() {
             $('div.green').empty();
 
             $.ajax({
-                url: '/registerfortournament',
+                url: '/registerForTournament',
                 data: $('form').serialize(),
                 type: 'POST',
                 success: function(response) {
