@@ -47,6 +47,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+LOGIN_URL = '/login'
+
 ROOT_URLCONF = 'web.urls'
 
 WSGI_APPLICATION = 'web.wsgi.application'

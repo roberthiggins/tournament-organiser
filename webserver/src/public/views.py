@@ -4,6 +4,8 @@ import os
 import urllib
 import urllib2
 
+from django.contrib import auth
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -138,7 +140,26 @@ def add_player(request):
 
 def login_account(request):
     """POST target for login attempts. This will get proxied to DAO server"""
-    return post_to_dao('/login', LoginForm(request.POST))
+
+    login_creds = LoginForm(request.POST)
+
+    username = request.POST.get('inputUsername', '')
+    password = request.POST.get('inputPassword', '')
+    if username == '' or password == '':
+        return HttpResponse('Enter the required fields')
+    user = auth.authenticate(username=username, password=password)
+    if user is None:
+        return HttpResponse('Username or password incorrect')
+
+    response = post_to_dao('/login', login_creds)
+    if  response.status_code == 200:
+        auth.login(request, user)
+        # TODO Update details from login service
+
+    return response
+
+def logout(request):
+    auth.logout(request)
 
 def place_feedback(request):
     """POST target for feedback. This will get proxied to DAO server"""
