@@ -21,7 +21,6 @@ urlpatterns = patterns('',
 
     # Post forwarding. These URLs are essentially posted to the dao
     url(r'^placefeedback$', views.feedback, name='forward_feedback'),
-    url(r'^loginAccount$', views.login, name='forward_login'),
     url(r'^addPlayer$', views.create_account, name='forward_add_player'),
     url(r'^addTournament$',
         views.create_tournament, name='forward_add_tournament'),

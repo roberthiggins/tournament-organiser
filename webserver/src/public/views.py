@@ -6,7 +6,7 @@ import urllib2
 
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from forms import AddTournamentForm, ApplyForTournamentForm, \
@@ -65,8 +65,20 @@ def feedback(request):
         RequestContext(request)
     )
 
+def render_login(request, form):
+    return render_to_response(
+        'login.html',
+        {'form': form,
+        'title': 'Tournament Organiser Login',
+        'intro': 'You can add/change your details here:'
+        },
+        RequestContext(request)
+    )
+
 def login(request):
     """Login page"""
+
+    login_creds = LoginForm()
 
     if request.method == 'POST':
         login_creds = LoginForm(request.POST)
@@ -74,26 +86,25 @@ def login(request):
         username = request.POST.get('inputUsername', '')
         password = request.POST.get('inputPassword', '')
         if username == '' or password == '':
-            return HttpResponse('Enter the required fields')
+            return render_login(request, login_creds)
+
         user = auth.authenticate(username=username, password=password)
         if user is None:
-            return HttpResponse('Username or password incorrect')
+            login_creds.add_error(None, 'Username or password incorrect')
+            return render_login(request, login_creds)
 
         response = post_to_dao('/login', login_creds)
         if  response.status_code == 200:
             auth.login(request, user)
             # TODO Update details from login service
 
-        return response
+            return HttpResponseRedirect(request.REQUEST.get('next', '/'))
 
-    return render_to_response(
-        'login.html',
-        {'form': LoginForm()},
-        RequestContext(request)
-    )
+    return render_login(request, login_creds)
 
 def logout(request):
     auth.logout(request)
+    return HttpResponseRedirect('/')
 
 def get_tournament_list():
     """ Get a list of tournaments; tupled for your convenience"""

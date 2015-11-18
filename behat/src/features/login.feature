@@ -23,21 +23,26 @@ Feature: Login
         Then I should see "Password"
         Then I should see "Forgot Password"
 
-    @javascript
+    Scenario: I log in with correct details
+        Given I am on "/login"
+        When I fill in "id_inputUsername" with "testuser"
+        When I fill in "id_inputPassword" with "shazam"
+        When I press "Login"
+        Then I should be on "/login"
+
     Scenario Outline: I try to log in
         Given I am on "/login"
         When I fill in "id_inputUsername" with "<uname>"
         When I fill in "id_inputPassword" with "<password>"
         When I press "Login"
-        When I wait for the response
+        Then I should be on "/login"
         Then I should see "<response>"
 
         Examples:
             |uname              |password       |response                       |
-            |foo                |               |Enter the required fields      |
-            |                   |bar            |Enter the required fields      |
-            |                   |               |Enter the required fields      |
+            |foo                |               |This field is required         |
+            |                   |bar            |This field is required         |
+            |                   |               |This field is required         |
             |steveqmcqueen      |password12     |Username or password incorrect |
             |steveqmcqueenie    |password123    |Username or password incorrect |
-            |testuser           |shazam         |Login successful               |
 
