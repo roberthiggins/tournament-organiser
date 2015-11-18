@@ -1,10 +1,12 @@
 """ Forms for public website."""
 
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 
 class ErrorStringForm(forms.Form):                      # pylint: disable=W0232
     """ A form with a default error message """
-    def error_code(self):                           # pylint: disable=C0111,R0201
+    def error_code(self):                         # pylint: disable=C0111,R0201
         return 'Enter the required fields'
 
 class AddTournamentForm(ErrorStringForm):               # pylint: disable=W0232
@@ -34,19 +36,31 @@ class ApplyForTournamentForm(ErrorStringForm):          # pylint: disable=W0232
         )
     inputUserName = forms.CharField(label='Your Username')
 
-class CreateAccountForm(ErrorStringForm):               # pylint: disable=W0232
-    """ Create account """
-    inputUsername = forms.CharField(label='User Name')
-    inputEmail = forms.EmailField(label='Email address')
-    inputPassword = forms.CharField(label='Password')
-    inputConfirmPassword = forms.CharField(label='Confirm password')
+class CreateAccountForm(UserCreationForm):              # pylint: disable=W0232
+    """ Add an account """
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "password1", "password2")
+
+    def save(self, commit=True):
+        user = super(CreateAccountForm, self).save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+        return user
 
     def error_code(self):
         # pylint: disable=E1101
-        if 'inputEmail' in self._errors and len(self._errors) == 1:
+        if 'email' in self._errors and len(self._errors) == 1:
             return 'This email does not appear valid'
+        elif 'username' in self._errors and len(self._errors) == 1:
+            return 'Please choose another name'
+        elif 'password2' in self._errors and len(self._errors) == 1:
+            return 'Please enter two matching passwords'
         else:
-            return ErrorStringForm.error_code(self)
+            return 'Enter the required fields'
 
 class FeedbackForm(ErrorStringForm):                    # pylint: disable=W0232
     """ Feedback and suggestions"""

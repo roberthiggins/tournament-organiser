@@ -6,25 +6,25 @@ Feature: Sign up
     Scenario: I try to navigate to the sign up page via a button
         Given I am on "/"
         When I follow "Sign Up"
-        Then I should see "User Name"
-        Then I should see "Email Address"
+        Then I should see "Username"
+        Then I should see "Email"
         Then I should see "Password"
-        Then I should see "Confirm Password"
+        Then I should see "Password confirmation"
 
     Scenario: I try to navigate to the sign up page via url
         Given I am on "/signup"
-        Then I should see "User Name"
-        Then I should see "Email Address"
+        Then I should see "Username"
+        Then I should see "Email"
         Then I should see "Password"
-        Then I should see "Confirm Password"
+        Then I should see "Password confirmation"
 
     @javascript
     Scenario Outline: I sign up with some new usernames
         Given I am on "/signup"
-        When I fill in "id_inputUsername" with "<username>"
-        When I fill in "id_inputEmail" with "<email>"
-        When I fill in "id_inputPassword" with "<password>"
-        When I fill in "id_inputConfirmPassword" with "<confirm>"
+        When I fill in "username" with "<username>"
+        When I fill in "email" with "<email>"
+        When I fill in "password1" with "<password>"
+        When I fill in "password2" with "<confirm>"
         When I press "signup"
         When I wait for the response
         Then I should see "<response>"
@@ -39,7 +39,8 @@ Feature: Sign up
             |           |             |             |             | Enter the required fields           |
             |           |foo@bar.com  |             |             | Enter the required fields           |
             | good      |foo@bar.com  |             |             | Enter the required fields           |
-            | good      |foo@bar.com  | password123 |             | Enter the required fields           |
+# FIXME
+            | good      |foo@bar.com  | password123 |             | Please enter two matching passwords |
             | good      |foo@bar.com  |             | password123 | Enter the required fields           |
             | mr        |foo@bar.com  | chulmondley | warner      | Please enter two matching passwords |
             | mr        |foo@bar.com  | password123 | password12  | Please enter two matching passwords |

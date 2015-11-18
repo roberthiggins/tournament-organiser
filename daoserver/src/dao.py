@@ -107,15 +107,15 @@ def add_account():
     """
     POST to add an account
     Expects:
-        - inputUsername
-        - inputEmail
-        - inputPassword
-        - inputConfirmPassword
+        - username
+        - email
+        - password1
+        - password2
     """
-    username = request.form['inputUsername'].strip()
-    email = request.form['inputEmail'].strip()
-    password = request.form['inputPassword'].strip()
-    confirm = request.form['inputConfirmPassword'].strip()
+    username = request.form['username'].strip()
+    email = request.form['email'].strip()
+    password = request.form['password1'].strip()
+    confirm = request.form['password2'].strip()
 
     if not username:
         return make_response("Please fill in the required fields", 400)

@@ -4,11 +4,11 @@ import os
 import urllib
 import urllib2
 
-from forms import AddTournamentForm, ApplyForTournamentForm, \
-CreateAccountForm, FeedbackForm, LoginForm
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from forms import AddTournamentForm, ApplyForTournamentForm, \
+CreateAccountForm, FeedbackForm, LoginForm
 
 DAO_URL = "http://%s:%s" % (
     os.environ['DAOSERVER_PORT_5000_TCP_ADDR'],
@@ -129,7 +129,12 @@ def add_tournament(request):
 
 def add_player(request):
     """POST target for player creation. This will get proxied to DAO server"""
-    return post_to_dao('/addPlayer', CreateAccountForm(request.POST))
+    if request.method == 'POST':
+        form = CreateAccountForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+        return post_to_dao('/addPlayer', form)
 
 def login_account(request):
     """POST target for login attempts. This will get proxied to DAO server"""

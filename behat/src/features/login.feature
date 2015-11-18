@@ -5,10 +5,10 @@ Feature: Login
 
     Background:
         Given I am on "/signup"
-        When I fill in "id_inputUsername" with "testuser"
-        When I fill in "id_inputEmail" with "foo@bar.com"
-        When I fill in "id_inputPassword" with "shazam"
-        When I fill in "id_inputConfirmPassword" with "shazam"
+        When I fill in "username" with "testuser"
+        When I fill in "email" with "foo@bar.com"
+        When I fill in "password1" with "shazam"
+        When I fill in "password2" with "shazam"
         When I press "signup"
 
     Scenario: I Want to go to the login page
