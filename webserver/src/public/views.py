@@ -22,6 +22,14 @@ def index(request):                                     # pylint: disable=W0613
 
 def create_account(request):
     """Page to create a new account"""
+
+    if request.method == 'POST':
+        form = CreateAccountForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+        return post_to_dao('/addPlayer', form)
+
     return render_to_response(
         'create-a-player.html',
         {'form': CreateAccountForm()},
@@ -30,6 +38,10 @@ def create_account(request):
 
 def create_tournament(request):
     """Page for creating a tournament"""
+
+    if request.method == 'POST':
+        return post_to_dao('/addTournament', AddTournamentForm(request.POST))
+
     return render_to_response(
         'create-a-tournament.html',
         {'form': AddTournamentForm()},
@@ -38,6 +50,10 @@ def create_tournament(request):
 
 def feedback(request):
     """ Page for user to place feedback"""
+
+    if request.method == 'POST':
+        return post_to_dao('/placefeedback', FeedbackForm(request.POST))
+
     context_dict = {
         'title': 'Place Feedback',
         'intro': 'Please give us feedback on your experience on the site',
@@ -51,11 +67,33 @@ def feedback(request):
 
 def login(request):
     """Login page"""
+
+    if request.method == 'POST':
+        login_creds = LoginForm(request.POST)
+
+        username = request.POST.get('inputUsername', '')
+        password = request.POST.get('inputPassword', '')
+        if username == '' or password == '':
+            return HttpResponse('Enter the required fields')
+        user = auth.authenticate(username=username, password=password)
+        if user is None:
+            return HttpResponse('Username or password incorrect')
+
+        response = post_to_dao('/login', login_creds)
+        if  response.status_code == 200:
+            auth.login(request, user)
+            # TODO Update details from login service
+
+        return response
+
     return render_to_response(
         'login.html',
         {'form': LoginForm()},
         RequestContext(request)
     )
+
+def logout(request):
+    auth.logout(request)
 
 def get_tournament_list():
     """ Get a list of tournaments; tupled for your convenience"""
@@ -64,6 +102,15 @@ def get_tournament_list():
 
 def register_for_tournament(request):
     """Page to register for tournament"""
+
+    if request.method == 'POST':
+        return post_to_dao(
+            '/registerfortournament',
+            ApplyForTournamentForm(
+                request.POST,
+                tournament_list=get_tournament_list())
+        )
+
     return render_to_response(
         'register-for-tournament.html',
         {'form': ApplyForTournamentForm(tournament_list=get_tournament_list())},
@@ -114,54 +161,3 @@ def post_to_dao(url, form):
             return HttpResponse(err.read(), status=400)
         else:
             raise
-
-### Wrappers to Dao
-def apply_for_tournament(request):
-    """Page for player to apply to a tournament"""
-    return post_to_dao(
-        '/registerfortournament',
-        ApplyForTournamentForm(
-            request.POST,
-            tournament_list=get_tournament_list())
-    )
-
-def add_tournament(request):
-    """Page to add a tournament"""
-    return post_to_dao('/addTournament', AddTournamentForm(request.POST))
-
-def add_player(request):
-    """POST target for player creation. This will get proxied to DAO server"""
-    if request.method == 'POST':
-        form = CreateAccountForm(request.POST)
-        if form.is_valid():
-            form.save()
-
-        return post_to_dao('/addPlayer', form)
-
-def login_account(request):
-    """POST target for login attempts. This will get proxied to DAO server"""
-
-    login_creds = LoginForm(request.POST)
-
-    username = request.POST.get('inputUsername', '')
-    password = request.POST.get('inputPassword', '')
-    if username == '' or password == '':
-        return HttpResponse('Enter the required fields')
-    user = auth.authenticate(username=username, password=password)
-    if user is None:
-        return HttpResponse('Username or password incorrect')
-
-    response = post_to_dao('/login', login_creds)
-    if  response.status_code == 200:
-        auth.login(request, user)
-        # TODO Update details from login service
-
-    return response
-
-def logout(request):
-    auth.logout(request)
-
-def place_feedback(request):
-    """POST target for feedback. This will get proxied to DAO server"""
-    return post_to_dao('/placefeedback', FeedbackForm(request.POST))
-
