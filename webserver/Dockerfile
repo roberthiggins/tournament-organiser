@@ -3,11 +3,10 @@
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
-RUN apt-get update && apt-get install -y python python-django python-dev libpq-dev build-essential
+RUN apt-get update && apt-get install -y curl python python-setuptools python-dev libpq-dev build-essential
 
 # Getting pip.
 # For some reason I can get it via apt-get. So we do it the hard way.
-RUN apt-get install -y curl
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 RUN python get-pip.py
 # End getting pip
