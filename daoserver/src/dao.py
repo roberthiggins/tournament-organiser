@@ -8,7 +8,7 @@ should talk to this for functionality wherever possible.
 import os
 import re
 
-from flask import Flask, request, make_response, json
+from flask import Flask, request, make_response, json, jsonify
 
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
@@ -34,7 +34,6 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     tournament names
     """
-    from flask import jsonify
     return jsonify({'tournaments' : TOURNAMENT_DB_CONN.list_tournaments()})
 
 @APP.route('/registerfortournament', methods=['POST'])
@@ -240,6 +239,21 @@ def place_feedback():
         return make_response("Please fill in the required fields", 400)
     FEEDBACK_DB_CONN.submit_feedback(_feedback)
     return make_response("Thanks for you help improving the site", 200)
+
+@APP.route('/userDetails/<u_name>', methods=['GET'])
+def userDetails(u_name=None):
+    """
+    GET to get account details in url form
+    TODO security
+    """
+
+    try:
+        return jsonify({u_name: PLAYER_DB_CONN.user_details(u_name)})
+    except RuntimeError as err:
+        return make_response(str(err), 400)
+    except Exception as err:
+        print err
+        return make_response(str(err), 500)
 
 
 if __name__ == "__main__":

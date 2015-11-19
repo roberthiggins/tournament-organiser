@@ -46,3 +46,8 @@ Feature: Sign up
             | mr        |foo@bar.com  | password123 | password1234| Please enter two matching passwords |
             | longymclongersone_who9foaiss8n'sosif.asofadofh-asgy0ytn3gt |foo@bar.com  | password123 | password123 | Account created |
 
+    Scenario: I want user details from the API
+        When I GET "/userDetails/charlie_murphy" from the API
+        Then the response is JSON
+        Then the response has a "charlie_murphy" property
+

@@ -84,3 +84,17 @@ class PlayerDBConnection(object):
         else:
             return "Login unsuccessful"
 
+    def user_details(self, username):
+        """ get the user details asa a json blob """
+        try:
+            cur = self.con.cursor()
+            cur.execute(
+                "SELECT a.contact_email, p.settings \
+                FROM account a INNER JOIN player p ON a.id = p.id \
+                WHERE p.username = %s",
+                [username])
+            return cur.fetchone()
+        except psycopg2.DatabaseError as err:
+            self.con.rollback()
+            print 'Database Error %s' % err
+            raise err
