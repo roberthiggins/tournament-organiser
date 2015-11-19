@@ -24,16 +24,23 @@ def index(request):                                     # pylint: disable=W0613
 def create_account(request):
     """Page to create a new account"""
 
+    form = CreateAccountForm()
+
     if request.method == 'POST':
         form = CreateAccountForm(request.POST)
         if form.is_valid():                             # pylint: disable=E1101
             form.save()
 
-        return from_dao('/addPlayer', form)
+        response = from_dao('/addPlayer', form)
+
+        if  response.status_code == 200:
+            return HttpResponse(response)
+        else:
+            form.add_error(None, response.content)      # pylint: disable=E1103
 
     return render_to_response(
         'create-a-player.html',
-        {'form': CreateAccountForm()},
+        {'form': form},
         RequestContext(request)
     )
 
@@ -72,10 +79,7 @@ def render_login(request, form):
     """ Render the login page from the template """
     return render_to_response(
         'login.html',
-        {'form': form,
-        'title': 'Tournament Organiser Login',
-        'intro': 'You can add/change your details here:'
-        },
+        {'form': form},
         RequestContext(request)
     )
 

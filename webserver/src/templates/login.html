@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-    <head>
-        <title>{{ title }}</title>
-    </head>
+{% block title %}Login{% endblock %}
 
-    <body>
-        <p>{{ intro }}</p>
-        <form action="" method="POST">
-            {% csrf_token %}
-            {{ form.as_p}}
-            <button type="submit">Login</button>
-        </form>
-        <p>
-            <a href="/resetpassword">Forgot Password</a>
-        </p>
-    </body>
-</html>
+{% block intro %}<p>Login to your account</p>{% endblock %}
+
+{% block form %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Login</button>
+    </form>
+{% endblock %}
+
+{% block outro %}
+    <p>
+        <a href="/resetpassword">Forgot Password</a>
+        <a href="/signup">Create Account</a>
+    </p>
+{% endblock %}

@@ -1,26 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
- 
-    <head>
-        <title>Tournament Organiser Modify Player</title>
-    </head>
+{% extends "base.html" %}
 
-    <body>
-        <div class="red" style="background: red; display:none"><ul></ul></div>
-        <div class="green" style="background: green; display:none"><ul></ul></div>
-        <p>You can add/change your details here:</p>
-        <form class="form-add-player">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input id="signup" class="btn btn-lg btn-primary btn-block submit" value="Sign Up" type="submit">
-        </form>
+{% block title %}Modify Player{% endblock %}
 
-    </body>
+{% block intro %}<p>You can add/change your details here:</p>{% endblock %}
 
-    {% load staticfiles %}
-    <script type="text/javascript"
-            src="{% static "js/jquery-2.1.4.min.js" %}"></script>
-    <script type="text/javascript"
-            src="{% static "js/add-player.js" %}"></script>
-
-</html>
+{% block form %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Sign Up</button>
+    </form>
+{% endblock %}
