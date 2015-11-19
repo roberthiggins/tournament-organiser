@@ -46,8 +46,14 @@ class PlayerDBConnection(object):
         except Exception as err:
             print "Exception in add_account: " + err
 
-    def login(self, username, password):
-        """Attempt to log a player in"""
+    def authenticate_user(self, username, password):
+        """
+        Authenticates the uanme and pword.
+        Expects:
+            - username
+            - password - may be encrypted as per standard practice
+        Return True on success
+        """
         if not username or not password:
             raise RuntimeError("Enter username and password")
         try:
@@ -60,7 +66,7 @@ class PlayerDBConnection(object):
             creds = cur.fetchone()
             if not creds or not sha256_crypt.verify(password, creds[0]):
                 raise RuntimeError("Username or password incorrect")
-            return "Login successful"
+            return True
         except psycopg2.DatabaseError as err:
             self.con.rollback()
             print 'Database Error %s' % err
@@ -70,4 +76,11 @@ class PlayerDBConnection(object):
         except Exception as err:
             print err
             raise
+
+    def login(self, username, password):
+        """Attempt to log a player in"""
+        if self.authenticate_user(username, password):
+            return "Login successful"
+        else:
+            return "Login unsuccessful"
 
