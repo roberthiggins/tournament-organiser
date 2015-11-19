@@ -3,6 +3,13 @@ Feature: Create a Tournament
     As a organiser
     I need to be able to create a tournament
 
+    Background:
+        Given I am on "/login"
+        When I fill in "id_inputUsername" with "charlie_murphy"
+        When I fill in "id_inputPassword" with "darkness"
+        When I press "Login"
+        Then I should be on "/"
+
     Scenario: I try to navigate to the page via the front page
         Given I am on "/"
         When I follow "Create a Tournament"

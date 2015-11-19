@@ -3,6 +3,13 @@ Feature: Place feedback to improve the sight
     As a site visitor
     I want to be able to log feedback
 
+    Background:
+        Given I am on "/login"
+        When I fill in "id_inputUsername" with "charlie_murphy"
+        When I fill in "id_inputPassword" with "darkness"
+        When I press "Login"
+        Then I should be on "/"
+
     Scenario Outline: I navigate to the feedback section
         Given I am on "/"
         When I follow "<link>"

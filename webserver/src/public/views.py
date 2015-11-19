@@ -5,6 +5,7 @@ import urllib
 import urllib2
 
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -36,6 +37,7 @@ def create_account(request):
         RequestContext(request)
     )
 
+@login_required
 def create_tournament(request):
     """Page for creating a tournament"""
 
@@ -48,6 +50,7 @@ def create_tournament(request):
         RequestContext(request)
     )
 
+@login_required
 def feedback(request):
     """ Page for user to place feedback"""
 
@@ -137,6 +140,7 @@ def get_tournament_list():
     t_list = json.load(from_dao('/listtournaments'))['tournaments']
     return [(x, x) for x in t_list]
 
+@login_required
 def register_for_tournament(request):
     """Page to register for tournament"""
 
@@ -154,6 +158,7 @@ def register_for_tournament(request):
         RequestContext(request)
     )
 
+@login_required
 def suggest_improvement(request):
     """Page to suggest improvements to the site"""
     context_dict = {
