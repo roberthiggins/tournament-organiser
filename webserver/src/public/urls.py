@@ -18,12 +18,4 @@ urlpatterns = patterns('',
     url(r'^signup$', views.create_account, name='create_account'),
     url(r'^suggestimprovement$',
         views.suggest_improvement, name='suggest_improvement'),
-
-    # Post forwarding. These URLs are essentially posted to the dao
-    url(r'^placefeedback$', views.feedback, name='forward_feedback'),
-    url(r'^addPlayer$', views.create_account, name='forward_add_player'),
-    url(r'^addTournament$',
-        views.create_tournament, name='forward_add_tournament'),
-    url(r'^registerForTournament$',
-        views.register_for_tournament, name='forward_register_for_tournament'),
 )
