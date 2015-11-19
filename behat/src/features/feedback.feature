@@ -22,18 +22,16 @@ Feature: Place feedback to improve the sight
             | feedback                  | Place Feedback        | Please give us feedback on your experience on the site        |
             | suggestimprovement        | Suggest Improvement   | Suggest a feature you would like to see on the site           |
 
-    @javascript
     Scenario Outline: I enter some information
         Given I am on "/<url>"
         When I fill in "inputFeedback" with "<content>"
         When I press "Submit"
-        When I wait for the response
         Then I should see "<response>"
 
         Examples:
             |url                |content         |response                                      |
-            |feedback           |                |Enter the required fields                     |
+            |feedback           |                |This field is required                        |
             |feedback           |lkjsdflkjsdflkj |Thanks for you help improving the site        |
-            |suggestimprovement |                |Enter the required fields                     |
+            |suggestimprovement |                |This field is required                        |
             |suggestimprovement |lkjsdflkffffffj |Thanks for you help improving the site        |
             |suggestimprovement |lkjsdflkffffffj |Thanks for you help improving the site        |

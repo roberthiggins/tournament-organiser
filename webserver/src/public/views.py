@@ -71,13 +71,22 @@ def create_tournament(request):
 def feedback(request):
     """ Page for user to place feedback"""
 
+    form = FeedbackForm()
+
     if request.method == 'POST':
-        return from_dao('/placefeedback', FeedbackForm(request.POST))
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            response = from_dao('/placefeedback', form)
+
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
 
     context_dict = {
         'title': 'Place Feedback',
         'intro': 'Please give us feedback on your experience on the site',
-        'form': FeedbackForm()
+        'form': form
     }
     return render_to_response(
         'feedback.html',
@@ -177,10 +186,23 @@ def register_for_tournament(request):
 @login_required
 def suggest_improvement(request):
     """Page to suggest improvements to the site"""
+
+    form = FeedbackForm()
+
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            response = from_dao('/placefeedback', form)
+
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
+
     context_dict = {
         'title': 'Suggest Improvement',
         'intro': 'Suggest a feature you would like to see on the site',
-        'form': FeedbackForm()
+        'form': form
     }
     return render_to_response(
         'feedback.html',
