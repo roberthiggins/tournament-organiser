@@ -169,17 +169,22 @@ def get_tournament_list():
 def register_for_tournament(request):
     """Page to register for tournament"""
 
+    t_list = get_tournament_list()
+    form = ApplyForTournamentForm(tournament_list=t_list)
+
     if request.method == 'POST':
-        return from_dao(
-            '/registerfortournament',
-            ApplyForTournamentForm(
-                request.POST,
-                tournament_list=get_tournament_list())
-        )
+        form = ApplyForTournamentForm(request.POST, tournament_list=t_list)
+        if form.is_valid():
+            response = from_dao('/registerfortournament', form)
+
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
 
     return render_to_response(
         'register-for-tournament.html',
-        {'form': ApplyForTournamentForm(tournament_list=get_tournament_list())},
+        {'form': form},
         RequestContext(request)
     )
 
