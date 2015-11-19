@@ -75,10 +75,36 @@ def render_login(request, form):
         RequestContext(request)
     )
 
+def create_or_update_user(login_creds):
+    """
+    Create a new local user or update from db.
+
+    A failure to authenticate locally could be because the user details have
+    been updated on the db but not on this webserver
+
+    TODO security to ensure the user is actually in the db
+    """
+    u_name = login_creds.cleaned_data['inputUsername']
+    p_word = login_creds.cleaned_data['inputPassword']
+    user = json.load(from_dao('/userDetails/%s' % u_name)).get(u_name)
+
+    try:
+        local_user = User.objects.get(username=u_name)
+        local_user.set_password(p_word)
+        local_user.email = user[0]
+        local_user.save()
+    except User.DoesNotExist as err:
+        User.objects.create_user(
+            username=u_name,
+            email=user[0],
+            password=p_word)
+
 def login(request):
     """Login page"""
 
     login_creds = LoginForm()
+    if request.user.is_authenticated():
+        return make_response('You are already logged in')
 
     if request.method == 'POST':
         login_creds = LoginForm(request.POST)
@@ -88,17 +114,17 @@ def login(request):
         if username == '' or password == '':
             return render_login(request, login_creds)
 
-        user = auth.authenticate(username=username, password=password)
-        if user is None:
-            login_creds.add_error(None, 'Username or password incorrect')
-            return render_login(request, login_creds)
-
         response = from_dao('/login', login_creds)
         if  response.status_code == 200:
+            # The user might exist in the db but not on this webserver.
+            create_or_update_user(login_creds)
+            user = auth.authenticate(username = username, password=password)
             auth.login(request, user)
-            # TODO Update details from login service
+        else:
+            login_creds.add_error(None, 'Username or password incorrect') # pylint: disable=E1103
+            return render_login(request, login_creds)
 
-            return HttpResponseRedirect(request.REQUEST.get('next', '/'))
+        return HttpResponseRedirect(request.REQUEST.get('next', '/'))
 
     return render_login(request, login_creds)
 
