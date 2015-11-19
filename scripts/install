@@ -68,13 +68,13 @@ do
             sleep 10    # wait for db to finish startup
         ;;
         drawserver)
-            sudo docker run --name=drawserver -d -p 8888:8080 --link=db drawserver_image
+            sudo docker run --name=drawserver -d -p 5002:8080 --link=db drawserver_image
         ;;
         daoserver)
             sudo docker run --name=daoserver -d -p 5001:5000 --link=db --link=drawserver daoserver_image
         ;;
         webserver)
-            sudo docker run --name=webserver -d -p 8000:8000 --link=db --link=drawserver --link=daoserver webserver_image
+            sudo docker run --name=webserver -d -p 5000:8000 --link=db --link=drawserver --link=daoserver webserver_image
         sleep 5
         ;;
         *)
