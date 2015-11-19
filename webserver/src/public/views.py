@@ -28,7 +28,7 @@ def create_account(request):
         if form.is_valid():
             form.save()
 
-        return post_to_dao('/addPlayer', form)
+        return from_dao('/addPlayer', form)
 
     return render_to_response(
         'create-a-player.html',
@@ -40,7 +40,7 @@ def create_tournament(request):
     """Page for creating a tournament"""
 
     if request.method == 'POST':
-        return post_to_dao('/addTournament', AddTournamentForm(request.POST))
+        return from_dao('/addTournament', AddTournamentForm(request.POST))
 
     return render_to_response(
         'create-a-tournament.html',
@@ -52,7 +52,7 @@ def feedback(request):
     """ Page for user to place feedback"""
 
     if request.method == 'POST':
-        return post_to_dao('/placefeedback', FeedbackForm(request.POST))
+        return from_dao('/placefeedback', FeedbackForm(request.POST))
 
     context_dict = {
         'title': 'Place Feedback',
@@ -93,7 +93,7 @@ def login(request):
             login_creds.add_error(None, 'Username or password incorrect')
             return render_login(request, login_creds)
 
-        response = post_to_dao('/login', login_creds)
+        response = from_dao('/login', login_creds)
         if  response.status_code == 200:
             auth.login(request, user)
             # TODO Update details from login service
@@ -108,14 +108,14 @@ def logout(request):
 
 def get_tournament_list():
     """ Get a list of tournaments; tupled for your convenience"""
-    t_list = json.load(get_from_dao('/listtournaments'))['tournaments']
+    t_list = json.load(from_dao('/listtournaments'))['tournaments']
     return [(x, x) for x in t_list]
 
 def register_for_tournament(request):
     """Page to register for tournament"""
 
     if request.method == 'POST':
-        return post_to_dao(
+        return from_dao(
             '/registerfortournament',
             ApplyForTournamentForm(
                 request.POST,
@@ -143,32 +143,28 @@ def suggest_improvement(request):
 
 ### Some helper methods
 
-def get_from_dao(url):
+def from_dao(url, form=None):
     """
-    Proxies a GET to the daoserver. This helps keep input handling in the DAO \
-    api
-    """
-    try:
-        return urllib2.urlopen(urllib2.Request(DAO_URL + url))
-    except Exception as err:
-        print err
-        raise
-
-def post_to_dao(url, form):
-    """
-    Proxies a POST to the daoserver. This helps keep input handling in the DAO \
-    api
+    Proxies a GET/POST to the daoserver. This helps keep input handling in \
+    the DAO API
     """
     try:
-        if not form.is_valid():
-            return HttpResponse(form.error_code(), status=400)
 
-        response = urllib2.urlopen(urllib2.Request(
-            DAO_URL + url,
-            urllib.urlencode(form.cleaned_data)))
-        return HttpResponse(response)
-    except urllib2.HTTPError, err:
+        if form is None:
+            return urllib2.urlopen(urllib2.Request(DAO_URL + url))
+
+        if form.is_valid():
+            return HttpResponse(
+                urllib2.urlopen(urllib2.Request(DAO_URL + url,
+                urllib.urlencode(form.cleaned_data))))
+
+        return HttpResponse(form.error_code(), status=400)
+
+    except urllib2.HTTPError as err:
         if err.code == 400:
             return HttpResponse(err.read(), status=400)
         else:
             raise
+    except Exception as err:
+        print err
+        raise
