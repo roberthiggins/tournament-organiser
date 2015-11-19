@@ -48,12 +48,22 @@ def create_account(request):
 def create_tournament(request):
     """Page for creating a tournament"""
 
+    form = AddTournamentForm()
+
     if request.method == 'POST':
-        return from_dao('/addTournament', AddTournamentForm(request.POST))
+        form = AddTournamentForm(request.POST)
+        if form.is_valid():
+            response = from_dao('/addTournament', form)
+
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
+
 
     return render_to_response(
         'create-a-tournament.html',
-        {'form': AddTournamentForm()},
+        {'form': form},
         RequestContext(request)
     )
 

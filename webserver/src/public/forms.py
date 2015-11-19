@@ -14,15 +14,7 @@ class AddTournamentForm(ErrorStringForm):               # pylint: disable=W0232
     inputTournamentName = forms.CharField(label='Tournament Name', )
     inputTournamentDate = forms.DateField(
         label='Tournament Date',
-        error_messages={'required': 'Enter the required fields'}
     )
-    def error_code(self):                               # pylint: disable=C0111
-        # pylint: disable=E1101
-        if 'inputTournamentDate' in self._errors \
-        and len(self._errors) == 1:                     # pylint: disable=E1101
-            return self._errors['inputTournamentDate']  # pylint: disable=E1101
-        else:
-            return ErrorStringForm.error_code(self)
 
 class ApplyForTournamentForm(ErrorStringForm):          # pylint: disable=W0232
     """ Apply for a tournament """
