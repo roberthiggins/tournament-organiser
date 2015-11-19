@@ -40,13 +40,13 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=W0232
     """ Add an account """
     email = forms.EmailField(required=True)
 
-    class Meta:
+    class Meta: # pylint: disable=W0232,C0111
         model = User
         fields = ("username", "email", "password1", "password2")
 
-    def save(self, commit=True):
+    def save(self, commit=True):                        # pylint: disable=W0232
         user = super(CreateAccountForm, self).save(commit=False)
-        user.email = self.cleaned_data["email"]
+        user.email = self.cleaned_data["email"]         # pylint: disable=E1101
         if commit:
             user.save()
         return user

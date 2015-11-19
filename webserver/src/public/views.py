@@ -26,7 +26,7 @@ def create_account(request):
 
     if request.method == 'POST':
         form = CreateAccountForm(request.POST)
-        if form.is_valid():
+        if form.is_valid():                             # pylint: disable=E1101
             form.save()
 
         return from_dao('/addPlayer', form)
@@ -69,6 +69,7 @@ def feedback(request):
     )
 
 def render_login(request, form):
+    """ Render the login page from the template """
     return render_to_response(
         'login.html',
         {'form': form,
@@ -96,7 +97,7 @@ def create_or_update_user(login_creds):
         local_user.set_password(p_word)
         local_user.email = user[0]
         local_user.save()
-    except User.DoesNotExist as err:
+    except User.DoesNotExist:                           # pylint: disable=E1101
         User.objects.create_user(
             username=u_name,
             email=user[0],
@@ -107,7 +108,7 @@ def login(request):
 
     login_creds = LoginForm()
     if request.user.is_authenticated():
-        return make_response('You are already logged in')
+        return render_to_response('You are already logged in')
 
     if request.method == 'POST':
         login_creds = LoginForm(request.POST)
@@ -121,7 +122,7 @@ def login(request):
         if  response.status_code == 200:
             # The user might exist in the db but not on this webserver.
             create_or_update_user(login_creds)
-            user = auth.authenticate(username = username, password=password)
+            user = auth.authenticate(username=username, password=password)
             auth.login(request, user)
         else:
             login_creds.add_error(None, 'Username or password incorrect') # pylint: disable=E1103
@@ -132,6 +133,7 @@ def login(request):
     return render_login(request, login_creds)
 
 def logout(request):
+    """ logout the user from current request """
     auth.logout(request)
     return HttpResponseRedirect('/')
 

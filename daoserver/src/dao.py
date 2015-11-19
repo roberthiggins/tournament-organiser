@@ -241,7 +241,7 @@ def place_feedback():
     return make_response("Thanks for you help improving the site", 200)
 
 @APP.route('/userDetails/<u_name>', methods=['GET'])
-def userDetails(u_name=None):
+def user_details(u_name=None):
     """
     GET to get account details in url form
     TODO security
