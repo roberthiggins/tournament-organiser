@@ -1,0 +1,17 @@
+h1. Deployment Instructions for Tournament Organiser
+
+h2. Developement
+
+Use the scripts/install file. You can pass the arguments for the names of the machines you want to spin up. See the script for more information
+
+h2. Production
+
+This application is not in a production-ready state.
+
+h2. Data Persistence
+
+For testing purposes you should avoid data persistence in the db. Instead you should use the deafult data in the test_data file that lives in the db dir.
+
+In production the solution is to use the "volumes-from" argument when making the db. The intention is that the install script will not deploy the database unless you force it to. When you want oto make a new db you should make new db container using the data volume in the old db. This should suffice in a single machine environment where down time is acceptable. You can then deploy the rest of the framework to point to the new db. Once done you can remove the old db container - volumes aren't seleted by default.
+
+Long term we should look into making a default data container. We can build it from the postrges image as that will ensure all the directories are set up correctly.
