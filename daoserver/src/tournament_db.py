@@ -87,3 +87,21 @@ class TournamentDBConnection(object):
         except psycopg2.DatabaseError as err:
             print 'Database Error %s' % err
             raise err
+
+    def tournament_details(self, name):
+        """
+        Get information about a tournament.
+        Returns none if tournie non-existent
+        """
+        if not self.tournament_exists(name):
+            raise RuntimeError('No information is available on "%s" ' % name)
+
+        try:
+            cur = self.con.cursor()
+            cur.execute("SELECT * FROM tournament WHERE name = %s",
+                [name])
+            return cur.fetchone()
+
+        except psycopg2.DatabaseError as err:
+            print 'Database Error %s' % err
+            raise err

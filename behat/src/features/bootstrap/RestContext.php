@@ -172,9 +172,15 @@ class RestContext extends BehatContext
     {
         $baseUrl = $this->getParameter('api_url');
         $this->_requestUrl = $baseUrl.$pageUrl;
-        $response = $this->_client
-            ->request('GET', $this->_requestUrl.'?'.http_build_query((array)$this->_restObject));
-        $this->_response = $response;
+        try {
+            $response = $this->_client
+                ->request('GET',
+                    $this->_requestUrl.'?'.http_build_query((array)$this->_restObject));
+            $this->_response = $response;
+        }
+        catch (GuzzleHttp\Exception\ClientException $e) {
+            $this->_response = $e->getResponse();
+        }
     }
     /**
      * @When /^I POST "([^"]*)" to "([^"]*)" from the API$/

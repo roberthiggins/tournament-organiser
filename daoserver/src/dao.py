@@ -10,6 +10,7 @@ import re
 
 from flask import Flask, request, make_response, json, jsonify
 
+from datetime_encoder import DateTimeJSONEncoder
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
 from tournament_db import TournamentDBConnection
@@ -239,6 +240,36 @@ def place_feedback():
         return make_response("Please fill in the required fields", 400)
     FEEDBACK_DB_CONN.submit_feedback(_feedback)
     return make_response("Thanks for you help improving the site", 200)
+
+@APP.route('/tournamentDetails/<t_name>', methods=['GET'])
+def tournament_details(t_name=None):
+    """
+    GET to get details about a tournament. This includes entrants and format
+    information
+    """
+
+    try:
+        if not t_name or not TOURNAMENT_DB_CONN.tournament_exists(t_name):
+            raise RuntimeError('No information is available on %s ' % t_name)
+
+        details = TOURNAMENT_DB_CONN.tournament_details(t_name)
+
+        return DateTimeJSONEncoder().encode({
+            'name': details[1],
+            'date': details[2],
+            'details': {
+                'rounds': details[3] if details[3] is not None else 'N/A',
+                'score_format': details[4] if details[4] is not None else 'N/A',
+            }
+        })
+
+        return DateTimeJSONEncoder().encode(details)
+    except RuntimeError as err:
+        return make_response(str(err), 400)
+    except Exception as err:
+        print err
+        return make_response(str(err), 500)
+
 
 @APP.route('/userDetails/<u_name>', methods=['GET'])
 def user_details(u_name=None):
