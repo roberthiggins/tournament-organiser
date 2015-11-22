@@ -1,0 +1,3 @@
+dao-get () {
+    curl "http://$DAOSERVER_PORT_5000_TCP_ADDR:$DAOSERVER_PORT_5000_TCP_PORT/$1"
+}

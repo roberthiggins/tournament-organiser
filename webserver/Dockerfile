@@ -20,5 +20,7 @@ WORKDIR webapp/
 
 ENV ROOT_PASSWORD=foo
 
+ADD src/bash_aliases /root/.bash_aliases
+
 ADD ./init.sh ./
 CMD bash ./init.sh && python manage.py runserver 0.0.0.0:8000
