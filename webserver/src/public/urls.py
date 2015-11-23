@@ -18,4 +18,8 @@ urlpatterns = patterns('',
     url(r'^signup$', views.create_account, name='create_account'),
     url(r'^suggestimprovement$',
         views.suggest_improvement, name='suggest_improvement'),
+    url(r'^tournament/(?P<tournament_id>.+)$',
+        views.tournament, name='tournament'),
+    url(r'^tournament/$',
+        views.register_for_tournament, name='apply_for_tournament'),
 )

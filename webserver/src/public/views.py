@@ -215,6 +215,22 @@ def suggest_improvement(request):
         RequestContext(request)
     )
 
+def tournament(request, tournament_id):
+
+    if tournament_id is None or request.method == 'POST':
+        return register_for_tournament(request)
+
+    response = from_dao('/tournamentDetails/%s' % tournament_id)
+    try:
+        t_info = json.load(response)
+        return render_to_response(
+            'tournament-info.html',
+            {'id': tournament_id, 'info': t_info},
+            RequestContext(request)
+        )
+    except AttributeError as err:
+        return HttpResponse(response)
+
 ### Some helper methods
 
 def from_dao(url, form=None):
