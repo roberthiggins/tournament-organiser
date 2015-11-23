@@ -22,4 +22,5 @@ urlpatterns = patterns('',
         views.tournament, name='tournament'),
     url(r'^tournament/$',
         views.register_for_tournament, name='apply_for_tournament'),
+    url(r'^tournaments$', views.list_tournaments, name='list_tournaments'),
 )

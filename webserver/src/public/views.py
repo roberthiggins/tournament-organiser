@@ -126,6 +126,15 @@ def create_or_update_user(login_creds):
             email=user[0],
             password=p_word)
 
+def list_tournaments(request):
+    """ Get a list of tournaments"""
+    t_list = json.load(from_dao('/listtournaments'))['tournaments']
+    return render_to_response(
+        'tournament-list.html',
+        {'tournaments': t_list},
+        RequestContext(request)
+    )
+
 def login(request):
     """Login page"""
 
