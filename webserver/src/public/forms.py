@@ -32,18 +32,18 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=W0232
     """ Add an account """
     email = forms.EmailField(required=True)
 
-    class Meta: # pylint: disable=W0232,C0111
+    class Meta: # pylint: disable=W0232,C0111,C1001
         model = User
         fields = ("username", "email", "password1", "password2")
 
-    def save(self, commit=True):                        # pylint: disable=W0232
+    def save(self, commit=True):                # pylint: disable=W0232,E1002
         user = super(CreateAccountForm, self).save(commit=False)
         user.email = self.cleaned_data["email"]         # pylint: disable=E1101
         if commit:
             user.save()
         return user
 
-    def error_code(self):
+    def error_code(self):                               # pylint: disable=C0111
         # pylint: disable=E1101
         if 'email' in self._errors and len(self._errors) == 1:
             return 'This email does not appear valid'

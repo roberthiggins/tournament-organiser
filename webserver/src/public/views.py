@@ -52,7 +52,7 @@ def create_tournament(request):
 
     if request.method == 'POST':
         form = AddTournamentForm(request.POST)
-        if form.is_valid():
+        if form.is_valid():                             # pylint: disable=E1101
             response = from_dao('/addTournament', form)
 
             if  response.status_code == 200:
@@ -75,7 +75,7 @@ def feedback(request):
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
-        if form.is_valid():
+        if form.is_valid():                             # pylint: disable=E1101
             response = from_dao('/placefeedback', form)
 
             if  response.status_code == 200:
@@ -174,7 +174,7 @@ def register_for_tournament(request):
 
     if request.method == 'POST':
         form = ApplyForTournamentForm(request.POST, tournament_list=t_list)
-        if form.is_valid():
+        if form.is_valid():                             # pylint: disable=E1101
             response = from_dao('/registerfortournament', form)
 
             if  response.status_code == 200:
@@ -196,7 +196,7 @@ def suggest_improvement(request):
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
-        if form.is_valid():
+        if form.is_valid():                             # pylint: disable=E1101
             response = from_dao('/placefeedback', form)
 
             if  response.status_code == 200:
@@ -216,7 +216,7 @@ def suggest_improvement(request):
     )
 
 def tournament(request, tournament_id):
-
+    """ See information about a single tournament"""
     if tournament_id is None or request.method == 'POST':
         return register_for_tournament(request)
 
@@ -228,7 +228,7 @@ def tournament(request, tournament_id):
             {'id': tournament_id, 'info': t_info},
             RequestContext(request)
         )
-    except AttributeError as err:
+    except AttributeError:
         return HttpResponse(response)
 
 ### Some helper methods

@@ -262,8 +262,6 @@ def tournament_details(t_name=None):
                 'score_format': details[4] if details[4] is not None else 'N/A',
             }
         })
-
-        return DateTimeJSONEncoder().encode(details)
     except RuntimeError as err:
         return make_response(str(err), 400)
     except Exception as err:
