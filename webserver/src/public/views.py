@@ -160,16 +160,12 @@ def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
 
-def get_tournament_list():
-    """ Get a list of tournaments; tupled for your convenience"""
-    t_list = json.load(from_dao('/listtournaments'))['tournaments']
-    return [(x, x) for x in t_list]
-
 @login_required
 def register_for_tournament(request):
     """Page to register for tournament"""
 
-    t_list = get_tournament_list()
+    t_list = json.load(from_dao('/listtournaments'))['tournaments']
+    t_list = [(x['name'], x['name']) for x in t_list]
     form = ApplyForTournamentForm(tournament_list=t_list)
 
     if request.method == 'POST':

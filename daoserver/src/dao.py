@@ -35,7 +35,8 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     tournament names
     """
-    return jsonify({'tournaments' : TOURNAMENT_DB_CONN.list_tournaments()})
+    return DateTimeJSONEncoder().encode(
+        {'tournaments' : TOURNAMENT_DB_CONN.list_tournaments()})
 
 @APP.route('/registerfortournament', methods=['POST'])
 def apply_for_tournament():

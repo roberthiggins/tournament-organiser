@@ -82,8 +82,14 @@ class TournamentDBConnection(object):
         """Get a list of tournaments"""
         try:
             cur = self.con.cursor()
-            cur.execute("SELECT name FROM tournament")
-            return [x[0] for x in cur.fetchall()]
+            cur.execute(
+                "SELECT name, date, num_rounds, score_id FROM tournament")
+            raw_list = cur.fetchall()
+
+            return [{'name': x[0],
+                    'date': x[1],
+                    'rounds': x[2],
+                    'scoring': x[3]} for x in raw_list]
         except psycopg2.DatabaseError as err:
             print 'Database Error %s' % err
             raise err
