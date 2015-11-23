@@ -1,8 +1,8 @@
-""" Basic URL mappings for the webserver """
+"""
+Basic URL mappings for the webserver
+"""
+
 import json
-import os
-import urllib
-import urllib2
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -12,10 +12,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from forms import AddTournamentForm, ApplyForTournamentForm, \
 CreateAccountForm, FeedbackForm, LoginForm
-
-DAO_URL = "http://%s:%s" % (
-    os.environ['DAOSERVER_PORT_5000_TCP_ADDR'],
-    os.environ['DAOSERVER_PORT_5000_TCP_PORT'])
+from public.view_helpers import from_dao
 
 def index(request):                                     # pylint: disable=W0613
     """The index"""
@@ -235,31 +232,3 @@ def tournament(request, tournament_id):
         )
     except AttributeError:
         return HttpResponse(response)
-
-### Some helper methods
-
-def from_dao(url, form=None):
-    """
-    Proxies a GET/POST to the daoserver. This helps keep input handling in \
-    the DAO API
-    """
-    try:
-
-        if form is None:
-            return urllib2.urlopen(urllib2.Request(DAO_URL + url))
-
-        if form.is_valid():
-            return HttpResponse(
-                urllib2.urlopen(urllib2.Request(DAO_URL + url,
-                urllib.urlencode(form.cleaned_data))))
-
-        return HttpResponse(form.error_code(), status=400)
-
-    except urllib2.HTTPError as err:
-        if err.code == 400:
-            return HttpResponse(err.read(), status=400)
-        else:
-            raise
-    except Exception as err:
-        print err
-        raise
