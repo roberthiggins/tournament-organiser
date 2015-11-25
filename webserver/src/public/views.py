@@ -5,10 +5,10 @@ Basic URL mappings for the webserver
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from forms import AddTournamentForm, ApplyForTournamentForm, FeedbackForm
+from forms import AddTournamentForm, ApplyForTournamentForm, FeedbackForm, TournamentSetupForm
 from public.view_helpers import from_dao
 
 @login_required
@@ -114,5 +114,33 @@ def suggest_improvement(request):
     return render_to_response(
         'feedback.html',
         context_dict,
+        RequestContext(request)
+    )
+
+@login_required
+def tournament_setup(request, tournament_id):
+
+    form = TournamentSetupForm(tournament_id=tournament_id)
+
+    if request.method == 'POST':
+        form = TournamentSetupForm(request.POST, tournament_id=tournament_id)
+        if form.is_valid():                             # pylint: disable=E1101
+            response = from_dao('/setTournamentScore', form)
+
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
+
+    tournament_details = from_dao('/tournamentDetails/%s' % tournament_id)
+    if tournament_details.status_code != 200:
+        return HttpResponseNotFound('Tournament %s not found' % tournament_id)
+
+    return render_to_response(
+        'tournament-setup.html',
+        {
+            'form': form,
+            'name': tournament_id
+        },
         RequestContext(request)
     )

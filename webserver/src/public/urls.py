@@ -26,4 +26,6 @@ urlpatterns = patterns('',
         views.register_for_tournament, name='apply_for_tournament'),
     url(r'^suggestimprovement$',
         views.suggest_improvement, name='suggest_improvement'),
+    url(r'^tournamentsetup/(?P<tournament_id>.+)$',
+        views.tournament_setup, name='tournament_setup'),
 )
