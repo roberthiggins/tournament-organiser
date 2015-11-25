@@ -21,7 +21,9 @@ def from_dao(url, form=None):
     try:
 
         if form is None:
-            return urllib2.urlopen(urllib2.Request(DAO_URL + url))
+            return HttpResponse(
+                urllib2.urlopen(urllib2.Request(DAO_URL + url))
+            )
 
         if form.is_valid():
             return HttpResponse(

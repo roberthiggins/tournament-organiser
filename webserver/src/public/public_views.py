@@ -50,7 +50,7 @@ def create_or_update_user(login_creds):
     """
     u_name = login_creds.cleaned_data['inputUsername']
     p_word = login_creds.cleaned_data['inputPassword']
-    user = json.load(from_dao('/userDetails/%s' % u_name)).get(u_name)
+    user = json.loads(from_dao('/userDetails/%s' % u_name).content).get(u_name)
 
     try:
         local_user = User.objects.get(username=u_name)
@@ -65,7 +65,7 @@ def create_or_update_user(login_creds):
 
 def list_tournaments(request):
     """ Get a list of tournaments"""
-    t_list = json.load(from_dao('/listtournaments'))['tournaments']
+    t_list = json.loads(from_dao('/listtournaments').content)['tournaments']
     return render_to_response(
         'tournament-list.html',
         {'tournaments': t_list},
@@ -116,9 +116,9 @@ def tournament(request, tournament_id):
     if request.method == 'POST':
         return HttpResponseRedirect('/registerforatournament')
 
-    response = from_dao('/tournamentDetails/%s' % tournament_id)
+    response = from_dao('/tournamentDetails/%s' % tournament_id).content
     try:
-        t_info = json.load(response)
+        t_info = json.loads(response)
         return render_to_response(
             'tournament-info.html',
             {'id': tournament_id, 'info': t_info},

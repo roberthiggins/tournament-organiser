@@ -70,7 +70,7 @@ def logout(request):
 def register_for_tournament(request):
     """Page to register for tournament"""
 
-    t_list = json.load(from_dao('/listtournaments'))['tournaments']
+    t_list = json.loads(from_dao('/listtournaments').content)['tournaments']
     t_list = [(x['name'], x['name']) for x in t_list]
     form = ApplyForTournamentForm(tournament_list=t_list)
 
