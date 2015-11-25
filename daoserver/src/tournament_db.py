@@ -111,3 +111,43 @@ class TournamentDBConnection(object):
         except psycopg2.DatabaseError as err:
             print 'Database Error %s' % err
             raise err
+
+    def set_score_category(self, tournament_id, key, min_val, max_val):
+        """
+        Create a score that entries can get in the tournament. This should be
+        called for all scores you want, e.g. round_1_battle, round_2_battle
+
+        Expects:
+            - a varchar candidate. The key will need to be unique and should
+            be a varchar.
+            - min_val. Integer. nin val for the score. Default 0
+            - max_val. Integer. max val for the score. Default 20
+
+        Returns: throws ValueError and psycopg2.DatabaseError as appropriate
+        """
+        if not tournament_id or not key:
+            raise ValueError('Arguments missing from set_score_category call')
+        try:
+            min_val = int(min_val)
+        except ValueError:
+            raise ValueError('Minimum Score must be an integer')
+
+        try:
+            max_val = int(max_val)
+        except ValueError:
+            raise ValueError('Maximum Score must be an integer')
+
+        try:
+            cur = self.con.cursor()
+            cur.execute(
+                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s)",
+                [key, tournament_id, max_val, min_val])
+            self.con.commit()
+
+        except psycopg2.IntegrityError:
+            self.con.rollback()
+            raise RuntimeError('Score already set')
+        except psycopg2.DatabaseError as err:
+            self.con.rollback()
+            print 'Database Error %s' % err
+            raise RuntimeError(err)

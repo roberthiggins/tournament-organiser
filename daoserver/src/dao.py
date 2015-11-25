@@ -242,6 +242,50 @@ def place_feedback():
     FEEDBACK_DB_CONN.submit_feedback(_feedback)
     return make_response("Thanks for you help improving the site", 200)
 
+@APP.route('/setTournamentScore', methods=['POST'])
+def set_tournament_score():
+    """
+    POST to set a score category that a player is eligible for in a tournament.
+    For example, use this to specify that a tournament has a 'round_1_battle'
+    score for each player.
+
+    Expected:
+        - tournament_id - unique name of the tournament
+        - key - unique name for the score in the tournament e.g. round_4_comp
+        - (opt) min_val - for score - default 0
+        - (opt) max_val - for score - default 20
+    """
+    t_id = request.values.get('tournamentId', None)
+    key = request.values.get('key', None)
+    min_val = request.values.get('minVal')
+    if not min_val:
+        min_val = 0
+    max_val = request.values.get('maxVal')
+    if not max_val:
+        max_val = 20
+    print t_id, key, min_val, max_val
+
+
+    if not t_id or not key:
+        return make_response('Enter the required fields', 400)
+
+    try:
+        TOURNAMENT_DB_CONN.set_score_category(
+            tournament_id=t_id,
+            key=key,
+            min_val=min_val,
+            max_val=max_val)
+        return make_response('Score created', 200)
+    except ValueError as err:
+        print err
+        return make_response(str(err), 400)
+    except RuntimeError as err:
+        print err
+        return make_response(str(err), 400)
+    except Exception as err:
+        print err
+        return make_response(str(err), 500)
+
 @APP.route('/tournamentDetails/<t_name>', methods=['GET'])
 def tournament_details(t_name=None):
     """
