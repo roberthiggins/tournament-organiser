@@ -193,6 +193,7 @@ class RestContext extends BehatContext
             $response = $this->_client->request(
                             'POST',
                             $this->_requestUrl.'?'.$value);
+            $this->_response = $response;
         }
         catch (GuzzleHttp\Exception\ClientException $e) {
             $this->_response = $e->getResponse();
