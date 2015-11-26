@@ -30,22 +30,6 @@ class TournamentDBConnection(object):
 
         raise NotImplementedError("enter game score not implemented")
 
-    def enter_score(self, tournament_id, player_id, category, score):
-        """
-        Enters a score for category into tournament for player
-
-        Expects: All fields required
-
-        Assumption: That the player exists
-        """
-        if not player_id or not tournament_id or not category or not score:
-            raise RuntimeError('Enter the required fields')
-
-        if not self.tournament_exists(tournament_id):
-            raise RuntimeError('Unknown tournament: ' + tournament_id)
-
-        raise NotImplementedError("enter score not implemented")
-
     def tournament_exists(self, name):
         """Check if a tournament exists with the passed name"""
         try:

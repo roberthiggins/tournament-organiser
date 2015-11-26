@@ -11,12 +11,14 @@ import re
 from flask import Flask, request, make_response, json, jsonify
 
 from datetime_encoder import DateTimeJSONEncoder
+from entry_db import EntryDBConnection
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
 from tournament_db import TournamentDBConnection
 from registration_db import RegistrationDBConnection
 
 APP = Flask(__name__)
+ENTRY_DB_CONN = EntryDBConnection()
 FEEDBACK_DB_CONN = FeedbackDBConnection()
 PLAYER_DB_CONN = PlayerDBConnection()
 TOURNAMENT_DB_CONN = TournamentDBConnection()
@@ -181,31 +183,32 @@ def enter_game_score():
 @APP.route('/entertournamentscore', methods=['POST'])
 def enter_tournament_score():
     """
-    POST to enter a one-time score for a player in a tournament. An example
-    might be a painting score.
+    POST to enter a score for a player in a tournament.
 
     Expects:
-        - username
-        - tournament - the tournament name
-        - key - the category e.g. painting
-        - value - the score
+        - username - the player_id
+        - tournament - the tournament_id
+        - key - the category e.g. painting, round_6_battle
+        - value - the score. Integer
     """
 
-    user = request.args.get('username')
-    tournament = request.args.get('tournament')
-    category = request.args.get('key')
-    score = request.args.get('value')
+    user = request.values.get('username', None)
+    tournament = request.values.get('tournament', None)
+    category = request.values.get('key', None)
+    score = request.values.get('value', None)
 
     if not user or not tournament or not category or not score:
         return make_response('Enter the required fields', 400)
 
-    if not PLAYER_DB_CONN.username_exists(user):
-        return make_response('Unknown user: ' + user, 400)
-
     try:
+        entry = ENTRY_DB_CONN.entry_id(tournament, user)
+
+        ENTRY_DB_CONN.enter_score(tournament, entry, category, score)
         return make_response(
-            TOURNAMENT_DB_CONN.enter_score(tournament, user, category, score),
+            'Score entered for {}: {}'.format(user, score),
             200)
+    except ValueError as err:
+        return make_response(str(err), 400)
     except RuntimeError as err:
         return make_response(str(err), 400)
 

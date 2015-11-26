@@ -17,21 +17,20 @@ Feature: Enter a tournament score
         Examples:
             |value                                                                                      |response_code  |response_text                          |
             |foo                                                                                        |400            |Enter the required fields              |
-            |tournament=painting_test&key=painting&value=20                                             |400            |Enter the required fields              |
-            |username=stevemcqueen&key=painting&value=20                                                |400            |Enter the required fields              |
-            |username=stevemcqueen&username=stevemcqueen&key=painting&value=20                          |400            |Enter the required fields              |
+            |tournament=painting_test&key=fanciest_wig&value=20                                         |400            |Enter the required fields              |
+            |username=stevemcqueen&key=fanciest_wig&value=20                                            |400            |Enter the required fields              |
+            |username=stevemcqueen&username=stevemcqueen&key=fanciest_wig&value=20                      |400            |Enter the required fields              |
             |username=stevemcqueen&tournament=painting_test&value=20                                    |400            |Enter the required fields              |
-            |username=stevemcqueen&tournament=painting_test&key=painting                                |400            |Enter the required fields              |
-            |username=stevemcqueen&tournament=painting_test&key=painting&                               |400            |Enter the required fields              |
-            |username=jimmynoname&tournament=painting_test&key=painting&value=20                        |400            |Unknown user: jimmynoname              |
-            |username=stevemcqueen&tournament=notatournament&key=painting&value=20                      |400            |Unknown tournament: notatournament     |
-# Awaiting db implementation
-#            |username=stevemcqueen&tournament=painting_test&key=painting&value=ham                      |400            |Invalid score: ham                     |
-#            |username=stevemcqueen&tournament=notatournament&key=magic&value=20                         |400            |Unknown category: magic                |
-#            |username=stevemcqueen&tournament=painting_test&key=painting&value=20                       |200            |Score entered for stevemcqueen: 20     |
-#            |username=stevemcqueen&tournament=painting_test&key=painting&value=19                       |200            |Score entered for stevemcqueen: 19     |
-#            |username=stevemcqueen&username=stevemcqueen&tournament=painting_test&key=painting&value=20 |200            |Score entered for stevemcqueen: 20     |
-#            |username=stevemcqueen&username=jerry&tournament=painting_test&key=painting&value=20        |200            |Score entered for stevemcqueen: 20     |
+            |username=stevemcqueen&tournament=painting_test&key=fanciest_wig                            |400            |Enter the required fields              |
+            |username=stevemcqueen&tournament=painting_test&key=fanciest_wig&                           |400            |Enter the required fields              |
+            |username=jimmynoname&tournament=painting_test&key=fanciest_wig&value=20                    |400            |Unknown player: jimmynoname            |
+            |username=stevemcqueen&tournament=notatournament&key=fanciest_wig&value=20                  |400            |Unknown tournament: notatournament     |
+            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=ham                    |400            |Invalid score: ham                     |
+            |username=rick_james&tournament=painting_test&key=magic&value=20                            |400            |Unknown category: magic                |
+            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=20                     |200            |Score entered for rick_james: 20       |
+            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=19                     |400            |Score already set                      |
+            |username=rick_james&username=rick_james&tournament=painting_test&key=fanciest_wig&value=20 |400            |Score already set                      |
+            |username=rick_james&username=jerry&tournament=painting_test&key=fanciest_wig&value=20      |400            |Score already set                      |
 
 # Awaiting user controls
 #    Scenario: Another player tries to give a painting score to a player
