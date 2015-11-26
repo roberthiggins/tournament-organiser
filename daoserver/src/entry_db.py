@@ -85,3 +85,29 @@ class EntryDBConnection(object):
         except psycopg2.DatabaseError as err:
             self.con.rollback()
             raise err
+
+    def entry_info(self, entry_id):
+        """ Given an entry, get information about the user and tournament"""
+        if not entry_id:
+            raise ValueError('Missing required fields to entry_info')
+        try:
+            entry_id = int(entry_id)
+        except ValueError:
+            raise ValueError('Entry ID must be an integer')
+
+        try:
+            cur = self.con.cursor()
+            cur.execute("SELECT p.username, t.name \
+                FROM entry e INNER JOIN player p on e.player_id = p.username \
+                INNER JOIN tournament t on e.tournament_id = t.name \
+                WHERE e.id = %s", [entry_id])
+            row = cur.fetchone()
+            if row is None:
+                raise ValueError('Entry ID not valid: {}'.format(entry_id))
+            return {
+                'entry_id': entry_id,
+                'username': row[0],
+                'tournament_name': row[1],
+            }
+        except psycopg2.DatabaseError as err:
+            raise RuntimeError(err)
