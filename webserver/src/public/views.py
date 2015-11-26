@@ -4,11 +4,14 @@ Basic URL mappings for the webserver
 
 import json
 
+from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, \
+HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from forms import AddTournamentForm, ApplyForTournamentForm, FeedbackForm, TournamentSetupForm
+from forms import AddTournamentForm, ApplyForTournamentForm, FeedbackForm, \
+TournamentSetupForm
 from public.view_helpers import from_dao
 
 @login_required
@@ -119,7 +122,7 @@ def suggest_improvement(request):
 
 @login_required
 def tournament_setup(request, tournament_id):
-
+    """Adda score to a tournament"""
     form = TournamentSetupForm(tournament_id=tournament_id)
 
     if request.method == 'POST':

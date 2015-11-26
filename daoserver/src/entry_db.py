@@ -64,7 +64,7 @@ class EntryDBConnection(object):
     def entry_id(self, tournament_id, player_id):
         """
         Get the entry_id for the player in the tournament
-        
+
         Returns: Integer. The entry_id of entry, if one exists. Throws
             ValueErrors and RuntimeError if tournament or player don't exist.
         """
