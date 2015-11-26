@@ -1,8 +1,13 @@
+-- Set up some tournaments
 INSERT INTO tournament VALUES (DEFAULT, 'northcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'southcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
 INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10');
 
+INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 'painting_test', 4, 15);
+
+
+-- Set up some users
 DO $$
 DECLARE lastid int := 0;
 BEGIN
@@ -17,4 +22,8 @@ BEGIN
     INSERT INTO account_security VALUES (lastid, '$5$rounds=535000$1ChlmvAIh/6yDqVg$wn8vZxK1igRA17V8pjMr90ph3Titr35DF5X5DYSLpv.');
 END $$;
 
+
+-- Enter some players
 INSERT INTO registration VALUES('stevemcqueen', 'painting_test');
+
+INSERT INTO entry VALUES(default, 'rick_james', 'painting_test');
