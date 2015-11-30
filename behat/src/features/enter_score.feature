@@ -21,17 +21,28 @@ Feature: Enter a score for a player
         Given I am on "/enterscore/1"
         Then I should be on "/login"
 
+    Scenario Outline: I only know the tournament and username
+        Given I am on "/enterscore/<tournament>/<username>"
+        Then I should be on "<destination>"
+        Then the response status code should be <code>
+        Examples:
+            |tournament         |username       |destination                    |code   |
+            |painting_test      |rick_james     |/enterscore/1                  |200    |
+            |                   |rick_james     |/enterscore//rick_james        |404    |
+            |painting_test      |               |/enterscore/painting_test/     |404    |
+            |foobar             |rick_james     |/enterscore/foobar/rick_james  |404    |
+            |painting_test      |jimmy          |/enterscore/painting_test/jimmy|404    |
+
     Scenario Outline: URL malformed
         Given I am on "/enterscore/<id>"
         Then the response status code should be <code>
-        Then I should see "<content>"
         Examples:
-            | code | id | content                               |
-            | 404  |    | Page not found                        |
-            | 400  | 0  | Entry ID not valid: 0                 |
-            | 400  | a  | Entry ID must be an integer           |
-            | 400  | 1a | Entry ID must be an integer           |
-            | 200  | 1  | rick_james                            |
+            | code | id |
+            | 404  |    |
+            | 400  | 0  |
+            | 404  | a  |
+            | 404  | 1a |
+            | 200  | 1  |
 
     Scenario Outline: I enter some scores
         Given I am on "/enterscore/1"

@@ -212,6 +212,11 @@ def enter_tournament_score():
     except RuntimeError as err:
         return make_response(str(err), 400)
 
+@APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
+def entry_id(tournament_id, username):
+    return DateTimeJSONEncoder().encode(
+        ENTRY_DB_CONN.entry_id(tournament_id, username))
+
 @APP.route('/entryInfo/<entry_id>', methods=['GET'])
 def entry_info(entry_id):
     """ Given entry_id, get info about player and tournament"""

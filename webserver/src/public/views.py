@@ -38,8 +38,25 @@ def create_tournament(request):
     )
 
 @login_required
+def enter_score(request, tournament_id, username):
+    """Enter score page when the entry_id isn't known"""
+    try:
+
+        response = from_dao('/entryId/{}/{}'.format(tournament_id, username))
+        entry_id = json.loads(response.content)
+        return HttpResponseRedirect('/enterscore/{}'.format(entry_id))
+    except Exception as err:
+        print err
+        return HttpResponseNotFound()
+
+@login_required
 def enter_score_by_entry(request, entry_id):
     """Enter score page"""
+    try:
+        entry_id = int(entry_id)
+    except ValueError:
+        return HttpResponseNotFound()
+
     response = from_dao('/entryInfo/{}'.format(entry_id))
     if response.status_code != 200:
         return HttpResponse(response, status=response.status_code)
