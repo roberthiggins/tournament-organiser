@@ -1,13 +1,10 @@
-Feature: Enter a tournament score
-    I want to enter once-per-tournament scores
-    As tournament organiser or player
-    So that I can give people points
+Feature: Enter a score for a player
+    In order to get points in a tournament
+    As a logged in user
+    I want to enter scores
 
-    Background:
-        # There is a tournamnent that has a  best painted and a per-player
-        # painting score. Each player, and the TO, is eligible to give a vote
-        # for best painted. Only the TO is eligible to give painting scores to
-        # players.
+    # There are two ways to enter the score, using tournament id and player id
+    # or by using the entry id directly
 
     Scenario Outline: The TO gives a painting score to a player
         When I POST "<value>" to "/entertournamentscore" from the API
@@ -27,12 +24,14 @@ Feature: Enter a tournament score
             |username=stevemcqueen&tournament=notatournament&key=fanciest_wig&value=20                  |400            |Unknown tournament: notatournament     |
             |username=rick_james&tournament=painting_test&key=fanciest_wig&value=ham                    |400            |Invalid score: ham                     |
             |username=rick_james&tournament=painting_test&key=magic&value=20                            |400            |Unknown category: magic                |
-            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=20                     |200            |Score entered for rick_james: 20       |
-            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=19                     |400            |Score already set                      |
-            |username=rick_james&username=rick_james&tournament=painting_test&key=fanciest_wig&value=20 |400            |Score already set                      |
-            |username=rick_james&username=jerry&tournament=painting_test&key=fanciest_wig&value=20      |400            |Score already set                      |
+            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=1000                   |400            |Invalid score: 1000                    |
+            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=-3                     |400            |Invalid score: -3                      |
+            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=14                     |200            |Score entered for rick_james: 14       |
+            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=12                     |400            |12 not entered. Score is already set   |
+            |username=rick_james&username=rick_james&tournament=painting_test&key=fanciest_wig&value=9  |400            |9 not entered. Score is already set    |
+            |username=rick_james&username=jerry&tournament=painting_test&key=fanciest_wig&value=8       |400            |8 not entered. Score is already set    |
 
-# Awaiting user controls
-#    Scenario: Another player tries to give a painting score to a player
-#    Scenario: People try to give best painted votes to a player
 
+    # TODO User controls
+    Scenario: another player
+    Scenario: to

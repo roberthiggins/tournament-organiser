@@ -38,14 +38,22 @@ class EntryDBConnection(object):
 
             # score_key should mean something in the context of the tournie
             cur.execute(
-                "SELECT id from score_key \
+                "SELECT id, min_val, max_val FROM score_key \
                 WHERE key = %s AND tournament_id = %s",
                 [score_key, tournament_id])
+            row = cur.fetchone()
             try:
-                score_id = cur.fetchone()[0]
+                score_id = row[0]
             except TypeError:
-                raise RuntimeError('Unknown category: %s' % score_key)
+                raise RuntimeError('Unknown category: {}'.format(score_key))
 
+            try:
+                score = int(score)
+            except ValueError:
+                raise psycopg2.DataError()
+
+            if score < int(row[1]) or score > int(row[2]):
+                raise psycopg2.DataError()
 
             cur.execute("INSERT INTO score VALUES(%s, %s, %s)",
                 [entry_id, score_id, score])
@@ -56,7 +64,8 @@ class EntryDBConnection(object):
             raise RuntimeError('Invalid score: %s' % score)
         except psycopg2.IntegrityError as err:
             self.con.rollback()
-            raise RuntimeError('Score already set')
+            raise RuntimeError(
+                '{} not entered. Score is already set'.format(score))
         except psycopg2.DatabaseError as err:
             self.con.rollback()
             raise RuntimeError(err)

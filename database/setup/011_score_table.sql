@@ -2,8 +2,8 @@ CREATE TABLE score_key (
     id                  SERIAL UNIQUE,
     key                 VARCHAR NOT NULL,
     tournament_id       VARCHAR REFERENCES tournament(name),
-    max_val             INTEGER,
     min_val             INTEGER,
+    max_val             INTEGER,
     PRIMARY KEY (key, tournament_id)
 );
 COMMENT ON TABLE score_key IS 'This table is all the score keys that might be entered for a tournament. An example might be round_1_battle, round_1_sports, best_painted_votes';
