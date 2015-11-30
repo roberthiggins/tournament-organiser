@@ -10,8 +10,8 @@ from django.http import HttpResponse, HttpResponseNotFound, \
 HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from forms import AddTournamentForm, ApplyForTournamentForm, FeedbackForm, \
-TournamentSetupForm
+from forms import AddTournamentForm, ApplyForTournamentForm, \
+EnterScoreForm, FeedbackForm, TournamentSetupForm
 from public.view_helpers import from_dao
 
 @login_required
@@ -34,6 +34,39 @@ def create_tournament(request):
     return render_to_response(
         'create-a-tournament.html',
         {'form': form},
+        RequestContext(request)
+    )
+
+@login_required
+def enter_score_by_entry(request, entry_id):
+    """Enter score page"""
+    response = from_dao('/entryInfo/{}'.format(entry_id))
+    if response.status_code != 200:
+        return HttpResponse(response, status=response.status_code)
+
+    user_info = json.loads(response.content)
+    form = EnterScoreForm(
+        username=user_info['username'],
+        tournament=user_info['tournament_name'])
+
+    if request.method == 'POST':
+        form = EnterScoreForm(
+            data=request.POST,
+            username=user_info['username'],
+            tournament=user_info['tournament_name'])
+
+        if form.is_valid():                             # pylint: disable=E1101
+            response = from_dao('/entertournamentscore', form)
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
+
+    return render_to_response(
+        'enter-score.html',
+        {'form': form,
+        'username': user_info['username'],
+        },
         RequestContext(request)
     )
 

@@ -5,6 +5,7 @@ INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
 INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10');
 
 INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 'painting_test', 4, 15);
+INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 'painting_test', 2, 28);
 
 
 -- Set up some users

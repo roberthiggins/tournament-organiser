@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Enter score for {{username}}{% endblock %}
+
+{% block intro %}<p>Enter a score for {{username}}</p>{% endblock %}
+
+{% block form %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Enter Score</button>
+    </form>
+{% endblock %}

@@ -6,6 +6,47 @@ Feature: Enter a score for a player
     # There are two ways to enter the score, using tournament id and player id
     # or by using the entry id directly
 
+    Background:
+        Given I am on "/login"
+        When I fill in "id_inputUsername" with "charlie_murphy"
+        When I fill in "id_inputPassword" with "darkness"
+        When I press "Login"
+        Then I should be on "/"
+
+    Scenario: Logged in
+        Given I am on "/enterscore/1"
+
+    Scenario: Logged out
+        Given I am on "/logout"
+        Given I am on "/enterscore/1"
+        Then I should be on "/login"
+
+    Scenario Outline: URL malformed
+        Given I am on "/enterscore/<id>"
+        Then the response status code should be <code>
+        Then I should see "<content>"
+        Examples:
+            | code | id | content                               |
+            | 404  |    | Page not found                        |
+            | 400  | 0  | Entry ID not valid: 0                 |
+            | 400  | a  | Entry ID must be an integer           |
+            | 400  | 1a | Entry ID must be an integer           |
+            | 200  | 1  | rick_james                            |
+
+    Scenario Outline: I enter some scores
+        Given I am on "/enterscore/1"
+        Then I fill in "id_key" with "number_tassles"
+        Then I fill in "id_value" with "<score>"
+        Then I press "Enter Score"
+        Then the response status code should be 200
+        Then I should see "<content>"
+        Examples:
+            |score | content                                    |
+            | 1    | Invalid score: 1                           |
+            | 29   | Invalid score: 29                          |
+            | 5    | Score entered for rick_james: 5            |
+            | 6    | 6 not entered. Score is already set        |
+
     Scenario Outline: The TO gives a painting score to a player
         When I POST "<value>" to "/entertournamentscore" from the API
         Then the API response should contain "<response_text>"

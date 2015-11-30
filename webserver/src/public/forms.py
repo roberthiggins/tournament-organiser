@@ -54,6 +54,21 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=W0232
         else:
             return 'Enter the required fields'
 
+class EnterScoreForm(ErrorStringForm):                  # pylint: disable=W0232
+    def __init__(self, *args, **kwargs):                # pylint: disable=E1002
+        username = kwargs.pop('username')
+        tournament = kwargs.pop('tournament')
+        super(EnterScoreForm, self).__init__(*args, **kwargs)
+        # pylint: disable=E1101
+        self.fields['username'] = forms.CharField(
+            initial=username,
+            widget=forms.widgets.HiddenInput())
+        self.fields['tournament'] = forms.CharField(
+            initial=tournament,
+            widget=forms.widgets.HiddenInput())
+    key = forms.CharField(label='Category (e.g. round_1_battle)', )
+    value = forms.CharField(label='Score', )
+
 class FeedbackForm(ErrorStringForm):                    # pylint: disable=W0232
     """ Feedback and suggestions"""
     inputFeedback = forms.CharField(
