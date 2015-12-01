@@ -8,7 +8,6 @@ This serves two functions.
 
 from tournament_db import TournamentDBConnection
 
-
 class Tournament(object):
     """A tournament DAO"""
 
@@ -40,3 +39,25 @@ class Tournament(object):
             }
         }
 
+    def set_score(self, key, min_val=0, max_val=20):
+        """
+        Set a score category that a player is eligible for in a tournament.
+
+        For example, use this to specify that a tournament has a 'round_1_battle'
+        score for each player.
+
+        Expected:
+            - key - unique name e.g. round_4_comp
+            - (opt) min_val - for score - default 0
+            - (opt) max_val - for score - default 20
+        """
+        if not min_val:
+            min_val = 0
+        if not max_val:
+            max_val = 20
+
+        self.tourn_db_conn.set_score_category(
+            tournament_id=self.tournament_id,
+            key=key,
+            min_val=min_val,
+            max_val=max_val)
