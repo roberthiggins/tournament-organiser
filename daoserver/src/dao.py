@@ -8,7 +8,7 @@ should talk to this for functionality wherever possible.
 import os
 import re
 
-from flask import Flask, request, make_response, json, jsonify
+from flask import Flask, request, make_response, jsonify
 
 from datetime_encoder import DateTimeJSONEncoder
 from entry_db import EntryDBConnection
@@ -38,8 +38,7 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     tournament names
     """
-    return DateTimeJSONEncoder().encode(
-        {'tournaments' : TOURNAMENT_DB_CONN.list_tournaments()})
+    return DateTimeJSONEncoder().encode(Tournament.list_tournaments())
 
 @APP.route('/registerfortournament', methods=['POST'])
 def apply_for_tournament():

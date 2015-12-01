@@ -58,6 +58,16 @@ class Tournament(object):
             }
         }
 
+    @staticmethod
+    def list_tournaments():
+        """
+        GET a list of tournaments
+        Returns json. The only key is 'tournaments' and the value is a list of
+        tournament names
+        """
+        tourn_db_conn = TournamentDBConnection()
+        return {'tournaments' : tourn_db_conn.list_tournaments()}
+
     def set_score(self, key, min_val=0, max_val=20):
         """
         Set a score category that a player is eligible for in a tournament.
