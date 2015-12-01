@@ -72,7 +72,6 @@ def add_tournament():
         - inputTournamentName - Tournament name. Must be unique.
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
-    import datetime
     name = request.form['inputTournamentName']
     date = request.form['inputTournamentDate']
 
@@ -80,20 +79,15 @@ def add_tournament():
         return make_response("Please fill in the required fields", 400)
 
     try:
-        date = datetime.datetime.strptime(
-                    request.form['inputTournamentDate'],
-                    "%Y-%m-%d")
-        assert date.date() >= datetime.date.today()
+        tourn = Tournament(name)
+        tourn.add_to_db(date)
+        return make_response('<p>Tournament Created! You submitted the \
+            following fields:</p><ul><li>Name: {name}</li><li>Date: {date} \
+            </li></ul>'.format(**locals()), 200)
     except ValueError:
-        return make_response("Enter a valid date", 400)
-
-    if TOURNAMENT_DB_CONN.tournament_exists(name):
-        return make_response("A tournament with name %s already exists! \
-        Please choose another name" % name, 400)
-    TOURNAMENT_DB_CONN.add_tournament({'name' : name, 'date' : date})
-    return make_response('<p>Tournament Created! You submitted the \
-        following fields:</p><ul><li>Name: {name}</li><li>Date: {date} \
-        </li></ul>'.format(**locals()), 200)
+        return make_response(str(err), 400)
+    except RuntimeError as err:
+        return make_response(str(err), 400)
 
 def validate_user_email(email):
     """

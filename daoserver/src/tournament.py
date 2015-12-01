@@ -5,6 +5,7 @@ This serves two functions.
     - It houses tournament functions to reduce complexity in the app class
     - It holds a tournament object for housing of scoring strategies, etc.
 """
+import datetime
 
 from tournament_db import TournamentDBConnection
 
@@ -16,6 +17,24 @@ class Tournament(object):
         self.tournament_id = tournament_id
         self.exists_in_db = tournament_id is not None \
             and self.tourn_db_conn.tournament_exists(tournament_id)
+
+    def add_to_db(self, date):
+        """
+        add a tournament
+        Expects:
+            - inputTournamentDate - Tournament Date. YYYY-MM-DD
+        """
+        if self.exists_in_db:
+            raise RuntimeError('A tournament with name {} already exists! \
+            Please choose another name'.format(self.tournament_id))
+
+        date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        if date.date() < datetime.date.today():
+            raise ValueError('Enter a valid date')
+
+        self.tourn_db_conn.add_tournament(
+            {'name' : self.tournament_id, 'date' : date})
+
 
     def details(self):
         """
