@@ -15,14 +15,12 @@ from entry_db import EntryDBConnection
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
 from tournament import Tournament
-from tournament_db import TournamentDBConnection
 from registration_db import RegistrationDBConnection
 
 APP = Flask(__name__)
 ENTRY_DB_CONN = EntryDBConnection()
 FEEDBACK_DB_CONN = FeedbackDBConnection()
 PLAYER_DB_CONN = PlayerDBConnection()
-TOURNAMENT_DB_CONN = TournamentDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
 
 @APP.route("/")
@@ -134,45 +132,6 @@ def add_account():
     return make_response('<p>Account created! You submitted the following \
         fields:</p><ul><li>User Name: {username}</li><li>Email: {email}\
         </li></ul>'.format(**locals()), 200)
-
-@APP.route('/entergamescore', methods=['POST'])
-def enter_game_score():
-    """
-    POST to enter the scores for a single game.
-
-    Expects:
-        - json blob named 'gamescore' e.g. gamescore={blah}.It should include:
-            {
-            'scores': { 'username':{}, 'username': {} },
-            'tournament_name': 'some_tournament_id',
-            'round': '1'
-            }
-    """
-    if not request.args.get('gamescore'):
-        return make_response('Enter the required fields', 400)
-
-    data = json.loads(request.args.get('gamescore'))
-
-    if not data \
-    or not 'tournament_name' in data \
-    or not 'round' in data \
-    or not 'scores' in data:
-        return make_response('Enter the required fields', 400)
-
-    unknown_players = [x for x in data['scores'].keys() \
-                        if not PLAYER_DB_CONN.username_exists(x)]
-    if len(unknown_players) > 0:
-        return make_response('Unknown player: ' + unknown_players[0], 400)
-
-    try:
-        return make_response(
-            TOURNAMENT_DB_CONN.enter_game_score(
-                data['tournament_name'],
-                data['round'],
-                data['scores']),
-            200)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
 
 @APP.route('/entertournamentscore', methods=['POST'])
 def enter_tournament_score():

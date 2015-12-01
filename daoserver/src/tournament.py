@@ -41,7 +41,6 @@ class Tournament(object):
         Get details about a tournament. This includes entrants and format
         information
         """
-        #TODO pythonesque
         if not self.exists_in_db:
             raise RuntimeError(
                 'No information is available on {} '.format(
