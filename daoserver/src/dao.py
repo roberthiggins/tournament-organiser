@@ -215,6 +215,7 @@ def enter_tournament_score():
 
 @APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
 def entry_id(tournament_id, username):
+    """Get entry info from tournament and username"""
     return DateTimeJSONEncoder().encode(
         ENTRY_DB_CONN.entry_id(tournament_id, username))
 
@@ -259,7 +260,7 @@ def place_feedback():
     if re.match(r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
     FEEDBACK_DB_CONN.submit_feedback(_feedback)
-    return make_response("Thanks for you help improving the site", 200)    
+    return make_response("Thanks for you help improving the site", 200)
 
 @APP.route('/setTournamentScore', methods=['POST'])
 def set_tournament_score():

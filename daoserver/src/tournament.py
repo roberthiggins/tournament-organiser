@@ -43,7 +43,7 @@ class Tournament(object):
         """
         Set a score category that a player is eligible for in a tournament.
 
-        For example, use this to specify that a tournament has a 'round_1_battle'
+        For example, use this to specify that a tourn has a 'round_1_battle'
         score for each player.
 
         Expected:
