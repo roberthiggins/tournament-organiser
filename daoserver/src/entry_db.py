@@ -3,6 +3,7 @@ This file contains code to connect to the entry_db
 """
 
 import psycopg2
+from psycopg2.extras import DictCursor
 
 from db_connection import DBConnection
 from player_db import PlayerDBConnection
@@ -70,6 +71,35 @@ class EntryDBConnection(object):
             self.con.rollback()
             raise RuntimeError(err)
 
+    def entry_list(self, tournament_id):
+        """
+        Get the list of entries for the specified tournament.
+        This simply returns a dump of entries and their info in a big list.
+        """
+        cur = self.con.cursor(cursor_factory=DictCursor)
+        cur.execute(
+            "SELECT \
+                e.id            AS entry_id, \
+                p.username      AS username, \
+                t.name          AS tournament_id \
+            FROM entry e \
+            INNER JOIN player p on e.player_id = p.username \
+            INNER JOIN tournament t on e.tournament_id = t.name \
+            WHERE t.name = %s",
+            [tournament_id])
+        entries = cur.fetchall()
+
+        unranked_list = [
+            {
+                'entry_id': entry['entry_id'],
+                'username': entry['username'],
+                'tournament_id': entry['tournament_id'],
+                'scores': self.get_scores_for_entry(entry['entry_id']),
+            } for entry in entries
+        ]
+
+        return unranked_list
+
     def entry_id(self, tournament_id, player_id):
         """
         Get the entry_id for the player in the tournament
@@ -120,3 +150,11 @@ class EntryDBConnection(object):
             }
         except psycopg2.DatabaseError as err:
             raise RuntimeError(err)
+
+    def get_scores_for_entry(self, entry_id):
+        """ Get all the score_key:score pairs for an entry"""
+        cur = self.con.cursor(cursor_factory=DictCursor)
+        cur.execute("SELECT k.key, s.value FROM score s \
+            INNER JOIN score_key k ON s.score_key_id = k.id \
+            WHERE entry_id = %s", [entry_id])
+        return { x[0]:x[1] for x in cur.fetchall() }
