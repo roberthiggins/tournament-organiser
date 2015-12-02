@@ -214,6 +214,32 @@ def place_feedback():
     FEEDBACK_DB_CONN.submit_feedback(_feedback)
     return make_response("Thanks for you help improving the site", 200)
 
+@APP.route('/rankEntries/<tournament_id>', methods=['GET'])
+def rank_entries(tournament_id):
+    """
+    Rank all the entries in a tournament based on the scoring criteria for the
+    tournament.
+    The structure of the returned JSON blob will be as follows:
+    [
+        {
+            'username': 'homer',
+            'entry_id': 1,
+            'tournament_id': 'some_tournie',
+            'scores': {'round_1': 10, 'round_2': 4 }
+        },
+    ]
+    """
+    try:
+        tourn = Tournament(tournament_id)
+        if not tourn.exists_in_db:
+            return make_response(
+                'Tournament {} doesn\'t exist'.format(tournament_id), 404)
+        return DateTimeJSONEncoder().encode(
+            tourn.ranking_strategy.overall_ranking()
+        )
+    except RuntimeError as err:
+        return make_response(str(err), 400)
+
 @APP.route('/setTournamentScore', methods=['POST'])
 def set_tournament_score():
     """

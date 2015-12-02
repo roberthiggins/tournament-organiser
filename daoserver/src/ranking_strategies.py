@@ -24,6 +24,9 @@ class RankingStrategy(object):
             of the entrants have incopmlete scores.
         """
         entries = self.entry_db_conn.entry_list(self.tournament_id)
+        for i, e in enumerate(entries):
+            e['ranking'] = i + 1
+
         return entries
 
     def ranking_by_category(self, category):
