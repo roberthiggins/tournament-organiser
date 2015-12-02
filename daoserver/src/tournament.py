@@ -7,16 +7,19 @@ This serves two functions.
 """
 import datetime
 
+from ranking_strategies import RankingStrategy
 from tournament_db import TournamentDBConnection
 
 class Tournament(object):
     """A tournament DAO"""
 
-    def __init__(self, tournament_id=None):
+    def __init__(self, tournament_id=None, ranking_strategy=None):
         self.tourn_db_conn = TournamentDBConnection()
         self.tournament_id = tournament_id
         self.exists_in_db = tournament_id is not None \
             and self.tourn_db_conn.tournament_exists(tournament_id)
+        self.ranking_strategy = ranking_strategy if ranking_strategy \
+            else RankingStrategy(tournament_id)
 
     def add_to_db(self, date):
         """
