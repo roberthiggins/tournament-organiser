@@ -157,4 +157,4 @@ class EntryDBConnection(object):
         cur.execute("SELECT k.key, s.value FROM score s \
             INNER JOIN score_key k ON s.score_key_id = k.id \
             WHERE entry_id = %s", [entry_id])
-        return { x[0]:x[1] for x in cur.fetchall() }
+        return {x[0]:x[1] for x in cur.fetchall()}

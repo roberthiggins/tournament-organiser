@@ -130,6 +130,7 @@ def tournament(request, tournament_id):
         return HttpResponse(response)
 
 def tournament_rankings(request, tournament_id):
+    """Get placings for the entries in the tournament"""
     if tournament_id is None:
         return HttpResponseNotFound()
     try:
@@ -144,6 +145,6 @@ def tournament_rankings(request, tournament_id):
                 },
                 RequestContext(request)
         )
-    except urllib2.HTTPError as err:
+    except urllib2.HTTPError:
         return HttpResponseNotFound()
 

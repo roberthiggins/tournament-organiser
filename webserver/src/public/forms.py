@@ -55,6 +55,7 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=W0232
             return 'Enter the required fields'
 
 class EnterScoreForm(ErrorStringForm):                  # pylint: disable=W0232
+    """Enter a score for a tournament"""
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002
         username = kwargs.pop('username')
         tournament = kwargs.pop('tournament')

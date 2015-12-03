@@ -3,6 +3,7 @@ Basic URL mappings for the webserver
 """
 
 import json
+import urllib2
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -38,15 +39,14 @@ def create_tournament(request):
     )
 
 @login_required
-def enter_score(request, tournament_id, username):
+def enter_score(request, tournament_id, username):      # pylint: disable=W0613
     """Enter score page when the entry_id isn't known"""
     try:
 
         response = from_dao('/entryId/{}/{}'.format(tournament_id, username))
         entry_id = json.loads(response.content)
         return HttpResponseRedirect('/enterscore/{}'.format(entry_id))
-    except Exception as err:
-        print err
+    except urllib2.HTTPError:
         return HttpResponseNotFound()
 
 @login_required
