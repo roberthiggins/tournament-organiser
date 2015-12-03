@@ -9,6 +9,8 @@ urlpatterns = patterns('',
     # Public views
     url(r'^$', public_views.index, name='index'),
     url(r'^login$', public_views.login, name='login'),
+    url(r'^rankings/(?P<tournament_id>.+)$',
+        public_views.tournament_rankings, name='tournament_rankings'),
     url(r'^signup$', public_views.create_account, name='create_account'),
     url(r'^tournament/(?P<tournament_id>.+)$',
         public_views.tournament, name='tournament'),

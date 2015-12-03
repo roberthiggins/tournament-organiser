@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Placings for {{tournament_id}}{% endblock %}
+
+{% block intro %}
+    <p>Placings for {{tournament_id}}:</p>
+    {%  if not placings|length %}
+        <p>There are no players entered for this event</p>
+    {% else %}
+        <table border="1">
+            <tr>
+                <td>Rank</td>
+                <td>Name</td>
+                {% for s in placings.0.scores %}
+                    <td>{{s}}</td>
+                {% endfor %}
+            </tr>
+            {% for entry in placings %}
+                <tr>
+                    <td>
+                        {{entry.ranking}}
+                    </td>
+                    <td>
+                        {{entry.username}}
+                    </td>
+                    {% for s in entry.scores.values %}
+                        <td>{{s}}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

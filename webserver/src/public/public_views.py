@@ -3,10 +3,12 @@ Basic URL mappings for the webserver
 """
 
 import json
+import urllib2
 
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, \
+                        HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from forms import CreateAccountForm, LoginForm
@@ -126,3 +128,22 @@ def tournament(request, tournament_id):
         )
     except AttributeError:
         return HttpResponse(response)
+
+def tournament_rankings(request, tournament_id):
+    if tournament_id is None:
+        return HttpResponseNotFound()
+    try:
+        json_data = json.loads(
+            from_dao('/rankEntries/%s' % tournament_id).content)
+
+        return render_to_response(
+                'tournament-rankings.html',
+                {
+                    'tournament_id': tournament_id,
+                    'placings': json_data,
+                },
+                RequestContext(request)
+        )
+    except urllib2.HTTPError as err:
+        return HttpResponseNotFound()
+
