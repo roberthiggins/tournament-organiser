@@ -96,7 +96,7 @@ class TournamentDBConnection(object):
             print 'Database Error %s' % err
             raise err
 
-    def set_score_category(self, tournament_id, key, min_val, max_val):
+    def set_score_key(self, tournament_id, key, min_val, max_val):
         """
         Create a score that entries can get in the tournament. This should be
         called for all scores you want, e.g. round_1_battle, round_2_battle
