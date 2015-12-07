@@ -8,13 +8,14 @@ INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
 DO $$
 DECLARE
     lastid int := 0;
+    fanciness int := 0;
 BEGIN
 
     INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10');
 
-    INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT);
-    INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 'painting_test', 4, 15);
-    INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 'painting_test', 2, 28);
+    INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT) RETURNING id INTO fanciness;
+    INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 'painting_test', 4, 15, fanciness);
+    INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 'painting_test', 2, 28, fanciness);
 
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO lastid;
     INSERT INTO player VALUES (lastid, 'stevemcqueen', NULL);
@@ -42,15 +43,17 @@ DECLARE
     rd1key int := 0;
     rd2key int := 0;
     sportskey int := 0;
+    battlecategory int := 0;
+    sportscategory int := 0;
 BEGIN
 
     INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12');
 
-    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', DEFAULT);
-    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 2);
-    INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', 'ranking_test', 0, 20) RETURNING id INTO rd1key;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 'ranking_test', 0, 20) RETURNING id INTO rd2key;
-    INSERT INTO score_key VALUES (DEFAULT, 'sports', 'ranking_test', 1, 5) RETURNING id INTO sportskey;
+    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', DEFAULT) RETURNING id INTO battlecategory;
+    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 2) RETURNING id INTO sportscategory;
+    INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', 'ranking_test', 0, 20, battlecategory) RETURNING id INTO rd1key;
+    INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 'ranking_test', 0, 20, battlecategory) RETURNING id INTO rd2key;
+    INSERT INTO score_key VALUES (DEFAULT, 'sports', 'ranking_test', 1, 5, sportscategory) RETURNING id INTO sportskey;
 
 
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;
