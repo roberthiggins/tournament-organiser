@@ -43,6 +43,8 @@ BEGIN
     INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12');
 
 
+    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', DEFAULT);
+    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 2);
     INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', 'ranking_test', 0, 20) RETURNING id INTO rd1key;
     INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 'ranking_test', 0, 20) RETURNING id INTO rd2key;
     INSERT INTO score_key VALUES (DEFAULT, 'sports', 'ranking_test', 1, 5) RETURNING id INTO sportskey;

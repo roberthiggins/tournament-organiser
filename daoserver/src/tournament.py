@@ -38,6 +38,12 @@ class Tournament(object):
         self.tourn_db_conn.add_tournament(
             {'name' : self.tournament_id, 'date' : date})
 
+    def create_score_category(self, category, percentage):
+        """ Add a score category """
+        if not self.exists_in_db:
+            raise RuntimeError('Unknown tournament: ' + self.tournament_id)
+        self.tourn_db_conn.create_score_category(
+            category, self.tournament_id, percentage)
 
     def details(self):
         """
@@ -59,6 +65,17 @@ class Tournament(object):
                 'score_format': details[4] if details[4] is not None else 'N/A',
             }
         }
+
+    def list_score_categories(self):
+        """
+        List all the score categories available to this tournie and their
+        percentages.
+        [{ 'name': 'painting', 'percentage': 20 }]
+        """
+        if not self.exists_in_db:
+            raise ValueError('Tournament {} not found in database'.format(
+                self.tournament_id))
+        return self.tourn_db_conn.list_score_categories(self.tournament_id)
 
     @staticmethod
     def list_tournaments():

@@ -240,6 +240,50 @@ def rank_entries(tournament_id):
     except RuntimeError as err:
         return make_response(str(err), 400)
 
+@APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
+def get_score_categories(tournament_id):
+    """
+    GET the score categories set for the tournament.
+    e.g. [{ 'name': 'painting', 'percentage': 20 }]
+    """
+    try:
+        tourn = Tournament(tournament_id)
+        return DateTimeJSONEncoder().encode(tourn.list_score_categories())
+    except ValueError as err:
+        return make_response(str(err), 404)
+    except Exception as err:
+        print type(err).__name__
+        print err
+        import traceback
+        traceback.print_exc()
+        raise err
+
+
+@APP.route('/setScoreCategory', methods=['POST'])
+def set_score_category():
+    """
+    POST to create a score category.
+    Expects:
+        - tournament - the tournament name
+        - category - a human-readable key for the category
+        - percentage - the percentage of the overall score that will be
+                        comprised from this score.
+    """
+    tournament = request.values.get('tournament', None)
+    category = request.values.get('category', None)
+    percentage = request.values.get('percentage', None)
+
+    if not tournament or not category or not percentage:
+        return make_response('Enter the required fields', 400)
+    try:
+        tourn = Tournament(tournament)
+        tourn.create_score_category(category, percentage)
+        return make_response('Score category set: {}'.format(category), 200)
+    except ValueError as err:
+        return make_response(str(err), 400)
+    except RuntimeError as err:
+        return make_response(str(err), 400)
+
 @APP.route('/setTournamentScore', methods=['POST'])
 def set_tournament_score():
     """

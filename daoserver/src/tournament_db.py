@@ -62,6 +62,61 @@ class TournamentDBConnection(object):
             print 'Database Error %s' % err
             raise err
 
+    def create_score_category(self, category, tournament_id, percentage):
+        """
+        Create a score category for a tournament.
+        Expects:
+            category - A human-readable name for the category
+            tournament_id - the tournament the category will be used for
+            pecentage - The percentage of the total score taken up by scores
+                in this category. For example, if you wanted battle to be 60
+                percent of the total tournament score, percentage would be 60
+        """
+        try:
+            percentage = int(percentage)
+        except ValueError:
+            raise ValueError('percentage must be an integer')
+
+        try:
+            cur = self.con.cursor()
+
+            cur.execute(
+                "SELECT SUM(percentage) FROM score_category \
+                WHERE tournament_id = %s", [tournament_id])
+            existing = cur.fetchone()
+            existing_total = existing[0] if existing[0] is not None else 0
+            if (existing_total + percentage) > 100:
+                raise ValueError('percentage too high: {}'.format(category))
+
+            cur.execute(
+                "INSERT INTO score_category VALUES(DEFAULT, %s, %s, %s)",
+                [tournament_id, category, percentage]
+            )
+            self.con.commit()
+
+        except psycopg2.DatabaseError as err:
+            self.con.rollback()
+            print 'Database Error %s' % err
+            raise err
+
+    def list_score_categories(self, tournament_id):
+        """
+        Get score_categories associated with a tournament.
+        e.g. [{ 'name': 'painting', 'percentage': 20 }]
+        """
+        try:
+            cur = self.con.cursor()
+            cur.execute(
+                "SELECT display_name, percentage FROM score_category \
+                WHERE tournament_id = %s", [tournament_id])
+            raw_list = cur.fetchall()
+            print raw_list
+            return [{'name': x[0],
+                    'percentage': x[1]} for x in raw_list]
+        except psycopg2.DatabaseError as err:
+            print 'Database Error %s' % err
+            raise err
+
     def list_tournaments(self):
         """Get a list of tournaments"""
         try:
