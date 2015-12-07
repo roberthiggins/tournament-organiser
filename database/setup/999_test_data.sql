@@ -2,16 +2,20 @@
 INSERT INTO tournament VALUES (DEFAULT, 'northcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'southcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
-INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10');
-
-INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 'painting_test', 4, 15);
-INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 'painting_test', 2, 28);
 
 
 -- Set up some users
 DO $$
-DECLARE lastid int := 0;
+DECLARE
+    lastid int := 0;
 BEGIN
+
+    INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10');
+
+    INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT);
+    INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 'painting_test', 4, 15);
+    INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 'painting_test', 2, 28);
+
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO lastid;
     INSERT INTO player VALUES (lastid, 'stevemcqueen', NULL);
     INSERT INTO account_security VALUES (lastid, '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
@@ -41,7 +45,6 @@ DECLARE
 BEGIN
 
     INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12');
-
 
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', DEFAULT);
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 2);
