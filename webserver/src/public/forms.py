@@ -86,12 +86,17 @@ class TournamentSetupForm(ErrorStringForm):             # pylint: disable=W0232
     """Setup a tournament. Mostly set the scores you can get"""
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002
         t_id = kwargs.pop('tournament_id')
+        score_categories = kwargs.pop('score_categories')
         super(TournamentSetupForm, self).__init__(*args, **kwargs)
         # pylint: disable=E1101
         self.fields['tournamentId'] = forms.CharField(
             initial=t_id,
             widget=forms.widgets.HiddenInput())
+        self.fields['scoreCategory'] = forms.ChoiceField(
+            label='What type of score is this?',
+            choices=score_categories
+        )
+
     key = forms.CharField(label='Score key', )
     maxVal = forms.CharField(label='Min Score', required=False)
     minVal = forms.CharField(label='Max Score', required=False)
-

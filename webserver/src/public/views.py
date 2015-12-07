@@ -170,13 +170,34 @@ def suggest_improvement(request):
         RequestContext(request)
     )
 
+def score_categories(tournament_id):
+    """
+    Get a list of score categories for a tournament. THey should be ready for
+    insertion into a select.
+    """
+    response = from_dao('/getScoreCategories/{}'.format(tournament_id))
+    score_categories = [
+        ( x['name'], '{} ({}%)'.format(x['name'], int(x['percentage']) ))
+        for x in json.loads(response.content)
+    ]
+    return score_categories
+
 @login_required
 def tournament_setup(request, tournament_id):
-    """Adda score to a tournament"""
-    form = TournamentSetupForm(tournament_id=tournament_id)
+    """Add a score to a tournament"""
+
+    t_details = from_dao('/tournamentDetails/{}'.format(tournament_id))
+    if t_details.status_code != 200:
+        return HttpResponseNotFound(
+            'Tournament {} not found'.format(tournament_id))
+
+    categories = score_categories(tournament_id)
+    form = TournamentSetupForm(tournament_id=tournament_id,
+        score_categories=categories)
 
     if request.method == 'POST':
-        form = TournamentSetupForm(request.POST, tournament_id=tournament_id)
+        form = TournamentSetupForm(request.POST, tournament_id=tournament_id,
+            score_categories=categories)
         if form.is_valid():                             # pylint: disable=E1101
             response = from_dao('/setTournamentScore', form)
 
@@ -184,10 +205,6 @@ def tournament_setup(request, tournament_id):
                 return HttpResponse(response)
             else:
                 form.add_error(None, response.content)  # pylint: disable=E1103
-
-    tournament_details = from_dao('/tournamentDetails/%s' % tournament_id)
-    if tournament_details.status_code != 200:
-        return HttpResponseNotFound('Tournament %s not found' % tournament_id)
 
     return render_to_response(
         'tournament-setup.html',
