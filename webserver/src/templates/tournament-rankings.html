@@ -12,7 +12,7 @@
                 <td>Rank</td>
                 <td>Name</td>
                 {% for s in placings.0.scores %}
-                    <td>{{s}}</td>
+                    <td>{{s.key}}</td>
                 {% endfor %}
             </tr>
             {% for entry in placings %}
@@ -23,8 +23,8 @@
                     <td>
                         {{entry.username}}
                     </td>
-                    {% for s in entry.scores.values %}
-                        <td>{{s}}</td>
+                    {% for s in entry.scores %}
+                        <td>{{s.score}}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
