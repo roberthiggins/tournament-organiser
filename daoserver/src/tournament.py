@@ -87,7 +87,7 @@ class Tournament(object):
         tourn_db_conn = TournamentDBConnection()
         return {'tournaments' : tourn_db_conn.list_tournaments()}
 
-    def set_score(self, key, min_val=0, max_val=20):
+    def set_score(self, key, category, min_val=0, max_val=20):
         """
         Set a score category that a player is eligible for in a tournament.
 
@@ -107,5 +107,6 @@ class Tournament(object):
         self.tourn_db_conn.set_score_key(
             t_id=self.tournament_id,
             key=key,
+            category=category,
             min_val=min_val,
             max_val=max_val)

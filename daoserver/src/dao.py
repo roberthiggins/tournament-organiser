@@ -292,9 +292,10 @@ def set_tournament_score():
     try:
         tourn = Tournament(request.values.get('tournamentId', None))
         tourn.set_score(
-            request.values.get('key', None),
-            request.values.get('minVal'),
-            request.values.get('maxVal'))
+            key=request.values.get('key', None),
+            min_val=request.values.get('minVal'),
+            max_val=request.values.get('maxVal'),
+            category=request.values.get('scoreCategory'))
         return make_response('Score created', 200)
     except ValueError as err:
         print err

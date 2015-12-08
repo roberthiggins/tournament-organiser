@@ -151,7 +151,7 @@ class TournamentDBConnection(object):
             print 'Database Error %s' % err
             raise err
 
-    def set_score_key(self, t_id, key, min_val, max_val):
+    def set_score_key(self, t_id, key, category, min_val, max_val):
         """
         Create a score that entries can get in the tournament. This should be
         called for all scores you want, e.g. round_1_battle, round_2_battle
@@ -179,8 +179,8 @@ class TournamentDBConnection(object):
         try:
             cur = self.con.cursor()
             cur.execute(
-                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s)",
-                [key, t_id, max_val, min_val])
+                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s, %s)",
+                [key, t_id, max_val, min_val, category])
             self.con.commit()
 
         except psycopg2.IntegrityError:
