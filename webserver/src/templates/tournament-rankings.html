@@ -11,6 +11,7 @@
             <tr>
                 <td>Rank</td>
                 <td>Name</td>
+                <td>Total Score</td>
                 {% for s in placings.0.scores %}
                     <td>{{s.key}}</td>
                 {% endfor %}
@@ -22,6 +23,9 @@
                     </td>
                     <td>
                         {{entry.username}}
+                    </td>
+                    <td>
+                        {{entry.total_score}}
                     </td>
                     {% for s in entry.scores %}
                         <td>{{s.score}}</td>

@@ -21,6 +21,22 @@ class RankingStrategy(object):
         self.entry_db_conn = EntryDBConnection()
         self.score_categories = score_categories_func
 
+    def total_score(self, scores):
+        """
+        Calculate the total score for the entry
+        """
+
+        categories = self.score_categories()
+        for cat in categories:
+            agg_score = sum(
+                [x['score'] for x in scores if x['category'] == cat['id']])
+            agg_total = sum(
+                [x['max_val'] for x in scores if x['category'] == cat['id']])
+            cat['total_score'] = \
+                float(agg_score) / float(agg_total) * int(cat['percentage'])
+
+        return sum([x['total_score'] for x in categories])
+
     def overall_ranking(self, error_on_incomplete=False): # pylint: disable=W0613
         """
         Combines all scores for an overall ranking of entries.
@@ -30,8 +46,8 @@ class RankingStrategy(object):
         """
         entries = self.entry_db_conn.entry_list(self.tournament_id)
         for i, entry in enumerate(entries):
+            entry['total_score'] = self.total_score(entry['scores'])
             entry['ranking'] = i + 1
-
         return entries
 
     def ranking_by_category(self, category):
