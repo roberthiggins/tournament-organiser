@@ -16,9 +16,10 @@ class RankingStrategy(object):
     are output from the db.
     """
 
-    def __init__(self, tournament_id):
+    def __init__(self, tournament_id, score_categories_func):
         self.tournament_id = tournament_id
         self.entry_db_conn = EntryDBConnection()
+        self.score_categories = score_categories_func
 
     def overall_ranking(self, error_on_incomplete=False): # pylint: disable=W0613
         """

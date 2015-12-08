@@ -18,8 +18,10 @@ class Tournament(object):
         self.tournament_id = tournament_id
         self.exists_in_db = tournament_id is not None \
             and self.tourn_db_conn.tournament_exists(tournament_id)
-        self.ranking_strategy = ranking_strategy if ranking_strategy \
-            else RankingStrategy(tournament_id)
+        self.ranking_strategy = \
+            ranking_strategy(tournament_id, self.list_score_categories) \
+            if ranking_strategy \
+            else RankingStrategy(tournament_id, self.list_score_categories)
 
     def add_to_db(self, date):
         """
