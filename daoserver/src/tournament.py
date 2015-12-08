@@ -105,7 +105,7 @@ class Tournament(object):
             max_val = 20
 
         self.tourn_db_conn.set_score_key(
-            tournament_id=self.tournament_id,
+            t_id=self.tournament_id,
             key=key,
             min_val=min_val,
             max_val=max_val)
