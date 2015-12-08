@@ -175,11 +175,14 @@ def score_categories(tournament_id):
     Get a list of score categories for a tournament. THey should be ready for
     insertion into a select.
     """
-    response = from_dao('/getScoreCategories/{}'.format(tournament_id))
-    return [
-        (x['id'], '{} ({}%)'.format(x['name'], int(x['percentage'])))
-        for x in json.loads(response.content)
-    ]
+    try:
+        response = from_dao('/getScoreCategories/{}'.format(tournament_id))
+        return [
+            (x['id'], '{} ({}%)'.format(x['name'], int(x['percentage'])))
+            for x in json.loads(response.content)
+        ]
+    except urllib2.HTTPError:
+        return []
 
 @login_required
 def tournament_setup(request, tournament_id):
@@ -197,13 +200,13 @@ def tournament_setup(request, tournament_id):
     if request.method == 'POST':
         form = TournamentSetupForm(request.POST, tournament_id=tournament_id,
             score_categories=categories)
-        if form.is_valid():                             # pylint: disable=E1101
-            response = from_dao('/setTournamentScore', form)
 
-            if  response.status_code == 200:
+        if form.is_valid():                             # pylint: disable=E1101
+            try:
+                response = from_dao('/setTournamentScore', form)
                 return HttpResponse(response)
-            else:
-                form.add_error(None, response.content)  # pylint: disable=E1103
+            except urllib2.HTTPError:
+                form.add_error(None, response.content)
 
     return render_to_response(
         'tournament-setup.html',

@@ -31,7 +31,7 @@ Feature: Get information about a tournament
 
     Scenario: I try to visit a non-existent page
         Given I am on "/tournament/not_a_tournament"
-        Then I should see "No information is available on not_a_tournament"
+        Then I should see "Tournament not_a_tournament not found in database"
 
     Scenario: I check the API for information on northcon_2095
         Given I GET "/tournamentDetails/northcon_2095" from the API

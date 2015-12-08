@@ -281,8 +281,6 @@ def set_score_category():
         return make_response('Score category set: {}'.format(category), 200)
     except ValueError as err:
         return make_response(str(err), 400)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
 
 @APP.route('/setTournamentScore', methods=['POST'])
 def set_tournament_score():
@@ -301,11 +299,7 @@ def set_tournament_score():
         print err
         return make_response(str(err), 400)
     except RuntimeError as err:
-        print err
         return make_response(str(err), 400)
-    except Exception as err:
-        print err
-        return make_response(str(err), 500)
 
 @APP.route('/tournamentDetails/<t_name>', methods=['GET'])
 def tournament_details(t_name=None):
@@ -316,11 +310,8 @@ def tournament_details(t_name=None):
     try:
         tourn = Tournament(t_name)
         return DateTimeJSONEncoder().encode(tourn.details())
-    except RuntimeError as err:
+    except ValueError as err:
         return make_response(str(err), 400)
-    except Exception as err:
-        print err
-        return make_response(str(err), 500)
 
 @APP.route('/userDetails/<u_name>', methods=['GET'])
 def user_details(u_name=None):

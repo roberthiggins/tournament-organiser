@@ -118,8 +118,8 @@ def tournament(request, tournament_id):
     if request.method == 'POST':
         return HttpResponseRedirect('/registerforatournament')
 
-    response = from_dao('/tournamentDetails/%s' % tournament_id).content
     try:
+        response = from_dao('/tournamentDetails/%s' % tournament_id).content
         t_info = json.loads(response)
         return render_to_response(
             'tournament-info.html',
@@ -127,6 +127,8 @@ def tournament(request, tournament_id):
             RequestContext(request)
         )
     except AttributeError:
+        return HttpResponse(response)
+    except ValueError as err:
         return HttpResponse(response)
 
 def tournament_rankings(request, tournament_id):

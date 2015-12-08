@@ -45,7 +45,7 @@ Feature: Create a score category for a tournament
             |tournament=category_test&category=shiniest_shoes                   |400 |Enter the required fields                 |
             |tournament=category_test&category=shiniest_shoes&percentage=       |400 |Enter the required fields                 |
             |tournament=category_test&category=&percentage=5                    |400 |Enter the required fields                 |
-            |tournament=foo&category=shiniest_shoes&percentage=5                |400 |Unknown tournament: foo                   |
+            |tournament=foo&category=shiniest_shoes&percentage=5                |400 |Tournament foo not found in database      |
             |tournament=category_test&category=shiniest_shoes&percentage=a      |400 |percentage must be an integer             |
             |tournament=category_test&category=shiniest_shoes&percentage=15     |200 |Score category set: shiniest_shoes        |
             |tournament=category_test&category=over_the_top&percentage=90       |400 |percentage too high: over_the_top         |

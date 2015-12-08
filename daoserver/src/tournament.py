@@ -1,14 +1,23 @@
 """
 Model of a tournament
 
-This serves two functions.
-    - It houses tournament functions to reduce complexity in the app class
-    - It holds a tournament object for housing of scoring strategies, etc.
+It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
 from ranking_strategies import RankingStrategy
 from tournament_db import TournamentDBConnection
+
+def must_exist_in_db(func):
+    """ A decorator that requires the tournament exists in the db"""
+    def wrapped(self, *args, **kwargs):
+        if not self.exists_in_db:
+            print 'Tournament not found: {}'.format(self.tournament_id)
+            raise ValueError(
+                'Tournament {} not found in database'.format(
+                self.tournament_id))
+        return func(self, *args, **kwargs)
+    return wrapped
 
 class Tournament(object):
     """A tournament DAO"""
@@ -40,23 +49,18 @@ class Tournament(object):
         self.tourn_db_conn.add_tournament(
             {'name' : self.tournament_id, 'date' : date})
 
+    @must_exist_in_db
     def create_score_category(self, category, percentage):
         """ Add a score category """
-        if not self.exists_in_db:
-            raise RuntimeError('Unknown tournament: ' + self.tournament_id)
         self.tourn_db_conn.create_score_category(
             category, self.tournament_id, percentage)
 
+    @must_exist_in_db
     def details(self):
         """
         Get details about a tournament. This includes entrants and format
         information
         """
-        if not self.exists_in_db:
-            raise RuntimeError(
-                'No information is available on {} '.format(
-                    self.tournament_id))
-
         details = self.tourn_db_conn.tournament_details(self.tournament_id)
 
         return {
@@ -68,15 +72,13 @@ class Tournament(object):
             }
         }
 
+    @must_exist_in_db
     def list_score_categories(self):
         """
         List all the score categories available to this tournie and their
         percentages.
         [{ 'name': 'Painting', 'percentage': 20, 'id': 1 }]
         """
-        if not self.exists_in_db:
-            raise ValueError('Tournament {} not found in database'.format(
-                self.tournament_id))
         return self.tourn_db_conn.list_score_categories(self.tournament_id)
 
     @staticmethod
@@ -89,6 +91,7 @@ class Tournament(object):
         tourn_db_conn = TournamentDBConnection()
         return {'tournaments' : tourn_db_conn.list_tournaments()}
 
+    @must_exist_in_db
     def set_score(self, key, category, min_val=0, max_val=20):
         """
         Set a score category that a player is eligible for in a tournament.
@@ -101,9 +104,6 @@ class Tournament(object):
             - (opt) min_val - for score - default 0
             - (opt) max_val - for score - default 20
         """
-        if not self.exists_in_db:
-            raise ValueError('Tournament {} not found in database'.format(
-                self.tournament_id))
         if not min_val:
             min_val = 0
         if not max_val:
