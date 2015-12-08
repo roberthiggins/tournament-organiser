@@ -70,7 +70,7 @@ class Tournament(object):
         """
         List all the score categories available to this tournie and their
         percentages.
-        [{ 'name': 'painting', 'percentage': 20 }]
+        [{ 'name': 'Painting', 'percentage': 20, 'id': 1 }]
         """
         if not self.exists_in_db:
             raise ValueError('Tournament {} not found in database'.format(

@@ -244,7 +244,7 @@ def rank_entries(tournament_id):
 def get_score_categories(tournament_id):
     """
     GET the score categories set for the tournament.
-    e.g. [{ 'name': 'painting', 'percentage': 20 }]
+    e.g. [{ 'name': 'painting', 'percentage': 20, 'id': 2 }]
     """
     try:
         tourn = Tournament(tournament_id)

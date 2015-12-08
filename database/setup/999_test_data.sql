@@ -3,6 +3,8 @@ INSERT INTO tournament VALUES (DEFAULT, 'northcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'southcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
 
+INSERT INTO score_category VALUES(DEFAULT, 'southcon_2095', 'some_category', DEFAULT);
+INSERT INTO score_category VALUES(10, 'northcon_2095', 'leastnortherly', DEFAULT);
 
 -- Set up some users
 DO $$

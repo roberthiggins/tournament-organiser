@@ -177,7 +177,7 @@ def score_categories(tournament_id):
     """
     response = from_dao('/getScoreCategories/{}'.format(tournament_id))
     score_categories = [
-        ( x['name'], '{} ({}%)'.format(x['name'], int(x['percentage']) ))
+        ( x['id'], '{} ({}%)'.format(x['name'], int(x['percentage']) ))
         for x in json.loads(response.content)
     ]
     return score_categories
