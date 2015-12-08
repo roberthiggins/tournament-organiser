@@ -19,7 +19,7 @@ class EntryDBConnection(object):
         self.db_conn = DBConnection()
         self.con = self.db_conn.con
 
-    def enter_score(self, tournament_id, entry_id, score_key, score):
+    def enter_score(self, entry_id, score_key, score):
         """
         Enters a score for category into tournament for player.
 
@@ -37,10 +37,15 @@ class EntryDBConnection(object):
         try:
             cur = self.con.cursor()
 
+            cur.execute(
+                "SELECT tournament_id FROM entry WHERE id = %s", [entry_id])
+            tournament_id = cur.fetchone()[0]
+
             # score_key should mean something in the context of the tournie
             cur.execute(
-                "SELECT id, min_val, max_val FROM score_key \
-                WHERE key = %s AND tournament_id = %s",
+                "SELECT k.id, min_val, max_val FROM score_key k \
+                INNER JOIN score_category c ON k.category = c.id \
+                WHERE k.key = %s AND c.tournament_id = %s",
                 [score_key, tournament_id])
             row = cur.fetchone()
             try:

@@ -16,8 +16,8 @@ BEGIN
     INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10');
 
     INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT) RETURNING id INTO fanciness;
-    INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 'painting_test', 4, 15, fanciness);
-    INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 'painting_test', 2, 28, fanciness);
+    INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 4, 15, fanciness);
+    INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 2, 28, fanciness);
 
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO lastid;
     INSERT INTO player VALUES (lastid, 'stevemcqueen', NULL);
@@ -53,9 +53,9 @@ BEGIN
 
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90) RETURNING id INTO battlecategory;
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10) RETURNING id INTO sportscategory;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', 'ranking_test', 0, 20, battlecategory) RETURNING id INTO rd1key;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 'ranking_test', 0, 20, battlecategory) RETURNING id INTO rd2key;
-    INSERT INTO score_key VALUES (DEFAULT, 'sports', 'ranking_test', 1, 5, sportscategory) RETURNING id INTO sportskey;
+    INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', 0, 20, battlecategory) RETURNING id INTO rd1key;
+    INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 0, 20, battlecategory) RETURNING id INTO rd2key;
+    INSERT INTO score_key VALUES (DEFAULT, 'sports', 1, 5, sportscategory) RETURNING id INTO sportskey;
 
 
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;

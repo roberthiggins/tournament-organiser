@@ -151,7 +151,7 @@ class TournamentDBConnection(object):
             print 'Database Error %s' % err
             raise err
 
-    def set_score_key(self, t_id, key, category, min_val, max_val):
+    def set_score_key(self, key, category, min_val, max_val):
         """
         Create a score that entries can get in the tournament. This should be
         called for all scores you want, e.g. round_1_battle, round_2_battle
@@ -159,12 +159,13 @@ class TournamentDBConnection(object):
         Expects:
             - a varchar candidate. The key will need to be unique and should
             be a varchar.
+            - category - the score_category id
             - min_val. Integer. nin val for the score. Default 0
             - max_val. Integer. max val for the score. Default 20
 
         Returns: throws ValueError and psycopg2.DatabaseError as appropriate
         """
-        if not t_id or not key:
+        if not category or not key:
             raise ValueError('Arguments missing from set_score_category call')
         try:
             min_val = int(min_val)
@@ -179,8 +180,8 @@ class TournamentDBConnection(object):
         try:
             cur = self.con.cursor()
             cur.execute(
-                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s, %s)",
-                [key, t_id, max_val, min_val, category])
+                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s)",
+                [key, max_val, min_val, category])
             self.con.commit()
 
         except psycopg2.IntegrityError:

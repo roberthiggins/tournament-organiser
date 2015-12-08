@@ -101,13 +101,15 @@ class Tournament(object):
             - (opt) min_val - for score - default 0
             - (opt) max_val - for score - default 20
         """
+        if not self.exists_in_db:
+            raise ValueError('Tournament {} not found in database'.format(
+                self.tournament_id))
         if not min_val:
             min_val = 0
         if not max_val:
             max_val = 20
 
         self.tourn_db_conn.set_score_key(
-            t_id=self.tournament_id,
             key=key,
             category=category,
             min_val=min_val,

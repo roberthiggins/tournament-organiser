@@ -156,7 +156,7 @@ def enter_tournament_score():
     try:
         entry = ENTRY_DB_CONN.entry_id(tournament, user)
 
-        ENTRY_DB_CONN.enter_score(tournament, entry, category, score)
+        ENTRY_DB_CONN.enter_score(entry, category, score)
         return make_response(
             'Score entered for {}: {}'.format(user, score),
             200)
