@@ -176,11 +176,10 @@ def score_categories(tournament_id):
     insertion into a select.
     """
     response = from_dao('/getScoreCategories/{}'.format(tournament_id))
-    score_categories = [
-        ( x['id'], '{} ({}%)'.format(x['name'], int(x['percentage']) ))
+    return [
+        (x['id'], '{} ({}%)'.format(x['name'], int(x['percentage'])))
         for x in json.loads(response.content)
     ]
-    return score_categories
 
 @login_required
 def tournament_setup(request, tournament_id):

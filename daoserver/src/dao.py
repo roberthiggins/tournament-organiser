@@ -166,7 +166,7 @@ def enter_tournament_score():
         return make_response(str(err), 400)
 
 @APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
-def entry_id(tournament_id, username):
+def get_entry_id(tournament_id, username):
     """Get entry info from tournament and username"""
     return DateTimeJSONEncoder().encode(
         ENTRY_DB_CONN.entry_id(tournament_id, username))

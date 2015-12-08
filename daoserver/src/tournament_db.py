@@ -110,7 +110,6 @@ class TournamentDBConnection(object):
                 "SELECT id, display_name, percentage FROM score_category \
                 WHERE tournament_id = %s", [tournament_id])
             raw_list = cur.fetchall()
-            print raw_list
             return [{'id': x[0],
                     'name': x[1],
                     'percentage': x[2]} for x in raw_list]
