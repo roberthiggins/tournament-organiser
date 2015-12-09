@@ -24,6 +24,21 @@ FEEDBACK_DB_CONN = FeedbackDBConnection()
 PLAYER_DB_CONN = PlayerDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
 
+@APP.errorhandler(RuntimeError)
+@APP.errorhandler(ValueError)
+def input_error(err):
+    """Input errors"""
+    return make_response(str(err), 400)
+
+@APP.errorhandler(Exception)
+def unknown_error(err):
+    """All other exceptions are essentially just raised with logging"""
+    print type(err).__name__
+    print err
+    import traceback
+    traceback.print_exc()
+    return make_response(str(err), 500)
+
 def enforce_request_variable(var):
     """ A decorator that requires var exists in the request"""
     def decorator(func):
@@ -76,14 +91,11 @@ def apply_for_tournament():
         - inputUserName - Username of player applying
         - inputTournamentName - Tournament as returned by GET /listtournaments
     """
-    try:
-        return make_response(
-            REGISTRATION_DB_CONN.register_for_tournament(
-                inputTournamentName,
-                inputUserName),
-            200)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+    return make_response(
+        REGISTRATION_DB_CONN.register_for_tournament(
+            inputTournamentName,
+            inputUserName),
+        200)
 
 @APP.route('/addTournament', methods=['POST'])
 @enforce_request_variable('inputTournamentName')
@@ -95,17 +107,12 @@ def add_tournament():
         - inputTournamentName - Tournament name. Must be unique.
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
-    try:
-        tourn = Tournament(inputTournamentName)
-        tourn.add_to_db(inputTournamentDate)
-        return make_response(
-            '<p>Tournament Created! You submitted the following fields:</p> \
-            <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
-            inputTournamentName, inputTournamentDate), 200)
-    except ValueError:
-        return make_response(str(err), 400)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+    tourn = Tournament(inputTournamentName)
+    tourn.add_to_db(inputTournamentDate)
+    return make_response(
+        '<p>Tournament Created! You submitted the following fields:</p> \
+        <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
+        inputTournamentName, inputTournamentDate), 200)
 
 def validate_user_email(email):
     """
@@ -170,17 +177,12 @@ def enter_tournament_score():
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
-    try:
-        entry = ENTRY_DB_CONN.entry_id(tournament, username)
+    entry = ENTRY_DB_CONN.entry_id(tournament, username)
 
-        ENTRY_DB_CONN.enter_score(entry, key, value)
-        return make_response(
-            'Score entered for {}: {}'.format(username, value),
-            200)
-    except ValueError as err:
-        return make_response(str(err), 400)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+    ENTRY_DB_CONN.enter_score(entry, key, value)
+    return make_response(
+        'Score entered for {}: {}'.format(username, value),
+        200)
 
 @APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
 def get_entry_id(tournament_id, username):
@@ -191,12 +193,7 @@ def get_entry_id(tournament_id, username):
 @APP.route('/entryInfo/<entry_id>', methods=['GET'])
 def entry_info(entry_id):
     """ Given entry_id, get info about player and tournament"""
-    try:
-        return DateTimeJSONEncoder().encode(ENTRY_DB_CONN.entry_info(entry_id))
-    except ValueError as err:
-        return make_response(str(err), 400)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+    return DateTimeJSONEncoder().encode(ENTRY_DB_CONN.entry_info(entry_id))
 
 @APP.route('/login', methods=['POST'])
 def login():
@@ -209,14 +206,7 @@ def login():
     username = request.form['inputUsername'].strip()
     password = request.form['inputPassword'].strip()
 
-    try:
-        return make_response(PLAYER_DB_CONN.login(username, password), 200)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
-    except Exception as err:
-        print err
-        return make_response(str(err), 500)
-
+    return make_response(PLAYER_DB_CONN.login(username, password), 200)
 
 @APP.route('/placefeedback', methods=['POST'])
 def place_feedback():
@@ -246,16 +236,13 @@ def rank_entries(tournament_id):
         },
     ]
     """
-    try:
-        tourn = Tournament(tournament_id)
-        if not tourn.exists_in_db:
-            return make_response(
-                'Tournament {} doesn\'t exist'.format(tournament_id), 404)
-        return DateTimeJSONEncoder().encode(
-            tourn.ranking_strategy.overall_ranking()
-        )
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+    tourn = Tournament(tournament_id)
+    if not tourn.exists_in_db:
+        return make_response(
+            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
+    return DateTimeJSONEncoder().encode(
+        tourn.ranking_strategy.overall_ranking()
+    )
 
 @APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
 def get_score_categories(tournament_id):
@@ -268,13 +255,6 @@ def get_score_categories(tournament_id):
         return DateTimeJSONEncoder().encode(tourn.list_score_categories())
     except ValueError as err:
         return make_response(str(err), 404)
-    except Exception as err:
-        print type(err).__name__
-        print err
-        import traceback
-        traceback.print_exc()
-        raise err
-
 
 @APP.route('/setScoreCategory', methods=['POST'])
 @enforce_request_variable('tournament')
@@ -289,31 +269,22 @@ def set_score_category():
         - percentage - the percentage of the overall score that will be
                         comprised from this score.
     """
-    try:
-        tourn = Tournament(tournament)
-        tourn.create_score_category(category, percentage)
-        return make_response('Score category set: {}'.format(category), 200)
-    except ValueError as err:
-        return make_response(str(err), 400)
+    tourn = Tournament(tournament)
+    tourn.create_score_category(category, percentage)
+    return make_response('Score category set: {}'.format(category), 200)
 
 @APP.route('/setTournamentScore', methods=['POST'])
 def set_tournament_score():
     """
     POST to set a score category that a player is eligible for in a tournament.
     """
-    try:
-        tourn = Tournament(request.values.get('tournamentId', None))
-        tourn.set_score(
-            key=request.values.get('key', None),
-            min_val=request.values.get('minVal'),
-            max_val=request.values.get('maxVal'),
-            category=request.values.get('scoreCategory'))
-        return make_response('Score created', 200)
-    except ValueError as err:
-        print err
-        return make_response(str(err), 400)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+    tourn = Tournament(request.values.get('tournamentId', None))
+    tourn.set_score(
+        key=request.values.get('key', None),
+        min_val=request.values.get('minVal'),
+        max_val=request.values.get('maxVal'),
+        category=request.values.get('scoreCategory'))
+    return make_response('Score created', 200)
 
 @APP.route('/tournamentDetails/<t_name>', methods=['GET'])
 def tournament_details(t_name=None):
@@ -321,11 +292,8 @@ def tournament_details(t_name=None):
     GET to get details about a tournament. This includes entrants and format
     information
     """
-    try:
-        tourn = Tournament(t_name)
-        return DateTimeJSONEncoder().encode(tourn.details())
-    except ValueError as err:
-        return make_response(str(err), 400)
+    tourn = Tournament(t_name)
+    return DateTimeJSONEncoder().encode(tourn.details())
 
 @APP.route('/userDetails/<u_name>', methods=['GET'])
 def user_details(u_name=None):
@@ -333,15 +301,7 @@ def user_details(u_name=None):
     GET to get account details in url form
     TODO security
     """
-
-    try:
-        return jsonify({u_name: PLAYER_DB_CONN.user_details(u_name)})
-    except RuntimeError as err:
-        return make_response(str(err), 400)
-    except Exception as err:
-        print err
-        return make_response(str(err), 500)
-
+    return jsonify({u_name: PLAYER_DB_CONN.user_details(u_name)})
 
 if __name__ == "__main__":
     # Bind to PORT if defined, otherwise default to 5000.

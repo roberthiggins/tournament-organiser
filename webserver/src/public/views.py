@@ -42,11 +42,10 @@ def create_tournament(request):
 def enter_score(request, tournament_id, username):      # pylint: disable=W0613
     """Enter score page when the entry_id isn't known"""
     try:
-
         response = from_dao('/entryId/{}/{}'.format(tournament_id, username))
         entry_id = json.loads(response.content)
         return HttpResponseRedirect('/enterscore/{}'.format(entry_id))
-    except urllib2.HTTPError:
+    except ValueError:
         return HttpResponseNotFound()
 
 @login_required
