@@ -139,27 +139,22 @@ def add_account():
         - password1
         - password2
     """
-    username = request.form['username'].strip()
-    email = request.form['email'].strip()
-    password = request.form['password1'].strip()
-    confirm = request.form['password2'].strip()
-
     if not validate_user_email(email):
         return make_response("This email does not appear valid", 400)
 
-    if password != confirm:
+    if password1 != password2:
         return make_response("Please enter two matching passwords", 400)
 
     if PLAYER_DB_CONN.username_exists(username):
-        return make_response("A user with the username %s already exists! \
-            Please choose another name" % username, 400)
+        return make_response("A user with the username {} already exists! \
+            Please choose another name".format(username), 400)
 
     PLAYER_DB_CONN.add_account({'user_name': username,
                                'email' : email,
-                               'password': password})
+                               'password': password1})
     return make_response('<p>Account created! You submitted the following \
-        fields:</p><ul><li>User Name: {username}</li><li>Email: {email}\
-        </li></ul>'.format(**locals()), 200)
+        fields:</p><ul><li>User Name: {}</li><li>Email: {}\
+        </li></ul>'.format(username, email), 200)
 
 @APP.route('/entertournamentscore', methods=['POST'])
 @enforce_request_variables('username', 'tournament', 'key', 'value')
