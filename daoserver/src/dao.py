@@ -9,6 +9,7 @@ import os
 import re
 
 from flask import Flask, request, make_response, jsonify
+from functools import wraps
 
 from datetime_encoder import DateTimeJSONEncoder
 from entry_db import EntryDBConnection
@@ -22,6 +23,33 @@ ENTRY_DB_CONN = EntryDBConnection()
 FEEDBACK_DB_CONN = FeedbackDBConnection()
 PLAYER_DB_CONN = PlayerDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
+
+def enforce_request_variable(var):
+    """ A decorator that requires var exists in the request"""
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            value = request.form[var] if var in request.form \
+                else request.values.get(var, None)
+            if not value:
+                return make_response('Enter the required fields', 400)
+            glob = func.func_globals
+            sentinel = object()
+
+            oldvalue = glob.get(var, sentinel)
+            glob[var] = value
+
+            try:
+                res = func(*args, **kwargs)
+            finally:
+                if oldvalue is sentinel:
+                    del glob[var]
+                else:
+                    glob[var] = oldvalue
+
+            return res
+        return wrapped
+    return decorator
 
 @APP.route("/")
 def main():
@@ -39,6 +67,8 @@ def list_tournaments():
     return DateTimeJSONEncoder().encode(Tournament.list_tournaments())
 
 @APP.route('/registerfortournament', methods=['POST'])
+@enforce_request_variable('inputTournamentName')
+@enforce_request_variable('inputUserName')
 def apply_for_tournament():
     """
     POST to apply for entry to a tournament.
@@ -46,22 +76,18 @@ def apply_for_tournament():
         - inputUserName - Username of player applying
         - inputTournamentName - Tournament as returned by GET /listtournaments
     """
-    username = request.form['inputUserName']
-    tournament_name = request.form['inputTournamentName']
-
-    if not username or not tournament_name:
-        return make_response("Enter the required fields", 400)
-
     try:
         return make_response(
             REGISTRATION_DB_CONN.register_for_tournament(
-                tournament_name,
-                username),
+                inputTournamentName,
+                inputUserName),
             200)
     except RuntimeError as err:
         return make_response(str(err), 400)
 
 @APP.route('/addTournament', methods=['POST'])
+@enforce_request_variable('inputTournamentName')
+@enforce_request_variable('inputTournamentDate')
 def add_tournament():
     """
     POST to add a tournament
@@ -69,18 +95,13 @@ def add_tournament():
         - inputTournamentName - Tournament name. Must be unique.
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
-    name = request.form['inputTournamentName']
-    date = request.form['inputTournamentDate']
-
-    if not name or not date:
-        return make_response("Please fill in the required fields", 400)
-
     try:
-        tourn = Tournament(name)
-        tourn.add_to_db(date)
-        return make_response('<p>Tournament Created! You submitted the \
-            following fields:</p><ul><li>Name: {name}</li><li>Date: {date} \
-            </li></ul>'.format(**locals()), 200)
+        tourn = Tournament(inputTournamentName)
+        tourn.add_to_db(inputTournamentDate)
+        return make_response(
+            '<p>Tournament Created! You submitted the following fields:</p> \
+            <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
+            inputTournamentName, inputTournamentDate), 200)
     except ValueError:
         return make_response(str(err), 400)
     except RuntimeError as err:
@@ -99,6 +120,10 @@ def validate_user_email(email):
         return False
 
 @APP.route('/addPlayer', methods=['POST'])
+@enforce_request_variable('username')
+@enforce_request_variable('email')
+@enforce_request_variable('password1')
+@enforce_request_variable('password2')
 def add_account():
     """
     POST to add an account
@@ -113,13 +138,10 @@ def add_account():
     password = request.form['password1'].strip()
     confirm = request.form['password2'].strip()
 
-    if not username:
-        return make_response("Please fill in the required fields", 400)
-
     if not validate_user_email(email):
         return make_response("This email does not appear valid", 400)
 
-    if not password or not confirm or password != confirm:
+    if password != confirm:
         return make_response("Please enter two matching passwords", 400)
 
     if PLAYER_DB_CONN.username_exists(username):
@@ -134,6 +156,10 @@ def add_account():
         </li></ul>'.format(**locals()), 200)
 
 @APP.route('/entertournamentscore', methods=['POST'])
+@enforce_request_variable('username')
+@enforce_request_variable('tournament')
+@enforce_request_variable('key')
+@enforce_request_variable('value')
 def enter_tournament_score():
     """
     POST to enter a score for a player in a tournament.
@@ -144,21 +170,12 @@ def enter_tournament_score():
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
-
-    user = request.values.get('username', None)
-    tournament = request.values.get('tournament', None)
-    category = request.values.get('key', None)
-    score = request.values.get('value', None)
-
-    if not user or not tournament or not category or not score:
-        return make_response('Enter the required fields', 400)
-
     try:
-        entry = ENTRY_DB_CONN.entry_id(tournament, user)
+        entry = ENTRY_DB_CONN.entry_id(tournament, username)
 
-        ENTRY_DB_CONN.enter_score(entry, category, score)
+        ENTRY_DB_CONN.enter_score(entry, key, value)
         return make_response(
-            'Score entered for {}: {}'.format(user, score),
+            'Score entered for {}: {}'.format(username, value),
             200)
     except ValueError as err:
         return make_response(str(err), 400)
@@ -260,6 +277,9 @@ def get_score_categories(tournament_id):
 
 
 @APP.route('/setScoreCategory', methods=['POST'])
+@enforce_request_variable('tournament')
+@enforce_request_variable('category')
+@enforce_request_variable('percentage')
 def set_score_category():
     """
     POST to create a score category.
@@ -269,12 +289,6 @@ def set_score_category():
         - percentage - the percentage of the overall score that will be
                         comprised from this score.
     """
-    tournament = request.values.get('tournament', None)
-    category = request.values.get('category', None)
-    percentage = request.values.get('percentage', None)
-
-    if not tournament or not category or not percentage:
-        return make_response('Enter the required fields', 400)
     try:
         tourn = Tournament(tournament)
         tourn.create_score_category(category, percentage)
