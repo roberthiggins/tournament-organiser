@@ -192,6 +192,7 @@ def entry_info(entry_id):
     return DateTimeJSONEncoder().encode(ENTRY_DB_CONN.entry_info(entry_id))
 
 @APP.route('/login', methods=['POST'])
+@enforce_request_variables('inputUsername', 'inputPassword')
 def login():
     """
     POST to login
@@ -199,10 +200,9 @@ def login():
         - inputUsername
         - inputPassword
     """
-    username = request.form['inputUsername'].strip()
-    password = request.form['inputPassword'].strip()
-
-    return make_response(PLAYER_DB_CONN.login(username, password), 200)
+    return make_response(
+        PLAYER_DB_CONN.login(inputUsername, inputPassword),
+        200)
 
 @APP.route('/placefeedback', methods=['POST'])
 def place_feedback():
