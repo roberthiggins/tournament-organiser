@@ -39,28 +39,32 @@ def unknown_error(err):
     traceback.print_exc()
     return make_response(str(err), 500)
 
-def enforce_request_variable(var):
+def enforce_request_variables(*vars_to_enforce):
     """ A decorator that requires var exists in the request"""
     def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
-            value = request.form[var] if var in request.form \
-                else request.values.get(var, None)
-            if not value:
-                return make_response('Enter the required fields', 400)
             glob = func.func_globals
             sentinel = object()
+            old_values = {}
 
-            oldvalue = glob.get(var, sentinel)
-            glob[var] = value
+            for var in vars_to_enforce:
+                value = request.form[var] if var in request.form \
+                    else request.values.get(var, None)
+                if not value:
+                    return make_response('Enter the required fields', 400)
+
+                old_values[var] = glob.get(var, sentinel)
+                glob[var] = value
 
             try:
                 res = func(*args, **kwargs)
             finally:
-                if oldvalue is sentinel:
-                    del glob[var]
-                else:
-                    glob[var] = oldvalue
+                for var in vars_to_enforce:
+                    if old_values[var] is sentinel:
+                        del glob[var]
+                    else:
+                        glob[var] = old_values[var]
 
             return res
         return wrapped
@@ -82,8 +86,7 @@ def list_tournaments():
     return DateTimeJSONEncoder().encode(Tournament.list_tournaments())
 
 @APP.route('/registerfortournament', methods=['POST'])
-@enforce_request_variable('inputTournamentName')
-@enforce_request_variable('inputUserName')
+@enforce_request_variables('inputTournamentName', 'inputUserName')
 def apply_for_tournament():
     """
     POST to apply for entry to a tournament.
@@ -98,8 +101,7 @@ def apply_for_tournament():
         200)
 
 @APP.route('/addTournament', methods=['POST'])
-@enforce_request_variable('inputTournamentName')
-@enforce_request_variable('inputTournamentDate')
+@enforce_request_variables('inputTournamentName', 'inputTournamentDate')
 def add_tournament():
     """
     POST to add a tournament
@@ -127,10 +129,7 @@ def validate_user_email(email):
         return False
 
 @APP.route('/addPlayer', methods=['POST'])
-@enforce_request_variable('username')
-@enforce_request_variable('email')
-@enforce_request_variable('password1')
-@enforce_request_variable('password2')
+@enforce_request_variables('username', 'email', 'password1', 'password2')
 def add_account():
     """
     POST to add an account
@@ -163,10 +162,7 @@ def add_account():
         </li></ul>'.format(**locals()), 200)
 
 @APP.route('/entertournamentscore', methods=['POST'])
-@enforce_request_variable('username')
-@enforce_request_variable('tournament')
-@enforce_request_variable('key')
-@enforce_request_variable('value')
+@enforce_request_variables('username', 'tournament', 'key', 'value')
 def enter_tournament_score():
     """
     POST to enter a score for a player in a tournament.
@@ -257,9 +253,7 @@ def get_score_categories(tournament_id):
         return make_response(str(err), 404)
 
 @APP.route('/setScoreCategory', methods=['POST'])
-@enforce_request_variable('tournament')
-@enforce_request_variable('category')
-@enforce_request_variable('percentage')
+@enforce_request_variables('tournament', 'category', 'percentage')
 def set_score_category():
     """
     POST to create a score category.
