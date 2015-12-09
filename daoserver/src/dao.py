@@ -41,9 +41,9 @@ def unknown_error(err):
 
 def enforce_request_variables(*vars_to_enforce):
     """ A decorator that requires var exists in the request"""
-    def decorator(func):
+    def decorator(func):                                # pylint: disable=C0111
         @wraps(func)
-        def wrapped(*args, **kwargs):
+        def wrapped(*args, **kwargs):                   # pylint: disable=C0111
             glob = func.func_globals
             sentinel = object()
             old_values = {}
@@ -87,7 +87,7 @@ def list_tournaments():
 
 @APP.route('/registerfortournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputUserName')
-def apply_for_tournament():
+def apply_for_tournament():                             # pylint: disable=E0602
     """
     POST to apply for entry to a tournament.
     Expects:
@@ -102,7 +102,7 @@ def apply_for_tournament():
 
 @APP.route('/addTournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')
-def add_tournament():
+def add_tournament():                                   # pylint: disable=E0602
     """
     POST to add a tournament
     Expects:
@@ -130,7 +130,7 @@ def validate_user_email(email):
 
 @APP.route('/addPlayer', methods=['POST'])
 @enforce_request_variables('username', 'email', 'password1', 'password2')
-def add_account():
+def add_account():                                      # pylint: disable=E0602
     """
     POST to add an account
     Expects:
@@ -158,7 +158,7 @@ def add_account():
 
 @APP.route('/entertournamentscore', methods=['POST'])
 @enforce_request_variables('username', 'tournament', 'key', 'value')
-def enter_tournament_score():
+def enter_tournament_score():                           # pylint: disable=E0602
     """
     POST to enter a score for a player in a tournament.
 
@@ -188,7 +188,7 @@ def entry_info(entry_id):
 
 @APP.route('/login', methods=['POST'])
 @enforce_request_variables('inputUsername', 'inputPassword')
-def login():
+def login():                                            # pylint: disable=E0602
     """
     POST to login
     Expects:
@@ -249,7 +249,7 @@ def get_score_categories(tournament_id):
 
 @APP.route('/setScoreCategory', methods=['POST'])
 @enforce_request_variables('tournament', 'category', 'percentage')
-def set_score_category():
+def set_score_category():                               # pylint: disable=E0602
     """
     POST to create a score category.
     Expects:
@@ -264,7 +264,7 @@ def set_score_category():
 
 @APP.route('/setTournamentScore', methods=['POST'])
 @enforce_request_variables('key', 'scoreCategory')
-def set_tournament_score():
+def set_tournament_score():                             # pylint: disable=E0602
     """
     POST to set a score category that a player is eligible for in a tournament.
     """
