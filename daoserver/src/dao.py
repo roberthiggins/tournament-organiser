@@ -268,16 +268,17 @@ def set_score_category():
     return make_response('Score category set: {}'.format(category), 200)
 
 @APP.route('/setTournamentScore', methods=['POST'])
+@enforce_request_variables('key', 'scoreCategory')
 def set_tournament_score():
     """
     POST to set a score category that a player is eligible for in a tournament.
     """
     tourn = Tournament(request.values.get('tournamentId', None))
     tourn.set_score(
-        key=request.values.get('key', None),
+        key=key,
         min_val=request.values.get('minVal'),
         max_val=request.values.get('maxVal'),
-        category=request.values.get('scoreCategory'))
+        category=scoreCategory)
     return make_response('Score created', 200)
 
 @APP.route('/tournamentDetails/<t_name>', methods=['GET'])
