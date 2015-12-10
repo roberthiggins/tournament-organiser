@@ -235,6 +235,13 @@ def rank_entries(tournament_id):
         tourn.ranking_strategy.overall_ranking()
     )
 
+@APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET'])
+def get_round_info(tournament_id, round_id):
+    """Get the information about a round"""
+    tourn = Tournament(tournament_id)
+    scores = tourn.get_score_keys_for_round(round_id)
+    return DateTimeJSONEncoder().encode(scores)
+
 @APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
 def get_score_categories(tournament_id):
     """

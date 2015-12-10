@@ -191,3 +191,35 @@ class TournamentDBConnection(object):
             self.con.rollback()
             print 'Database Error %s' % err
             raise RuntimeError(err)
+
+    def get_score_keys_for_round(self, tournament_id, round_id):
+        """
+        Get all the score keys, and the information from their rows, for a
+        particular round
+        """
+        try:
+            round_id = int(round_id)
+        except ValueError:
+            raise ValueError('Round ID must be an integer')
+
+        try:
+            cur = self.con.cursor()
+            cur.execute(
+                "SELECT COUNT(*) FROM tournament_round \
+                WHERE tournament_id = %s AND id = %s",
+                [tournament_id, round_id]
+            )
+            if cur.fetchone()[0] == 0:
+                raise ValueError("Round {} doesn't exist in {}".format(
+                    round_id, tournament_id))
+            cur.execute(
+                "SELECT * FROM score_key k \
+                INNER JOIN round_score s ON s.score_key_id = k.id \
+                WHERE s.round_id = %s", [round_id])
+            return cur.fetchall()
+
+        except psycopg2.DatabaseError as err:
+            self.con.rollback()
+            print 'Database Error %s' % err
+            raise RuntimeError(err)
+

@@ -50,13 +50,16 @@ DECLARE
 BEGIN
 
     INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12');
+    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1);
+    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2);
 
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90) RETURNING id INTO battlecategory;
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10) RETURNING id INTO sportscategory;
     INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', 0, 20, battlecategory) RETURNING id INTO rd1key;
     INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 0, 20, battlecategory) RETURNING id INTO rd2key;
     INSERT INTO score_key VALUES (DEFAULT, 'sports', 1, 5, sportscategory) RETURNING id INTO sportskey;
-
+    INSERT INTO round_score VALUES(rd1key, 1);
+    INSERT INTO round_score VALUES(rd2key, 2);
 
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;
     INSERT INTO player VALUES (accid, 'homer', NULL);

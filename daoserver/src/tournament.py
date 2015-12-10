@@ -10,7 +10,7 @@ from tournament_db import TournamentDBConnection
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
-    def wrapped(self, *args, **kwargs):
+    def wrapped(self, *args, **kwargs):                 # pylint: disable=C0111
         if not self.exists_in_db:
             print 'Tournament not found: {}'.format(self.tournament_id)
             raise ValueError(
@@ -114,3 +114,14 @@ class Tournament(object):
             category=category,
             min_val=min_val,
             max_val=max_val)
+
+    @must_exist_in_db
+    def get_score_keys_for_round(self, round_id='next'):
+        """ Get all the score keys associated with this round"""
+
+        #TODO get next round
+        if round_id == 'next':
+            raise NotImplementedError('next round is unknown')
+
+        return self.tourn_db_conn.get_score_keys_for_round(
+            self.tournament_id, round_id)
