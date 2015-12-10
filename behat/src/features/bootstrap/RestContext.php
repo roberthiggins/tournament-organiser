@@ -200,12 +200,12 @@ class RestContext extends BehatContext
         }
     }
     /**
-     * @Then /^the API response should contain "([^"]*)"$/
+     * @Then /^the API response should( not)? contain "([^"]*)"$/
      */
-    public function theRequestShouldContain($value){
+    public function theRequestShouldContain($negate, $value){
         $data = $this->_response->getBody(true);
         if (!empty($data)) {
-            if (strpos($data,$value) === false) {
+            if (strpos($data,$value) === (false || $negate)) {
                 throw new Exception("Response doesn't include " .
                     $value . "\n".$this->_response->getBody(true));
             }
