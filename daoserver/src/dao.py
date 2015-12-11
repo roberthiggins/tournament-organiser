@@ -240,7 +240,9 @@ def get_round_info(tournament_id, round_id):
     """Get the information about a round"""
     tourn = Tournament(tournament_id)
     scores = tourn.get_score_keys_for_round(round_id)
-    return DateTimeJSONEncoder().encode(scores)
+    draw = tourn.draw_strategy.draw(int(round_id))
+
+    return DateTimeJSONEncoder().encode({'score_keys': scores, 'draw': draw})
 
 @APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
 def get_score_categories(tournament_id):

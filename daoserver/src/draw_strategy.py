@@ -44,7 +44,8 @@ class RoundRobin(object):
                     'entry_2': {entry from singles} or 'BYE'
                 }
         """
-        if len(singles) == 0: return pairs
+        if len(singles) == 0:
+            return pairs
         elif len(singles) == 1:
             pairs.append({'entry_1': singles[0], 'entry_2': 'BYE'})
             return pairs

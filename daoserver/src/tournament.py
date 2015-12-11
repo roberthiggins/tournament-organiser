@@ -5,6 +5,7 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
+from draw_strategy import RoundRobin
 from ranking_strategies import RankingStrategy
 from tournament_db import TournamentDBConnection
 
@@ -31,6 +32,7 @@ class Tournament(object):
             ranking_strategy(tournament_id, self.list_score_categories) \
             if ranking_strategy \
             else RankingStrategy(tournament_id, self.list_score_categories)
+        self.draw_strategy = RoundRobin(tournament_id)
 
     def add_to_db(self, date):
         """
