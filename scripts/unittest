@@ -1,0 +1,6 @@
+sudo docker kill dao_unit_test
+sudo docker rm -v dao_unit_test
+
+# We assume the dao image exists
+
+sudo docker run --name=dao_unit_test -t --link=db --link=drawserver daoserver_image python -u webapp/unit_test.py

@@ -80,6 +80,33 @@ BEGIN
     INSERT INTO score VALUES(eid, rd2key, 5);
     INSERT INTO score VALUES(eid, sportskey, 5);
 
+    INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;
+    INSERT INTO player VALUES (accid, 'lisa', NULL);
+    INSERT INTO account_security VALUES (accid, '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO registration VALUES('lisa', 'ranking_test');
+    INSERT INTO entry VALUES(default, 'lisa', 'ranking_test') RETURNING id INTO eid;
+    INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO score VALUES(eid, sportskey, 5);
+
+    INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;
+    INSERT INTO player VALUES (accid, 'bart', NULL);
+    INSERT INTO account_security VALUES (accid, '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO registration VALUES('bart', 'ranking_test');
+    INSERT INTO entry VALUES(default, 'bart', 'ranking_test') RETURNING id INTO eid;
+    INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO score VALUES(eid, sportskey, 5);
+
+    INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;
+    INSERT INTO player VALUES (accid, 'maggie', NULL);
+    INSERT INTO account_security VALUES (accid, '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO registration VALUES('maggie', 'ranking_test');
+    INSERT INTO entry VALUES(default, 'maggie', 'ranking_test') RETURNING id INTO eid;
+    INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO score VALUES(eid, sportskey, 5);
+
     RETURN 0;
 END $$;
 SELECT ranking_test_setup()

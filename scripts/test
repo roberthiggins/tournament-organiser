@@ -6,4 +6,5 @@ then
   exit 1
 fi
 
+./scripts/unittest
 ./scripts/behaviourtest
