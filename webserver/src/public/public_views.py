@@ -128,8 +128,24 @@ def tournament(request, tournament_id):
         )
     except AttributeError:
         return HttpResponse(response)
-    except ValueError as err:
+    except ValueError:
         return HttpResponse(response)
+
+def tournament_draw(request, tournament_id, round_id):
+    """Get the entire tournament draw for a single round of a tournament"""
+    json_data = json.loads(from_dao(
+        '/roundInfo/{}/{}'.format(tournament_id, round_id)
+    ).content)
+
+    return render_to_response(
+        'draw.html',
+        {
+            'tournament_id': tournament_id,
+            'round': round_id,
+            'draw': json_data['draw'],
+        },
+        RequestContext(request)
+    )
 
 def tournament_rankings(request, tournament_id):
     """Get placings for the entries in the tournament"""
