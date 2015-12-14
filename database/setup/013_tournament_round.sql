@@ -3,7 +3,7 @@
 
 CREATE TABLE tournament_round(
     id                  SERIAL PRIMARY KEY,
-    tournament_id       VARCHAR NOT NULL REFERENCES tournament(name),
+    tournament_name     VARCHAR NOT NULL REFERENCES tournament(name),
     ordering            INTEGER NOT NULL DEFAULT 1
 );
 COMMENT ON TABLE tournament_round IS 'The higher the order number the later the round.';

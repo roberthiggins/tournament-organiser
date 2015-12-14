@@ -206,7 +206,7 @@ class TournamentDBConnection(object):
             cur = self.con.cursor()
             cur.execute(
                 "SELECT COUNT(*) FROM tournament_round \
-                WHERE tournament_id = %s AND id = %s",
+                WHERE tournament_name = %s AND id = %s",
                 [tournament_id, round_id]
             )
             if cur.fetchone()[0] == 0:
