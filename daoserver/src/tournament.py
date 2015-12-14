@@ -94,6 +94,16 @@ class Tournament(object):
         return {'tournaments' : tourn_db_conn.list_tournaments()}
 
     @must_exist_in_db
+    def get_mission(self, round_id):
+        """Get the mission for a given round"""
+        return self.tourn_db_conn.get_mission(self.tournament_id, round_id)
+
+    @must_exist_in_db
+    def set_mission(self, round_id, mission):
+        """Set the mission for a given round"""
+        self.tourn_db_conn.set_mission(self.tournament_id, round_id, mission)
+
+    @must_exist_in_db
     def set_score(self, key, category, min_val=0, max_val=20):
         """
         Set a score category that a player is eligible for in a tournament.

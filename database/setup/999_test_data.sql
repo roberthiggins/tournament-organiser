@@ -50,8 +50,8 @@ DECLARE
 BEGIN
 
     INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12');
-    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1);
-    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2);
+    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1, 'Kill');
+    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2, DEFAULT);
 
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90) RETURNING id INTO battlecategory;
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10) RETURNING id INTO sportscategory;

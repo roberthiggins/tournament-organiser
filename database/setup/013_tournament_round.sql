@@ -4,7 +4,8 @@
 CREATE TABLE tournament_round(
     id                  SERIAL PRIMARY KEY,
     tournament_name     VARCHAR NOT NULL REFERENCES tournament(name),
-    ordering            INTEGER NOT NULL DEFAULT 1
+    ordering            INTEGER NOT NULL DEFAULT 1,
+    mission             VARCHAR NOT NULL DEFAULT 'TBA'
 );
 COMMENT ON TABLE tournament_round IS 'The higher the order number the later the round.';
 

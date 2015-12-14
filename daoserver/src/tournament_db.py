@@ -30,6 +30,30 @@ class TournamentDBConnection(object):
 
         raise NotImplementedError("enter game score not implemented")
 
+    def get_mission(self, tournament, round_id):
+        """Get mission for given round"""
+        try:
+            cur = self.con.cursor()
+            cur.execute("SELECT mission FROM tournament_round \
+                        WHERE tournament_name = %s AND ordering = %s",
+                        [tournament, round_id])
+            existing = cur.fetchone()
+            return existing[0]
+        except psycopg2.DatabaseError as err:
+            raise ValueError(err)
+
+    def set_mission(self, tournament, round_id, mission):
+        """Set mission for given round"""
+        try:
+            cur = self.con.cursor()
+            cur.execute("UPDATE tournament_round SET mission = %s \
+                        WHERE tournament_name = %s AND ordering = %s",
+                        [mission, tournament, round_id])
+            self.con.commit()
+        except psycopg2.DatabaseError as err:
+            self.con.rollback()
+            raise ValueError(err)
+
     def tournament_exists(self, name):
         """Check if a tournament exists with the passed name"""
         try:
