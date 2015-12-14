@@ -7,6 +7,7 @@ Feature: Get round info for display to the user
         When I GET "/roundInfo/ranking_test/1" from the API
         Then the response is JSON
         Then the API response should contain "round_1_battle"
+        Then the API response should contain "Kill"
         Then the API response should not contain "round_2_battle"
         Then the API response should not contain "sports"
 

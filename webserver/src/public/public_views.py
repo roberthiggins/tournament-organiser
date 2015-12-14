@@ -143,6 +143,7 @@ def tournament_draw(request, tournament_id, round_id):
             'tournament_id': tournament_id,
             'round': round_id,
             'draw': json_data['draw'],
+            'mission': json_data['mission'],
         },
         RequestContext(request)
     )
