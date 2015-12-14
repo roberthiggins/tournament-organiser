@@ -101,6 +101,13 @@ class TournamentDBConnection(object):
                 'rounds': x[2],
                 'scoring': x[3]} for x in raw_list]
 
+    @db_conn(commit=True)
+    def set_rounds(self, tournament_id, num_rounds):
+        """Set the number of rounds for a tournament"""
+        cur.execute(
+            "UPDATE tournament SET num_rounds = %s WHERE name = %s",
+            [num_rounds, tournament_id])
+
     @db_conn()
     def tournament_details(self, name):
         """

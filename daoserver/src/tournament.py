@@ -69,7 +69,7 @@ class Tournament(object):
             'name': details[1],
             'date': details[2],
             'details': {
-                'rounds': details[3] if details[3] is not None else 'N/A',
+                'rounds': details[3] if details[3] is not None else 0,
                 'score_format': details[4] if details[4] is not None else 'N/A',
             }
         }
@@ -102,6 +102,10 @@ class Tournament(object):
     def set_mission(self, round_id, mission):
         """Set the mission for a given round"""
         self.tourn_db_conn.set_mission(self.tournament_id, round_id, mission)
+
+    @must_exist_in_db
+    def set_number_of_rounds(self, num_rounds):
+        self.tourn_db_conn.set_rounds(self.tournament_id, int(num_rounds))
 
     @must_exist_in_db
     def set_score(self, key, category, min_val=0, max_val=20):

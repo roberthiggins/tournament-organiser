@@ -82,6 +82,17 @@ class LoginForm(ErrorStringForm):                       # pylint: disable=W0232
     inputUsername = forms.CharField(label='Username')
     inputPassword = forms.CharField(label='Password')
 
+class SetRoundsForm(ErrorStringForm):
+    """ Set number of rounds for a tournament"""
+    def __init__(self, *args, **kwargs):                # pylint: disable=E1002
+        t_id = kwargs.pop('tournament_id')
+        super(SetRoundsForm, self).__init__(*args, **kwargs)
+        # pylint: disable=E1101
+        self.fields['tournamentId'] = forms.CharField(
+            initial=t_id,
+            widget=forms.widgets.HiddenInput())
+    numRounds = forms.CharField(label='Number of rounds')
+
 class TournamentSetupForm(ErrorStringForm):             # pylint: disable=W0232
     """Setup a tournament. Mostly set the scores you can get"""
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002

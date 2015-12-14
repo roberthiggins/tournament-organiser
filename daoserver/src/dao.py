@@ -241,6 +241,7 @@ def rank_entries(tournament_id):
 
 @APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET', 'POST'])
 @enforce_request_variables('score_keys', 'mission')
+# pylint: disable=E0602
 def get_round_info(tournament_id, round_id):
     """
     GET the information about a round
@@ -261,6 +262,17 @@ def get_round_info(tournament_id, round_id):
         'draw': tourn.draw_strategy.draw(int(round_id)),
         'mission': tourn.get_mission(int(round_id))
     })
+
+@APP.route('/setRounds', methods=['POST'])
+@enforce_request_variables('numRounds', 'tournamentId')
+# pylint: disable=E0602
+def set_rounds():
+    """Set the number of rounds for a tournament"""
+    rounds = int(numRounds)
+    if rounds < 1:
+        raise ValueError('Set at least 1 round')
+    Tournament(tournamentId).set_number_of_rounds(rounds)
+    return make_response('Rounds set: {}'.format(rounds), 200)
 
 @APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
 def get_score_categories(tournament_id):
