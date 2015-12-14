@@ -44,6 +44,10 @@ def enforce_request_variables(*vars_to_enforce):
     def decorator(func):                                # pylint: disable=C0111
         @wraps(func)
         def wrapped(*args, **kwargs):                   # pylint: disable=C0111
+
+            if request.method == 'GET':
+                return func(*args, **kwargs)
+
             glob = func.func_globals
             sentinel = object()
             old_values = {}
