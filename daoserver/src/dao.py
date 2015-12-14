@@ -239,14 +239,28 @@ def rank_entries(tournament_id):
         tourn.ranking_strategy.overall_ranking()
     )
 
-@APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET'])
+@APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET', 'POST'])
+@enforce_request_variables('score_keys', 'mission')
 def get_round_info(tournament_id, round_id):
-    """Get the information about a round"""
+    """
+    GET the information about a round
+    POST information including the mission, score_keys to be used.
+    POST Expects:
+        {
+            'mission': a text name,
+        }
+    """
     tourn = Tournament(tournament_id)
-    scores = tourn.get_score_keys_for_round(round_id)
-    draw = tourn.draw_strategy.draw(int(round_id))
 
-    return DateTimeJSONEncoder().encode({'score_keys': scores, 'draw': draw})
+    if request.method == 'POST':
+        tourn.set_mission(round_id, mission)
+
+    # We will return all round info for all requests regardless of method
+    return DateTimeJSONEncoder().encode({
+        'score_keys': tourn.get_score_keys_for_round(round_id),
+        'draw': tourn.draw_strategy.draw(int(round_id)),
+        'mission': tourn.get_mission(int(round_id))
+    })
 
 @APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
 def get_score_categories(tournament_id):

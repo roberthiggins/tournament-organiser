@@ -4,3 +4,6 @@ dao-get () {
 dao-post () {
     curl --data $2 "http://$DAOSERVER_PORT_5000_TCP_ADDR:$DAOSERVER_PORT_5000_TCP_PORT/$1"
 }
+round-info () {
+    dao-get roundInfo/$1/$2
+}
