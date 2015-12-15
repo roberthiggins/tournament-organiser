@@ -29,9 +29,9 @@ class TournamentDBConnection(object):
     @db_conn()
     def tournament_exists(self, name):
         """Check if a tournament exists with the passed name"""
-        cur.execute("SELECT COUNT(*) FROM tournament WHERE name = %s",
+        cur.execute("SELECT COUNT(*) > 0 FROM tournament WHERE name = %s",
                     [name])
-        return cur.fetchone()[0] > 0
+        return cur.fetchone()[0]
 
     @db_conn(commit=True)
     def add_tournament(self, tournament):
