@@ -109,4 +109,19 @@ BEGIN
 
     RETURN 0;
 END $$;
-SELECT ranking_test_setup()
+SELECT ranking_test_setup();
+
+-- Make a tournament for the purposes of testing missions
+CREATE OR REPLACE FUNCTION mission_test_setup() RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    tourn_name varchar := 'mission_test';
+BEGIN
+
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12');
+    INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Mission the First');
+    INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, 'Mission the Second');
+    INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 3, 'Mission the Third');
+
+    RETURN 0;
+END $$;
+SELECT mission_test_setup();

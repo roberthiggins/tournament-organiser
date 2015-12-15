@@ -203,6 +203,12 @@ def login():                                            # pylint: disable=E0602
         PLAYER_DB_CONN.login(inputUsername, inputPassword),
         200)
 
+@APP.route('/getMissions/<tournament_id>', methods=['GET'])
+def get_missions(tournament_id):
+    """GET list of missions for a tournament."""
+    return DateTimeJSONEncoder().encode(
+        Tournament(tournament_id).get_missions())
+
 @APP.route('/placefeedback', methods=['POST'])
 def place_feedback():
     """

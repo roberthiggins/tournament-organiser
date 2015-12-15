@@ -19,6 +19,14 @@ class TournamentDBConnection(object):
                     [tournament, round_id])
         return cur.fetchone()[0]
 
+    @db_conn()
+    def get_missions(self, tournament):
+        """Get mission for given round"""
+        cur.execute("SELECT mission FROM tournament_round \
+                    WHERE tournament_name = %s",
+                    [tournament])
+        return [x[0] for x in cur.fetchall()]
+
     @db_conn(commit=True)
     def set_mission(self, tournament, round_id, mission):
         """Set mission for given round"""

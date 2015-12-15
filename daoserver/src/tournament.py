@@ -99,6 +99,11 @@ class Tournament(object):
         return self.tourn_db_conn.get_mission(self.tournament_id, round_id)
 
     @must_exist_in_db
+    def get_missions(self):
+        """Get all missions for the tournament"""
+        return self.tourn_db_conn.get_missions(self.tournament_id)
+
+    @must_exist_in_db
     def set_mission(self, round_id, mission):
         """Set the mission for a given round"""
         self.tourn_db_conn.set_mission(self.tournament_id, round_id, mission)
