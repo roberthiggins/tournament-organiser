@@ -5,6 +5,7 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
+import json
 import os
 import re
 
@@ -208,6 +209,24 @@ def get_missions(tournament_id):
     """GET list of missions for a tournament."""
     return DateTimeJSONEncoder().encode(
         Tournament(tournament_id).get_missions())
+
+@APP.route('/setMissions', methods=['POST'])
+@enforce_request_variables('tournamentId', 'missions')
+# pylint: disable=E0602
+def set_missions():
+    """POST to set the missions for a tournament.A list of strings expected"""
+    tourn = Tournament(tournamentId)
+    rounds = tourn.details()['details']['rounds']
+    json_missions = json.loads(missions)
+
+    if len(json_missions) != int(rounds):
+        raise ValueError('Tournament {} has {} rounds. \
+            You submitted missions {}'.format(tournamentId, rounds, missions))
+
+    for i, mission in enumerate(json_missions):
+        tourn.set_mission(i + 1, mission)
+
+    return make_response('Missions set: {}'.format(missions), 200)
 
 @APP.route('/placefeedback', methods=['POST'])
 def place_feedback():
