@@ -110,6 +110,7 @@ class Tournament(object):
 
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
+        """Set the number of rounds in a tournament"""
         self.tourn_db_conn.set_rounds(self.tournament_id, int(num_rounds))
 
     @must_exist_in_db
