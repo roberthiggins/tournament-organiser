@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Set Missions For {{tournament}}{% endblock %}
+
+{% block intro %}<p>Set the missions for {{tournament}} here:</p>{% endblock %}
+
+{% block form %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Set</button>
+    </form>
+{% endblock %}

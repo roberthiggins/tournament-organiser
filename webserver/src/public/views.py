@@ -12,7 +12,8 @@ HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from forms import AddTournamentForm, ApplyForTournamentForm, \
-EnterScoreForm, FeedbackForm, TournamentSetupForm, SetRoundsForm
+EnterScoreForm, FeedbackForm, TournamentSetupForm, SetRoundsForm, \
+SetMissionsForm
 from public.view_helpers import from_dao
 
 @login_required
@@ -117,6 +118,45 @@ def logout(request):
     """ logout the user from current request """
     auth.logout(request)
     return HttpResponseRedirect('/')
+
+@login_required
+def set_missions(request, tournament_id):
+    """Set the number of rounds for a competition"""
+    t_details = from_dao('/tournamentDetails/{}'.format(tournament_id))
+    if t_details.status_code != 200:
+        return HttpResponseNotFound(
+            'Tournament {} not found'.format(tournament_id))
+    rounds = int(json.loads(t_details.content)['details']['rounds'])
+
+    existing_missions = json.loads(
+        from_dao('/getMissions/{}'.format(tournament_id)).content)
+
+    form = SetMissionsForm(
+        tournament_id=tournament_id,
+        initial_missions=existing_missions,
+        rounds=rounds)
+
+    if request.method == 'POST':
+        form = SetMissionsForm(request.POST,
+            tournament_id=tournament_id,
+            rounds=rounds)
+
+        if form.is_valid():                             # pylint: disable=E1101
+            response = from_dao('/setMissions', form)
+
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
+
+    return render_to_response(
+        'set-missions.html',
+        {
+            'form': form,
+            'tournament': tournament_id,
+        },
+        RequestContext(request)
+    )
 
 @login_required
 def register_for_tournament(request):
