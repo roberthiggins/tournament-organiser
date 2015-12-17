@@ -30,9 +30,17 @@ class TournamentDBConnection(object):
     @db_conn(commit=True)
     def set_mission(self, tournament, round_id, mission):
         """Set mission for given round"""
-        cur.execute("UPDATE tournament_round SET mission = %s \
+        cur.execute("SELECT COUNT(*) > 0 FROM tournament_round \
                     WHERE tournament_name = %s AND ordering = %s",
-                    [mission, tournament, round_id])
+                    [tournament, round_id])
+        if cur.fetchone()[0]:
+            cur.execute("UPDATE tournament_round SET mission = %s \
+                        WHERE tournament_name = %s AND ordering = %s",
+                        [mission, tournament, round_id])
+        else:
+            cur.execute("INSERT INTO tournament_round \
+                        VALUES(DEFAULT, %s, %s, %s)",
+                        [tournament, round_id, mission])
 
     @db_conn()
     def tournament_exists(self, name):
@@ -115,6 +123,9 @@ class TournamentDBConnection(object):
         cur.execute(
             "UPDATE tournament SET num_rounds = %s WHERE name = %s",
             [num_rounds, tournament_id])
+        cur.execute("DELETE FROM tournament_round \
+                    WHERE tournament_name = %s AND ordering > %s",
+                    [tournament_id, num_rounds])
 
     @db_conn()
     def tournament_details(self, name):
