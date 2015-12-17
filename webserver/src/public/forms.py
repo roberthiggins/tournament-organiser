@@ -1,8 +1,11 @@
 """ Forms for public website."""
 
+import json
+
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.template.loader import render_to_string
 
 class ErrorStringForm(forms.Form):                      # pylint: disable=W0232
     """ A form with a default error message """
@@ -81,6 +84,56 @@ class LoginForm(ErrorStringForm):                       # pylint: disable=W0232
     """ Login """
     inputUsername = forms.CharField(label='Username')
     inputPassword = forms.CharField(label='Password')
+
+class MissionWidget(forms.MultiWidget):
+    """Widget to handle the input for the custom mission field"""
+    def __init__(self, *args, **kwargs):# pylint: disable=E1002
+        rounds = int(kwargs.pop('rounds', 0))
+        widgets = tuple(forms.TextInput() for x in range(1, rounds + 1))
+
+        super(MissionWidget, self).__init__(widgets, *args, **kwargs)
+
+    def decompress(self, value):
+        return value.split(',') if value else []
+
+    def format_output(self, rendered_widgets):
+        """Customize widget rendering. We need the inputs to look separate"""
+        widget_context = {
+            'elements': [{'label': 'Round {}'.format(x + 1), 'input': y} \
+            for x, y in enumerate(rendered_widgets)]
+        }
+        return render_to_string('mission-input.html', widget_context)
+
+class MissionFields(forms.MultiValueField):
+    """Custom field to display all the mission inputs and combine them"""
+    def __init__(self, *args, **kwargs):                # pylint: disable=E1002
+        rounds = int(kwargs.pop('rounds', 0))
+        fields = tuple(forms.CharField() for x in range(0, rounds))
+        widget = MissionWidget(rounds=rounds)
+
+        super(MissionFields, self).__init__(
+            fields, widget=widget, *args, **kwargs)
+
+    def compress(self, data_list):
+        return json.dumps(data_list)
+
+class SetMissionsForm(ErrorStringForm):
+    """Set missions for a tournament"""
+    def __init__(self, *args, **kwargs):                # pylint: disable=E1002
+        t_id = kwargs.pop('tournament_id')
+        initial_missions = kwargs.pop('initial_missions', None)
+        rounds = int(kwargs.pop('rounds'))
+
+        super(SetMissionsForm, self).__init__(*args, **kwargs)
+
+        # pylint: disable=E1101
+        self.fields['missions'] = MissionFields(rounds=rounds, required=False)
+        if initial_missions is not None:
+            self.initial['missions'] = initial_missions # pylint: disable=E1101
+        # pylint: disable=E1101
+        self.fields['tournamentId'] = forms.CharField(
+            initial=t_id,
+            widget=forms.widgets.HiddenInput())
 
 class SetRoundsForm(ErrorStringForm):
     """ Set number of rounds for a tournament"""
