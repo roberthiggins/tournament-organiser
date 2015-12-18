@@ -52,3 +52,32 @@ class ProtestAvoidanceStrategy(object):
                 protests += 1
         return protests
 
+    @staticmethod
+    def get_protest_score_for_layout(layout):
+        """
+        Get the protest scores for a single layout
+
+        Expects:
+            List of tuples [(table, [entries at that table])]
+        Returns:
+            A list of protests [
+                0-protest-count,
+                1-protest-count,
+                2-protest-count,
+                total-protest-points,
+                ]
+        """
+        if len(layout) == 0:
+            return [0, 0, 0, 0]
+        num_entries = len(layout[0][1])
+        if any(len(x[1]) != num_entries for x in layout):
+            raise IndexError('Some games have differing numbers of entries')
+
+        protest_list = [0 for x in range(num_entries + 2)] # pylint: disable=W0612
+        for game in layout:
+            protests = ProtestAvoidanceStrategy.get_protest_score_for_game(
+                game[0], game[1])
+            protest_list[protests] += 1
+            protest_list[-1] += protests
+
+        return protest_list

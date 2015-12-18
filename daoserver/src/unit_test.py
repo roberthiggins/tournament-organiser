@@ -3,6 +3,7 @@ Tests for the Round Robin DrawStrategy
 """
 
 import unittest
+from testfixtures import compare
 
 from draw_strategy import RoundRobin
 from table_strategy import ProtestAvoidanceStrategy
@@ -85,6 +86,53 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
 
         self.assertRaises(TypeError, func, 1, ['spanner', entry2])
         self.assertRaises(ValueError, func, 'a', game)
+
+    def protest_score_for_layout(self):
+        """
+        Protest object for a layout
+        Should be something like [total, 0s, 1s, 2s]
+        """
+        entry1 = {'id': 'entry1', 'games': [1, 2]}
+        entry2 = {'id': 'entry2', 'games': [2, 1]}
+        entry3 = {'id': 'entry3', 'games': [3, 2]}
+        entry4 = {'id': 'entry4', 'games': [1, 3]}
+        entry5 = {'id': 'entry5', 'games': [2, 3]}
+        entry6 = {'id': 'entry6', 'games': [3, 1]}
+
+        func = ProtestAvoidanceStrategy.get_protest_score_for_layout
+
+        layout = [
+            (3, [entry1, entry2]), # should get 0
+            (2, [entry3, entry4]), # should get 1 from e3
+            (1, [entry5, entry6])] # should get 1 from e6
+        compare(func(layout), [1, 2, 0, 2])
+
+        layout = [
+            (1, [entry1, entry2]), # should get 2
+            (2, [entry3, entry4]), # should get 1 from e3
+            (3, [entry5, entry6])] # should get 2 from e6
+        compare(func(layout), [0, 1, 2, 5])
+
+        layout = [(3, [entry1, entry2])] # should get 0
+        compare(func(layout), [1, 0, 0, 0])
+
+        layout = [] # should get 0
+        compare(func(layout), [0, 0, 0, 0])
+
+        layout = None
+        self.assertRaises(TypeError, func, layout)
+
+        layout = [
+            (1, [entry1]), # should get 1
+            (2, [entry3, entry4]), # explode as longer than first game
+            (3, [entry5, entry6])]
+        self.assertRaises(IndexError, func, layout)
+
+        layout = [
+            (None, [entry1, entry2]), # explode
+            (2, [entry3, entry4]),
+            (3, [entry5, entry6])]
+        self.assertRaises(TypeError, func, layout)
 
 if __name__ == '__main__':
     unittest.main()
