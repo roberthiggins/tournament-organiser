@@ -35,3 +35,20 @@ class ProtestAvoidanceStrategy(object):
             A reasonably complex select to get table history for each player
             could be stored with the entry.
     """
+
+    @staticmethod
+    def get_protest_score_for_game(table, entries):
+        """
+        Get the protest score for a single game.
+        Returns a single protest score between 0 and len(entries)
+        Expects:
+            - an int for the table number
+            - A list of entries e.g. [{'id': 'entry2', 'games': [2, 3]}]
+        """
+        protests = 0
+        table = int(table)
+        for entry in entries:
+            if table in entry['games']:
+                protests += 1
+        return protests
+

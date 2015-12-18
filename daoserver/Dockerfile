@@ -30,6 +30,10 @@ RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate
 # Django is used for email validation
 RUN pip install django
 
+# Unit tests only
+RUN pip install testfixtures
+# End Unit test installs
+
 ENV DB_PASSWORD FuEm7l003bfd6zM
 ADD src/bash_aliases /root/.bash_aliases
 
