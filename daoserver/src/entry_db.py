@@ -84,9 +84,12 @@ class EntryDBConnection(object):
         cur = self.con.cursor(cursor_factory=DictCursor)
         cur.execute(
             "SELECT \
-                e.id            AS entry_id, \
-                p.username      AS username, \
-                t.name          AS tournament_id \
+                e.id                                    AS entry_id, \
+                p.username                              AS username, \
+                t.name                                  AS tournament_id, \
+                (SELECT array(SELECT table_no \
+                FROM table_allocation \
+                WHERE entry_id = e.id))                  AS game_history \
             FROM entry e \
             INNER JOIN player p on e.player_id = p.username \
             INNER JOIN tournament t on e.tournament_id = t.name \
@@ -99,6 +102,7 @@ class EntryDBConnection(object):
                 'entry_id': entry['entry_id'],
                 'username': entry['username'],
                 'tournament_id': entry['tournament_id'],
+                'game_history': entry['game_history'],
                 'scores': self.get_scores_for_entry(entry['entry_id']),
             } for entry in entries
         ]

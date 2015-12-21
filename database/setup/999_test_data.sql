@@ -67,7 +67,9 @@ BEGIN
     INSERT INTO registration VALUES('homer', 'ranking_test');
     INSERT INTO entry VALUES(default, 'homer', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 20);
+    INSERT INTO table_allocation VALUES(eid, 1, 1);
     INSERT INTO score VALUES(eid, rd2key, 15);
+    INSERT INTO table_allocation VALUES(eid, 2, 2);
     INSERT INTO score VALUES(eid, sportskey, 1);
 
 
@@ -77,6 +79,7 @@ BEGIN
     INSERT INTO registration VALUES('marge', 'ranking_test');
     INSERT INTO entry VALUES(default, 'marge', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO table_allocation VALUES(eid, 2, 1);
     INSERT INTO score VALUES(eid, rd2key, 5);
     INSERT INTO score VALUES(eid, sportskey, 5);
 
@@ -87,6 +90,7 @@ BEGIN
     INSERT INTO entry VALUES(default, 'lisa', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
     INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO table_allocation VALUES(eid, 2, 2);
     INSERT INTO score VALUES(eid, sportskey, 5);
 
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;
@@ -95,7 +99,9 @@ BEGIN
     INSERT INTO registration VALUES('bart', 'ranking_test');
     INSERT INTO entry VALUES(default, 'bart', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO table_allocation VALUES(eid, 2, 1);
     INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO table_allocation VALUES(eid, 1, 2);
     INSERT INTO score VALUES(eid, sportskey, 5);
 
     INSERT INTO account VALUES (DEFAULT, 'foo@bar.com') RETURNING id INTO accid;
@@ -104,7 +110,9 @@ BEGIN
     INSERT INTO registration VALUES('maggie', 'ranking_test');
     INSERT INTO entry VALUES(default, 'maggie', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO table_allocation VALUES(eid, 1, 1);
     INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO table_allocation VALUES(eid, 1, 2);
     INSERT INTO score VALUES(eid, sportskey, 5);
 
     RETURN 0;
