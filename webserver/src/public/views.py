@@ -88,6 +88,23 @@ def enter_score_by_entry(request, entry_id):
     )
 
 @login_required
+def enter_score_for_game(tournament_id, username, round_id):
+
+    form = EnterScoreForm()
+    if request.method== 'POST':
+        pass
+    # work out what game we're talking about
+    # get the scores that need to be filled in for this game
+    # make a form
+
+    # if the request is a post:
+    #   validate the form
+    #   send the info back to the db
+    
+    # render the form and pass back to the browser 
+    # 
+
+@login_required
 def feedback(request):
     """ Page for user to place feedback"""
 
