@@ -99,7 +99,7 @@ def login(request):
             login_creds.add_error(None, 'Username or password incorrect') # pylint: disable=E1103
             return render_login(request, login_creds)
 
-        return HttpResponseRedirect(request.REQUEST.get('next', '/'))
+        return HttpResponseRedirect(request.GET.get('next', '/'))
 
     return render_login(request, login_creds)
 
