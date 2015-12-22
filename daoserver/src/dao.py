@@ -6,13 +6,13 @@ should talk to this for functionality wherever possible.
 """
 
 import json
+import jsonpickle
 import os
 import re
 
 from flask import Flask, request, make_response, jsonify
 from functools import wraps
 
-from datetime_encoder import DateTimeJSONEncoder
 from entry_db import EntryDBConnection
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
@@ -88,7 +88,7 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     tournament names
     """
-    return DateTimeJSONEncoder().encode(Tournament.list_tournaments())
+    return jsonpickle.encode(Tournament.list_tournaments(), unpicklable=False)
 
 @APP.route('/registerfortournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputUserName')
@@ -183,13 +183,14 @@ def enter_tournament_score():                           # pylint: disable=E0602
 @APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
 def get_entry_id(tournament_id, username):
     """Get entry info from tournament and username"""
-    return DateTimeJSONEncoder().encode(
-        ENTRY_DB_CONN.entry_id(tournament_id, username))
+    return jsonpickle.encode(
+        ENTRY_DB_CONN.entry_id(tournament_id, username), unpicklable=False)
 
 @APP.route('/entryInfo/<entry_id>', methods=['GET'])
 def entry_info(entry_id):
     """ Given entry_id, get info about player and tournament"""
-    return DateTimeJSONEncoder().encode(ENTRY_DB_CONN.entry_info(entry_id))
+    return jsonpickle.encode(
+        ENTRY_DB_CONN.entry_info(entry_id), unpicklable=False)
 
 @APP.route('/login', methods=['POST'])
 @enforce_request_variables('inputUsername', 'inputPassword')
@@ -207,8 +208,8 @@ def login():                                            # pylint: disable=E0602
 @APP.route('/getMissions/<tournament_id>', methods=['GET'])
 def get_missions(tournament_id):
     """GET list of missions for a tournament."""
-    return DateTimeJSONEncoder().encode(
-        Tournament(tournament_id).get_missions())
+    return jsonpickle.encode(
+        Tournament(tournament_id).get_missions(), unpicklable=False)
 
 @APP.route('/setMissions', methods=['POST'])
 @enforce_request_variables('tournamentId', 'missions')
@@ -260,9 +261,8 @@ def rank_entries(tournament_id):
     if not tourn.exists_in_db:
         return make_response(
             'Tournament {} doesn\'t exist'.format(tournament_id), 404)
-    return DateTimeJSONEncoder().encode(
-        tourn.ranking_strategy.overall_ranking()
-    )
+    return jsonpickle.encode(
+        tourn.ranking_strategy.overall_ranking(), unpicklable=False)
 
 @APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET', 'POST'])
 @enforce_request_variables('score_keys', 'mission')
@@ -282,11 +282,11 @@ def get_round_info(tournament_id, round_id):
         tourn.set_mission(round_id, mission)
 
     # We will return all round info for all requests regardless of method
-    return DateTimeJSONEncoder().encode({
+    return jsonpickle.encode({
         'score_keys': tourn.get_score_keys_for_round(round_id),
         'draw': tourn.draw_strategy.draw(int(round_id)),
         'mission': tourn.get_mission(int(round_id))
-    })
+    }, unpicklable=False)
 
 @APP.route('/setRounds', methods=['POST'])
 @enforce_request_variables('numRounds', 'tournamentId')
@@ -307,7 +307,8 @@ def get_score_categories(tournament_id):
     """
     try:
         tourn = Tournament(tournament_id)
-        return DateTimeJSONEncoder().encode(tourn.list_score_categories())
+        return jsonpickle.encode(
+            tourn.list_score_categories(), unpicklable=False)
     except ValueError as err:
         return make_response(str(err), 404)
 
@@ -347,7 +348,7 @@ def tournament_details(t_name=None):
     information
     """
     tourn = Tournament(t_name)
-    return DateTimeJSONEncoder().encode(tourn.details())
+    return jsonpickle.encode(tourn.details(), unpicklable=False)
 
 @APP.route('/userDetails/<u_name>', methods=['GET'])
 def user_details(u_name=None):
@@ -362,3 +363,9 @@ if __name__ == "__main__":
     PORT = int(os.environ.get('PORT', 5000))
     APP.run(host='0.0.0.0', port=PORT)
 
+    class DatetimeHandler(jsonpickle.handlers.BaseHandler):
+        def flatten(self, obj, data):
+            return obj.isoformat()
+
+    jsonpickle.handlers.registry.register(datetime.datetime, DatetimeHandler)
+    jsonpickle.handlers.registry.register(datetime.date, DatetimeHandler)

@@ -27,6 +27,9 @@ RUN apt-get install -y python-dev
 RUN apt-get install -y libpq-dev
 RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate
 
+# jsonpickle is used for serializing objects into JSON
+RUN pip install jsonpickle
+
 # Django is used for email validation
 RUN pip install django
 
