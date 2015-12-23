@@ -2,12 +2,29 @@
 This file contains code to connect to the entry_db
 """
 
+from flask import json
 import psycopg2
 from psycopg2.extras import DictCursor
 
 from db_connection import DBConnection
 from player_db import PlayerDBConnection
 from tournament_db import TournamentDBConnection
+
+class Entry(json.JSONEncoder):
+    """
+    A tournament is composed of entries who play each other. This is distinct
+    from users or accounts as there may be multiple players on a team, etc.
+    """
+
+    def __init__(self, entry_id=None, username=None, tournament_id=None,
+        game_history=[], scores=None):
+        self.entry_id = entry_id
+        self.username = username
+        self.tournament_id = tournament_id
+        self.game_history = game_history
+        self.ranking = None
+        self.scores = scores
+        self.total_score = 0
 
 class EntryDBConnection(object):
     """
@@ -98,13 +115,13 @@ class EntryDBConnection(object):
         entries = cur.fetchall()
 
         unranked_list = [
-            {
-                'entry_id': entry['entry_id'],
-                'username': entry['username'],
-                'tournament_id': entry['tournament_id'],
-                'game_history': entry['game_history'],
-                'scores': self.get_scores_for_entry(entry['entry_id']),
-            } for entry in entries
+            Entry(
+                entry_id=entry['entry_id'],
+                username=entry['username'],
+                tournament_id=entry['tournament_id'],
+                game_history=entry['game_history'],
+                scores=self.get_scores_for_entry(entry['entry_id']),
+            ) for entry in entries
         ]
 
         return unranked_list

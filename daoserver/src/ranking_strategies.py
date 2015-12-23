@@ -51,8 +51,8 @@ class RankingStrategy(object):
         """
         entries = self.entry_db_conn.entry_list(self.tournament_id)
         for i, entry in enumerate(entries):
-            entry['total_score'] = self.total_score(entry['scores'])
-            entry['ranking'] = i + 1
+            entry.total_score = self.total_score(entry.scores)
+            entry.ranking = i + 1
         return entries
 
     def ranking_by_category(self, category):
