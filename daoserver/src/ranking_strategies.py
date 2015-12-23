@@ -32,8 +32,13 @@ class RankingStrategy(object):
                 [x['score'] for x in scores if x['category'] == cat['id']])
             agg_total = sum(
                 [x['max_val'] for x in scores if x['category'] == cat['id']])
-            cat['total_score'] = \
-                float(agg_score) / float(agg_total) * int(cat['percentage'])
+            try:
+                agg_score = float(agg_score)
+                agg_total = float(agg_total)
+                percentage = int(cat['percentage'])
+                cat['total_score'] = agg_score / agg_total * percentage
+            except ZeroDivisionError:
+                cat['total_score'] = 0
 
         return sum([x['total_score'] for x in categories])
 
