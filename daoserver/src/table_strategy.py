@@ -43,12 +43,12 @@ class ProtestAvoidanceStrategy(object):
         Returns a single protest score between 0 and len(entries)
         Expects:
             - an int for the table number
-            - A list of entries e.g. [{'id': 'entry2', 'games': [2, 3]}]
+            - A list of Entry
         """
         protests = 0
         table = int(table)
         for entry in entries:
-            if table in entry['games']:
+            if table in entry.game_history:
                 protests += 1
         return protests
 
@@ -59,6 +59,7 @@ class ProtestAvoidanceStrategy(object):
 
         Expects:
             List of tuples [(table, [entries at that table])]
+            Note that the game might simply be the string 'BYE'
         Returns:
             A list of protests [
                 0-protest-count,
@@ -75,8 +76,14 @@ class ProtestAvoidanceStrategy(object):
 
         protest_list = [0 for x in range(num_entries + 2)] # pylint: disable=W0612
         for game in layout:
-            protests = ProtestAvoidanceStrategy.get_protest_score_for_game(
-                game[0], game[1])
+            g1 = game[1][0]
+            g2 = game[1][1]
+
+            if g1 == 'BYE' or g2 == 'BYE':
+                protests = 0
+            else:
+                protests = ProtestAvoidanceStrategy.get_protest_score_for_game(
+                    game[0], (g1, g2))
             protest_list[protests] += 1
             protest_list[-1] += protests
 

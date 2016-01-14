@@ -6,6 +6,7 @@ import unittest
 from testfixtures import compare
 
 from draw_strategy import RoundRobin
+from entry_db import Entry
 from table_strategy import ProtestAvoidanceStrategy
 
 class DrawStrategyTests(unittest.TestCase):             # pylint: disable=R0904
@@ -15,51 +16,51 @@ class DrawStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         """Test get_draw"""
         draw_strategy = RoundRobin('ranking_test')
         draw = draw_strategy.draw(1)
-        self.assertTrue(draw[0]['entry_1']['username'] == 'homer')
-        self.assertTrue(draw[0]['entry_2']['username'] == 'maggie')
-        self.assertTrue(draw[1]['entry_1']['username'] == 'marge')
-        self.assertTrue(draw[1]['entry_2']['username'] == 'bart')
-        self.assertTrue(draw[2]['entry_1']['username'] == 'lisa')
+        self.assertTrue(draw[0]['entry_1'].username == 'homer')
+        self.assertTrue(draw[0]['entry_2'].username == 'maggie')
+        self.assertTrue(draw[1]['entry_1'].username == 'marge')
+        self.assertTrue(draw[1]['entry_2'].username == 'bart')
+        self.assertTrue(draw[2]['entry_1'].username == 'lisa')
         self.assertTrue(draw[2]['entry_2'] == 'BYE')
 
         draw = draw_strategy.draw(2)
-        self.assertTrue(draw[0]['entry_1']['username'] == 'maggie')
-        self.assertTrue(draw[0]['entry_2']['username'] == 'bart')
-        self.assertTrue(draw[1]['entry_1']['username'] == 'homer')
-        self.assertTrue(draw[1]['entry_2']['username'] == 'lisa')
-        self.assertTrue(draw[2]['entry_1']['username'] == 'marge')
+        self.assertTrue(draw[0]['entry_1'].username == 'maggie')
+        self.assertTrue(draw[0]['entry_2'].username == 'bart')
+        self.assertTrue(draw[1]['entry_1'].username == 'homer')
+        self.assertTrue(draw[1]['entry_2'].username == 'lisa')
+        self.assertTrue(draw[2]['entry_1'].username == 'marge')
         self.assertTrue(draw[2]['entry_2'] == 'BYE')
 
         draw = draw_strategy.draw(3)
-        self.assertTrue(draw[0]['entry_1']['username'] == 'bart')
-        self.assertTrue(draw[0]['entry_2']['username'] == 'lisa')
-        self.assertTrue(draw[1]['entry_1']['username'] == 'maggie')
-        self.assertTrue(draw[1]['entry_2']['username'] == 'marge')
-        self.assertTrue(draw[2]['entry_1']['username'] == 'homer')
+        self.assertTrue(draw[0]['entry_1'].username == 'bart')
+        self.assertTrue(draw[0]['entry_2'].username == 'lisa')
+        self.assertTrue(draw[1]['entry_1'].username == 'maggie')
+        self.assertTrue(draw[1]['entry_2'].username == 'marge')
+        self.assertTrue(draw[2]['entry_1'].username == 'homer')
         self.assertTrue(draw[2]['entry_2'] == 'BYE')
 
         draw = draw_strategy.draw(4)
-        self.assertTrue(draw[0]['entry_1']['username'] == 'lisa')
-        self.assertTrue(draw[0]['entry_2']['username'] == 'marge')
-        self.assertTrue(draw[1]['entry_1']['username'] == 'bart')
-        self.assertTrue(draw[1]['entry_2']['username'] == 'homer')
-        self.assertTrue(draw[2]['entry_1']['username'] == 'maggie')
+        self.assertTrue(draw[0]['entry_1'].username == 'lisa')
+        self.assertTrue(draw[0]['entry_2'].username == 'marge')
+        self.assertTrue(draw[1]['entry_1'].username == 'bart')
+        self.assertTrue(draw[1]['entry_2'].username == 'homer')
+        self.assertTrue(draw[2]['entry_1'].username == 'maggie')
         self.assertTrue(draw[2]['entry_2'] == 'BYE')
 
         draw = draw_strategy.draw(5)
-        self.assertTrue(draw[0]['entry_1']['username'] == 'marge')
-        self.assertTrue(draw[0]['entry_2']['username'] == 'homer')
-        self.assertTrue(draw[1]['entry_1']['username'] == 'lisa')
-        self.assertTrue(draw[1]['entry_2']['username'] == 'maggie')
-        self.assertTrue(draw[2]['entry_1']['username'] == 'bart')
+        self.assertTrue(draw[0]['entry_1'].username == 'marge')
+        self.assertTrue(draw[0]['entry_2'].username == 'homer')
+        self.assertTrue(draw[1]['entry_1'].username == 'lisa')
+        self.assertTrue(draw[1]['entry_2'].username == 'maggie')
+        self.assertTrue(draw[2]['entry_1'].username == 'bart')
         self.assertTrue(draw[2]['entry_2'] == 'BYE')
 
         draw = draw_strategy.draw(6)
-        self.assertTrue(draw[0]['entry_1']['username'] == 'homer')
-        self.assertTrue(draw[0]['entry_2']['username'] == 'maggie')
-        self.assertTrue(draw[1]['entry_1']['username'] == 'marge')
-        self.assertTrue(draw[1]['entry_2']['username'] == 'bart')
-        self.assertTrue(draw[2]['entry_1']['username'] == 'lisa')
+        self.assertTrue(draw[0]['entry_1'].username == 'homer')
+        self.assertTrue(draw[0]['entry_2'].username == 'maggie')
+        self.assertTrue(draw[1]['entry_1'].username == 'marge')
+        self.assertTrue(draw[1]['entry_2'].username == 'bart')
+        self.assertTrue(draw[2]['entry_1'].username == 'lisa')
         self.assertTrue(draw[2]['entry_2'] == 'BYE')
 
 class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
@@ -67,8 +68,8 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
 
     def test_get_protest_score_for_game(self):
         """Test that individual games get the correct protest score"""
-        entry1 = {'id': 'entry1', 'games': [1, 3]}
-        entry2 = {'id': 'entry2', 'games': [2, 3]}
+        entry1 = Entry(entry_id='entry1', game_history=[1, 3])
+        entry2 = Entry(entry_id='entry2', game_history=[2, 3])
         game = [entry1, entry2]
         func = ProtestAvoidanceStrategy.get_protest_score_for_game
 
@@ -84,7 +85,7 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         self.assertTrue(func(1, []) == 0)
         self.assertTrue(func(3, [entry1, entry1, entry1]) == 3)
 
-        self.assertRaises(TypeError, func, 1, ['spanner', entry2])
+        self.assertRaises(AttributeError, func, 1, ['spanner', entry2])
         self.assertRaises(ValueError, func, 'a', game)
 
     def protest_score_for_layout(self):
@@ -92,12 +93,12 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         Protest object for a layout
         Should be something like [total, 0s, 1s, 2s]
         """
-        entry1 = {'id': 'entry1', 'games': [1, 2]}
-        entry2 = {'id': 'entry2', 'games': [2, 1]}
-        entry3 = {'id': 'entry3', 'games': [3, 2]}
-        entry4 = {'id': 'entry4', 'games': [1, 3]}
-        entry5 = {'id': 'entry5', 'games': [2, 3]}
-        entry6 = {'id': 'entry6', 'games': [3, 1]}
+        entry1 = Entry(entry_id='entry1', game_history=[1, 2])
+        entry2 = Entry(entry_id='entry1', game_history=[2, 1])
+        entry3 = Entry(entry_id='entry1', game_history=[3, 2])
+        entry4 = Entry(entry_id='entry1', game_history=[1, 3])
+        entry5 = Entry(entry_id='entry1', game_history=[2, 3])
+        entry6 = Entry(entry_id='entry1', game_history=[3, 1])
 
         func = ProtestAvoidanceStrategy.get_protest_score_for_layout
 
