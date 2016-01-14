@@ -43,8 +43,6 @@ class PlayerDBConnection(object):
             self.con.rollback()
             print 'Database Error %s' % err
             return err
-        except Exception as err:
-            print "Exception in add_account: " + err
 
     def authenticate_user(self, username, password):
         """

@@ -11,7 +11,7 @@ from django.http import HttpResponse, HttpResponseNotFound, \
 HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from forms import AddTournamentForm, ApplyForTournamentForm, \
+from public.forms import AddTournamentForm, ApplyForTournamentForm, \
 EnterScoreForm, FeedbackForm, TournamentSetupForm, SetRoundsForm, \
 SetMissionsForm
 from public.view_helpers import from_dao
@@ -81,17 +81,16 @@ def enter_score_by_entry(request, entry_id):
 
     return render_to_response(
         'enter-score.html',
-        {'form': form,
-        'username': user_info['username'],
-        },
+        {'form': form, 'username': user_info['username']},
         RequestContext(request)
     )
 
 @login_required
 def enter_score_for_game(tournament_id, username, round_id):
+    """ Enter a score for a single game"""
 
     form = EnterScoreForm()
-    if request.method== 'POST':
+    if request.method == 'POST':
         pass
     # work out what game we're talking about
     # get the scores that need to be filled in for this game
@@ -100,9 +99,8 @@ def enter_score_for_game(tournament_id, username, round_id):
     # if the request is a post:
     #   validate the form
     #   send the info back to the db
-    
-    # render the form and pass back to the browser 
-    # 
+
+    # render the form and pass back to the browser
 
 @login_required
 def feedback(request):
@@ -154,7 +152,8 @@ def set_missions(request, tournament_id):
         rounds=rounds)
 
     if request.method == 'POST':
-        form = SetMissionsForm(request.POST,
+        form = SetMissionsForm(
+            request.POST,
             tournament_id=tournament_id,
             rounds=rounds)
 
@@ -282,11 +281,14 @@ def tournament_setup(request, tournament_id):
             'Tournament {} not found'.format(tournament_id))
 
     categories = score_categories(tournament_id)
-    form = TournamentSetupForm(tournament_id=tournament_id,
+    form = TournamentSetupForm(
+        tournament_id=tournament_id,
         score_categories=categories)
 
     if request.method == 'POST':
-        form = TournamentSetupForm(request.POST, tournament_id=tournament_id,
+        form = TournamentSetupForm(
+            request.POST,
+            tournament_id=tournament_id,
             score_categories=categories)
 
         if form.is_valid():                             # pylint: disable=E1101

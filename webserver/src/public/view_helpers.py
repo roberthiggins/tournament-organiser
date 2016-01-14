@@ -27,8 +27,9 @@ def from_dao(url, form=None):
 
         if form.is_valid():
             return HttpResponse(
-                urllib2.urlopen(urllib2.Request(DAO_URL + url,
-                urllib.urlencode(form.cleaned_data))))
+                urllib2.urlopen(urllib2.Request(
+                    DAO_URL + url,
+                    urllib.urlencode(form.cleaned_data))))
 
         return HttpResponse(form.error_code(), status=400)
 

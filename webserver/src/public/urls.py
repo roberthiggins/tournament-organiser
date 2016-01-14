@@ -4,7 +4,8 @@ from django.conf.urls import patterns, url
 from public import public_views, views
 
 # pylint: disable=C0103
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
 
     # Public views
     url(r'^$', public_views.index, name='index'),
@@ -28,7 +29,8 @@ urlpatterns = patterns('',
         views.enter_score, name='enter_score'),
     url(r'^enterscore/(?P<entry_id>.+)$',
         views.enter_score_by_entry, name='enter_score_by_entry'),
-    url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)/(?P<round_id>.+)$', views.enter_score_for_game, name='enter_score_for_game'),
+    url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)/(?P<round_id>.+)$',
+        views.enter_score_for_game, name='enter_score_for_game'),
     url(r'^feedback$', views.feedback, name='feedback'),
     url(r'^logout$', views.logout, name='logout'),
     url(r'^setmissions/(?P<tournament_id>.+)$',

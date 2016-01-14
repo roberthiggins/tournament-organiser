@@ -11,7 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect, \
                         HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from forms import CreateAccountForm, LoginForm
+from public.forms import CreateAccountForm, LoginForm
 from public.view_helpers import from_dao
 
 def index(request):                                     # pylint: disable=W0613
@@ -157,13 +157,13 @@ def tournament_rankings(request, tournament_id):
             from_dao('/rankEntries/%s' % tournament_id).content)
 
         return render_to_response(
-                'tournament-rankings.html',
-                {
-                    'tournament_id': tournament_id,
-                    'placings': json_data,
-                },
-                RequestContext(request)
-        )
+            'tournament-rankings.html',
+            {
+                'tournament_id': tournament_id,
+                'placings': json_data,
+            },
+            RequestContext(request)
+            )
     except urllib2.HTTPError:
         return HttpResponseNotFound()
 

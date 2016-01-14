@@ -5,6 +5,7 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
+import datetime
 import json
 import jsonpickle
 import os
@@ -92,13 +93,14 @@ def list_tournaments():
 
 @APP.route('/registerfortournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputUserName')
-def apply_for_tournament():                             # pylint: disable=E0602
+def apply_for_tournament():
     """
     POST to apply for entry to a tournament.
     Expects:
         - inputUserName - Username of player applying
         - inputTournamentName - Tournament as returned by GET /listtournaments
     """
+    # pylint: disable=E0602
     return make_response(
         REGISTRATION_DB_CONN.register_for_tournament(
             inputTournamentName,
@@ -107,19 +109,22 @@ def apply_for_tournament():                             # pylint: disable=E0602
 
 @APP.route('/addTournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')
-def add_tournament():                                   # pylint: disable=E0602
+def add_tournament():
     """
     POST to add a tournament
     Expects:
         - inputTournamentName - Tournament name. Must be unique.
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
+    # pylint: disable=E0602
     tourn = Tournament(inputTournamentName)
+    # pylint: disable=E0602
     tourn.add_to_db(inputTournamentDate)
+    # pylint: disable=E0602
     return make_response(
         '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
-        inputTournamentName, inputTournamentDate), 200)
+            inputTournamentName, inputTournamentDate), 200)
 
 def validate_user_email(email):
     """
@@ -135,7 +140,7 @@ def validate_user_email(email):
 
 @APP.route('/addPlayer', methods=['POST'])
 @enforce_request_variables('username', 'email', 'password1', 'password2')
-def add_account():                                      # pylint: disable=E0602
+def add_account():
     """
     POST to add an account
     Expects:
@@ -144,9 +149,11 @@ def add_account():                                      # pylint: disable=E0602
         - password1
         - password2
     """
+    # pylint: disable=E0602
     if not validate_user_email(email):
         return make_response("This email does not appear valid", 400)
 
+    # pylint: disable=E0602
     if password1 != password2:
         return make_response("Please enter two matching passwords", 400)
 
@@ -155,15 +162,15 @@ def add_account():                                      # pylint: disable=E0602
             Please choose another name".format(username), 400)
 
     PLAYER_DB_CONN.add_account({'user_name': username,
-                               'email' : email,
-                               'password': password1})
+                                'email' : email,
+                                'password': password1})
     return make_response('<p>Account created! You submitted the following \
         fields:</p><ul><li>User Name: {}</li><li>Email: {}\
         </li></ul>'.format(username, email), 200)
 
 @APP.route('/entertournamentscore', methods=['POST'])
 @enforce_request_variables('username', 'tournament', 'key', 'value')
-def enter_tournament_score():                           # pylint: disable=E0602
+def enter_tournament_score():
     """
     POST to enter a score for a player in a tournament.
 
@@ -173,8 +180,10 @@ def enter_tournament_score():                           # pylint: disable=E0602
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
+    # pylint: disable=E0602
     entry = ENTRY_DB_CONN.entry_id(tournament, username)
 
+    # pylint: disable=E0602
     ENTRY_DB_CONN.enter_score(entry, key, value)
     return make_response(
         'Score entered for {}: {}'.format(username, value),
@@ -194,13 +203,14 @@ def entry_info(entry_id):
 
 @APP.route('/login', methods=['POST'])
 @enforce_request_variables('inputUsername', 'inputPassword')
-def login():                                            # pylint: disable=E0602
+def login():
     """
     POST to login
     Expects:
         - inputUsername
         - inputPassword
     """
+    # pylint: disable=E0602
     return make_response(
         PLAYER_DB_CONN.login(inputUsername, inputPassword),
         200)
@@ -213,14 +223,16 @@ def get_missions(tournament_id):
 
 @APP.route('/setMissions', methods=['POST'])
 @enforce_request_variables('tournamentId', 'missions')
-# pylint: disable=E0602
 def set_missions():
     """POST to set the missions for a tournament.A list of strings expected"""
+    # pylint: disable=E0602
     tourn = Tournament(tournamentId)
+    # pylint: disable=E0602
     rounds = tourn.details()['details']['rounds']
     json_missions = json.loads(missions)
 
     if len(json_missions) != int(rounds):
+        # pylint: disable=E0602
         raise ValueError('Tournament {} has {} rounds. \
             You submitted missions {}'.format(tournamentId, rounds, missions))
 
@@ -290,12 +302,13 @@ def get_round_info(tournament_id, round_id):
 
 @APP.route('/setRounds', methods=['POST'])
 @enforce_request_variables('numRounds', 'tournamentId')
-# pylint: disable=E0602
 def set_rounds():
     """Set the number of rounds for a tournament"""
+    # pylint: disable=E0602
     rounds = int(numRounds)
     if rounds < 1:
         raise ValueError('Set at least 1 round')
+    # pylint: disable=E0602
     Tournament(tournamentId).set_number_of_rounds(rounds)
     return make_response('Rounds set: {}'.format(rounds), 200)
 
@@ -323,7 +336,9 @@ def set_score_category():                               # pylint: disable=E0602
         - percentage - the percentage of the overall score that will be
                         comprised from this score.
     """
+    # pylint: disable=E0602
     tourn = Tournament(tournament)
+    # pylint: disable=E0602
     tourn.create_score_category(category, percentage)
     return make_response('Score category set: {}'.format(category), 200)
 
@@ -334,6 +349,7 @@ def set_tournament_score():                             # pylint: disable=E0602
     POST to set a score category that a player is eligible for in a tournament.
     """
     tourn = Tournament(request.values.get('tournamentId', None))
+    # pylint: disable=E0602
     tourn.set_score(
         key=key,
         min_val=request.values.get('minVal'),
@@ -363,8 +379,10 @@ if __name__ == "__main__":
     PORT = int(os.environ.get('PORT', 5000))
     APP.run(host='0.0.0.0', port=PORT)
 
+    # pylint: disable=W0232
     class DatetimeHandler(jsonpickle.handlers.BaseHandler):
-        def flatten(self, obj, data):
+        """Custom handler to get datetimes as ISO dates"""
+        def flatten(self, obj, data):   # pylint: disable=C0111,W0613,R0201
             return obj.isoformat()
 
     jsonpickle.handlers.registry.register(datetime.datetime, DatetimeHandler)

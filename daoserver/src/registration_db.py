@@ -69,8 +69,7 @@ class RegistrationDBConnection(object):
                     on r.tournament_id = t.name \
                 WHERE player_id = %s \
                 AND date = (SELECT date FROM tournament WHERE name = %s)",
-                [player_id,
-                tournament_id])
+                [player_id, tournament_id])
             existing = cur.fetchone()
             print existing
             return existing

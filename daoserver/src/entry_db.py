@@ -16,8 +16,14 @@ class Entry(json.JSONEncoder):
     from users or accounts as there may be multiple players on a team, etc.
     """
 
-    def __init__(self, entry_id=None, username=None, tournament_id=None,
-        game_history=[], scores=None):
+    #pylint: disable=R0913
+    def __init__(
+            self,
+            entry_id=None,
+            username=None,
+            tournament_id=None,
+            game_history=None,
+            scores=None):
         self.entry_id = entry_id
         self.username = username
         self.tournament_id = tournament_id
@@ -78,7 +84,8 @@ class EntryDBConnection(object):
             if score < int(row[1]) or score > int(row[2]):
                 raise psycopg2.DataError()
 
-            cur.execute("INSERT INTO score VALUES(%s, %s, %s)",
+            cur.execute(
+                "INSERT INTO score VALUES(%s, %s, %s)",
                 [entry_id, score_id, score])
             self.con.commit()
 

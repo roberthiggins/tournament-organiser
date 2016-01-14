@@ -28,8 +28,6 @@ class DBConnection(object):
                 password=self.config['db_pass'])
         except psycopg2.Error as err:
             print 'psycopg Error %s' % err
-        except Exception as err:
-            print 'Error %s' % err
 
     def __del__(self):
         if self.con:

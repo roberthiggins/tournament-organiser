@@ -91,14 +91,14 @@ class ProtestAvoidanceStrategy(object):
 
         protest = LayoutProtest()
         for game in layout:
-            g1 = game[1][0]
-            g2 = game[1][1]
+            game_1 = game[1][0]
+            game_2 = game[1][1]
 
             try:
                 protest_score = \
                     ProtestAvoidanceStrategy.get_protest_score_for_game(
-                    game[0], (g1, g2))
-            except AttributeError as err:
+                        game[0], (game_1, game_2))
+            except AttributeError:
                 protest_score = 0
             protest.protests[protest_score] += 1
 

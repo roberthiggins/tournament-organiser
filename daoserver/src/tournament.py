@@ -16,7 +16,7 @@ def must_exist_in_db(func):
             print 'Tournament not found: {}'.format(self.tournament_id)
             raise ValueError(
                 'Tournament {} not found in database'.format(
-                self.tournament_id))
+                    self.tournament_id))
         return func(self, *args, **kwargs)
     return wrapped
 

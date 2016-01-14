@@ -102,8 +102,8 @@ class TournamentDBConnection(object):
             WHERE tournament_id = %s", [tournament_id])
         raw_list = cur.fetchall()
         return [{'id': x[0],
-                'name': x[1],
-                'percentage': x[2]} for x in raw_list]
+                 'name': x[1],
+                 'percentage': x[2]} for x in raw_list]
 
     @db_conn()
     def list_tournaments(self):
@@ -113,9 +113,9 @@ class TournamentDBConnection(object):
         raw_list = cur.fetchall()
 
         return [{'name': x[0],
-                'date': x[1],
-                'rounds': x[2],
-                'scoring': x[3]} for x in raw_list]
+                 'date': x[1],
+                 'rounds': x[2],
+                 'scoring': x[3]} for x in raw_list]
 
     @db_conn(commit=True)
     def set_rounds(self, tournament_id, num_rounds):
@@ -136,8 +136,7 @@ class TournamentDBConnection(object):
         if not self.tournament_exists(name):
             raise RuntimeError('No information is available on "%s" ' % name)
 
-        cur.execute("SELECT * FROM tournament WHERE name = %s",
-            [name])
+        cur.execute("SELECT * FROM tournament WHERE name = %s", [name])
         return cur.fetchone()
 
     @db_conn(commit=True)
