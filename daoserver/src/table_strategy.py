@@ -2,6 +2,8 @@
 Module to contain table allocation strategy
 """
 
+import itertools
+
 class LayoutProtest(object):
     """
     A count of the protests for a proposed draw.
@@ -103,3 +105,33 @@ class ProtestAvoidanceStrategy(object):
             protest.protests[protest_score] += 1
 
         return protest
+
+    # pylint: disable=R0201
+    def determine_tables(self, drawn_games):
+        """
+        The main method that returns a table configuration.
+
+        Assumptions:
+            Each Entry is expected to have a correct playing history as this
+            will be used for determining the draw.
+        Expects:
+            A list of games. Each game should be a tuple of 2 Entry
+
+        Returns:
+            A list of tuples with table number prepended to each. e.g.
+            [(1, Entry, Entry), (2, Entry, Entry)]
+        """
+        permutations = list(itertools.permutations(drawn_games))
+        permutations = [[(i+1, [e['entry_1'], e['entry_2']]) \
+            for i, e in enumerate(x)] for x in permutations]
+
+        protests = [
+            (ProtestAvoidanceStrategy.get_protest_score_for_layout(x), x) \
+            for x in permutations
+        ]
+
+        protests.sort(cmp=lambda x, y: cmp(
+            x[0].total_protests(),
+            y[0].total_protests()))
+
+        return protests[0][1]
