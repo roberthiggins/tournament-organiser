@@ -2,6 +2,26 @@
 Module to contain table allocation strategy
 """
 
+class LayoutProtest(object):
+    """
+    A count of the protests for a proposed draw.
+    The default is suitable for a 2-player-per-game draw. It contains:
+        - 0_protests - count of games for where neither entry protested
+        - 1_protests - count of games for where 1 entry protested
+        - 2_protests - count of games for where both entries protested
+    """
+    def __init__(self):
+        self.protests = [0, 0, 0]
+
+    def total_protests(self):
+        """ Sum of all protests """
+        return sum(self.protests[1:])
+
+    def __repr__(self):
+        rep = [x for x in self.protests]
+        rep.append(self.total_protests())
+        return '[' + ','.join(str(e) for e in rep) + ']'
+
 class ProtestAvoidanceStrategy(object):
     """
     Allocate tables by determining all possible options and allocating based on
@@ -61,30 +81,25 @@ class ProtestAvoidanceStrategy(object):
             List of tuples [(table, [entries at that table])]
             Note that the game might simply be the string 'BYE'
         Returns:
-            A list of protests [
-                0-protest-count,
-                1-protest-count,
-                2-protest-count,
-                total-protest-points,
-                ]
+            A LayoutProtest
         """
         if len(layout) == 0:
-            return [0, 0, 0, 0]
+            return LayoutProtest()
         num_entries = len(layout[0][1])
         if any(len(x[1]) != num_entries for x in layout):
             raise IndexError('Some games have differing numbers of entries')
 
-        protest_list = [0 for x in range(num_entries + 2)] # pylint: disable=W0612
+        protest = LayoutProtest()
         for game in layout:
             g1 = game[1][0]
             g2 = game[1][1]
 
-            if g1 == 'BYE' or g2 == 'BYE':
-                protests = 0
-            else:
-                protests = ProtestAvoidanceStrategy.get_protest_score_for_game(
+            try:
+                protest_score = \
+                    ProtestAvoidanceStrategy.get_protest_score_for_game(
                     game[0], (g1, g2))
-            protest_list[protests] += 1
-            protest_list[-1] += protests
+            except AttributeError as err:
+                protest_score = 0
+            protest.protests[protest_score] += 1
 
-        return protest_list
+        return protest
