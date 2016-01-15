@@ -139,6 +139,34 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
             Table(3, [entry5, entry6])]
         self.assertRaises(IndexError, func, layout)
 
+    def test_determine_layouts(self):
+        """
+        We can change the history and you should get different draws
+        """
+
+        entry1 = Entry(entry_id='entry1', game_history=[1, 2])
+        entry2 = Entry(entry_id='entry2', game_history=[2, 1])
+        entry3 = Entry(entry_id='entry3', game_history=[3, 2])
+        entry4 = Entry(entry_id='entry4', game_history=[1, 3])
+        entry5 = Entry(entry_id='entry5', game_history=[2, 3])
+        entry6 = Entry(entry_id='entry6', game_history=[3, 1])
+        games = [(entry1, entry2), (entry3, entry4), (entry5, entry6)]
+        strategy = ProtestAvoidanceStrategy()
+
+        draw = strategy.determine_tables(games)
+        compare(draw[2].entrants, [entry1, entry2])
+        compare(draw[0].entrants, [entry3, entry4])
+        compare(draw[1].entrants, [entry5, entry6])
+
+        # if we swap matchup one and two they should switch places
+        entry1.game_history = [3, 2]
+        entry2.game_history = [1, 3]
+        entry3.game_history = [1, 2]
+        entry4.game_history = [2, 1]
+        draw = strategy.determine_tables(games)
+        compare(draw[0].entrants, [entry1, entry2])
+        compare(draw[2].entrants, [entry3, entry4])
+        compare(draw[1].entrants, [entry5, entry6])
 
 if __name__ == '__main__':
     unittest.main()
