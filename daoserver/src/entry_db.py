@@ -32,6 +32,9 @@ class Entry(json.JSONEncoder):
         self.scores = scores
         self.total_score = 0
 
+    def __repr__(self):
+        return self.entry_id
+
 class EntryDBConnection(object):
     """
     Connection class to the entry database
