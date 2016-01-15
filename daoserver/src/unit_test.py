@@ -7,7 +7,7 @@ from testfixtures import compare
 
 from draw_strategy import RoundRobin
 from entry_db import Entry
-from table_strategy import ProtestAvoidanceStrategy
+from table_strategy import ProtestAvoidanceStrategy, Table
 
 class DrawStrategyTests(unittest.TestCase):             # pylint: disable=R0904
     """Tests for `draw_strategy.py`."""
@@ -71,27 +71,26 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         entry1 = Entry(entry_id='entry1', game_history=[1, 3])
         entry2 = Entry(entry_id='entry2', game_history=[2, 3])
         game = [entry1, entry2]
-        func = ProtestAvoidanceStrategy.get_protest_score_for_game
 
-        self.assertTrue(func(1, game) == 1)
-        self.assertTrue(func(2, game) == 1)
-        self.assertTrue(func(3, game) == 2)
-        self.assertTrue(func(4, game) == 0)
-        self.assertTrue(func(5, game) == 0)
-        self.assertTrue(func(-1, game) == 0)
-        self.assertTrue(func(-1, [entry1]) == 0)
-        self.assertTrue(func(1, [entry1]) == 1)
-        self.assertTrue(func(-1, []) == 0)
-        self.assertTrue(func(1, []) == 0)
-        self.assertTrue(func(3, [entry1, entry1, entry1]) == 3)
+        self.assertTrue(Table(1, game).protest_score() == 1)
+        self.assertTrue(Table(2, game).protest_score() == 1)
+        self.assertTrue(Table(3, game).protest_score() == 2)
+        self.assertTrue(Table(4, game).protest_score() == 0)
+        self.assertTrue(Table(5, game).protest_score() == 0)
+        self.assertTrue(Table(-1, game).protest_score() == 0)
+        self.assertTrue(Table(-1, [entry1]).protest_score() == 0)
+        self.assertTrue(Table(1, [entry1]).protest_score() == 1)
+        self.assertTrue(Table(-1, []).protest_score() == 0)
+        self.assertTrue(Table(1, []).protest_score() == 0)
+        self.assertTrue(Table(3, [entry1, entry1, entry1]).protest_score() == 3)
+        self.assertTrue(Table(1, ['spanner', entry2]).protest_score() == 0)
 
-        self.assertRaises(AttributeError, func, 1, ['spanner', entry2])
-        self.assertRaises(ValueError, func, 'a', game)
+        self.assertRaises(ValueError, Table, 'a', game)
 
     def test_protest_score_for_layout(self):
         """
         Protest object for a layout
-        Should be something like [total, 0s, 1s, 2s]
+        Should be something like [0s, 1s, 2s, totals]
         """
         entry1 = Entry(entry_id='entry1', game_history=[1, 2])
         entry2 = Entry(entry_id='entry1', game_history=[2, 1])
@@ -103,23 +102,23 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         func = ProtestAvoidanceStrategy.get_protest_score_for_layout
 
         layout = [
-            (3, [entry1, entry2]), # should get 0
-            (2, [entry3, entry4]), # should get 1 from e3
-            (1, [entry5, entry6])] # should get 1 from e6
+            Table(3, [entry1, entry2]), # should get 0
+            Table(2, [entry3, entry4]), # should get 1 from e3
+            Table(1, [entry5, entry6])] # should get 1 from e6
         result = func(layout)
         compare(result.protests, [1, 2, 0])
         compare(result.total_protests(), 2)
 
         layout = [
-            (1, [entry1, entry2]), # should get 2
-            (2, [entry3, entry4]), # should get 1 from e3
-            (3, [entry5, entry6])] # should get 2 from e6
+            Table(1, [entry1, entry2]), # should get 2
+            Table(2, [entry3, entry4]), # should get 1 from e3
+            Table(3, [entry5, entry6])] # should get 2 from e6
         result = func(layout)
         compare(result.protests, [0, 1, 2])
         compare(result.total_protests(), 5)
 
 
-        layout = [(3, [entry1, entry2])] # should get 0
+        layout = [Table(3, [entry1, entry2])] # should get 0
         result = func(layout)
         compare(result.protests, [1, 0, 0])
         compare(result.total_protests(), 0)
@@ -135,16 +134,11 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         self.assertRaises(TypeError, func, layout)
 
         layout = [
-            (1, [entry1]), # should get 1
-            (2, [entry3, entry4]), # explode as longer than first game
-            (3, [entry5, entry6])]
+            Table(1, [entry1]), # should get 1
+            Table(2, [entry3, entry4]), # explode as longer than first game
+            Table(3, [entry5, entry6])]
         self.assertRaises(IndexError, func, layout)
 
-        layout = [
-            (None, [entry1, entry2]), # explode
-            (2, [entry3, entry4]),
-            (3, [entry5, entry6])]
-        self.assertRaises(TypeError, func, layout)
 
 if __name__ == '__main__':
     unittest.main()

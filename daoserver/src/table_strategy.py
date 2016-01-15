@@ -24,6 +24,32 @@ class LayoutProtest(object):
         rep.append(self.total_protests())
         return '[' + ','.join(str(e) for e in rep) + ']'
 
+class Table(object):
+    """
+    A game table. It contains one or more entrants and a table number
+    """
+    def __init__(self, table_number=0, entrants=None):
+        self.table_number = int(table_number)
+        self.entrants = entrants
+
+    def protest_score(self):
+        """
+        Get the protest score for a single game.
+        Returns a single protest score between 0 and len(entries)
+        Expects:
+            - an int for the table number
+            - A list of Entry
+        """
+        protests = 0
+        try:
+            for entry in self.entrants:
+                if self.table_number in entry.game_history:
+                    protests += 1
+        except AttributeError:
+            pass
+
+        return protests
+
 class ProtestAvoidanceStrategy(object):
     """
     Allocate tables by determining all possible options and allocating based on
@@ -59,50 +85,26 @@ class ProtestAvoidanceStrategy(object):
     """
 
     @staticmethod
-    def get_protest_score_for_game(table, entries):
-        """
-        Get the protest score for a single game.
-        Returns a single protest score between 0 and len(entries)
-        Expects:
-            - an int for the table number
-            - A list of Entry
-        """
-        protests = 0
-        table = int(table)
-        for entry in entries:
-            if table in entry.game_history:
-                protests += 1
-        return protests
-
-    @staticmethod
     def get_protest_score_for_layout(layout):
         """
         Get the protest scores for a single layout
 
         Expects:
-            List of tuples [(table, [entries at that table])]
+            List of Table
             Note that the game might simply be the string 'BYE'
         Returns:
             A LayoutProtest
         """
         if len(layout) == 0:
             return LayoutProtest()
-        num_entries = len(layout[0][1])
-        if any(len(x[1]) != num_entries for x in layout):
+
+        num_entries = len(layout[0].entrants)
+        if any(len(x.entrants) != num_entries for x in layout):
             raise IndexError('Some games have differing numbers of entries')
 
         protest = LayoutProtest()
         for game in layout:
-            game_1 = game[1][0]
-            game_2 = game[1][1]
-
-            try:
-                protest_score = \
-                    ProtestAvoidanceStrategy.get_protest_score_for_game(
-                        game[0], (game_1, game_2))
-            except AttributeError:
-                protest_score = 0
-            protest.protests[protest_score] += 1
+            protest.protests[game.protest_score()] += 1
 
         return protest
 
@@ -118,12 +120,12 @@ class ProtestAvoidanceStrategy(object):
             A list of games. Each game should be a tuple of 2 Entry
 
         Returns:
-            A list of tuples with table number prepended to each. e.g.
-            [(1, Entry, Entry), (2, Entry, Entry)]
+            A list of Table
         """
         permutations = list(itertools.permutations(drawn_games))
-        permutations = [[(i+1, [e['entry_1'], e['entry_2']]) \
-            for i, e in enumerate(x)] for x in permutations]
+        permutations = [
+            [Table(i+1, list(e)) for i, e in enumerate(x)] \
+            for x in permutations]
 
         protests = [
             (ProtestAvoidanceStrategy.get_protest_score_for_layout(x), x) \
