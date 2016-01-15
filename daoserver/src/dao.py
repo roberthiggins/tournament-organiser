@@ -296,7 +296,8 @@ def get_round_info(tournament_id, round_id):
     # We will return all round info for all requests regardless of method
     return jsonpickle.encode({
         'score_keys': tourn.get_score_keys_for_round(round_id),
-        'draw': tourn.draw_strategy.draw(int(round_id)),
+        'draw': tourn.table_strategy.determine_tables(
+            tourn.draw_strategy.draw(int(round_id))),
         'mission': tourn.get_mission(int(round_id))
     }, unpicklable=False)
 

@@ -17,13 +17,13 @@
             {% for entry in draw %}
                 <tr>
                     <td>
-                        {{entry.table}}
+                        {{entry.table_number}}
                     </td>
                     <td>
-                        {{entry.entry_1.username}}
+                        {{entry.entrants.0.username}}
                     </td>
                     <td>
-                        {{entry.entry_2.username}}
+                        {{entry.entrants.1.username}}
                     </td>
                 </tr>
             {% endfor %}

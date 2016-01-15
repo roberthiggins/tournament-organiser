@@ -39,16 +39,13 @@ class RoundRobin(object):
         Expects:
             - singles is a list of all singles yet to be pairs
             - pairs is a list of pairings:
-                {
-                    'entry_1': {entry from singles},
-                    'entry_2': {entry from singles} or 'BYE'
-                }
+                ({entry from singles} or 'BYE', {entry from singles} or 'BYE')
         """
         if len(singles) == 0:
             return pairs
         elif len(singles) == 1:
-            pairs.append({'entry_1': singles[0], 'entry_2': 'BYE'})
+            pairs.append((singles[0], 'BYE'))
             return pairs
         else:
-            pairs.append({'entry_1': singles[0], 'entry_2': singles[-1]})
+            pairs.append((singles[0], singles[-1]))
             return self.determine_matchup(singles[1:-1], pairs)

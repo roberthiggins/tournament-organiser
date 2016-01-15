@@ -7,6 +7,7 @@ import datetime
 
 from draw_strategy import RoundRobin
 from ranking_strategies import RankingStrategy
+from table_strategy import ProtestAvoidanceStrategy
 from tournament_db import TournamentDBConnection
 
 def must_exist_in_db(func):
@@ -33,6 +34,7 @@ class Tournament(object):
             if ranking_strategy \
             else RankingStrategy(tournament_id, self.list_score_categories)
         self.draw_strategy = RoundRobin(tournament_id)
+        self.table_strategy = ProtestAvoidanceStrategy()
 
     def add_to_db(self, date):
         """
