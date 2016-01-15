@@ -88,7 +88,7 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         self.assertRaises(AttributeError, func, 1, ['spanner', entry2])
         self.assertRaises(ValueError, func, 'a', game)
 
-    def protest_score_for_layout(self):
+    def test_protest_score_for_layout(self):
         """
         Protest object for a layout
         Should be something like [total, 0s, 1s, 2s]
@@ -106,19 +106,30 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
             (3, [entry1, entry2]), # should get 0
             (2, [entry3, entry4]), # should get 1 from e3
             (1, [entry5, entry6])] # should get 1 from e6
-        compare(func(layout), [1, 2, 0, 2])
+        result = func(layout)
+        compare(result.protests, [1, 2, 0])
+        compare(result.total_protests(), 2)
 
         layout = [
             (1, [entry1, entry2]), # should get 2
             (2, [entry3, entry4]), # should get 1 from e3
             (3, [entry5, entry6])] # should get 2 from e6
-        compare(func(layout), [0, 1, 2, 5])
+        result = func(layout)
+        compare(result.protests, [0, 1, 2])
+        compare(result.total_protests(), 5)
+
 
         layout = [(3, [entry1, entry2])] # should get 0
-        compare(func(layout), [1, 0, 0, 0])
+        result = func(layout)
+        compare(result.protests, [1, 0, 0])
+        compare(result.total_protests(), 0)
+
 
         layout = [] # should get 0
-        compare(func(layout), [0, 0, 0, 0])
+        result = func(layout)
+        compare(result.protests, [0, 0, 0])
+        compare(result.total_protests(), 0)
+
 
         layout = None
         self.assertRaises(TypeError, func, layout)

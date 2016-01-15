@@ -16,8 +16,8 @@ class LayoutProtest(object):
         self.protests = [0, 0, 0]
 
     def total_protests(self):
-        """ Sum of all protests """
-        return sum(self.protests[1:])
+        """ Sum of all protests. A double protest counts as two individuals."""
+        return self.protests[1] + self.protests[2] * 2
 
     def __repr__(self):
         rep = [x for x in self.protests]
