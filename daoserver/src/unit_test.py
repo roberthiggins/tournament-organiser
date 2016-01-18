@@ -168,5 +168,23 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         compare(draw[2].entrants, [entry3, entry4])
         compare(draw[1].entrants, [entry5, entry6])
 
+from permissions import PermissionsChecker
+class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
+    """Tests for `permissions.py`."""
+
+    def test_is_organiser(self):
+        """check if a user is an organiser"""
+        checker = PermissionsChecker()
+
+        options = [None, 'ranking_test', 'not_a_tournament', '', 'lisa', \
+            'not_a_person', 'superman', 'permission_test', 'lex_luthor']
+
+        for user in options:
+            for tourn in options:
+                if user == 'lex_luthor' and tourn == 'permission_test':
+                    self.assertTrue(checker.is_organiser(user, tourn))
+                else:
+                    self.assertFalse(checker.is_organiser(user, tourn))
+
 if __name__ == '__main__':
     unittest.main()
