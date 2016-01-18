@@ -59,8 +59,12 @@ class TournamentDBConnection(object):
                             'date' - YY-MM-DD}
         """
         cur.execute(
-            "INSERT INTO tournament VALUES (default, %s, %s)",
-            [tournament['name'], tournament['date']])
+            "INSERT INTO protected_object VALUES (default) RETURNING id")
+        protected_object_id = cur.fetchone()[0]
+        cur.execute(
+            "INSERT INTO tournament VALUES \
+            (default, %s, %s, default, default, %s)",
+            [tournament['name'], tournament['date'], protected_object_id])
 
     @db_conn(commit=True)
     def create_score_category(self, category, tournament_id, percentage):

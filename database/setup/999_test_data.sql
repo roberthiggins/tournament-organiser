@@ -11,9 +11,12 @@ DO $$
 DECLARE
     lastid int := 0;
     fanciness int := 0;
+    protect_object_id int := 0;
 BEGIN
 
-    INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10');
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+
+    INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10', DEFAULT, DEFAULT, protect_object_id);
 
     INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT) RETURNING id INTO fanciness;
     INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 4, 15, fanciness);
@@ -47,9 +50,11 @@ DECLARE
     sportskey int := 0;
     battlecategory int := 0;
     sportscategory int := 0;
+    protect_object_id int := 0;
 BEGIN
 
-    INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12');
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12', DEFAULT, DEFAULT, protect_object_id);
     INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1, 'Kill');
     INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2, DEFAULT);
 
@@ -123,9 +128,11 @@ SELECT ranking_test_setup();
 CREATE OR REPLACE FUNCTION mission_test_setup() RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
     tourn_name varchar := 'mission_test';
+    protect_object_id int := 0;
 BEGIN
 
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3);
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3, DEFAULT, protect_object_id);
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Mission the First');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, 'Mission the Second');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 3, 'Mission the Third');
@@ -133,3 +140,30 @@ BEGIN
     RETURN 0;
 END $$;
 SELECT mission_test_setup();
+
+-- Make a tournament for the purposes of testing permissions
+CREATE OR REPLACE FUNCTION permission_test_setup() RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    lastid int := 0;
+    tourn_name varchar := 'permission_test';
+    protect_object_id int := 0;
+    protected_object_action_id int := 0;
+    protected_object_permission_id int := 0;
+BEGIN
+
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', DEFAULT, DEFAULT, protect_object_id);
+
+    -- Create a user with access to modify
+    INSERT INTO account VALUES (DEFAULT, 'lex_luthor@evil_hideout.com') RETURNING id INTO lastid;
+    INSERT INTO organiser VALUES (lastid, 'lex_luthor', NULL);
+    INSERT INTO account_security VALUES (lastid, '$5$rounds=535000$1ChlmvAIh/6yDqVg$wn8vZxK1igRA17V8pjMr90ph3Titr35DF5X5DYSLpv.');
+
+    -- Give them permission to enter a score for it
+    INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_game_score') RETURNING id INTO protected_object_action_id;
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_object_action_id) RETURNING id INTO protected_object_permission_id;
+    INSERT INTO account_protected_object_permission VALUES (lastid, protected_object_permission_id);
+
+    RETURN 0;
+END $$;
+SELECT permission_test_setup();
