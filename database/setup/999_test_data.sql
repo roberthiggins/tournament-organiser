@@ -144,7 +144,6 @@ BEGIN
     -- Create a superuser
     username = 'superman';
     INSERT INTO account VALUES (username, 'manofsteel@fortressofsolitude.com', TRUE);
-    INSERT INTO organiser VALUES (username, NULL);
     INSERT INTO account_security VALUES (username, '$5$rounds=535000$cwi5O.qhjs6Ww/bh$kl6DZypdYrbeUmOFCQ7d.uCLcLJM6C/ZNZ5mmWIcEjA');
 
 
@@ -155,7 +154,6 @@ BEGIN
     -- Create a user with access to modify
     username = 'lex_luthor';
     INSERT INTO account VALUES (username, 'lex_luthor@evil_hideout.com');
-    INSERT INTO organiser VALUES (username, NULL);
     INSERT INTO account_security VALUES (username, '$5$rounds=535000$1ChlmvAIh/6yDqVg$wn8vZxK1igRA17V8pjMr90ph3Titr35DF5X5DYSLpv.');
 
     -- Give them permission to enter a score for it

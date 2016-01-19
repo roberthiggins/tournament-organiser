@@ -1,8 +1,3 @@
-create table organiser (
-	username varchar references account(username),
-	settings json
-);
-
 CREATE VIEW tournament_organiser_permissions AS
     SELECT
         t.name          AS tournament_name,
