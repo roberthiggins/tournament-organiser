@@ -32,8 +32,10 @@ class PlayerDBConnection(object):
             cur.execute(
                 "INSERT INTO account VALUES (%s, %s)",
                 [account['user_name'], account['email']])
-            cur.execute("INSERT INTO account_security VALUES (%s, %s)",
-                        [account['user_name'], sha256_crypt.encrypt(account['password'])])
+            cur.execute(
+                "INSERT INTO account_security VALUES (%s, %s)",
+                [account['user_name'],
+                 sha256_crypt.encrypt(account['password'])])
             self.con.commit()
 
         except psycopg2.DatabaseError as err:
