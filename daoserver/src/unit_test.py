@@ -197,5 +197,20 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
                 else:
                     self.assertFalse(checker.is_organiser(user, tourn))
 
+    def test_check_permissions(self):
+        """Test the entrypoint method"""
+        checker = PermissionsChecker()
+
+        self.assertRaises(
+            ValueError, checker.check_permission, None, None, None)
+        self.assertRaises(
+            ValueError, checker.check_permission, '', None, None)
+        self.assertRaises(
+            ValueError, checker.check_permission, 'not_a_list', None, None)
+        self.assertRaises(
+            ValueError, checker.check_permission, 'ENTER_SCORE', None, None)
+
+        self.assertFalse(checker.check_permission('enter_score', None, None))
+
 if __name__ == '__main__':
     unittest.main()

@@ -73,7 +73,7 @@ def enter_score_by_entry(request, entry_id):
             tournament=user_info['tournament_name'])
 
         if form.is_valid():                             # pylint: disable=E1101
-            response = from_dao('/entertournamentscore', form)
+            response = from_dao('/entertournamentscore', form, request)
             if  response.status_code == 200:
                 return HttpResponse(response)
             else:

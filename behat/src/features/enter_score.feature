@@ -8,8 +8,8 @@ Feature: Enter a score for a player
 
     Background:
         Given I am on "/login"
-        When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "darkness"
+        When I fill in "id_inputUsername" with "superman"
+        When I fill in "id_inputPassword" with "kryptonite"
         When I press "Login"
         Then I should be on "/"
 
@@ -20,6 +20,21 @@ Feature: Enter a score for a player
         Given I am on "/logout"
         Given I am on "/enterscore/1"
         Then I should be on "/login"
+
+    Scenario: No permissions
+        Given I am on "/logout"
+        Given I am on "/login"
+        When I fill in "id_inputUsername" with "charlie_murphy"
+        When I fill in "id_inputPassword" with "darkness"
+        When I press "Login"
+        Then I should be on "/"
+        Given I am on "/enterscore/painting_test/rick_james"
+        When I fill in "id_key" with "number_tassles"
+        When I fill in "id_value" with "1"
+        Then I press "Enter Score"
+        Then the response status code should be 200
+        Then I should see "Permission denied"
+
 
     Scenario Outline: I only know the tournament and username
         Given I am on "/enterscore/<tournament>/<username>"
@@ -59,6 +74,7 @@ Feature: Enter a score for a player
             | 6    | 6 not entered. Score is already set        |
 
     Scenario Outline: The TO gives a painting score to a player
+        Given that I set auth to u:"superman" and p:"kryptonite"
         When I POST "<value>" to "/entertournamentscore" from the API
         Then the API response should contain "<response_text>"
         Then the API response status code should be <response_code>

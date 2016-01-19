@@ -17,6 +17,7 @@ from functools import wraps
 from authentication import requires_auth
 from entry_db import EntryDBConnection
 from feedback_db import FeedbackDBConnection
+from permissions import PERMISSIONS, PermissionsChecker
 from player_db import PlayerDBConnection
 from tournament import Tournament
 from registration_db import RegistrationDBConnection
@@ -74,6 +75,27 @@ def enforce_request_variables(*vars_to_enforce):
                         glob[var] = old_values[var]
 
             return res
+        return wrapped
+    return decorator
+
+def requires_permission(action, error_msg):
+    """
+    A decorator that requires a permission check for the function.
+    Assumptions:
+        - the function scope includes the variables 'username' and 'tournament'
+    """
+    def decorator(func):                                # pylint: disable=C0111
+        @wraps(func)
+        def wrapped(*args, **kwargs):                   # pylint: disable=C0111
+
+            checker = PermissionsChecker()
+            if request.authorization is None or not checker.check_permission(
+                action,
+                request.authorization.username,
+                tournament):
+                raise ValueError('Permission denied. {}'.format(error_msg))
+
+            return func(*args, **kwargs)
         return wrapped
     return decorator
 
@@ -171,6 +193,9 @@ def add_account():
 
 @APP.route('/entertournamentscore', methods=['POST'])
 @enforce_request_variables('username', 'tournament', 'key', 'value')
+@requires_permission(
+    PERMISSIONS.get('ENTER_SCORE'),
+    'You cannot enter scores for this game. Contact the TO.')
 def enter_tournament_score():
     """
     POST to enter a score for a player in a tournament.

@@ -4,6 +4,10 @@ Module to handle permissions for accounts trying to modify a tournament.
 
 from db_connection import db_conn
 
+PERMISSIONS = {
+    'ENTER_SCORE': 'enter_score',
+}
+
 # pylint: disable=E0602
 class PermissionsChecker(object):
     """
@@ -13,6 +17,21 @@ class PermissionsChecker(object):
     Organisers and admins can modify scores.
     Etc.
     """
+
+    def check_permission(self, action, user, tournament):
+        """
+        Entry point method for checking permissions.
+        Check that a user is entitled to perform action for tournament
+        """
+
+        if not action in PERMISSIONS.values():
+            raise ValueError(
+                'Illegal action passed to check_permission {}'.format(action))
+
+        if action == PERMISSIONS['ENTER_SCORE']:
+            return self.is_admin(user) or self.is_organiser(user, tournament)
+
+        return False
 
     @db_conn()
     def is_admin(self, user):
