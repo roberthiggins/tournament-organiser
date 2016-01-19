@@ -37,8 +37,8 @@ CREATE TABLE protected_object_permission(
 COMMENT ON TABLE protected_object_permission IS 'An instance of a protected_object_action on a protected object e.g. enter score for tournament #2';
 
 CREATE TABLE account_protected_object_permission(
-    account_id                          INTEGER REFERENCES account(id),
+    account_username                    VARCHAR REFERENCES account(username),
     protected_object_permission_id      INTEGER REFERENCES protected_object_permission(id),
-    PRIMARY KEY(account_id, protected_object_permission_id)
+    PRIMARY KEY(account_username, protected_object_permission_id)
 );
 COMMENT ON TABLE account_protected_object_permission IS 'Links instance permissions to accounts';

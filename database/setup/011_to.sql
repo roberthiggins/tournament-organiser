@@ -1,6 +1,5 @@
 create table organiser (
-	id integer references account(id),
-	username varchar not null unique,
+	username varchar references account(username),
 	settings json
 );
 
@@ -8,8 +7,7 @@ CREATE VIEW tournament_organiser_permissions AS
     SELECT
         t.name          AS tournament_name,
         t.id            AS tournament_id,
-        a.id            AS account_id,
-        o.username,
+        a.username,
         poa.description AS permission_description
     FROM        tournament                              t
     INNER JOIN  protected_object                        po
@@ -21,7 +19,5 @@ CREATE VIEW tournament_organiser_permissions AS
     INNER JOIN  account_protected_object_permission     apop
         ON apop.protected_object_permission_id = pop.id
     INNER JOIN  account                                 a
-        ON a.id = apop.account_id
-    INNER JOIN  organiser                               o
-        ON a.id = o.id
+        ON a.username = apop.account_username
 ;

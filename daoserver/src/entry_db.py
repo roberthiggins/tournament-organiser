@@ -112,13 +112,13 @@ class EntryDBConnection(object):
         cur.execute(
             "SELECT \
                 e.id                                    AS entry_id, \
-                p.username                              AS username, \
+                a.username                              AS username, \
                 t.name                                  AS tournament_id, \
                 (SELECT array(SELECT table_no \
-                FROM table_allocation \
-                WHERE entry_id = e.id))                  AS game_history \
+                    FROM table_allocation \
+                    WHERE entry_id = e.id))             AS game_history \
             FROM entry e \
-            INNER JOIN player p on e.player_id = p.username \
+            INNER JOIN account a on e.player_id = a.username \
             INNER JOIN tournament t on e.tournament_id = t.name \
             WHERE t.name = %s",
             [tournament_id])
@@ -136,17 +136,17 @@ class EntryDBConnection(object):
 
         return unranked_list
 
-    def entry_id(self, tournament_id, player_id):
+    def entry_id(self, tournament_id, username):
         """
         Get the entry_id for the player in the tournament
 
         Returns: Integer. The entry_id of entry, if one exists. Throws
             ValueErrors and RuntimeError if tournament or player don't exist.
         """
-        if not tournament_id or not player_id:
+        if not tournament_id or not username:
             raise ValueError('Missing required fields to entry_id')
-        if not self.player_db_conn.username_exists(player_id):
-            raise ValueError('Unknown player: %s' % player_id)
+        if not self.player_db_conn.username_exists(username):
+            raise ValueError('Unknown player: %s' % username)
         if not self.tournament_db_conn.tournament_exists(tournament_id):
             raise ValueError('Unknown tournament: %s' % tournament_id)
 
@@ -155,10 +155,9 @@ class EntryDBConnection(object):
             cur.execute(
                 "SELECT id FROM entry \
                 WHERE player_id = %s AND tournament_id = %s",
-                [player_id, tournament_id])
+                [username, tournament_id])
             return cur.fetchone()[0]
         except psycopg2.DatabaseError as err:
-            self.con.rollback()
             raise err
 
     def entry_info(self, entry_id):
@@ -172,8 +171,8 @@ class EntryDBConnection(object):
 
         try:
             cur = self.con.cursor()
-            cur.execute("SELECT p.username, t.name \
-                FROM entry e INNER JOIN player p on e.player_id = p.username \
+            cur.execute("SELECT a.username, t.name \
+                FROM entry e INNER JOIN account a on e.player_id = a.username \
                 INNER JOIN tournament t on e.tournament_id = t.name \
                 WHERE e.id = %s", [entry_id])
             row = cur.fetchone()

@@ -17,7 +17,7 @@ class PlayerDBConnection(object):
         """Check if a username exists for a player"""
         try:
             cur = self.con.cursor()
-            cur.execute("SELECT COUNT(*) FROM player WHERE username = %s",
+            cur.execute("SELECT COUNT(*) FROM account WHERE username = %s",
                         [username])
             existing = cur.fetchone()
             return existing[0] > 0
@@ -30,13 +30,10 @@ class PlayerDBConnection(object):
         try:
             cur = self.con.cursor()
             cur.execute(
-                "INSERT INTO account VALUES (default, %s) RETURNING id",
-                [account['email']])
-            account_id = cur.fetchone()
+                "INSERT INTO account VALUES (%s, %s)",
+                [account['user_name'], account['email']])
             cur.execute("INSERT INTO account_security VALUES (%s, %s)",
-                        [account_id, sha256_crypt.encrypt(account['password'])])
-            cur.execute("INSERT INTO player VALUES (%s, %s)",
-                        [account_id, account['user_name']])
+                        [account['user_name'], sha256_crypt.encrypt(account['password'])])
             self.con.commit()
 
         except psycopg2.DatabaseError as err:
@@ -57,9 +54,9 @@ class PlayerDBConnection(object):
         try:
             cur = self.con.cursor()
             cur.execute(
-                "SELECT s.password \
-                 FROM account_security s INNER JOIN player p ON s.id = p.id \
-                 WHERE p.username = %s",
+                "SELECT password FROM account_security \
+                INNER JOIN account ON id = username \
+                WHERE username = %s",
                 [username])
             creds = cur.fetchone()
             if not creds or not sha256_crypt.verify(password, creds[0]):
@@ -87,9 +84,7 @@ class PlayerDBConnection(object):
         try:
             cur = self.con.cursor()
             cur.execute(
-                "SELECT a.contact_email, p.settings \
-                FROM account a INNER JOIN player p ON a.id = p.id \
-                WHERE p.username = %s",
+                "SELECT contact_email FROM account WHERE username = %s",
                 [username])
             return cur.fetchone()
         except psycopg2.DatabaseError as err:

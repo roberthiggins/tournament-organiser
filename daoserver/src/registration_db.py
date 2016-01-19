@@ -18,18 +18,18 @@ class RegistrationDBConnection(object):
         self.db_conn = DBConnection()
         self.con = self.db_conn.con
 
-    def register_for_tournament(self, tournament_id, player_id):
+    def register_for_tournament(self, tournament_id, username):
         """
         Register a player for a tournament
         Expects:
             - tournament_id - existing tounament name as per listtournaments
-            - player_id - existing username
+            - username - existing username
         """
         if not self.tournament_db_conn.tournament_exists(tournament_id) \
-        or not self.player_db_conn.username_exists(player_id):
+        or not self.player_db_conn.username_exists(username):
             raise RuntimeError("Check username and tournament")
 
-        clash = self.registration_clashes(tournament_id, player_id)
+        clash = self.registration_clashes(tournament_id, username)
         if clash is not None and clash[0] == tournament_id:
             raise RuntimeError("You've already applied to %s" % tournament_id)
         elif clash is not None:
@@ -39,7 +39,7 @@ class RegistrationDBConnection(object):
         try:
             cur = self.con.cursor()
             cur.execute("INSERT INTO registration VALUES(%s, %s)",
-                        [player_id, tournament_id])
+                        [username, tournament_id])
             self.con.commit()
         except psycopg2.DatabaseError as err:
             self.con.rollback()
@@ -47,20 +47,20 @@ class RegistrationDBConnection(object):
 
         return "Application Submitted"
 
-    def registration_clashes(self, tournament_id, player_id):
+    def registration_clashes(self, tournament_id, username):
         """
         Check if the date of the tournament overlaps with another tournament
         that has been registered for by the player
         Expects:
             - tournament_id - existing tounament name as per listtournaments
-            - player_id - existing username
+            - username - existing username
         """
-        if not tournament_id or not player_id:
+        if not tournament_id or not username:
             raise ValueError(
                 "Parameter missing for registration_clashes(self, \
-                tournament_id, player_id)",
+                tournament_id, username)",
                 tournament_id,
-                player_id)
+                username)
         try:
             cur = self.con.cursor()
             cur.execute(
@@ -69,7 +69,7 @@ class RegistrationDBConnection(object):
                     on r.tournament_id = t.name \
                 WHERE player_id = %s \
                 AND date = (SELECT date FROM tournament WHERE name = %s)",
-                [player_id, tournament_id])
+                [username, tournament_id])
             existing = cur.fetchone()
             print existing
             return existing

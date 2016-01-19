@@ -1,5 +1,4 @@
 CREATE TABLE player (
-    id          integer references account(id),
-    username    varchar not null unique,
+    username    varchar NOT NULL UNIQUE references account(username),
     settings    json
 );

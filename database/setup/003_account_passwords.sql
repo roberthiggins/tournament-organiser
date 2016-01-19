@@ -1,4 +1,4 @@
 CREATE TABLE account_security (
-    id          integer references account(id),
+    id          varchar references account(username),
     password    varchar not null
 );

@@ -1,4 +1,5 @@
 CREATE TABLE account(
-    id                  serial primary key unique,
-    contact_email       varchar not null
+    username            VARCHAR PRIMARY KEY,
+    contact_email       varchar not null,
+    is_superuser        BOOLEAN NOT NULL DEFAULT FALSE
 );

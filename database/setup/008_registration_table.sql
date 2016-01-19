@@ -1,5 +1,5 @@
 CREATE TABLE registration(
-    player_id           VARCHAR REFERENCES player(username),
+    player_id           VARCHAR REFERENCES account(username),
     tournament_id       VARCHAR REFERENCES tournament(name),
     has_paid            boolean not null default False,
     turned_up           boolean not null default False,
