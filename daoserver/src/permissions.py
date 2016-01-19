@@ -15,6 +15,18 @@ class PermissionsChecker(object):
     """
 
     @db_conn()
+    def is_admin(self, user):
+        """User is superuser"""
+        if user is None:
+            return False
+
+        cur.execute(
+            "SELECT count(*) > 0 FROM account \
+            WHERE username = %s AND is_superuser = TRUE",
+            [user])
+        return cur.fetchone()[0]
+
+    @db_conn()
     def is_organiser(self, user, tournament):
         """user is an organiser of tournament"""
         cur.execute(

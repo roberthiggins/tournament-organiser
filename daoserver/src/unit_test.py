@@ -172,6 +172,17 @@ from permissions import PermissionsChecker
 class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
     """Tests for `permissions.py`."""
 
+    def test_is_admin(self):
+        """check if a user is an admin"""
+        checker = PermissionsChecker()
+
+        self.assertFalse(checker.is_admin(None))
+        self.assertFalse(checker.is_admin(''))
+        self.assertFalse(checker.is_admin('charlie_murphy'))
+        self.assertFalse(checker.is_admin('not_a_person'))
+
+        self.assertTrue(checker.is_admin('superman'))
+
     def test_is_organiser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
