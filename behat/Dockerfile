@@ -1,6 +1,6 @@
 # This will build the behat testing container. The intention is that we test
 # the website by building a version of the real thing, insert a bunch of fake
-# data, and then run this container to run some functional testing.
+# data, and then run this container to run some functional testing. Unit tests will also be run from another container
 
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
