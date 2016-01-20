@@ -1,4 +1,5 @@
-# This will fire up the webserver. It is a flask app on ubuntu 14.04
+# Smoketester for the tournament builder ecosystem. This is only intended for
+# use with the webapp stack.
 
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
