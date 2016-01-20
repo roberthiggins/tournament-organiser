@@ -27,15 +27,16 @@ ADD setup/ setup/
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres
 
-# Create a PostgreSQL role named ``docker`` with ``docker`` as the password and
-# then create a database `docker` owned by the ``docker`` role. Then fill that
+# Create a PostgreSQL role named ``docker`` with default password and
+# then create a database `to-db` owned by the ``docker`` role. Then fill that
 # database from the files in the setup directory.
 # IMPORTANT ASSUMPTION: We assume that all the files in the setup dir are
 # ordered correctly. This can be done by prefixing a number to the filename.
+ENV DB_NAME to-db
 RUN    /etc/init.d/postgresql start &&\
     psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'FuEm7l003bfd6zM';" &&\
-    createdb -O docker docker &&\
-    for i in setup/*.sql; do psql --file=$i -d docker ;done
+    createdb -O docker $DB_NAME &&\
+    for i in setup/*.sql; do psql --file=$i -d to-db ;done
 
 # Adjust PostgreSQL configuration so that remote connections to the
 # database are possible. 
@@ -53,4 +54,7 @@ VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 # Set the default command to run when starting the container
 CMD ["/usr/lib/postgresql/9.3/bin/postgres", "-D", "/var/lib/postgresql/9.3/main", "-c", "config_file=/etc/postgresql/9.3/main/postgresql.conf"]
 
+# PRODUCTION NOTE
+# Outside of dev the password should be changed to something else. The default
+# password used here 'FuEm7...' is merely for convenience in dev.
 

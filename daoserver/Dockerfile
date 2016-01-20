@@ -44,6 +44,7 @@ ADD bash_aliases /root/.bash_aliases
 # This should only work in the dev environment. Staging/Prod dbs will have
 # their passwords set separately. However this is an issue for Orchestration.
 # For now a default password will do.
+ENV DB_NAME to-db
 ENV DB_PASSWORD FuEm7l003bfd6zM
 
 CMD python -u webapp/dao.py

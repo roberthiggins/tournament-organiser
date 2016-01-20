@@ -16,12 +16,13 @@ class DBConnection(object):
         self.con = None
         self.config = {
             'db_host': os.environ['DB_PORT_5432_TCP_ADDR'],
+            'db_name': os.environ['DB_NAME'],
             'db_port': os.environ['DB_PORT_5432_TCP_PORT'],
             'db_pass': os.environ['DB_PASSWORD']
         }
         try:
             self.con = psycopg2.connect(
-                database='docker',
+                database=self.config['db_name'],
                 user='docker',
                 host=self.config['db_host'],
                 port=self.config['db_port'],
