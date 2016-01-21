@@ -4,8 +4,7 @@ from django.conf.urls import patterns, url
 from public import public_views, views
 
 # pylint: disable=C0103
-urlpatterns = patterns(
-    '',
+urlpatterns = [
 
     # Public views
     url(r'^$', public_views.index, name='index'),
@@ -43,4 +42,4 @@ urlpatterns = patterns(
         views.suggest_improvement, name='suggest_improvement'),
     url(r'^tournamentsetup/(?P<tournament_id>.+)$',
         views.tournament_setup, name='tournament_setup'),
-)
+]
