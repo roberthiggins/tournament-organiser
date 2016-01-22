@@ -14,6 +14,7 @@ import re
 from flask import Flask, request, make_response, jsonify
 from functools import wraps
 
+from authentication import requires_auth
 from entry_db import EntryDBConnection
 from feedback_db import FeedbackDBConnection
 from player_db import PlayerDBConnection
