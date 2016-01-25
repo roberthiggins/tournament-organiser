@@ -3,7 +3,6 @@ Basic URL mappings for the webserver
 """
 
 import json
-import urllib2
 
 from django.contrib import auth
 from django.contrib.auth.models import User
@@ -89,7 +88,10 @@ def login(request):
         if username == '' or password == '':
             return render_login(request, login_creds)
 
-        response = from_dao('/login', login_creds)
+        if login_creds.is_valid():
+            request.user = auth.authenticate(username=username, password=password)
+
+        response = from_dao('/login', form = login_creds, request = request)
         if  response.status_code == 200:
             # The user might exist in the db but not on this webserver.
             create_or_update_user(login_creds)
@@ -164,6 +166,6 @@ def tournament_rankings(request, tournament_id):
             },
             RequestContext(request)
             )
-    except urllib2.HTTPError:
+    except ValueError:
         return HttpResponseNotFound()
 
