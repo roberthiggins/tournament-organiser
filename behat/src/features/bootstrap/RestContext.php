@@ -7,6 +7,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class RestContext extends BehatContext
 {
+    private $_auth              = null;
     private $_restObject        = null;
     private $_restObjectType    = null;
     private $_restObjectMethod  = 'get';
@@ -182,6 +183,15 @@ class RestContext extends BehatContext
             $this->_response = $e->getResponse();
         }
     }
+
+    /**
+     * @Given /^that I set auth to u:"([^"]*)" and p:"([^"]*)"$/
+     */
+    public function iSetAuth($username, $password)
+    {
+        $this->_auth = [$username,$password];
+    }
+
     /**
      * @When /^I POST "([^"]*)" to "([^"]*)" from the API$/
      */
@@ -191,14 +201,16 @@ class RestContext extends BehatContext
         $this->_requestUrl = $baseUrl.$pageUrl;
         try {
             $response = $this->_client->request(
-                            'POST',
-                            $this->_requestUrl.'?'.$value);
+                'POST',
+                $this->_requestUrl.'?'.$value,
+                [ 'auth' => $this->_auth ]);
             $this->_response = $response;
         }
         catch (GuzzleHttp\Exception\ClientException $e) {
             $this->_response = $e->getResponse();
         }
     }
+
     /**
      * @Then /^the API response should( not)? contain "([^"]*)"$/
      */
