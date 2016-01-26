@@ -211,6 +211,18 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
             ValueError, checker.check_permission, 'ENTER_SCORE', None, None)
 
         self.assertFalse(checker.check_permission('enter_score', None, None))
+        self.assertTrue(checker.check_permission(
+            'enter_score',
+            'lex_luthor',
+            'permission_test'))
+        self.assertTrue(checker.check_permission(
+            'enter_score',
+            'superman',
+            'permission_test'))
+        self.assertFalse(checker.check_permission(
+            'enter_score',
+            'charlie_murphy',
+            'permission_test'))
 
 if __name__ == '__main__':
     unittest.main()
