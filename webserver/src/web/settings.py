@@ -132,7 +132,7 @@ LOGGING = {
             'propagate': True,
             'level':'DEBUG',
         },
-        '': {
+        'public': {
             'handlers': ['web_log'],
             'level': 'DEBUG',
         },
