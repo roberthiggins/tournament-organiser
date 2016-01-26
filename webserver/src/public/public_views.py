@@ -89,9 +89,11 @@ def login(request):
             return render_login(request, login_creds)
 
         if login_creds.is_valid():
-            request.user = auth.authenticate(username=username, password=password)
+            request.user = auth.authenticate(
+                username=username,
+                password=password)
 
-        response = from_dao('/login', form = login_creds, request = request)
+        response = from_dao('/login', form=login_creds, request=request)
         if  response.status_code == 200:
             # The user might exist in the db but not on this webserver.
             create_or_update_user(login_creds)

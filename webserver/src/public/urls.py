@@ -1,5 +1,5 @@
 # pylint: disable=C0111
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from public import public_views, views
 

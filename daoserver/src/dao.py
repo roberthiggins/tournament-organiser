@@ -14,7 +14,6 @@ import re
 from flask import Flask, request, make_response, jsonify
 from functools import wraps
 
-from authentication import requires_auth
 from entry_db import EntryDBConnection
 from feedback_db import FeedbackDBConnection
 from permissions import PERMISSIONS, PermissionsChecker
@@ -90,9 +89,10 @@ def requires_permission(action, error_msg):
 
             checker = PermissionsChecker()
             if request.authorization is None or not checker.check_permission(
-                action,
-                request.authorization.username,
-                tournament):
+                    action,
+                    request.authorization.username,
+                    tournament):
+                # TODO get tournament from the request
                 raise ValueError('Permission denied. {}'.format(error_msg))
 
             return func(*args, **kwargs)

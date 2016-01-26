@@ -22,7 +22,7 @@ def from_dao(url, form=None, request=None):
         auth = None
         if request is not None and request.user is not None \
         and request.user.is_authenticated():
-            auth=(request.user.username, request.user.password)
+            auth = (request.user.username, request.user.password)
 
         if form is None:
             return requests.get(api, auth=auth)
@@ -32,7 +32,7 @@ def from_dao(url, form=None, request=None):
 
         return HttpResponse(form.error_code(), status=400)
 
-    except HTTPError as err:
+    except requests.exceptions.HTTPError as err:
         if err.code == 400:
             return HttpResponse(err.read(), status=400)
         else:
