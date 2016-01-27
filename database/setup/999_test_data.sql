@@ -157,8 +157,11 @@ BEGIN
     INSERT INTO account_security VALUES (username, '$5$rounds=535000$1ChlmvAIh/6yDqVg$wn8vZxK1igRA17V8pjMr90ph3Titr35DF5X5DYSLpv.');
 
     -- Give them permission to enter a score for it
-    INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_game_score') RETURNING id INTO protected_object_action_id;
-    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_object_action_id) RETURNING id INTO protected_object_permission_id;
+    SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'enter_score' LIMIT 1;
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, 
+        (SELECT id FROM protected_object_action
+            WHERE description = 'enter_score' LIMIT 1)
+        ) RETURNING id INTO protected_object_permission_id;
     INSERT INTO account_protected_object_permission VALUES (username, protected_object_permission_id);
 
     RETURN 0;

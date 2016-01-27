@@ -20,13 +20,12 @@ CREATE TABLE protected_object(
 );
 COMMENT ON TABLE protected_object IS 'A list of objects on which restrictions can be placed. Most/all tournaments should reference this for example.';
 
-
 CREATE TABLE protected_object_action(
     id          SERIAL PRIMARY KEY,
     description VARCHAR NOT NULL
 );
 COMMENT ON TABLE protected_object_action IS 'An abstract action that could be performed on a protected_object. "Enter Score", "add player", etc.';
-
+INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_score');
 
 CREATE TABLE protected_object_permission(
     id                          SERIAL UNIQUE,
