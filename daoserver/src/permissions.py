@@ -23,6 +23,44 @@ class PermissionsChecker(object):
     Etc.
     """
 
+    @db_conn(commit=True)
+    def add_permission(self, user, action, protected_obj_id):
+        """
+        Give user permission to perform action on protected_obj
+
+        Assumptions:
+            action must be a permissions.PERMISSIONS
+            protected_obj should be a protected_object id
+
+        e.g. - to_of_southcon, enter_score, southcon
+             - player_of_game_3, enter_score, game_3
+        """
+        check_action_valid(action)
+
+        cur.execute(
+            "SELECT id FROM protected_object_action \
+            WHERE description = %s LIMIT 1",
+            [action])
+        action_id = cur.fetchone()[0]
+
+        try:
+            cur.execute(
+                "SELECT id FROM protected_object_permission \
+                WHERE protected_object_id = %s \
+                AND protected_object_action_id = %s",
+                [protected_obj_id, action_id])
+            permission_id = cur.fetchone()[0]
+        except TypeError:
+            cur.execute(
+                "INSERT INTO protected_object_permission \
+                VALUES (DEFAULT, %s, %s) RETURNING id",
+                [protected_obj_id, action_id])
+            permission_id = cur.fetchone()[0]
+
+        cur.execute(
+            "INSERT INTO account_protected_object_permission VALUES (%s, %s)",
+            [user, permission_id])
+
     def check_permission(self, action, user, tournament):
         """
         Entry point method for checking permissions.
