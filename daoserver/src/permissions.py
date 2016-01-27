@@ -8,6 +8,11 @@ PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',
 }
 
+def check_action_valid(action):
+    if action is None or not action in PERMISSIONS.values():
+        raise ValueError(
+            'Illegal action passed to check_permission {}'.format(action))
+
 # pylint: disable=E0602
 class PermissionsChecker(object):
     """
@@ -24,9 +29,7 @@ class PermissionsChecker(object):
         Check that a user is entitled to perform action for tournament
         """
 
-        if not action in PERMISSIONS.values():
-            raise ValueError(
-                'Illegal action passed to check_permission {}'.format(action))
+        check_action_valid(action)
 
         if action == PERMISSIONS['ENTER_SCORE']:
             return self.is_admin(user) or self.is_organiser(user, tournament)
