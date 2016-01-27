@@ -6,6 +6,7 @@ It holds a tournament object for housing of scoring strategies, etc.
 import datetime
 
 from draw_strategy import RoundRobin
+from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
 from tournament_db import TournamentDBConnection
@@ -24,7 +25,7 @@ def must_exist_in_db(func):
 class Tournament(object):
     """A tournament DAO"""
 
-    def __init__(self, tournament_id=None, ranking_strategy=None):
+    def __init__(self, tournament_id=None, ranking_strategy=None, creator=None):
         self.tourn_db_conn = TournamentDBConnection()
         self.tournament_id = tournament_id
         self.exists_in_db = tournament_id is not None \
@@ -35,6 +36,7 @@ class Tournament(object):
             else RankingStrategy(tournament_id, self.list_score_categories)
         self.draw_strategy = RoundRobin(tournament_id)
         self.table_strategy = ProtestAvoidanceStrategy()
+        self.creator_username = creator
 
     def add_to_db(self, date):
         """
@@ -52,6 +54,11 @@ class Tournament(object):
 
         self.tourn_db_conn.add_tournament(
             {'name' : self.tournament_id, 'date' : date})
+
+        PermissionsChecker().add_permission(
+            self.creator_username,
+            PERMISSIONS['ENTER_SCORE'],
+            self.tourn_db_conn.tournament_details(self.tournament_id)[5])
 
     @must_exist_in_db
     def create_score_category(self, category, percentage):

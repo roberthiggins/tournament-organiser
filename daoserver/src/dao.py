@@ -140,7 +140,9 @@ def add_tournament():
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
     # pylint: disable=E0602
-    tourn = Tournament(inputTournamentName)
+    tourn = Tournament(
+        inputTournamentName,
+        creator=request.authorization.username)
     # pylint: disable=E0602
     tourn.add_to_db(inputTournamentDate)
     # pylint: disable=E0602
