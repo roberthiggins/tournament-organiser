@@ -103,6 +103,13 @@ class Tournament(object):
         return {'tournaments' : tourn_db_conn.list_tournaments()}
 
     @must_exist_in_db
+    def make_draw(self, round_id=0):
+        """Determines the draw for round. This draw is written to the db"""
+        match_ups = self.matching_strategy.match(int(round_id))
+        draw = self.table_strategy.determine_tables(match_ups)
+        return draw
+
+    @must_exist_in_db
     def get_mission(self, round_id):
         """Get the mission for a given round"""
         return self.tourn_db_conn.get_mission(self.tournament_id, round_id)
@@ -111,6 +118,19 @@ class Tournament(object):
     def get_missions(self):
         """Get all missions for the tournament"""
         return self.tourn_db_conn.get_missions(self.tournament_id)
+
+    @must_exist_in_db
+    def round_info(self, round_id=0):
+        """
+        Returns info about round.
+        Returns:
+            - dict with three keys {score_keys, draw, mission}
+        """
+        return {
+            'score_keys': self.get_score_keys_for_round(round_id),
+            'draw': self.make_draw(round_id),
+            'mission': self.get_mission(round_id)
+        }
 
     @must_exist_in_db
     def set_mission(self, round_id, mission):

@@ -322,12 +322,9 @@ def get_round_info(tournament_id, round_id):
         tourn.set_mission(round_id, mission)
 
     # We will return all round info for all requests regardless of method
-    return jsonpickle.encode({
-        'score_keys': tourn.get_score_keys_for_round(round_id),
-        'draw': tourn.table_strategy.determine_tables(
-            tourn.matching_strategy.match(int(round_id))),
-        'mission': tourn.get_mission(int(round_id))
-    }, unpicklable=False)
+    return jsonpickle.encode(
+        tourn.round_info(int(round_id)),
+        unpicklable=False)
 
 @APP.route('/setRounds', methods=['POST'])
 @enforce_request_variables('numRounds', 'tournamentId')
