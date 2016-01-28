@@ -18,12 +18,11 @@ class RoundRobin(object):
         self.tournament_id = tournament_id
         self.entry_db_conn = EntryDBConnection()
 
-    def draw(self, round_to_draw):
+    def match(self, round_to_draw):
         """
-        Make the draw for a round.
-        This writes the draw to the db.
+        Match the entrants into pairs.
 
-        Returns: The draw for convenience.
+        Returns: A list of Tuples - each is a pair of entrants.
         """
         entry_list = deque(self.entry_db_conn.entry_list(self.tournament_id))
         entry_list.rotate(round_to_draw - 1)

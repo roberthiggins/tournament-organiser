@@ -5,7 +5,7 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
-from draw_strategy import RoundRobin
+from matching_strategy import RoundRobin
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
@@ -34,7 +34,7 @@ class Tournament(object):
             ranking_strategy(tournament_id, self.list_score_categories) \
             if ranking_strategy \
             else RankingStrategy(tournament_id, self.list_score_categories)
-        self.draw_strategy = RoundRobin(tournament_id)
+        self.matching_strategy = RoundRobin(tournament_id)
         self.table_strategy = ProtestAvoidanceStrategy()
         self.creator_username = creator
 
