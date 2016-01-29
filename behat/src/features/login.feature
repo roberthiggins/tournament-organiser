@@ -18,7 +18,7 @@ Feature: Login
     Scenario: I log in with correct details
         Given I am on "/login"
         When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "darkness"
+        When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Then I should be on "/"
 
@@ -41,7 +41,7 @@ Feature: Login
     Scenario: While logged in I try to log in again
         Given I am on "/login"
         When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "darkness"
+        When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Then I should be on "/"
         Given I am on "/login"

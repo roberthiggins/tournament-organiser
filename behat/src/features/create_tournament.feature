@@ -6,7 +6,7 @@ Feature: Create a Tournament
     Background:
         Given I am on "/login"
         When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "darkness"
+        When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Then I should be on "/"
 

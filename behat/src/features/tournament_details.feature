@@ -14,7 +14,7 @@ Feature: Get information about a tournament
         Then I press "Apply to play in northcon_2095"
         Then I should be on "/login?next=/registerforatournament"
         When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "darkness"
+        When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Then I should be on "/registerforatournament"
         When I select "northcon_2095" from "inputTournamentName"

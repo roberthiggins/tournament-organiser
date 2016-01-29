@@ -22,11 +22,11 @@ BEGIN
     INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 2, 28, fanciness);
 
     INSERT INTO account VALUES ('stevemcqueen', 'foo@bar.com');
-    INSERT INTO account_security VALUES ('stevemcqueen', '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO account_security VALUES ('stevemcqueen', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO account VALUES ('rick_james', 'foo@bar.com');
-    INSERT INTO account_security VALUES ('rick_james', '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO account_security VALUES ('rick_james', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO account VALUES ('charlie_murphy', 'chalie_murphy@darkness.com');
-    INSERT INTO account_security VALUES ('charlie_murphy', '$5$rounds=535000$1ChlmvAIh/6yDqVg$wn8vZxK1igRA17V8pjMr90ph3Titr35DF5X5DYSLpv.');
+    INSERT INTO account_security VALUES ('charlie_murphy', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
 END $$;
 
 
@@ -62,7 +62,7 @@ BEGIN
     INSERT INTO round_score VALUES(rd2key, 2);
 
     INSERT INTO account VALUES ('homer', 'foo@bar.com') ;
-    INSERT INTO account_security VALUES ('homer', '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO account_security VALUES ('homer', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('homer', 'ranking_test');
     INSERT INTO entry VALUES(default, 'homer', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 20);
@@ -73,7 +73,7 @@ BEGIN
 
 
     INSERT INTO account VALUES ('marge', 'foo@bar.com') ;
-    INSERT INTO account_security VALUES ('marge', '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO account_security VALUES ('marge', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('marge', 'ranking_test');
     INSERT INTO entry VALUES(default, 'marge', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
@@ -82,7 +82,7 @@ BEGIN
     INSERT INTO score VALUES(eid, sportskey, 5);
 
     INSERT INTO account VALUES ('lisa', 'foo@bar.com') ;
-    INSERT INTO account_security VALUES ('lisa', '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO account_security VALUES ('lisa', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('lisa', 'ranking_test');
     INSERT INTO entry VALUES(default, 'lisa', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
@@ -91,7 +91,7 @@ BEGIN
     INSERT INTO score VALUES(eid, sportskey, 5);
 
     INSERT INTO account VALUES ('bart', 'foo@bar.com') ;
-    INSERT INTO account_security VALUES ('bart', '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO account_security VALUES ('bart', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('bart', 'ranking_test');
     INSERT INTO entry VALUES(default, 'bart', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
@@ -101,7 +101,7 @@ BEGIN
     INSERT INTO score VALUES(eid, sportskey, 5);
 
     INSERT INTO account VALUES ('maggie', 'foo@bar.com') ;
-    INSERT INTO account_security VALUES ('maggie', '$5$rounds=535000$gEkrAmEJxdn30HMR$HPPOeXufYDksVGLSUbj5TqJVKKRTBsU31VsetE9oeI0');
+    INSERT INTO account_security VALUES ('maggie', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('maggie', 'ranking_test');
     INSERT INTO entry VALUES(default, 'maggie', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
@@ -144,7 +144,7 @@ BEGIN
     -- Create a superuser
     username = 'superman';
     INSERT INTO account VALUES (username, 'manofsteel@fortressofsolitude.com', TRUE);
-    INSERT INTO account_security VALUES (username, '$5$rounds=535000$cwi5O.qhjs6Ww/bh$kl6DZypdYrbeUmOFCQ7d.uCLcLJM6C/ZNZ5mmWIcEjA');
+    INSERT INTO account_security VALUES (username, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
 
 
     -- Create a tournament that will be restricted
@@ -154,7 +154,7 @@ BEGIN
     -- Create a user with access to modify
     username = 'lex_luthor';
     INSERT INTO account VALUES (username, 'lex_luthor@evil_hideout.com');
-    INSERT INTO account_security VALUES (username, '$5$rounds=535000$1ChlmvAIh/6yDqVg$wn8vZxK1igRA17V8pjMr90ph3Titr35DF5X5DYSLpv.');
+    INSERT INTO account_security VALUES (username, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
 
     -- Give them permission to enter a score for it
     SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'enter_score' LIMIT 1;

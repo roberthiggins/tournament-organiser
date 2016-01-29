@@ -9,7 +9,7 @@ Feature: Enter a score for a player
     Background:
         Given I am on "/login"
         When I fill in "id_inputUsername" with "superman"
-        When I fill in "id_inputPassword" with "kryptonite"
+        When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Then I should be on "/"
 
@@ -25,7 +25,7 @@ Feature: Enter a score for a player
         Given I am on "/logout"
         Given I am on "/login"
         When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "darkness"
+        When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Then I should be on "/"
         Given I am on "/enterscore/painting_test/rick_james"
@@ -74,7 +74,7 @@ Feature: Enter a score for a player
             | 6    | 6 not entered. Score is already set        |
 
     Scenario Outline: The TO gives a painting score to a player
-        Given that I set auth to u:"superman" and p:"kryptonite"
+        Given that I set auth to u:"superman" and p:"password"
         When I POST "<value>" to "/entertournamentscore" from the API
         Then the API response should contain "<response_text>"
         Then the API response status code should be <response_code>
