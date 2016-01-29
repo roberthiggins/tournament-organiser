@@ -30,7 +30,7 @@ class RoundRobin(object):
 
     def determine_matchup(self, singles, pairs):
         """
-        Determine a single match up for a round robin tournie
+        Determine match ups for a round robin tournie
         Algorithm:
             - The first and last in the list play each other.
             - The person in the middle is the bye, if they exist
@@ -39,6 +39,8 @@ class RoundRobin(object):
             - singles is a list of all singles yet to be pairs
             - pairs is a list of pairings:
                 ({entry from singles} or 'BYE', {entry from singles} or 'BYE')
+        Returns:
+            - A list of Tuples of entry_db.Entry from singles
         """
         if len(singles) == 0:
             return pairs
