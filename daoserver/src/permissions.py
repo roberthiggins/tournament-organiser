@@ -3,6 +3,7 @@ Module to handle permissions for accounts trying to modify a tournament.
 """
 
 from db_connection import db_conn
+from entry_db import EntryDBConnection
 
 PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',
@@ -62,7 +63,7 @@ class PermissionsChecker(object):
             "INSERT INTO account_protected_object_permission VALUES (%s, %s)",
             [user, permission_id])
 
-    def check_permission(self, action, user, tournament):
+    def check_permission(self, action, user, tournament, game_id=None):
         """
         Entry point method for checking permissions.
         Check that a user is entitled to perform action for tournament
@@ -71,7 +72,8 @@ class PermissionsChecker(object):
         check_action_valid(action)
 
         if action == PERMISSIONS['ENTER_SCORE']:
-            return self.is_admin(user) or self.is_organiser(user, tournament)
+            return self.is_admin(user) or self.is_organiser(user, tournament) \
+                or self.is_player(user, tournament, game_id)
 
         return False
 
@@ -94,4 +96,22 @@ class PermissionsChecker(object):
             "SELECT count(*) > 0 FROM tournament_organiser_permissions \
             WHERE tournament_name = %s AND username = %s",
             [tournament, user])
+        return cur.fetchone()[0]
+
+    @db_conn()
+    def is_player(self, user, tournament, game_id=None):
+        """user is a player in game."""
+        try:
+            entry_id = EntryDBConnection().entry_id(tournament, user)
+        except TypeError:
+            return False # The user is not entered into anything
+
+        # Eventually this will be expanded to be any player in a tournament
+        if game_id is None:
+            return False
+
+        cur.execute(
+            "SELECT count(*) > 0 FROM game_permissions \
+            WHERE game_id = %s AND entry_id = %s",
+            [game_id, entry_id])
         return cur.fetchone()[0]

@@ -209,8 +209,9 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
             ValueError, checker.check_permission, 'not_a_list', None, None)
         self.assertRaises(
             ValueError, checker.check_permission, 'ENTER_SCORE', None, None)
+        self.assertRaises(
+            ValueError, checker.check_permission, 'enter_score', None, None)
 
-        self.assertFalse(checker.check_permission('enter_score', None, None))
         self.assertTrue(checker.check_permission(
             'enter_score',
             'lex_luthor',
