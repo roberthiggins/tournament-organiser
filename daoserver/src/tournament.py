@@ -4,7 +4,9 @@ Model of a tournament
 It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
+import psycopg2
 
+from entry_db import EntryDBConnection
 from matching_strategy import RoundRobin
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
@@ -107,6 +109,26 @@ class Tournament(object):
         """Determines the draw for round. This draw is written to the db"""
         match_ups = self.matching_strategy.match(int(round_id))
         draw = self.table_strategy.determine_tables(match_ups)
+        try:
+            for match in draw:
+                game = self.tourn_db_conn.write_game(self.tournament_id,
+                    round_id,
+                    match.entrants[0],
+                    match.entrants[1],
+                    match.table_number)
+                if game[1] is not None:
+                    username = EntryDBConnection().entry_info(game[1])['username']
+                    PermissionsChecker().add_permission(
+                        username, PERMISSIONS['ENTER_SCORE'], game[6])
+                if game[2] is not None:
+                    username = EntryDBConnection().entry_info(game[2])['username']
+                    PermissionsChecker().add_permission(
+                        username, PERMISSIONS['ENTER_SCORE'], game[6])
+        except ValueError as err:
+            if 'duplicate key value violates unique constraint "game_pkey"' \
+            not in str(err):
+                raise err
+
         return draw
 
     @must_exist_in_db
