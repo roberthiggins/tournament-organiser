@@ -197,6 +197,34 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
                 else:
                     self.assertFalse(checker.is_organiser(user, tourn))
 
+    def tes_is_player(self):
+        """users can be a player by being involved in a game"""
+        checker = PermissionsChecker()
+
+        options = [None, 'ranking_test', 'not_a_tournament', '', 'lisa', \
+            'not_a_person', 'superman', 'permission_test', 'lex_luthor', 1, \
+            'homer', 2]
+
+        for tourn in options:
+            for user in options:
+                for game in options:
+                    if user == 'lisa' and tourn == 'ranking_test' and game == '1':
+                        self.assertTrue(checker.is_player(user, tourn, game))
+                    elif user == 'homer' and tourn == 'ranking_test' and game == '2':
+                        self.assertTrue(checker.is_player(user, tourn, game))
+                    else:
+                        self.assertFalse(checker.is_player(user, tourn, game))
+
+        # There is a variant without game_id
+        for tourn in options:
+            for user in options:
+                if user == 'lisa' and tourn == 'ranking_test':
+                    self.assertTrue(checker.is_player(user, tourn))
+                elif user == 'homer' and tourn == 'ranking_test':
+                    self.assertTrue(checker.is_player(user, tourn))
+                else:
+                    self.assertFalse(checker.is_player(user, tourn))
+
     def test_check_permissions(self):
         """Test the entrypoint method"""
         checker = PermissionsChecker()
