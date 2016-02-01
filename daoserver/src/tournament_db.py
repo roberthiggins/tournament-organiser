@@ -202,3 +202,29 @@ class TournamentDBConnection(object):
             INNER JOIN round_score s ON s.score_key_id = k.id \
             WHERE s.round_id = %s", [round_id])
         return cur.fetchall()
+
+    @db_conn(commit=True)
+    def write_game(self, tournament_id, round_id, entry_1, entry_2, table_num):
+        """Write a game to db"""
+
+        # BYEs should be made into a pseudo entry
+        entry_1 = None if entry_1 == 'BYE' else entry_1.entry_id
+        entry_2 = None if entry_2 == 'BYE' else entry_2.entry_id
+
+        # Get a protected_object_id
+        cur.execute("INSERT INTO protected_object VALUES(DEFAULT) RETURNING id")
+        protected_object_id = cur.fetchone()[0]
+
+        cur.execute(
+            "INSERT INTO game \
+            VALUES(DEFAULT, %s, %s, %s, %s, %s, %s) RETURNING *",
+            [
+                entry_2 if entry_1 is None else entry_1,
+                entry_1 if entry_1 is None else entry_2,
+                round_id,
+                tournament_id,
+                table_num,
+                protected_object_id
+            ]
+        )
+        return cur.fetchone()
