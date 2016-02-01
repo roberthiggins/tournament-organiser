@@ -33,6 +33,10 @@ TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
 @APP.errorhandler(ValueError)
 def input_error(err):
     """Input errors"""
+    print type(err).__name__
+    print err
+    import traceback
+    traceback.print_exc()
     return make_response(str(err), 400)
 
 @APP.errorhandler(Exception)
