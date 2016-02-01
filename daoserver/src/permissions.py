@@ -9,6 +9,7 @@ PERMISSIONS = {
 }
 
 def check_action_valid(action):
+    """Only actions found in PERMISSIONS are allowed"""
     if action is None or not action in PERMISSIONS.values():
         raise ValueError(
             'Illegal action passed to check_permission {}'.format(action))
