@@ -25,6 +25,9 @@ class PermissionsChecker(object):
     Etc.
     """
 
+    def __init__(self):
+        self.entry_db = EntryDBConnection()
+
     @db_conn(commit=True)
     def add_permission(self, user, action, protected_obj_id):
         """
@@ -102,7 +105,7 @@ class PermissionsChecker(object):
     def is_player(self, user, tournament, game_id=None):
         """user is a player in game."""
         try:
-            entry_id = EntryDBConnection().entry_id(tournament, user)
+            entry_id = self.entry_db.entry_id(tournament, user)
         except TypeError:
             return False # The user is not entered into anything
 
