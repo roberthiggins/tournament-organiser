@@ -6,12 +6,12 @@ It holds a tournament object for housing of scoring strategies, etc.
 import datetime
 import psycopg2
 
-from entry_db import EntryDBConnection
+from db_connections.entry_db import EntryDBConnection
+from db_connections.tournament_db import TournamentDBConnection
 from matching_strategy import RoundRobin
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
-from tournament_db import TournamentDBConnection
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""

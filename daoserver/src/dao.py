@@ -14,13 +14,13 @@ import re
 from flask import Flask, request, make_response, jsonify
 from functools import wraps
 
-from entry_db import EntryDBConnection
-from feedback_db import FeedbackDBConnection
+from db_connections.entry_db import EntryDBConnection
+from db_connections.feedback_db import FeedbackDBConnection
+from db_connections.player_db import PlayerDBConnection
+from db_connections.tournament_db import TournamentDBConnection
+from db_connections.registration_db import RegistrationDBConnection
 from permissions import PERMISSIONS, PermissionsChecker
-from player_db import PlayerDBConnection
 from tournament import Tournament
-from tournament_db import TournamentDBConnection
-from registration_db import RegistrationDBConnection
 
 APP = Flask(__name__)
 ENTRY_DB_CONN = EntryDBConnection()

@@ -8,7 +8,7 @@ The default here is RankingStrategy. It is the null strategy so it will just
 return lists in the order they were handed in and will pick the first db entry
 as the winner of any given category.
 """
-from entry_db import EntryDBConnection
+from db_connections.entry_db import EntryDBConnection
 
 class RankingStrategy(object):
     """

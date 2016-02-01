@@ -2,8 +2,8 @@
 Module to handle permissions for accounts trying to modify a tournament.
 """
 
-from db_connection import db_conn
-from entry_db import EntryDBConnection
+from db_connections.db_connection import db_conn
+from db_connections.entry_db import EntryDBConnection
 
 PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',

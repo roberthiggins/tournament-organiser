@@ -5,8 +5,8 @@ Tests for the Round Robin DrawStrategy
 import unittest
 from testfixtures import compare
 
+from db_connections.entry_db import Entry
 from matching_strategy import RoundRobin
-from entry_db import Entry
 from table_strategy import ProtestAvoidanceStrategy, Table
 
 class DrawStrategyTests(unittest.TestCase):             # pylint: disable=R0904

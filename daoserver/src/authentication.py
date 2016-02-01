@@ -3,7 +3,7 @@
 from functools import wraps
 from flask import request, Response
 
-from player_db import PlayerDBConnection
+from db_connections.player_db import PlayerDBConnection
 
 def check_auth(username, password):
     """This function is called to check if a username /

@@ -3,7 +3,7 @@ Module to make draws for tournaments
 """
 
 from collections import deque
-from entry_db import EntryDBConnection
+from db_connections.entry_db import EntryDBConnection
 
 class RoundRobin(object):
     """
