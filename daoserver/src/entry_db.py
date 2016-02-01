@@ -8,7 +8,6 @@ from psycopg2.extras import DictCursor
 
 from db_connection import DBConnection
 from player_db import PlayerDBConnection
-from tournament_db import TournamentDBConnection
 
 class Entry(json.JSONEncoder):
     """
@@ -40,7 +39,6 @@ class EntryDBConnection(object):
     Connection class to the entry database
     """
     def __init__(self):
-        self.tournament_db_conn = TournamentDBConnection()
         self.player_db_conn = PlayerDBConnection()
         self.db_conn = DBConnection()
         self.con = self.db_conn.con
@@ -147,8 +145,6 @@ class EntryDBConnection(object):
             raise ValueError('Missing required fields to entry_id')
         if not self.player_db_conn.username_exists(username):
             raise ValueError('Unknown player: %s' % username)
-        if not self.tournament_db_conn.tournament_exists(tournament_id):
-            raise ValueError('Unknown tournament: %s' % tournament_id)
 
         try:
             cur = self.con.cursor()

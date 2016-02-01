@@ -19,6 +19,7 @@ from feedback_db import FeedbackDBConnection
 from permissions import PERMISSIONS, PermissionsChecker
 from player_db import PlayerDBConnection
 from tournament import Tournament
+from tournament_db import TournamentDBConnection
 from registration_db import RegistrationDBConnection
 
 APP = Flask(__name__)
@@ -26,6 +27,7 @@ ENTRY_DB_CONN = EntryDBConnection()
 FEEDBACK_DB_CONN = FeedbackDBConnection()
 PLAYER_DB_CONN = PlayerDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
+TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
 
 @APP.errorhandler(RuntimeError)
 @APP.errorhandler(ValueError)
@@ -208,6 +210,9 @@ def enter_tournament_score():
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
+    if not TOURNAMENT_DB_CONNECTION.tournament_exists(tournament):
+        raise ValueError('Unknown tournament: {}'.format(tournament))
+
     # pylint: disable=E0602
     entry = ENTRY_DB_CONN.entry_id(tournament, username)
 
