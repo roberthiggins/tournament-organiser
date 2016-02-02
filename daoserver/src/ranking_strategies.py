@@ -29,7 +29,8 @@ class RankingStrategy(object):
         categories = self.score_categories()
         for cat in categories:
             agg_score = sum(
-                [x['score'] for x in scores if x['category'] == cat['id']])
+                [x['score'] for x in scores if x['category'] == cat['id'] \
+                and x['score'] is not None])
             agg_total = sum(
                 [x['max_val'] for x in scores if x['category'] == cat['id']])
             try:

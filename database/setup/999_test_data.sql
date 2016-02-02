@@ -81,14 +81,14 @@ BEGIN
     INSERT INTO entry VALUES(default, 'marge', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
     INSERT INTO table_allocation VALUES(eid, 2, 1);
-    INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO score VALUES(eid, rd2key, DEFAULT);
     INSERT INTO score VALUES(eid, sportskey, 5);
 
     INSERT INTO account VALUES ('lisa', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('lisa', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('lisa', 'ranking_test');
     INSERT INTO entry VALUES(default, 'lisa', 'ranking_test') RETURNING id INTO eid;
-    INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO score VALUES(eid, rd1key, DEFAULT);
     INSERT INTO score VALUES(eid, rd2key, 5);
     INSERT INTO table_allocation VALUES(eid, 2, 2);
     INSERT INTO score VALUES(eid, sportskey, 5);
