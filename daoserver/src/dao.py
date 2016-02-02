@@ -83,6 +83,7 @@ def enforce_request_variables(*vars_to_enforce):
         return wrapped
     return decorator
 
+# pylint: disable=E0602
 def requires_permission(action, error_msg):
     """
     A decorator that requires a permission check for the function.
@@ -214,6 +215,7 @@ def enter_tournament_score():
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
+    # pylint: disable=E0602
     if not TOURNAMENT_DB_CONNECTION.tournament_exists(tournament):
         raise ValueError('Unknown tournament: {}'.format(tournament))
 
