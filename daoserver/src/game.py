@@ -35,10 +35,8 @@ class Game(object):
 
         cur.execute(
             "INSERT INTO game \
-            VALUES(DEFAULT, %s, %s, %s, %s, %s, %s) RETURNING *",
+            VALUES(DEFAULT, %s, %s, %s, %s) RETURNING *",
             [
-                self.entry_2 if self.entry_1 is None else self.entry_1,
-                self.entry_1 if self.entry_1 is None else self.entry_2,
                 self.round_id,
                 self.tournament_id,
                 self.table_number,
@@ -47,4 +45,13 @@ class Game(object):
         )
         game = cur.fetchone()
         self.game_id = game[0]
-        self.protected_object_id = game[6]
+        self.protected_object_id = game[4]
+
+        if self.entry_1 is not None:
+            cur.execute(
+                "INSERT INTO game_entrant VALUES(%s, %s)",
+                [self.game_id, self.entry_1])
+        if self.entry_2 is not None:
+            cur.execute(
+                "INSERT INTO game_entrant VALUES(%s, %s)",
+                [self.game_id, self.entry_2 ])
