@@ -110,20 +110,23 @@ class Tournament(object):
         match_ups = self.matching_strategy.match(int(round_id))
         draw = self.table_strategy.determine_tables(match_ups)
         try:
+            from game import Game
             for match in draw:
-                game = self.tourn_db_conn.write_game(self.tournament_id,
-                    round_id,
-                    match.entrants[0],
-                    match.entrants[1],
-                    match.table_number)
-                if game[1] is not None:
-                    username = EntryDBConnection().entry_info(game[1])['username']
-                    PermissionsChecker().add_permission(
-                        username, PERMISSIONS['ENTER_SCORE'], game[6])
-                if game[2] is not None:
-                    username = EntryDBConnection().entry_info(game[2])['username']
-                    PermissionsChecker().add_permission(
-                        username, PERMISSIONS['ENTER_SCORE'], game[6])
+                game = Game(match.entrants,
+                    self.tournament_id, round_id, match.table_number)
+                game.write_to_db()
+
+                if game.entry_1 is not None:
+                    entry_id = game.entry_1
+                    uname = EntryDBConnection().entry_info(entry_id)['username']
+                    PermissionsChecker().add_permission(uname,
+                        PERMISSIONS['ENTER_SCORE'], game.protected_object_id)
+                if game.entry_2 is not None:
+                    entry_id = game.entry_2
+                    uname = EntryDBConnection().entry_info(entry_id)['username']
+                    PermissionsChecker().add_permission(uname,
+                        PERMISSIONS['ENTER_SCORE'], game.protected_object_id)
+
         except ValueError as err:
             if 'duplicate key value violates unique constraint "game_pkey"' \
             not in str(err):
