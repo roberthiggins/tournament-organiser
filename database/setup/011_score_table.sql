@@ -11,7 +11,7 @@ COMMENT ON TABLE score_key IS 'This table is all the score keys that might be en
 CREATE TABLE score (
     entry_id            INTEGER REFERENCES entry(id),
     score_key_id        INTEGER REFERENCES score_key(id),
-    value               INTEGER DEFAULT 0,
+    value               INTEGER,
     PRIMARY KEY (entry_id, score_key_id)
 );
 COMMENT ON TABLE score IS 'An entry will have lots of scores.';

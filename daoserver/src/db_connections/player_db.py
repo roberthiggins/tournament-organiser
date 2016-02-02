@@ -2,47 +2,34 @@
 This file contains code to connect to the player_db
 """
 
-import psycopg2
 from passlib.hash import sha256_crypt
 
-from db_connections.db_connection import DBConnection
+from db_connections.db_connection import db_conn
 
+# pylint: disable=E0602
 class PlayerDBConnection(object):
     """ A connection class for accessing player/account info from the db"""
-    def __init__(self):
-        self.db_conn = DBConnection()
-        self.con = self.db_conn.con
 
+    @db_conn()
     def username_exists(self, username):
         """Check if a username exists for a player"""
-        try:
-            cur = self.con.cursor()
-            cur.execute("SELECT COUNT(*) FROM account WHERE username = %s",
-                        [username])
-            existing = cur.fetchone()
-            return existing[0] > 0
-        except psycopg2.DatabaseError as err:
-            self.con.rollback()
-            raise err
+        cur.execute("SELECT COUNT(*) FROM account WHERE username = %s",
+                    [username])
+        existing = cur.fetchone()
+        return existing[0] > 0
 
+    @db_conn(commit=True)
     def add_account(self, account):
         """Add an account. Username cannot exist"""
-        try:
-            cur = self.con.cursor()
-            cur.execute(
-                "INSERT INTO account VALUES (%s, %s)",
-                [account['user_name'], account['email']])
-            cur.execute(
-                "INSERT INTO account_security VALUES (%s, %s)",
-                [account['user_name'],
-                 sha256_crypt.encrypt(account['password'])])
-            self.con.commit()
+        cur.execute(
+            "INSERT INTO account VALUES (%s, %s)",
+            [account['user_name'], account['email']])
+        cur.execute(
+            "INSERT INTO account_security VALUES (%s, %s)",
+            [account['user_name'],
+             sha256_crypt.encrypt(account['password'])])
 
-        except psycopg2.DatabaseError as err:
-            self.con.rollback()
-            print 'Database Error %s' % err
-            return err
-
+    @db_conn()
     def authenticate_user(self, username, password):
         """
         Authenticates the uanme and pword.
@@ -54,7 +41,6 @@ class PlayerDBConnection(object):
         if not username or not password:
             raise RuntimeError("Enter username and password")
         try:
-            cur = self.con.cursor()
             cur.execute(
                 "SELECT password FROM account_security \
                 INNER JOIN account ON id = username \
@@ -64,14 +50,7 @@ class PlayerDBConnection(object):
             if not creds or not sha256_crypt.verify(password, creds[0]):
                 raise RuntimeError("Username or password incorrect")
             return True
-        except psycopg2.DatabaseError as err:
-            self.con.rollback()
-            print 'Database Error %s' % err
-            raise err
         except RuntimeError:
-            raise
-        except Exception as err:
-            print err
             raise
 
     def login(self, username, password):
@@ -81,15 +60,10 @@ class PlayerDBConnection(object):
         else:
             return "Login unsuccessful"
 
+    @db_conn()
     def user_details(self, username):
         """ get the user details asa a json blob """
-        try:
-            cur = self.con.cursor()
-            cur.execute(
-                "SELECT contact_email FROM account WHERE username = %s",
-                [username])
-            return cur.fetchone()
-        except psycopg2.DatabaseError as err:
-            self.con.rollback()
-            print 'Database Error %s' % err
-            raise err
+        cur.execute(
+            "SELECT contact_email FROM account WHERE username = %s",
+            [username])
+        return cur.fetchone()
