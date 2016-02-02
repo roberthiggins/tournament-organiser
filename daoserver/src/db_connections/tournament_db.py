@@ -4,7 +4,7 @@ This file contains code to connect to the tournament_db
 
 import psycopg2
 
-from db_connection import db_conn
+from db_connections.db_connection import db_conn
 
 # pylint: disable=E0602,R0201
 class TournamentDBConnection(object):

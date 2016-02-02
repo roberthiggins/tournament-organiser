@@ -5,8 +5,8 @@ A game is simply a match between two entries. It is played on a table.
 """
 
 from db_connections.db_connection import db_conn
-from db_connections.tournament_db import TournamentDBConnection
 
+# pylint: disable=E0602
 class Game(object):
     """
     Representation of a single match between entrants.
@@ -15,7 +15,6 @@ class Game(object):
 
     def __init__(self, entrants, tournament_id=None, round_id=None,
                  table_number=None):
-        self.db_conn = TournamentDBConnection()
         self.tournament_id = tournament_id
         self.round_id = round_id
         self.table_number = table_number
@@ -54,4 +53,4 @@ class Game(object):
         if self.entry_2 is not None:
             cur.execute(
                 "INSERT INTO game_entrant VALUES(%s, %s)",
-                [self.game_id, self.entry_2 ])
+                [self.game_id, self.entry_2])

@@ -5,7 +5,7 @@ This file contains code to connect to the player_db
 import psycopg2
 from passlib.hash import sha256_crypt
 
-from db_connection import DBConnection
+from db_connections.db_connection import DBConnection
 
 class PlayerDBConnection(object):
     """ A connection class for accessing player/account info from the db"""

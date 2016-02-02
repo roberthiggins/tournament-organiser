@@ -208,9 +208,11 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
         for tourn in options:
             for user in options:
                 for game in options:
-                    if user == 'lisa' and tourn == 'ranking_test' and game == '1':
+                    if user == 'lisa' and tourn == 'ranking_test' \
+                    and game == '1':
                         self.assertTrue(checker.is_player(user, tourn, game))
-                    elif user == 'homer' and tourn == 'ranking_test' and game == '2':
+                    elif user == 'homer' and tourn == 'ranking_test' \
+                    and game == '2':
                         self.assertTrue(checker.is_player(user, tourn, game))
                     else:
                         self.assertFalse(checker.is_player(user, tourn, game))

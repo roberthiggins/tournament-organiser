@@ -4,7 +4,7 @@ This file handles inserting feedback into the db
 
 import psycopg2
 
-from db_connection import DBConnection
+from db_connections.db_connection import DBConnection
 
 class FeedbackDBConnection(object):
     """

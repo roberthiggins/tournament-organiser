@@ -4,7 +4,6 @@ Model of a tournament
 It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
-import psycopg2
 
 from db_connections.entry_db import EntryDBConnection
 from db_connections.tournament_db import TournamentDBConnection
@@ -113,19 +112,23 @@ class Tournament(object):
             from game import Game
             for match in draw:
                 game = Game(match.entrants,
-                    self.tournament_id, round_id, match.table_number)
+                            self.tournament_id, round_id, match.table_number)
                 game.write_to_db()
 
                 if game.entry_1 is not None:
                     entry_id = game.entry_1
                     uname = EntryDBConnection().entry_info(entry_id)['username']
-                    PermissionsChecker().add_permission(uname,
-                        PERMISSIONS['ENTER_SCORE'], game.protected_object_id)
+                    PermissionsChecker().add_permission(
+                        uname,
+                        PERMISSIONS['ENTER_SCORE'],
+                        game.protected_object_id)
                 if game.entry_2 is not None:
                     entry_id = game.entry_2
                     uname = EntryDBConnection().entry_info(entry_id)['username']
-                    PermissionsChecker().add_permission(uname,
-                        PERMISSIONS['ENTER_SCORE'], game.protected_object_id)
+                    PermissionsChecker().add_permission(
+                        uname,
+                        PERMISSIONS['ENTER_SCORE'],
+                        game.protected_object_id)
 
         except ValueError as err:
             if 'duplicate key value violates unique constraint "game_pkey"' \

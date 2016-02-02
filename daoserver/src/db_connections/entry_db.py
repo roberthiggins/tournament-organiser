@@ -6,8 +6,8 @@ from flask import json
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from db_connection import DBConnection
-from player_db import PlayerDBConnection
+from db_connections.db_connection import DBConnection
+from db_connections.player_db import PlayerDBConnection
 
 class Entry(json.JSONEncoder):
     """

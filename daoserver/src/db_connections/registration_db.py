@@ -4,9 +4,9 @@ This file contains code to connect to the tournament registrations
 
 import psycopg2
 
-from db_connection import DBConnection
-from player_db import PlayerDBConnection
-from tournament_db import TournamentDBConnection
+from db_connections.db_connection import DBConnection
+from db_connections.player_db import PlayerDBConnection
+from db_connections.tournament_db import TournamentDBConnection
 
 class RegistrationDBConnection(object):
     """
