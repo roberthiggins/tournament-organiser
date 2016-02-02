@@ -137,9 +137,16 @@ def tournament(request, tournament_id):
 
 def tournament_draw(request, tournament_id, round_id):
     """Get the entire tournament draw for a single round of a tournament"""
-    json_data = json.loads(from_dao(
-        '/roundInfo/{}/{}'.format(tournament_id, round_id)
-    ).content)
+    if tournament_id is None or round_id is None:
+        return HttpResponseNotFound()
+
+    try:
+        response = from_dao(
+            '/roundInfo/{}/{}'.format(tournament_id, round_id)
+        ).content
+        json_data = json.loads(response)
+    except ValueError:
+        return HttpResponse(response)
 
     return render_to_response(
         'draw.html',

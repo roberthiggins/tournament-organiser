@@ -195,8 +195,7 @@ class TournamentDBConnection(object):
             [tournament_id, round_id]
         )
         if cur.fetchone()[0] == 0:
-            raise ValueError("Round {} doesn't exist in {}".format(
-                round_id, tournament_id))
+            raise ValueError("Draw not ready. Contact TO")
         cur.execute(
             "SELECT * FROM score_key k \
             INNER JOIN round_score s ON s.score_key_id = k.id \
