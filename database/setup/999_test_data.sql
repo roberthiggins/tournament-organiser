@@ -62,6 +62,7 @@ BEGIN
     INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 0, 20, battlecategory) RETURNING id INTO rd2key;
     INSERT INTO score_key VALUES (DEFAULT, 'sports', 1, 5, sportscategory) RETURNING id INTO sportskey;
     INSERT INTO round_score VALUES(rd1key, 1);
+    INSERT INTO round_score VALUES(sportskey, 1);
     INSERT INTO round_score VALUES(rd2key, 2);
 
     INSERT INTO account VALUES ('homer', 'foo@bar.com') ;

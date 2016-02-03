@@ -185,10 +185,8 @@ class EntryDBConnection(object):
     def get_scores_for_entry(self, entry_id):
         """ Get all the score_key:score pairs for an entry"""
         cur = self.con.cursor(cursor_factory=DictCursor)
-        cur.execute("SELECT k.key, s.value, k.category, k.min_val, k.max_val \
-            FROM score s \
-            INNER JOIN score_key k ON s.score_key_id = k.id \
-            WHERE entry_id = %s", [entry_id])
+        cur.execute("SELECT key, score, category, min_val, max_val \
+            FROM player_score WHERE entry_id = %s", [entry_id])
         return [
             {
                 'key': x[0],
