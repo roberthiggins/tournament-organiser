@@ -112,9 +112,10 @@ class Tournament(object):
             from game import Game
             for match in draw:
                 game = Game(match.entrants,
-                            self.tournament_id, round_id, match.table_number)
+                            tournament_id=self.tournament_id,
+                            round_id=round_id,
+                            table_number=match.table_number)
                 game.write_to_db()
-
                 if game.entry_1 is not None:
                     entry_id = game.entry_1
                     uname = EntryDBConnection().entry_info(entry_id)['username']

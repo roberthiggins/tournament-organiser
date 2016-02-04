@@ -13,16 +13,17 @@ class Game(object):
     This might be a BYE
     """
 
-    def __init__(self, entrants, tournament_id=None, round_id=None,
-                 table_number=None):
+    #pylint: disable=R0913
+    def __init__(self, entrants, game_id=None, tournament_id=None,
+                 round_id=None, table_number=None, protected_object_id=None):
+        self.game_id = game_id
         self.tournament_id = tournament_id
         self.round_id = round_id
         self.table_number = table_number
         self.entry_1 = None if entrants[0] == 'BYE' else entrants[0].entry_id
         self.entry_2 = None if entrants[1] == 'BYE' else entrants[1].entry_id
+        self.protected_object_id = protected_object_id
 
-        self.game_id = None
-        self.protected_object_id = None
 
     @db_conn(commit=True)
     def write_to_db(self):
