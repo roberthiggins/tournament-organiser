@@ -4,6 +4,7 @@ create table game(
     tourn               varchar NOT NULL references tournament(name),
     table_num           integer,
     protected_object_id integer references protected_object(id),
+    score_entered       boolean DEFAULT False,
     PRIMARY KEY(table_num, round_num, tourn)
 );
 
