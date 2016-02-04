@@ -99,7 +99,32 @@ Feature: Enter a score for a player
             |username=rick_james&username=rick_james&tournament=painting_test&key=fanciest_wig&value=9  |400            |9 not entered. Score is already set    |
             |username=rick_james&username=jerry&tournament=painting_test&key=fanciest_wig&value=8       |400            |8 not entered. Score is already set    |
 
-
     # TODO User controls
     Scenario: another player
+        Given I am on "/logout"
+        Given I am on "/enterscore/4"
+        When I fill in "id_inputUsername" with "bart"
+        When I fill in "id_inputPassword" with "password"
+        When I press "Login"
+        Then I should be on "/enterscore/4"
+        When I fill in "id_key" with "round_2_battle"
+        When I fill in "id_value" with "1"
+        Then I press "Enter Score"
+        Then the response status code should be 200
+        Then I should see "Permission denied"
+
+    Scenario: A non super user
+        Given I am on "/logout"
+        Given I am on "/enterscore/4"
+        When I fill in "id_inputUsername" with "lisa"
+        When I fill in "id_inputPassword" with "password"
+        When I press "Login"
+        Then I should be on "/enterscore/4"
+        When I fill in "id_key" with "round_2_battle"
+        When I fill in "id_value" with "1"
+        Then I press "Enter Score"
+        Then the response status code should be 200
+        Then I should not see "Permission denied"
+        Then I should see "1 not entered. Score is already set"
+
     Scenario: to

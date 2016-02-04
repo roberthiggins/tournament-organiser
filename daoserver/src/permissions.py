@@ -66,7 +66,8 @@ class PermissionsChecker(object):
             "INSERT INTO account_protected_object_permission VALUES (%s, %s)",
             [user, permission_id])
 
-    def check_permission(self, action, user, tournament, game_id=None):
+    def check_permission(self, action, user, for_user, tournament,
+                         game_id=None):
         """
         Entry point method for checking permissions.
         Check that a user is entitled to perform action for tournament
@@ -75,8 +76,12 @@ class PermissionsChecker(object):
         check_action_valid(action)
 
         if action == PERMISSIONS['ENTER_SCORE']:
-            return self.is_admin(user) or self.is_organiser(user, tournament) \
-                or self.is_player(user, tournament, game_id)
+            if self.is_admin(user) or self.is_organiser(user, tournament):
+                return True
+            if user != for_user:
+                return False
+            return self.is_tournament_player(user, tournament) or \
+                self.is_tournament_player(user, tournament, game_id)
 
         return False
 
@@ -102,19 +107,28 @@ class PermissionsChecker(object):
         return cur.fetchone()[0]
 
     @db_conn()
-    def is_player(self, user, tournament, game_id=None):
+    def is_tournament_player(self, user, tournament):
         """user is a player in game."""
         try:
             entry_id = self.entry_db.entry_id(tournament, user)
         except TypeError:
-            return False # The user is not entered into anything
-
-        # Eventually this will be expanded to be any player in a tournament
-        if game_id is None:
             return False
 
         cur.execute(
-            "SELECT count(*) > 0 FROM game_permissions \
-            WHERE game_id = %s AND entry_id = %s",
-            [game_id, entry_id])
+            "SELECT count(*) > 0 FROM entry \
+            WHERE tournament_id = %s AND id = %s",
+            [tournament, entry_id])
         return cur.fetchone()[0]
+
+    @db_conn()
+    def is_game_player(self, user, game_id):
+        """user is a player in game."""
+
+        try:
+            cur.execute(
+                "SELECT count(*) > 0 FROM game_permissions \
+                WHERE game_id = %s AND username = %s",
+                [game_id, user])
+            return cur.fetchone()[0]
+        except ValueError:
+            return False

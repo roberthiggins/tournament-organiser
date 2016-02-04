@@ -98,6 +98,7 @@ def requires_permission(action, error_msg):
             if request.authorization is None or not checker.check_permission(
                     action,
                     request.authorization.username,
+                    username,
                     tournament):
                 # TODO get tournament from the request
                 raise ValueError('Permission denied. {}'.format(error_msg))

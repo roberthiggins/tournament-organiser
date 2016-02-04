@@ -59,6 +59,37 @@ class Game(object):
         self.entry_2 = None if entrants[1] == 'BYE' else entrants[1].entry_id
         self.protected_object_id = protected_object_id
 
+    @db_conn()
+    def is_score_entered(self):
+        """
+        Checks if all scores for the game are entered and updates game row if
+        True.
+
+        When a score is entered we should check to see if all the scores for
+        the game are entered. If yes we can update the game entry
+        """
+
+        cur.execute("SELECT score_entered FROM game WHERE id = %s",
+            [self.game_id])
+        if cur.fetchone()[0]:
+            return True
+
+        cur.execute(
+            "SELECT s.score \
+            FROM game g \
+            INNER JOIN game_entrant ge ON g.id = ge.game_id \
+            INNER JOIN player_score s ON ge.entrant_id = s.entry_id \
+            WHERE g.tourn = %s \
+                AND s.for_round = %s \
+                AND s.entry_id IN %s" ,
+            [self.tournament_id, self.round_id, (self.entry_1, self.entry_2)])
+
+        return None not in [x[0] for x in cur.fetchall()]
+
+    @db_conn(commit=True)
+    def set_score_entered(self):
+        cur.execute("UPDATE game SET score_entered = true WHERE id = %s",
+            [self.game_id])
 
     @db_conn(commit=True)
     def write_to_db(self):

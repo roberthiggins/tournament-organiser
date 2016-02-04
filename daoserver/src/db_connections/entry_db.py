@@ -141,7 +141,7 @@ class EntryDBConnection(object):
         Returns: Integer. The entry_id of entry, if one exists. Throws
             ValueErrors and RuntimeError if tournament or player don't exist.
         """
-        if not tournament_id or not username:
+        if tournament_id is None or username is None:
             raise ValueError('Missing required fields to entry_id')
         if not self.player_db_conn.username_exists(username):
             raise ValueError('Unknown player: %s' % username)

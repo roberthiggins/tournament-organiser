@@ -197,71 +197,79 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
                 else:
                     self.assertFalse(checker.is_organiser(user, tourn))
 
-    def tes_is_player(self):
+    def test_is_player(self):
         """users can be a player by being involved in a game"""
         checker = PermissionsChecker()
 
-        options = [None, 'ranking_test', 'not_a_tournament', '', 'lisa', \
-            'not_a_person', 'superman', 'permission_test', 'lex_luthor', 1, \
-            'homer', 2]
+        options = [None, '', 'lisa', 2, ]
 
-        for tourn in options:
-            for user in options:
-                for game in options:
-                    if user == 'lisa' and tourn == 'ranking_test' \
-                    and game == '1':
-                        self.assertTrue(checker.is_player(user, tourn, game))
-                    elif user == 'homer' and tourn == 'ranking_test' \
-                    and game == '2':
-                        self.assertTrue(checker.is_player(user, tourn, game))
-                    else:
-                        self.assertFalse(checker.is_player(user, tourn, game))
+        self.assertTrue(checker.is_game_player('lisa', 1))
+        self.assertFalse(checker.is_game_player('lisa', 12))
+        self.assertFalse(checker.is_game_player('superman', 1))
+        self.assertFalse(checker.is_game_player('homer', 1))
 
-        # There is a variant without game_id
-        for tourn in options:
-            for user in options:
-                if user == 'lisa' and tourn == 'ranking_test':
-                    self.assertTrue(checker.is_player(user, tourn))
-                elif user == 'homer' and tourn == 'ranking_test':
-                    self.assertTrue(checker.is_player(user, tourn))
-                else:
-                    self.assertFalse(checker.is_player(user, tourn))
+        self.assertTrue(checker.is_tournament_player('lisa', 'ranking_test'))
+        self.assertFalse(checker.is_tournament_player('superman', 'ranking_test'))
 
     def test_check_permissions(self):
         """Test the entrypoint method"""
         checker = PermissionsChecker()
 
         self.assertRaises(
-            ValueError, checker.check_permission, None, None, None)
+            ValueError, checker.check_permission, None, None, None, None)
         self.assertRaises(
-            ValueError, checker.check_permission, '', None, None)
+            ValueError, checker.check_permission, '', None, None, None)
         self.assertRaises(
-            ValueError, checker.check_permission, 'not_a_list', None, None)
+            ValueError, checker.check_permission, 'not_a_list', None, None, None)
         self.assertRaises(
-            ValueError, checker.check_permission, 'ENTER_SCORE', None, None)
-        self.assertRaises(
-            ValueError, checker.check_permission, 'enter_score', None, None)
+            ValueError, checker.check_permission, 'ENTER_SCORE', None, None, None)
 
+        self.assertRaises(
+            ValueError,
+            checker.check_permission,
+            'enter_score',
+            None,
+            None,
+            None)
         self.assertTrue(checker.check_permission(
             'enter_score',
             'lex_luthor',
+            None,
             'permission_test'))
         self.assertTrue(checker.check_permission(
             'enter_score',
             'superman',
+            None,
+            'permission_test'))
+        self.assertTrue(checker.check_permission(
+            'enter_score',
+            'permission_test_player',
+            'permission_test_player',
+            'permission_test'))
+        self.assertFalse(checker.check_permission(
+            'enter_score',
+            'permission_test_player',
+            'charlie_murphy',
+            'permission_test'))
+        self.assertFalse(checker.check_permission(
+            'enter_score',
+            'permission_test_player',
+            None,
             'permission_test'))
         self.assertFalse(checker.check_permission(
             'enter_score',
             'charlie_murphy',
+            None,
             'permission_test'))
 
+from game import get_game_from_score
 class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
     """Comes from a range of files"""
+
     def test_get_game_from_score(self):
         """
         You should be able to determine game from entry_id and the score_key
         """
-        from game import get_game_from_score
 
         # A regular player
         game = get_game_from_score(5, 'sports')
@@ -292,6 +300,15 @@ class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
         self.assertTrue(game is None)
         game = get_game_from_score(1, 'number_fdssfdtassles')
         self.assertTrue(game is None)
+
+    def test_score_entered(self):
+        game = get_game_from_score(5, 'round_1_battle')
+        self.assertTrue(game.is_score_entered())
+
+        game = get_game_from_score(4, 'round_1_battle')
+        self.assertFalse(game.is_score_entered())
+        game.set_score_entered()
+        self.assertTrue(game.is_score_entered())
 
 if __name__ == '__main__':
     unittest.main()

@@ -193,6 +193,12 @@ BEGIN
         ) RETURNING id INTO protected_object_permission_id;
     INSERT INTO account_protected_object_permission VALUES (username, protected_object_permission_id);
 
+    -- Create a basic player
+    INSERT INTO account VALUES ('permission_test_player', 'permission_test_player@darkness.com');
+    INSERT INTO account_security VALUES ('permission_test_player', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
+    INSERT INTO registration VALUES('permission_test_player', 'permission_test');
+    INSERT INTO entry VALUES(default, 'permission_test_player', 'permission_test');
+
     RETURN 0;
 END $$;
 SELECT permission_test_setup();
