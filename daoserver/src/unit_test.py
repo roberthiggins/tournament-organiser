@@ -255,5 +255,43 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
             'charlie_murphy',
             'permission_test'))
 
+class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
+    """Comes from a range of files"""
+    def test_get_game_from_score(self):
+        """
+        You should be able to determine game from entry_id and the score_key
+        """
+        from game import get_game_from_score
+
+        # A regular player
+        game = get_game_from_score(5, 'sports')
+        self.assertTrue(game is not None)
+
+        game = get_game_from_score(5, 'round_1_battle')
+        self.assertTrue(game is not None)
+        self.assertTrue(game.entry_1 is not None)
+        self.assertTrue(game.entry_2 is not None)
+        self.assertTrue(game.entry_1 == 5 or game.entry_2 == 5)
+        self.assertTrue(game.entry_1 == 3 or game.entry_2 == 3)
+
+
+        # A score that isn't tied to a game
+        game = get_game_from_score(1, 'number_tassles')
+        self.assertTrue(game is None)
+
+
+        # A player in a bye
+        game = get_game_from_score(4, 'round_1_battle')
+        self.assertTrue(game is not None)
+        self.assertTrue(game.entry_1 == 4)
+        self.assertTrue(game.entry_2 is None)
+
+
+        # Poor data will return None rather than an error
+        game = get_game_from_score(15, 'round_1_battle')
+        self.assertTrue(game is None)
+        game = get_game_from_score(1, 'number_fdssfdtassles')
+        self.assertTrue(game is None)
+
 if __name__ == '__main__':
     unittest.main()
