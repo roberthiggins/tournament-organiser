@@ -56,10 +56,7 @@ def db_conn(commit=False):
                 if commit:
                     glob['conn'].commit()
             except psycopg2.DatabaseError as err:
-                try:
-                    glob['conn'].rollback()
-                except AttributeError:
-                    pass
+                rollback(glob)
                 raise ValueError(err)
             finally:
                 glob['cur'].close()
@@ -73,3 +70,17 @@ def db_conn(commit=False):
             return res
         return wrapped
     return decorator
+
+def rollback(glob):
+    """
+    Rollback the db transaction.
+
+    If glob has a 'conn' db connection it will be closed.
+    """
+    if glob['conn'] is None:
+        return
+
+    try:
+        glob['conn'].rollback()
+    except AttributeError:
+        pass
