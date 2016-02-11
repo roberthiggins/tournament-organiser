@@ -39,7 +39,6 @@ class EntryDBConnection(object):
     Connection class to the entry database
     """
     def __init__(self):
-        self.player_db_conn = PlayerDBConnection()
         self.db_conn = DBConnection()
         self.con = self.db_conn.con
 
@@ -143,7 +142,7 @@ class EntryDBConnection(object):
         """
         if tournament_id is None or username is None:
             raise ValueError('Missing required fields to entry_id')
-        if not self.player_db_conn.username_exists(username):
+        if not PlayerDBConnection().username_exists(username):
             raise ValueError('Unknown player: %s' % username)
 
         try:
