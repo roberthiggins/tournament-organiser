@@ -67,23 +67,20 @@ class EntryDBConnection(object):
                 WHERE k.key = %s AND c.tournament_id = %s",
                 [score_key, tournament_id])
             row = cur.fetchone()
-            try:
-                score_id = row[0]
-            except TypeError:
-                raise RuntimeError('Unknown category: {}'.format(score_key))
-
-            try:
-                score = int(score)
-            except ValueError:
-                raise psycopg2.DataError()
+            score_id = row[0]
+            score = int(score)
 
             if score < int(row[1]) or score > int(row[2]):
-                raise psycopg2.DataError()
+                raise ValueError()
 
             cur.execute(
                 "INSERT INTO score VALUES(%s, %s, %s)",
                 [entry_id, score_id, score])
 
+        except TypeError:
+            raise RuntimeError('Unknown category: {}'.format(score_key))
+        except ValueError:
+            raise RuntimeError('Invalid score: %s' % score)
         except psycopg2.DataError:
             raise RuntimeError('Invalid score: %s' % score)
         except psycopg2.IntegrityError:
