@@ -34,7 +34,7 @@ class DBConnection(object):
         if self.con:
             self.con.close()
 
-def db_conn(commit=False):
+def db_conn(commit=False, cursor_factory=None):
     """A decorator that gives the function a db_conn to use (cur)"""
     def decorator(func):                            # pylint: disable=C0111
         @wraps(func)
@@ -49,7 +49,7 @@ def db_conn(commit=False):
 
             conn = DBConnection()
             glob['conn'] = conn.con
-            glob['cur'] = glob['conn'].cursor()
+            glob['cur'] = glob['conn'].cursor(cursor_factory=cursor_factory)
 
             try:
                 res = func(*args, **kwargs)
