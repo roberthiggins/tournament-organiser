@@ -6,7 +6,7 @@ from flask import json
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from db_connections.db_connection import DBConnection
+from db_connections.db_connection import db_conn
 from db_connections.player_db import PlayerDBConnection
 
 class Entry(json.JSONEncoder):
@@ -38,10 +38,8 @@ class EntryDBConnection(object):
     """
     Connection class to the entry database
     """
-    def __init__(self):
-        self.db_conn = DBConnection()
-        self.con = self.db_conn.con
 
+    @db_conn(commit=True)
     def enter_score(self, entry_id, score_key, score):
         """
         Enters a score for category into tournament for player.
@@ -58,8 +56,6 @@ class EntryDBConnection(object):
             raise ValueError('Enter the required fields')
 
         try:
-            cur = self.con.cursor()
-
             cur.execute(
                 "SELECT tournament_id FROM entry WHERE id = %s", [entry_id])
             tournament_id = cur.fetchone()[0]
@@ -87,25 +83,19 @@ class EntryDBConnection(object):
             cur.execute(
                 "INSERT INTO score VALUES(%s, %s, %s)",
                 [entry_id, score_id, score])
-            self.con.commit()
 
         except psycopg2.DataError:
-            self.con.rollback()
             raise RuntimeError('Invalid score: %s' % score)
-        except psycopg2.IntegrityError as err:
-            self.con.rollback()
+        except psycopg2.IntegrityError:
             raise RuntimeError(
                 '{} not entered. Score is already set'.format(score))
-        except psycopg2.DatabaseError as err:
-            self.con.rollback()
-            raise RuntimeError(err)
 
+    @db_conn(cursor_factory=DictCursor)
     def entry_list(self, tournament_id):
         """
         Get the list of entries for the specified tournament.
         This simply returns a dump of entries and their info in a big list.
         """
-        cur = self.con.cursor(cursor_factory=DictCursor)
         cur.execute(
             "SELECT \
                 e.id                                    AS entry_id, \
@@ -133,6 +123,7 @@ class EntryDBConnection(object):
 
         return unranked_list
 
+    @db_conn()
     def entry_id(self, tournament_id, username):
         """
         Get the entry_id for the player in the tournament
@@ -145,16 +136,13 @@ class EntryDBConnection(object):
         if not PlayerDBConnection().username_exists(username):
             raise ValueError('Unknown player: %s' % username)
 
-        try:
-            cur = self.con.cursor()
-            cur.execute(
-                "SELECT id FROM entry \
-                WHERE player_id = %s AND tournament_id = %s",
-                [username, tournament_id])
-            return cur.fetchone()[0]
-        except psycopg2.DatabaseError as err:
-            raise err
+        cur.execute(
+            "SELECT id FROM entry \
+            WHERE player_id = %s AND tournament_id = %s",
+            [username, tournament_id])
+        return cur.fetchone()[0]
 
+    @db_conn()
     def entry_info(self, entry_id):
         """ Given an entry, get information about the user and tournament"""
         if not entry_id:
@@ -165,7 +153,6 @@ class EntryDBConnection(object):
             raise ValueError('Entry ID must be an integer')
 
         try:
-            cur = self.con.cursor()
             cur.execute("SELECT a.username, t.name \
                 FROM entry e INNER JOIN account a on e.player_id = a.username \
                 INNER JOIN tournament t on e.tournament_id = t.name \
@@ -181,9 +168,9 @@ class EntryDBConnection(object):
         except psycopg2.DatabaseError as err:
             raise RuntimeError(err)
 
+    @db_conn()
     def get_scores_for_entry(self, entry_id):
         """ Get all the score_key:score pairs for an entry"""
-        cur = self.con.cursor(cursor_factory=DictCursor)
         cur.execute("SELECT key, score, category, min_val, max_val \
             FROM player_score WHERE entry_id = %s", [entry_id])
         return [
