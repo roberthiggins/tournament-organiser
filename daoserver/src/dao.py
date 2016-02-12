@@ -29,6 +29,7 @@ PLAYER_DB_CONN = PlayerDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
 TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
 
+@APP.errorhandler(TypeError)
 @APP.errorhandler(RuntimeError)
 @APP.errorhandler(ValueError)
 def input_error(err):

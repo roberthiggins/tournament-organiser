@@ -78,13 +78,13 @@ class EntryDBConnection(object):
                 [entry_id, score_id, score])
 
         except TypeError:
-            raise RuntimeError('Unknown category: {}'.format(score_key))
+            raise TypeError('Unknown category: {}'.format(score_key))
         except ValueError:
-            raise RuntimeError('Invalid score: %s' % score)
+            raise ValueError('Invalid score: %s' % score)
         except psycopg2.DataError:
-            raise RuntimeError('Invalid score: %s' % score)
+            raise ValueError('Invalid score: %s' % score)
         except psycopg2.IntegrityError:
-            raise RuntimeError(
+            raise ValueError(
                 '{} not entered. Score is already set'.format(score))
 
     @db_conn(cursor_factory=DictCursor)
