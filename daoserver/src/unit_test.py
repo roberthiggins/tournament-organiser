@@ -310,5 +310,22 @@ class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
         game.set_score_entered()
         self.assertTrue(game.is_score_entered())
 
+    def test_list_scores_for_game(self):
+        """
+        Games have a scores_entered which should return all the scores entered
+        for by each entrant.
+        """
+        game = get_game_from_score(4, 'round_1_battle')
+        compare(
+            game.scores_entered(),
+            [(4, 'round_1_battle', None), (4, 'sports', 5)])
+
+        game = get_game_from_score(2, 'round_1_battle')
+        compare(
+            game.scores_entered(),
+            [(6, 'round_1_battle', 0), (2, 'round_1_battle', 20),
+            (6, 'sports', 5), (2, 'sports', 1)])
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -91,6 +91,30 @@ class Game(object):
         cur.execute("UPDATE game SET score_entered = true WHERE id = %s",
             [self.game_id])
 
+    @db_conn()
+    def scores_entered(self):
+        """
+        Get a list of all scores entered for the game by all entrants.
+
+        Returns:
+            - a list of tuples (entry_id, score_key, score_entered)
+        """
+        cur.execute(
+            "SELECT \
+                s.entry_id, \
+                k.key, \
+                s.value \
+            FROM score s \
+            INNER JOIN score_key k       ON s.score_key_id = k.id \
+            INNER JOIN round_score rs    ON rs.score_key_id = k.id \
+            INNER JOIN score_category sc ON sc.id = k.category \
+            WHERE sc.tournament_id = %s \
+                AND rs.round_id = %s \
+                AND s. entry_id IN %s",
+            [self.tournament_id, self.round_id, (self.entry_1, self.entry_2)])
+
+        return cur.fetchall()
+
     @db_conn(commit=True)
     def write_to_db(self):
         """Write a game to db"""
