@@ -191,11 +191,13 @@ class TournamentDBConnection(object):
 
         cur.execute(
             "SELECT COUNT(*) FROM tournament_round \
-            WHERE tournament_name = %s AND id = %s",
+            WHERE tournament_name = %s AND ordering = %s",
             [tournament_id, round_id]
         )
+
+        # It may be that the mission has not been set for that round.
         if cur.fetchone()[0] == 0:
-            raise ValueError("Draw not ready. Contact TO")
+            raise ValueError("Draw not ready. Mission not set. Contact TO")
         cur.execute(
             "SELECT * FROM score_key k \
             INNER JOIN round_score s ON s.score_key_id = k.id \

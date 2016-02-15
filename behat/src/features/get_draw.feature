@@ -15,5 +15,5 @@ Feature: Check the draw
             |                   | 1     | 404    |                              |
             |ranking_test       | 2     | 200    | lisa                         |
             |ranking_test       | 1     | 200    | lisa                         |
-            |ranking_test       | 3     | 200    | Draw not ready. Contact TO   |
+            |ranking_test       | 4     | 200    | Draw not ready. Mission not set. Contact TO   |
             |ranking_test       |       | 404    |                              |
