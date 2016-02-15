@@ -302,12 +302,37 @@ class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
         game = get_game_from_score(1, 'number_fdssfdtassles')
         self.assertTrue(game is None)
 
+
+    @db_conn()
     def test_score_entered(self):
+
+        # A completed game
         game = get_game_from_score(5, 'round_1_battle')
+        compare(game.entry_1, 3)
+        compare(game.entry_2, 5)
         self.assertTrue(game.is_score_entered())
 
+        # a bye should be false
+        # TODO resolve Bye Scoring
         game = get_game_from_score(4, 'round_1_battle')
+        compare(game.entry_1, 4)
+        compare(game.entry_2, None)
         self.assertFalse(game.is_score_entered())
+
+        # Ensure the rd2 game bart vs. maggie is listed as not scored. This
+        # will force a full check. Maggie's score hasn't been entered.
+        cur.execute("UPDATE game SET score_entered = False WHERE id = 5")
+        game = get_game_from_score(5, 'round_2_battle')
+
+        compare(game.entry_1, 6)
+        compare(game.entry_2, 5)
+        self.assertFalse(game.is_score_entered())
+
+        # Enter the final score for maggie
+        cur.execute("INSERT INTO score VALUES(6, 4, 2)")
+        conn.commit()
+
+        self.assertTrue(game.is_score_entered())
         game.set_score_entered()
         self.assertTrue(game.is_score_entered())
 

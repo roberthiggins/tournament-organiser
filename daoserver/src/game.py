@@ -78,17 +78,20 @@ class Game(object):
         if cur.fetchone()[0]:
             return True
 
+        # expected scores
         cur.execute(
-            "SELECT s.score \
-            FROM game g \
-            INNER JOIN game_entrant ge ON g.id = ge.game_id \
-            INNER JOIN player_score s ON ge.entrant_id = s.entry_id \
-            WHERE g.tourn = %s \
-                AND s.for_round = %s \
-                AND s.entry_id IN %s" ,
-            [self.tournament_id, self.round_id, (self.entry_1, self.entry_2)])
+            "SELECT count(*) \
+            FROM score_key k \
+            INNER JOIN round_score rs    ON rs.score_key_id = k.id \
+            INNER JOIN score_category sc ON sc.id = k.category \
+            WHERE sc.tournament_id = %s \
+                AND rs.round_id = %s",
+            [self.tournament_id, self.round_id])
+        scores_for_round = int(cur.fetchone()[0])
+        scores_entered = [x[2] for x in self.scores_entered()]
 
-        return None not in [x[0] for x in cur.fetchall()]
+        return None not in scores_entered \
+        and len(scores_entered) == (scores_for_round * self.num_entrants())
 
     @db_conn(commit=True)
     def set_score_entered(self):
