@@ -131,6 +131,10 @@ class Tournament(object):
                         PERMISSIONS['ENTER_SCORE'],
                         game.protected_object_id)
 
+                # The person playing the bye gets no points at the time
+                if None in [game.entry_1, game.entry_2]:
+                    game.set_score_entered()
+
         except ValueError as err:
             if 'duplicate key value violates unique constraint "game_pkey"' \
             not in str(err):
