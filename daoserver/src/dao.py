@@ -393,7 +393,8 @@ def set_tournament_score():                             # pylint: disable=E0602
         key=key,
         min_val=request.values.get('minVal'),
         max_val=request.values.get('maxVal'),
-        category=scoreCategory)
+        category=scoreCategory,
+        round_id=request.values.get('round'))
     return make_response('Score created', 200)
 
 @APP.route('/tournamentDetails/<t_name>', methods=['GET'])

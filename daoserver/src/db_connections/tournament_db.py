@@ -172,8 +172,9 @@ class TournamentDBConnection(object):
 
         try:
             cur.execute(
-                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s)",
+                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s) RETURNING id",
                 [key, max_val, min_val, category])
+            return cur.fetchone()[0]
 
         except psycopg2.IntegrityError:
             raise psycopg2.DatabaseError('Score already set')
@@ -203,3 +204,13 @@ class TournamentDBConnection(object):
             INNER JOIN round_score s ON s.score_key_id = k.id \
             WHERE s.round_id = %s", [round_id])
         return cur.fetchall()
+
+    @db_conn(commit=True)
+    def set_score_key_for_round(self, score_key_id, round_id):
+        """
+        Attach the score_key to the round. Will then be accessible through
+        get_score_keys_for_round
+        """
+        cur.execute("INSERT INTO round_score VALUES( %s, %s)",
+            [score_key_id, round_id])
+

@@ -176,7 +176,7 @@ class Tournament(object):
         self.tourn_db_conn.set_rounds(self.tournament_id, int(num_rounds))
 
     @must_exist_in_db
-    def set_score(self, key, category, min_val=0, max_val=20):
+    def set_score(self, key, category, min_val=0, max_val=20, round_id=None):
         """
         Set a score category that a player is eligible for in a tournament.
 
@@ -187,17 +187,21 @@ class Tournament(object):
             - key - unique name e.g. round_4_comp
             - (opt) min_val - for score - default 0
             - (opt) max_val - for score - default 20
+            - (opt) round_id - the score is for the round
         """
         if not min_val:
             min_val = 0
         if not max_val:
             max_val = 20
 
-        self.tourn_db_conn.set_score_key(
+        score_key = self.tourn_db_conn.set_score_key(
             key=key,
             category=category,
             min_val=min_val,
             max_val=max_val)
+
+        if round_id is not None:
+            self.tourn_db_conn.set_score_key_for_round(score_key, round_id)
 
     @must_exist_in_db
     def get_score_keys_for_round(self, round_id='next'):
