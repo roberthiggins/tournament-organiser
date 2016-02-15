@@ -5,6 +5,7 @@ Tests for the Round Robin DrawStrategy
 import unittest
 from testfixtures import compare
 
+from db_connections.db_connection import db_conn
 from db_connections.entry_db import Entry
 from matching_strategy import RoundRobin
 from table_strategy import ProtestAvoidanceStrategy, Table
@@ -315,17 +316,24 @@ class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
         Games have a scores_entered which should return all the scores entered
         for by each entrant.
         """
+        # Bye
         game = get_game_from_score(4, 'round_1_battle')
         compare(
             game.scores_entered(),
             [(4, 'round_1_battle', None), (4, 'sports', 5)])
 
+        # Regular, completed game
         game = get_game_from_score(2, 'round_1_battle')
         compare(
             game.scores_entered(),
             [(6, 'round_1_battle', 0), (2, 'round_1_battle', 20),
             (6, 'sports', 5), (2, 'sports', 1)])
 
+        # Game partially filled in
+        game = get_game_from_score(5, 'round_2_battle')
+        compare(
+            game.scores_entered(),
+            [(5, 'round_2_battle', 5)])
 
 if __name__ == '__main__':
     unittest.main()
