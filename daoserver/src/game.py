@@ -59,6 +59,10 @@ class Game(object):
         self.entry_2 = None if entrants[1] == 'BYE' else entrants[1].entry_id
         self.protected_object_id = protected_object_id
 
+    def num_entrants(self):
+        """The number of entrants in the game"""
+        return 1 if None in [self.entry_1, self.entry_2] else 2
+
     @db_conn()
     def is_score_entered(self):
         """
