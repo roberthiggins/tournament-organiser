@@ -110,7 +110,7 @@ BEGIN
     INSERT INTO entry VALUES(default, 'maggie', 'ranking_test') RETURNING id INTO eid;
     INSERT INTO score VALUES(eid, rd1key, 0);
     INSERT INTO table_allocation VALUES(eid, 1, 1);
-    INSERT INTO score VALUES(eid, rd2key, 5);
+     --INSERT INTO score VALUES(eid, rd2key, 5);
     INSERT INTO table_allocation VALUES(eid, 1, 2);
     INSERT INTO score VALUES(eid, sportskey, 5);
 
@@ -124,7 +124,7 @@ BEGIN
     INSERT INTO account_protected_object_permission VALUES ('lisa', permission_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 1, 'ranking_test', 2, protect_object_id) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, 1, 'ranking_test', 2, protect_object_id, True) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 2);
     INSERT INTO game_entrant VALUEs(game_id, 6);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
@@ -132,12 +132,38 @@ BEGIN
     INSERT INTO account_protected_object_permission VALUES ('maggie', permission_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 1, 'ranking_test', 3, protect_object_id) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, 1, 'ranking_test', 3, protect_object_id, True) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 3);
     INSERT INTO game_entrant VALUEs(game_id, 5);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('marge', permission_id);
     INSERT INTO account_protected_object_permission VALUES ('bart', permission_id);
+
+    -- The draw for round 2 has already been completed.
+    SELECT id INTO protected_action_id FROM protected_object_action WHERE description = 'enter_score';
+
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO game VALUES(DEFAULT, 2, 'ranking_test', 1, protect_object_id, True) RETURNING id INTO game_id;
+    INSERT INTO game_entrant VALUEs(game_id, 3);
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
+    INSERT INTO account_protected_object_permission VALUES ('marge', permission_id);
+
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO game VALUES(DEFAULT, 2, 'ranking_test', 2, protect_object_id) RETURNING id INTO game_id;
+    INSERT INTO game_entrant VALUEs(game_id, 6);
+    INSERT INTO game_entrant VALUEs(game_id, 5);
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
+    INSERT INTO account_protected_object_permission VALUES ('maggie', permission_id);
+    INSERT INTO account_protected_object_permission VALUES ('bart', permission_id);
+
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO game VALUES(DEFAULT, 2, 'ranking_test', 3, protect_object_id, True) RETURNING id INTO game_id;
+    INSERT INTO game_entrant VALUEs(game_id, 2);
+    INSERT INTO game_entrant VALUEs(game_id, 4);
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
+    INSERT INTO account_protected_object_permission VALUES ('homer', permission_id);
+    INSERT INTO account_protected_object_permission VALUES ('lisa', permission_id);
+
 
     RETURN 0;
 END $$;
