@@ -47,4 +47,4 @@ ADD bash_aliases /root/.bash_aliases
 ENV DB_NAME to-db
 ENV DB_PASSWORD FuEm7l003bfd6zM
 
-CMD python -u webapp/dao.py
+CMD python -u webapp/app.py

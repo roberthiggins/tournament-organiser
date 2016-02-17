@@ -5,13 +5,11 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
-import datetime
 import json
 import jsonpickle
-import os
 import re
 
-from flask import Flask, request, make_response, jsonify
+from flask import Blueprint, request, make_response, jsonify
 from functools import wraps
 
 from db_connections.entry_db import EntryDBConnection
@@ -22,12 +20,13 @@ from db_connections.registration_db import RegistrationDBConnection
 from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
 
-APP = Flask(__name__)
 ENTRY_DB_CONN = EntryDBConnection()
 FEEDBACK_DB_CONN = FeedbackDBConnection()
 PLAYER_DB_CONN = PlayerDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
 TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
+
+APP = Blueprint('APP', __name__, url_prefix='')
 
 @APP.errorhandler(TypeError)
 @APP.errorhandler(RuntimeError)
@@ -413,17 +412,3 @@ def user_details(u_name=None):
     TODO security
     """
     return jsonify({u_name: PLAYER_DB_CONN.user_details(u_name)})
-
-if __name__ == "__main__":
-    # Bind to PORT if defined, otherwise default to 5000.
-    PORT = int(os.environ.get('PORT', 5000))
-    APP.run(host='0.0.0.0', port=PORT)
-
-    # pylint: disable=W0232
-    class DatetimeHandler(jsonpickle.handlers.BaseHandler):
-        """Custom handler to get datetimes as ISO dates"""
-        def flatten(self, obj, data):   # pylint: disable=C0111,W0613,R0201
-            return obj.isoformat()
-
-    jsonpickle.handlers.registry.register(datetime.datetime, DatetimeHandler)
-    jsonpickle.handlers.registry.register(datetime.date, DatetimeHandler)
