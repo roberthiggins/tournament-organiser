@@ -12,6 +12,15 @@ from flask import Flask
 def create_app():
     """Config for the app"""
     app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = \
+        'postgresql://docker:{}@{}:{}/{}'.format(
+            os.environ['DB_PASSWORD'],
+            os.environ['DB_PORT_5432_TCP_ADDR'],
+            os.environ['DB_PORT_5432_TCP_PORT'],
+            os.environ['DB_NAME'])
+
+    from models.feedback import db as feedback_db
+    feedback_db.init_app(app)
 
     from dao import APP
     app.register_blueprint(APP)

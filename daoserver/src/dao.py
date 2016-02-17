@@ -13,15 +13,14 @@ from flask import Blueprint, request, make_response, jsonify
 from functools import wraps
 
 from db_connections.entry_db import EntryDBConnection
-from db_connections.feedback_db import FeedbackDBConnection
 from db_connections.player_db import PlayerDBConnection
 from db_connections.tournament_db import TournamentDBConnection
 from db_connections.registration_db import RegistrationDBConnection
+from models.feedback import Feedback
 from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
 
 ENTRY_DB_CONN = EntryDBConnection()
-FEEDBACK_DB_CONN = FeedbackDBConnection()
 PLAYER_DB_CONN = PlayerDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
 TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
@@ -291,7 +290,8 @@ def place_feedback():
     _feedback = request.form['inputFeedback'].strip('\n\r\t+')
     if re.match(r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
-    FEEDBACK_DB_CONN.submit_feedback(_feedback)
+    Feedback(_feedback).write()
+
     return make_response("Thanks for you help improving the site", 200)
 
 @APP.route('/rankEntries/<tournament_id>', methods=['GET'])
