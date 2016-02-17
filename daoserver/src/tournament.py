@@ -59,7 +59,7 @@ class Tournament(object):
         PermissionsChecker().add_permission(
             self.creator_username,
             PERMISSIONS['ENTER_SCORE'],
-            self.tourn_db_conn.tournament_details(self.tournament_id)[5])
+            self.tourn_db_conn.tournament_details(self.tournament_id)[4])
 
     @must_exist_in_db
     def create_score_category(self, category, percentage):

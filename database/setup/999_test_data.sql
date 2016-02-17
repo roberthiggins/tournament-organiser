@@ -15,7 +15,7 @@ BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
 
-    INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10', DEFAULT, DEFAULT, protect_object_id);
+    INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10', DEFAULT, protect_object_id);
 
     INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT) RETURNING id INTO fanciness;
     INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 4, 15, fanciness);
@@ -52,7 +52,7 @@ DECLARE
 BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12', DEFAULT, DEFAULT, protect_object_id);
+    INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12', DEFAULT, protect_object_id);
     INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1, 'Kill');
     INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2, DEFAULT);
 
@@ -177,7 +177,7 @@ DECLARE
 BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3, DEFAULT, protect_object_id);
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3, protect_object_id);
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Mission the First');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, 'Mission the Second');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 3, 'Mission the Third');
@@ -204,7 +204,7 @@ BEGIN
 
     -- Create a tournament that will be restricted
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', DEFAULT, DEFAULT, protect_object_id);
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', DEFAULT, protect_object_id);
 
     -- Create a user with access to modify
     username = 'lex_luthor';

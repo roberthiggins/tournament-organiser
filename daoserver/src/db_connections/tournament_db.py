@@ -63,7 +63,7 @@ class TournamentDBConnection(object):
         protected_object_id = cur.fetchone()[0]
         cur.execute(
             "INSERT INTO tournament VALUES \
-            (default, %s, %s, default, default, %s)",
+            (default, %s, %s, default, %s)",
             [tournament['name'], tournament['date'], protected_object_id])
 
     @db_conn(commit=True)
@@ -113,13 +113,12 @@ class TournamentDBConnection(object):
     def list_tournaments(self):
         """Get a list of tournaments"""
         cur.execute(
-            "SELECT name, date, num_rounds, score_id FROM tournament")
+            "SELECT name, date, num_rounds FROM tournament")
         raw_list = cur.fetchall()
 
         return [{'name': x[0],
                  'date': x[1],
-                 'rounds': x[2],
-                 'scoring': x[3]} for x in raw_list]
+                 'rounds': x[2]} for x in raw_list]
 
     @db_conn(commit=True)
     def set_rounds(self, tournament_id, num_rounds):
