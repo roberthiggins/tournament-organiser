@@ -22,6 +22,9 @@ def create_app():
     from models.feedback import db as feedback_db
     feedback_db.init_app(app)
 
+    from models.protected_object import db as protected_object_db
+    protected_object_db.init_app(app)
+
     from dao import APP
     app.register_blueprint(APP)
 
