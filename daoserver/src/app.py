@@ -25,6 +25,9 @@ def create_app():
     from models.protected_object import db as protected_object_db
     protected_object_db.init_app(app)
 
+    from models.tournament import db as tournament_db
+    tournament_db.init_app(app)
+
     from dao import APP
     app.register_blueprint(APP)
 

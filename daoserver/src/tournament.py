@@ -8,6 +8,7 @@ import datetime
 from db_connections.entry_db import EntryDBConnection
 from db_connections.tournament_db import TournamentDBConnection
 from matching_strategy import RoundRobin
+from models.tournament import Tournament as TournamentDB
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
@@ -53,8 +54,9 @@ class Tournament(object):
         if date.date() < datetime.date.today():
             raise ValueError('Enter a valid date')
 
-        self.tourn_db_conn.add_tournament(
-            {'name' : self.tournament_id, 'date' : date})
+        dao = TournamentDB(self.tournament_id)
+        dao.date = date
+        dao.write()
 
         PermissionsChecker().add_permission(
             self.creator_username,

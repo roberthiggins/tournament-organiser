@@ -50,23 +50,6 @@ class TournamentDBConnection(object):
         return cur.fetchone()[0]
 
     @db_conn(commit=True)
-    def add_tournament(self, tournament):
-        """
-        Add a tournament.
-        Expects:
-            - tournament - dict {
-                            'name' - unique name,
-                            'date' - YY-MM-DD}
-        """
-        cur.execute(
-            "INSERT INTO protected_object VALUES (default) RETURNING id")
-        protected_object_id = cur.fetchone()[0]
-        cur.execute(
-            "INSERT INTO tournament VALUES \
-            (default, %s, %s, default, %s)",
-            [tournament['name'], tournament['date'], protected_object_id])
-
-    @db_conn(commit=True)
     def create_score_category(self, category, tournament_id, percentage):
         """
         Create a score category for a tournament.
