@@ -177,7 +177,12 @@ class Tournament(object):
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
-        self.tourn_db_conn.set_rounds(self.tournament_id, int(num_rounds))
+        tourn = TournamentDB.query.filter_by(name=self.tournament_id).first()
+        tourn.num_rounds = int(num_rounds)
+        tourn.write()
+        self.tourn_db_conn.remove_excess_rounds(
+            self.tournament_id,
+            int(num_rounds))
 
     @must_exist_in_db
     def set_score(self, key, category, min_val=0, max_val=20, round_id=None):

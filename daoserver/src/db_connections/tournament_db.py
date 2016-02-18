@@ -86,11 +86,8 @@ class TournamentDBConnection(object):
                  'percentage': x[2]} for x in raw_list]
 
     @db_conn(commit=True)
-    def set_rounds(self, tournament_id, num_rounds):
+    def remove_excess_rounds(self, tournament_id, num_rounds):
         """Set the number of rounds for a tournament"""
-        cur.execute(
-            "UPDATE tournament SET num_rounds = %s WHERE name = %s",
-            [num_rounds, tournament_id])
         cur.execute("DELETE FROM tournament_round \
                     WHERE tournament_name = %s AND ordering > %s",
                     [tournament_id, num_rounds])
