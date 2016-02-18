@@ -101,8 +101,11 @@ class Tournament(object):
         Returns json. The only key is 'tournaments' and the value is a list of
         tournament names
         """
-        tourn_db_conn = TournamentDBConnection()
-        return {'tournaments' : tourn_db_conn.list_tournaments()}
+        details = [
+            {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
+            for x in TournamentDB.query.all()]
+
+        return {'tournaments' : details}
 
     @must_exist_in_db
     def make_draw(self, round_id=0):

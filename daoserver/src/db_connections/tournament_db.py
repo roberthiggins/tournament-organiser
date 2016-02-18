@@ -85,17 +85,6 @@ class TournamentDBConnection(object):
                  'name': x[1],
                  'percentage': x[2]} for x in raw_list]
 
-    @db_conn()
-    def list_tournaments(self):
-        """Get a list of tournaments"""
-        cur.execute(
-            "SELECT name, date, num_rounds FROM tournament")
-        raw_list = cur.fetchall()
-
-        return [{'name': x[0],
-                 'date': x[1],
-                 'rounds': x[2]} for x in raw_list]
-
     @db_conn(commit=True)
     def set_rounds(self, tournament_id, num_rounds):
         """Set the number of rounds for a tournament"""
