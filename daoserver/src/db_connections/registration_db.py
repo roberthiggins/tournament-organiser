@@ -6,7 +6,7 @@ import psycopg2
 
 from db_connections.db_connection import DBConnection
 from db_connections.player_db import PlayerDBConnection
-from db_connections.tournament_db import TournamentDBConnection
+from models.tournament import Tournament
 
 class RegistrationDBConnection(object):
     """
@@ -14,7 +14,6 @@ class RegistrationDBConnection(object):
     """
     def __init__(self):
         self.player_db_conn = PlayerDBConnection()
-        self.tournament_db_conn = TournamentDBConnection()
         self.db_conn = DBConnection()
         self.con = self.db_conn.con
 
@@ -25,7 +24,7 @@ class RegistrationDBConnection(object):
             - tournament_id - existing tounament name as per listtournaments
             - username - existing username
         """
-        if not self.tournament_db_conn.tournament_exists(tournament_id) \
+        if Tournament.query.filter_by(name=tournament_id).first() is None \
         or not self.player_db_conn.username_exists(username):
             raise RuntimeError("Check username and tournament")
 

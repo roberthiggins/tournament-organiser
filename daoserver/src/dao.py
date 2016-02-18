@@ -215,8 +215,9 @@ def enter_tournament_score():
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
+    tourn = Tournament(tournament)
     # pylint: disable=E0602
-    if not TOURNAMENT_DB_CONNECTION.tournament_exists(tournament):
+    if not tourn.exists_in_db:
         raise ValueError('Unknown tournament: {}'.format(tournament))
 
     # pylint: disable=E0602
@@ -267,7 +268,7 @@ def set_missions():
     # pylint: disable=E0602
     tourn = Tournament(tournamentId)
     # pylint: disable=E0602
-    rounds = tourn.details()['details']['rounds']
+    rounds = tourn.details()['rounds']
     json_missions = json.loads(missions)
 
     if len(json_missions) != int(rounds):

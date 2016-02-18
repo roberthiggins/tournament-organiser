@@ -42,13 +42,6 @@ class TournamentDBConnection(object):
                         VALUES(DEFAULT, %s, %s, %s)",
                         [tournament, round_id, mission])
 
-    @db_conn()
-    def tournament_exists(self, name):
-        """Check if a tournament exists with the passed name"""
-        cur.execute("SELECT COUNT(*) > 0 FROM tournament WHERE name = %s",
-                    [name])
-        return cur.fetchone()[0]
-
     @db_conn(commit=True)
     def create_score_category(self, category, tournament_id, percentage):
         """
@@ -112,18 +105,6 @@ class TournamentDBConnection(object):
         cur.execute("DELETE FROM tournament_round \
                     WHERE tournament_name = %s AND ordering > %s",
                     [tournament_id, num_rounds])
-
-    @db_conn()
-    def tournament_details(self, name):
-        """
-        Get information about a tournament.
-        Returns none if tournie non-existent
-        """
-        if not self.tournament_exists(name):
-            raise RuntimeError('No information is available on "%s" ' % name)
-
-        cur.execute("SELECT * FROM tournament WHERE name = %s", [name])
-        return cur.fetchone()
 
     @db_conn(commit=True)
     def set_score_key(self, key, category, min_val, max_val):

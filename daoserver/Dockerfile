@@ -25,7 +25,7 @@ RUN pip install passlib
 # shouldn't run update manually. However it is the only way to get
 # python-dev or postgresql to install
 RUN apt-get update && apt-get install -y postgresql python-dev libpq-dev
-RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate
+RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate Flask-Testing
 
 # jsonpickle is used for serializing objects into JSON
 RUN pip install jsonpickle

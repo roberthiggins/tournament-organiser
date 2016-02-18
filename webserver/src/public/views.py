@@ -141,7 +141,7 @@ def set_missions(request, tournament_id):
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
-    rounds = int(json.loads(t_details.content)['details']['rounds'])
+    rounds = int(json.loads(t_details.content)['rounds'])
 
     existing_missions = json.loads(
         from_dao('/getMissions/{}'.format(tournament_id)).content)
@@ -205,7 +205,7 @@ def set_rounds(request, tournament_id):
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
-    rounds = int(json.loads(t_details.content)['details']['rounds'])
+    rounds = int(json.loads(t_details.content)['rounds'])
     rounds = 5 if rounds < 1 else rounds
 
     form = SetRoundsForm(

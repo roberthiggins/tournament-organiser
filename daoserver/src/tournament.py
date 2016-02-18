@@ -30,8 +30,8 @@ class Tournament(object):
     def __init__(self, tournament_id=None, ranking_strategy=None, creator=None):
         self.tourn_db_conn = TournamentDBConnection()
         self.tournament_id = tournament_id
-        self.exists_in_db = tournament_id is not None \
-            and self.tourn_db_conn.tournament_exists(tournament_id)
+        self.exists_in_db = TournamentDB.query.filter_by(
+            name=tournament_id).first() is not None
         self.ranking_strategy = \
             ranking_strategy(tournament_id, self.list_score_categories) \
             if ranking_strategy \
@@ -61,7 +61,7 @@ class Tournament(object):
         PermissionsChecker().add_permission(
             self.creator_username,
             PERMISSIONS['ENTER_SCORE'],
-            self.tourn_db_conn.tournament_details(self.tournament_id)[4])
+            dao.protected_object_id)
 
     @must_exist_in_db
     def create_score_category(self, category, percentage):
@@ -75,15 +75,14 @@ class Tournament(object):
         Get details about a tournament. This includes entrants and format
         information
         """
-        details = self.tourn_db_conn.tournament_details(self.tournament_id)
+        details = TournamentDB.query.filter_by(name=self.tournament_id).first()
+        if details is None:
+            raise RuntimeError('No information is available on "%s" ' % name)
 
         return {
-            'name': details[1],
-            'date': details[2],
-            'details': {
-                'rounds': details[3] if details[3] is not None else 0,
-                'score_format': details[4] if details[4] is not None else 'N/A',
-            }
+            'name': details.name,
+            'date': details.date,
+            'rounds': details.num_rounds,
         }
 
     @must_exist_in_db
