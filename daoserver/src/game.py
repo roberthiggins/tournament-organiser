@@ -74,7 +74,7 @@ class Game(object):
         """
 
         cur.execute("SELECT score_entered FROM game WHERE id = %s",
-            [self.game_id])
+                    [self.game_id])
         if cur.fetchone()[0]:
             return True
 
@@ -95,8 +95,12 @@ class Game(object):
 
     @db_conn(commit=True)
     def set_score_entered(self):
+        """
+        Regardless of whether scores have actually been entered you can set
+        this to true in the game
+        """
         cur.execute("UPDATE game SET score_entered = true WHERE id = %s",
-            [self.game_id])
+                    [self.game_id])
 
     @db_conn()
     def scores_entered(self):

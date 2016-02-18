@@ -54,6 +54,7 @@ def create_or_update_user(login_creds):
     user = json.loads(from_dao('/userDetails/%s' % u_name).content).get(u_name)
 
     try:
+        # pylint: disable=E1101
         local_user = User.objects.get(username=u_name)
         local_user.set_password(p_word)
         local_user.email = user[0]

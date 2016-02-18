@@ -121,7 +121,8 @@ class TournamentDBConnection(object):
 
         try:
             cur.execute(
-                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s) RETURNING id",
+                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s) \
+                RETURNING id",
                 [key, max_val, min_val, category])
             return cur.fetchone()[0]
 
@@ -161,5 +162,5 @@ class TournamentDBConnection(object):
         get_score_keys_for_round
         """
         cur.execute("INSERT INTO round_score VALUES( %s, %s)",
-            [score_key_id, round_id])
+                    [score_key_id, round_id])
 

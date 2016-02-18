@@ -14,6 +14,7 @@ from models.tournament import db as tournament_db
 from table_strategy import ProtestAvoidanceStrategy, Table
 from tournament import Tournament
 
+# pylint: disable=C0111,C0103,W0232
 class TournamentInfo(TestCase):
 
     def create_app(self):
@@ -36,10 +37,10 @@ class TournamentInfo(TestCase):
 
         self.assertRaises(NotImplementedError, tourn.get_score_keys_for_round)
         compare(tourn.get_score_keys_for_round(1),
-            [(3, "round_1_battle", 0, 20, 3, 3, 1),
-            (5, "sports", 1, 5, 4, 5, 1)])
+                [(3, "round_1_battle", 0, 20, 3, 3, 1),
+                 (5, "sports", 1, 5, 4, 5, 1)])
         compare(tourn.get_score_keys_for_round(2),
-            [(4, "round_2_battle", 0, 20, 3, 4, 2)])
+                [(4, "round_2_battle", 0, 20, 3, 4, 2)])
 
         self.assertRaises(ValueError, tourn.get_score_keys_for_round, 3)
 
@@ -47,9 +48,9 @@ class TournamentInfo(TestCase):
         compare(tourn.get_score_keys_for_round(3), []) # no score yet
 
         tourn.set_score(key='round_3_battle', min_val=0, max_val=25,
-            category=3, round_id=3)
+                        category=3, round_id=3)
         compare(tourn.get_score_keys_for_round(3)[0][1:],
-            ('round_3_battle', 25, 0, 3, 34, 3))
+                ('round_3_battle', 25, 0, 3, 34, 3))
 
 class DrawStrategyTests(unittest.TestCase):             # pylint: disable=R0904
     """Tests for `matching_strategy.py`."""
@@ -251,7 +252,8 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
         self.assertFalse(checker.is_game_player('homer', 1))
 
         self.assertTrue(checker.is_tournament_player('lisa', 'ranking_test'))
-        self.assertFalse(checker.is_tournament_player('superman', 'ranking_test'))
+        self.assertFalse(
+            checker.is_tournament_player('superman', 'ranking_test'))
 
     def test_check_permissions(self):
         """Test the entrypoint method"""
@@ -261,10 +263,10 @@ class PermissionsTests(unittest.TestCase):             # pylint: disable=R0904
             ValueError, checker.check_permission, None, None, None, None)
         self.assertRaises(
             ValueError, checker.check_permission, '', None, None, None)
-        self.assertRaises(
-            ValueError, checker.check_permission, 'not_a_list', None, None, None)
-        self.assertRaises(
-            ValueError, checker.check_permission, 'ENTER_SCORE', None, None, None)
+        self.assertRaises(ValueError, checker.check_permission, 'not_a_list',
+                          None, None, None)
+        self.assertRaises(ValueError, checker.check_permission, 'ENTER_SCORE',
+                          None, None, None)
 
         self.assertRaises(
             ValueError,
@@ -393,7 +395,7 @@ class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
         compare(
             game.scores_entered(),
             [(6, 'round_1_battle', 0), (2, 'round_1_battle', 20),
-            (6, 'sports', 5), (2, 'sports', 1)])
+             (6, 'sports', 5), (2, 'sports', 1)])
 
         # Game partially filled in
         game = get_game_from_score(5, 'round_2_battle')

@@ -1,3 +1,8 @@
+"""
+ORM module for feedback from the user
+"""
+# pylint: disable=C0103
+
 import datetime
 
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -27,4 +32,3 @@ class Feedback(db.Model):
             db.session.commit()
         except Exception:
             db.session.rollback()
-            pass

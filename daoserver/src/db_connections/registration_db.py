@@ -24,6 +24,7 @@ class RegistrationDBConnection(object):
             - tournament_id - existing tounament name as per listtournaments
             - username - existing username
         """
+        # pylint: disable=E1101
         if Tournament.query.filter_by(name=tournament_id).first() is None \
         or not self.player_db_conn.username_exists(username):
             raise RuntimeError("Check username and tournament")

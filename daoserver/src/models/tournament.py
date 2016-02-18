@@ -1,6 +1,7 @@
 """
 ORM module for a tournament
 """
+# pylint: disable=C0103
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from models.protected_object import ProtectedObject

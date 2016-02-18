@@ -215,8 +215,8 @@ def enter_tournament_score():
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
-    tourn = Tournament(tournament)
     # pylint: disable=E0602
+    tourn = Tournament(tournament)
     if not tourn.exists_in_db:
         raise ValueError('Unknown tournament: {}'.format(tournament))
 

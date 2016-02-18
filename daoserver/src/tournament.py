@@ -24,6 +24,7 @@ def must_exist_in_db(func):
         return func(self, *args, **kwargs)
     return wrapped
 
+# pylint: disable=E1101
 class Tournament(object):
     """A tournament DAO"""
 
@@ -77,7 +78,8 @@ class Tournament(object):
         """
         details = TournamentDB.query.filter_by(name=self.tournament_id).first()
         if details is None:
-            raise RuntimeError('No information is available on "%s" ' % name)
+            raise RuntimeError('No information is available on "{}"'.format(
+                self.tournament_id))
 
         return {
             'name': details.name,
@@ -185,6 +187,7 @@ class Tournament(object):
             int(num_rounds))
 
     @must_exist_in_db
+    # pylint: disable=R0913
     def set_score(self, key, category, min_val=0, max_val=20, round_id=None):
         """
         Set a score category that a player is eligible for in a tournament.

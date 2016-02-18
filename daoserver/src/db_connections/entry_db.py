@@ -40,6 +40,7 @@ class EntryDBConnection(object):
     """
 
     @db_conn(commit=True)
+    # pylint: disable=E0602
     def enter_score(self, entry_id, score_key, score):
         """
         Enters a score for category into tournament for player.
@@ -88,6 +89,7 @@ class EntryDBConnection(object):
                 '{} not entered. Score is already set'.format(score))
 
     @db_conn(cursor_factory=DictCursor)
+    # pylint: disable=E0602
     def entry_list(self, tournament_id):
         """
         Get the list of entries for the specified tournament.
@@ -121,6 +123,7 @@ class EntryDBConnection(object):
         return unranked_list
 
     @db_conn()
+    # pylint: disable=E0602
     def entry_id(self, tournament_id, username):
         """
         Get the entry_id for the player in the tournament
@@ -140,6 +143,7 @@ class EntryDBConnection(object):
         return cur.fetchone()[0]
 
     @db_conn()
+    # pylint: disable=E0602
     def entry_info(self, entry_id):
         """ Given an entry, get information about the user and tournament"""
         if not entry_id:
@@ -166,6 +170,7 @@ class EntryDBConnection(object):
             raise RuntimeError(err)
 
     @db_conn()
+    # pylint: disable=E0602
     def get_scores_for_entry(self, entry_id):
         """ Get all the score_key:score pairs for an entry"""
         cur.execute("SELECT key, score, category, min_val, max_val \

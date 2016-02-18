@@ -66,6 +66,7 @@ class PermissionsChecker(object):
             "INSERT INTO account_protected_object_permission VALUES (%s, %s)",
             [user, permission_id])
 
+    # pylint: disable=R0913
     def check_permission(self, action, user, for_user, tournament,
                          game_id=None):
         """

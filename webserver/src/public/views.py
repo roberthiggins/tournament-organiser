@@ -86,12 +86,13 @@ def enter_score_by_entry(request, entry_id):
     )
 
 @login_required
+# pylint: disable=W0613
 def enter_score_for_game(tournament_id, username, round_id):
     """ Enter a score for a single game"""
-
-    form = EnterScoreForm()
-    if request.method == 'POST':
-        pass
+    return
+    # form = EnterScoreForm()
+    # if request.method == 'POST':
+    #     pass
     # work out what game we're talking about
     # get the scores that need to be filled in for this game
     # make a form
