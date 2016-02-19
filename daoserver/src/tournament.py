@@ -5,10 +5,13 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
+from sqlalchemy.sql.expression import and_
+
 from db_connections.entry_db import EntryDBConnection
 from db_connections.tournament_db import TournamentDBConnection
 from matching_strategy import RoundRobin
 from models.tournament import Tournament as TournamentDB
+from models.tournament_round import TournamentRound
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
@@ -182,9 +185,11 @@ class Tournament(object):
         tourn = TournamentDB.query.filter_by(name=self.tournament_id).first()
         tourn.num_rounds = int(num_rounds)
         tourn.write()
-        self.tourn_db_conn.remove_excess_rounds(
-            self.tournament_id,
-            int(num_rounds))
+
+        for extra_round in TournamentRound.query.filter(and_(
+            TournamentRound.tournament_name == self.tournament_id,
+            TournamentRound.ordering > int(num_rounds) )).all():
+                extra_round.delete()
 
     @must_exist_in_db
     # pylint: disable=R0913
