@@ -19,6 +19,9 @@ def create_app():
             os.environ['DB_PORT_5432_TCP_PORT'],
             os.environ['DB_NAME'])
 
+    from models.account import db as account_db
+    account_db.init_app(app)
+
     from models.feedback import db as feedback_db
     feedback_db.init_app(app)
 

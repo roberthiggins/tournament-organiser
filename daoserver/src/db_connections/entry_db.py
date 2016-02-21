@@ -7,7 +7,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 
 from db_connections.db_connection import db_conn
-from db_connections.player_db import PlayerDBConnection
+from models.account import Account
 
 class Entry(json.JSONEncoder):
     """
@@ -133,7 +133,7 @@ class EntryDBConnection(object):
         """
         if tournament_id is None or username is None:
             raise ValueError('Missing required fields to entry_id')
-        if not PlayerDBConnection().username_exists(username):
+        if not Account.username_exists(username):
             raise ValueError('Unknown player: %s' % username)
 
         cur.execute(

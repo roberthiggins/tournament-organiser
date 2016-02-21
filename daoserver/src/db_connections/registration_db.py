@@ -5,7 +5,7 @@ This file contains code to connect to the tournament registrations
 import psycopg2
 
 from db_connections.db_connection import DBConnection
-from db_connections.player_db import PlayerDBConnection
+from models.account import Account
 from models.tournament import Tournament
 
 class RegistrationDBConnection(object):
@@ -13,7 +13,6 @@ class RegistrationDBConnection(object):
     Connection class for registrations to tournaments
     """
     def __init__(self):
-        self.player_db_conn = PlayerDBConnection()
         self.db_conn = DBConnection()
         self.con = self.db_conn.con
 
@@ -26,7 +25,7 @@ class RegistrationDBConnection(object):
         """
         # pylint: disable=E1101
         if Tournament.query.filter_by(name=tournament_id).first() is None \
-        or not self.player_db_conn.username_exists(username):
+        or not Account.username_exists(username):
             raise RuntimeError("Check username and tournament")
 
         clash = self.registration_clashes(tournament_id, username)

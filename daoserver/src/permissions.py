@@ -8,6 +8,7 @@ from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
 from db_connections.entry_db import EntryDBConnection
+from models.account import Account
 from models.protected_object import ProtectedObject
 
 PERMISSIONS = {
@@ -140,11 +141,10 @@ class PermissionsChecker(object):
         if user is None:
             return False
 
-        cur.execute(
-            "SELECT count(*) > 0 FROM account \
-            WHERE username = %s AND is_superuser = TRUE",
-            [user])
-        return cur.fetchone()[0]
+        return Account.query.filter(
+                and_(Account.username == user,
+                     Account.is_superuser)
+            ).first() is not None
 
     @db_conn()
     def is_organiser(self, user, tournament):

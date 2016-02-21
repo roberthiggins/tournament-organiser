@@ -5,25 +5,17 @@ This file contains code to connect to the player_db
 from passlib.hash import sha256_crypt
 
 from db_connections.db_connection import db_conn
+from models.account import Account
 
 # pylint: disable=E0602
 class PlayerDBConnection(object):
     """ A connection class for accessing player/account info from the db"""
 
-    @db_conn()
-    def username_exists(self, username):
-        """Check if a username exists for a player"""
-        cur.execute("SELECT COUNT(*) FROM account WHERE username = %s",
-                    [username])
-        existing = cur.fetchone()
-        return existing[0] > 0
-
     @db_conn(commit=True)
     def add_account(self, account):
         """Add an account. Username cannot exist"""
-        cur.execute(
-            "INSERT INTO account VALUES (%s, %s)",
-            [account['user_name'], account['email']])
+        Account(account['user_name'], account['email']).write()
+
         cur.execute(
             "INSERT INTO account_security VALUES (%s, %s)",
             [account['user_name'],
@@ -59,11 +51,3 @@ class PlayerDBConnection(object):
             return "Login successful"
         else:
             return "Login unsuccessful"
-
-    @db_conn()
-    def user_details(self, username):
-        """ get the user details asa a json blob """
-        cur.execute(
-            "SELECT contact_email FROM account WHERE username = %s",
-            [username])
-        return cur.fetchone()

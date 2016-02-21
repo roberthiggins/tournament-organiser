@@ -16,6 +16,7 @@ from db_connections.entry_db import EntryDBConnection
 from db_connections.player_db import PlayerDBConnection
 from db_connections.tournament_db import TournamentDBConnection
 from db_connections.registration_db import RegistrationDBConnection
+from models.account import Account
 from models.feedback import Feedback
 from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
@@ -189,7 +190,7 @@ def add_account():
     if password1 != password2:
         return make_response("Please enter two matching passwords", 400)
 
-    if PLAYER_DB_CONN.username_exists(username):
+    if Account.username_exists(username):
         return make_response("A user with the username {} already exists! \
             Please choose another name".format(username), 400)
 
@@ -412,4 +413,5 @@ def user_details(u_name=None):
     GET to get account details in url form
     TODO security
     """
-    return jsonify({u_name: PLAYER_DB_CONN.user_details(u_name)})
+    return jsonify({u_name: Account.query.filter_by(
+        username=u_name).first().contact_email})
