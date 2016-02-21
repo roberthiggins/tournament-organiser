@@ -1,19 +1,74 @@
 """
 Module to handle permissions for accounts trying to modify a tournament.
 """
+# pylint: disable=C0103
+
+from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
 from db_connections.entry_db import EntryDBConnection
+from models.protected_object import ProtectedObject
 
 PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',
 }
+
+db = SQLAlchemy()
 
 def check_action_valid(action):
     """Only actions found in PERMISSIONS are allowed"""
     if action is None or not action in PERMISSIONS.values():
         raise ValueError(
             'Illegal action passed to check_permission {}'.format(action))
+
+# pylint: disable=W0232
+class ProtObjAction(db.Model):
+    """An action you can perform on a protected object, e.g. enter score"""
+    __tablename__ = 'protected_object_action'
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self):
+        return '<ProtObjAction ({}, {})>'.format(
+            self.id,
+            self.description)
+
+class ProtObjPerm(db.Model):
+    """
+    Gain a permission to do a something ProtObjAction on a protected
+    object
+    """
+    __tablename__ = 'protected_object_permission'
+    id = db.Column(db.Integer, primary_key=True)
+    protected_object_id = db.Column(
+        db.Integer,
+        db.ForeignKey(ProtectedObject.id),
+        nullable=False)
+    protected_object_action_id = db.Column(
+        db.Integer,
+        db.ForeignKey(ProtObjAction.id),
+        nullable=False)
+
+    def __init__(self, prot_obj_id, action_id):
+        self.protected_object_id = prot_obj_id
+        self.protected_object_action_id = action_id
+
+    def __repr__(self):
+        return '<ProtObjPerm ({}, {}, {})>'.format(
+            self.id,
+            self.protected_object_id,
+            self.protected_object_action_id)
+
+    def write(self):
+        """To the DB"""
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
 
 # pylint: disable=E0602
 class PermissionsChecker(object):
@@ -29,7 +84,7 @@ class PermissionsChecker(object):
         self.entry_db = EntryDBConnection()
 
     @db_conn(commit=True)
-    def add_permission(self, user, action, protected_obj_id):
+    def add_permission(self, user, action, prot_obj_id):
         """
         Give user permission to perform action on protected_obj
 
@@ -42,25 +97,18 @@ class PermissionsChecker(object):
         """
         check_action_valid(action)
 
-        cur.execute(
-            "SELECT id FROM protected_object_action \
-            WHERE description = %s LIMIT 1",
-            [action])
-        action_id = cur.fetchone()[0]
+        act_id = ProtObjAction.query.filter_by(description=action).first().id
 
         try:
-            cur.execute(
-                "SELECT id FROM protected_object_permission \
-                WHERE protected_object_id = %s \
-                AND protected_object_action_id = %s",
-                [protected_obj_id, action_id])
-            permission_id = cur.fetchone()[0]
-        except TypeError:
-            cur.execute(
-                "INSERT INTO protected_object_permission \
-                VALUES (DEFAULT, %s, %s) RETURNING id",
-                [protected_obj_id, action_id])
-            permission_id = cur.fetchone()[0]
+            permission_id = ProtObjPerm.query.filter(
+                and_(
+                    ProtObjPerm.protected_object_id == prot_obj_id,
+                    ProtObjPerm.protected_object_action_id == act_id)
+                ).first().id
+        except AttributeError:
+            permission = ProtObjPerm(prot_obj_id, act_id)
+            permission.write()
+            permission_id = permission.id
 
         cur.execute(
             "INSERT INTO account_protected_object_permission VALUES (%s, %s)",
