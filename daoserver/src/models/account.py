@@ -37,3 +37,31 @@ class Account(db.Model):
     def username_exists(username):
         """Check if a username exists for a player"""
         return Account.query.filter_by(username=username).first() is not None
+
+class AccountSecurity(db.Model):
+    """Authentication for users"""
+
+    __tablename__ = 'account_security'
+    id = db.Column(
+        db.String(30),
+        db.ForeignKey(Account.username),
+        primary_key=True)
+    password = db.Column(db.String(100), nullable=False)
+
+    def __init__(self, username, password):
+        self.id = username
+        self.password = password
+
+    def __repr__(self):
+        return '<AccountSecurity ({}, {})>'.format(
+            self.id,
+            self.password)
+
+    def write(self):
+        """To the DB"""
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise

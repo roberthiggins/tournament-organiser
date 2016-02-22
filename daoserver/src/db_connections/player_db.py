@@ -5,7 +5,7 @@ This file contains code to connect to the player_db
 from passlib.hash import sha256_crypt
 
 from db_connections.db_connection import db_conn
-from models.account import Account
+from models.account import Account, AccountSecurity
 
 # pylint: disable=E0602
 class PlayerDBConnection(object):
@@ -15,11 +15,10 @@ class PlayerDBConnection(object):
     def add_account(self, account):
         """Add an account. Username cannot exist"""
         Account(account['user_name'], account['email']).write()
-
-        cur.execute(
-            "INSERT INTO account_security VALUES (%s, %s)",
-            [account['user_name'],
-             sha256_crypt.encrypt(account['password'])])
+        AccountSecurity(
+            account['user_name'],
+            sha256_crypt.encrypt(account['password'])
+        ).write()
 
     @db_conn()
     def authenticate_user(self, username, password):
