@@ -12,8 +12,8 @@ import re
 from flask import Blueprint, request, make_response, jsonify
 from functools import wraps
 
+from authentication import check_auth
 from db_connections.entry_db import EntryDBConnection
-from db_connections.player_db import PlayerDBConnection
 from db_connections.tournament_db import TournamentDBConnection
 from db_connections.registration_db import RegistrationDBConnection
 from models.account import Account
@@ -22,7 +22,6 @@ from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
 
 ENTRY_DB_CONN = EntryDBConnection()
-PLAYER_DB_CONN = PlayerDBConnection()
 REGISTRATION_DB_CONN = RegistrationDBConnection()
 TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
 
@@ -194,9 +193,9 @@ def add_account():
         return make_response("A user with the username {} already exists! \
             Please choose another name".format(username), 400)
 
-    PLAYER_DB_CONN.add_account({'user_name': username,
-                                'email' : email,
-                                'password': password1})
+    Account.add_account({'user_name': username,
+                         'email' : email,
+                         'password': password1})
     return make_response('<p>Account created! You submitted the following \
         fields:</p><ul><li>User Name: {}</li><li>Email: {}\
         </li></ul>'.format(username, email), 200)
@@ -253,7 +252,8 @@ def login():
     """
     # pylint: disable=E0602
     return make_response(
-        PLAYER_DB_CONN.login(inputUsername, inputPassword),
+        "Login successful" if check_auth(inputUsername, inputPassword) \
+        else "Login unsuccessful",
         200)
 
 @APP.route('/getMissions/<tournament_id>', methods=['GET'])

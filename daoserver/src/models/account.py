@@ -1,8 +1,10 @@
 """
 ORM module for accounts
 """
+# pylint: disable=C0103
 
 from flask.ext.sqlalchemy import SQLAlchemy
+from passlib.hash import sha256_crypt
 
 db = SQLAlchemy()
 
@@ -32,6 +34,15 @@ class Account(db.Model):
         except Exception:
             db.session.rollback()
             raise
+
+    @staticmethod
+    def add_account(account):
+        """Add an account. Username cannot exist"""
+        Account(account['user_name'], account['email']).write()
+        AccountSecurity(
+            account['user_name'],
+            sha256_crypt.encrypt(account['password'])
+        ).write()
 
     @staticmethod
     def username_exists(username):

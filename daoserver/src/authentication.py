@@ -2,15 +2,22 @@
 
 from functools import wraps
 from flask import request, Response
+from passlib.hash import sha256_crypt
 
-from db_connections.player_db import PlayerDBConnection
+from models.account import AccountSecurity
 
 def check_auth(username, password):
     """This function is called to check if a username /
     password combination is valid.
     """
     try:
-        return PlayerDBConnection().authenticate_user(username, password)
+        if not username or not password:
+            raise RuntimeError("Enter username and password")
+
+        creds = AccountSecurity.query.filter_by(id=username).first().password
+        if not sha256_crypt.verify(password, creds):
+            raise RuntimeError("Username or password incorrect")
+        return True
     except RuntimeError:
         return False
 
