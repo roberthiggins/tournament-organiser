@@ -34,6 +34,9 @@ def create_app():
     from models.tournament_round import db as tournament_round_db
     tournament_round_db.init_app(app)
 
+    from models.registration import db as registration_db
+    registration_db.init_app(app)
+
     from dao import APP
     app.register_blueprint(APP)
 

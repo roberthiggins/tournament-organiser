@@ -15,14 +15,13 @@ from functools import wraps
 from authentication import check_auth
 from db_connections.entry_db import EntryDBConnection
 from db_connections.tournament_db import TournamentDBConnection
-from db_connections.registration_db import RegistrationDBConnection
 from models.account import Account
 from models.feedback import Feedback
+from models.registration import TournamentRegistration
 from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
 
 ENTRY_DB_CONN = EntryDBConnection()
-REGISTRATION_DB_CONN = RegistrationDBConnection()
 TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
 
 APP = Blueprint('APP', __name__, url_prefix='')
@@ -132,9 +131,7 @@ def apply_for_tournament():
     """
     # pylint: disable=E0602
     return make_response(
-        REGISTRATION_DB_CONN.register_for_tournament(
-            inputTournamentName,
-            inputUserName),
+        TournamentRegistration(inputUserName, inputTournamentName).write(),
         200)
 
 @APP.route('/addTournament', methods=['POST'])

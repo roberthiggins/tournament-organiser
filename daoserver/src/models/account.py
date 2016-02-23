@@ -26,10 +26,20 @@ class Account(db.Model):
             self.contact_email,
             self.is_superuser)
 
-    def write(self):
+    def write(self, commit=True):
         """To the DB"""
         try:
             db.session.add(self)
+            if commit:
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+    def delete(self):
+        """Remove from db"""
+        try:
+            db.session.delete(self)
             db.session.commit()
         except Exception:
             db.session.rollback()
