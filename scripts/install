@@ -83,7 +83,7 @@ do
         sleep 5
         ;;
         rails-webserver)
-            sudo docker run --name=rails-webapp -d -p 3000:3000 rails_webapp_image
+            sudo docker run --name=rails-webserver -d -p 3000:3000 rails_webapp_image
         sleep 5
         ;;
         *)
