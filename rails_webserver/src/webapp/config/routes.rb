@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     # Homepage
     root 'home#index'
 
+    resources :tournaments
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
