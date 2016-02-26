@@ -5,51 +5,35 @@
 =end
 module DaoConnection
 
+require 'net/http'
+require 'uri'
+
 @@DAO_URL ="http://%s:%s" % [
     ENV['DAOSERVER_PORT_5000_TCP_ADDR'],
     ENV['DAOSERVER_PORT_5000_TCP_PORT']]
 
+# TODO This is only until logins get set up on webserver
+@@AUTH = { :username => 'superman',
+    :password => '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D' } # superuser permissions initially
+
+
 =begin
-    Use a GET request to the daoserver. The return value will be passed
-    back to the caller.
+    Interact with the DAOServer
 =end
-    def dao_get(url)
-        return HTTParty.get "%s/%s" % [@@DAO_URL, url]
+    def from_dao(url, form=nil, use_auth=false)
 
-        # TODO auth
-        # TODO form crap
+        uri = URI("%s/%s" % [@@DAO_URL, url])
+        http = Net::HTTP.new(uri.host, uri.port)
+        request = Net::HTTP::Get.new(uri.request_uri)
+
+        if form
+            request = Net::HTTP::Post.new(uri.request_uri)
+            request.set_form_data(form)
+        end
+
+        request.basic_auth(@@AUTH[:username], @@AUTH[:password])
+
+        return http.request(request)
     end
-
-
-
-#DAO_URL = "http://%s:%s" % (
-#    os.environ['DAOSERVER_PORT_5000_TCP_ADDR'],
-#    os.environ['DAOSERVER_PORT_5000_TCP_PORT'])
-#
-#def from_dao(url, form=None, request=None):
-#    """
-#    Proxies a GET/POST to the daoserver. This helps keep input handling in \
-#    the DAO API
-#    """
-#    try:
-#        api = DAO_URL + url
-#        auth = None
-#        if request is not None and request.user is not None \
-#        and request.user.is_authenticated():
-#            auth = (request.user.username, request.user.password)
-#
-#        if form is None:
-#            return requests.get(api, auth=auth)
-#
-#        if form.is_valid():
-#            return requests.post(api, auth=auth, data=form.cleaned_data)
-#
-#        return HttpResponse(form.error_code(), status=400)
-#
-#    except requests.exceptions.HTTPError as err:
-#        if err.code == 400:
-#            return HttpResponse(err.read(), status=400)
-#        else:
-#            raise
 
 end
