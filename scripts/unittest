@@ -3,4 +3,4 @@ sudo docker rm -v dao_unit_test
 
 # We assume the dao image exists
 
-sudo docker run --name=dao_unit_test -t --link=db daoserver_image python -u webapp/unit_test.py
+sudo docker run --name=dao_unit_test -t --link=db daoserver_image python -u unit_test.py
