@@ -13,7 +13,7 @@
 
 #### OPTION HANDLING ####
 ENVS_NOT_USED="rails-webserver"
-ENVS="db drawserver daoserver webserver"
+ENVS="db daoserver webserver"
 if [ $# -ne 0 ]
     then
     ENVS="$@"
@@ -33,14 +33,6 @@ do
         db)
             pushd database
             sudo docker build -t db_image .
-            popd
-        ;;
-        drawserver)
-            pushd drawserver
-            pushd drawbuilder
-            mvn clean package
-            popd
-            sudo docker build -t drawserver_image .
             popd
         ;;
         daoserver)
@@ -73,14 +65,11 @@ do
             sudo docker run -d -P --name db db_image
             sleep 10    # wait for db to finish startup
         ;;
-        drawserver)
-            sudo docker run --name=drawserver -d -p 5002:8080 --link=db drawserver_image
-        ;;
         daoserver)
-            sudo docker run --name=daoserver -d -p 5001:5000 --link=db --link=drawserver daoserver_image
+            sudo docker run --name=daoserver -d -p 5001:5000 --link=db daoserver_image
         ;;
         webserver)
-            sudo docker run --name=webserver -d -p 5000:8000 --link=db --link=drawserver --link=daoserver webserver_image
+            sudo docker run --name=webserver -d -p 5000:8000 --link=db --link=daoserver webserver_image
         sleep 5
         ;;
         rails-webserver)
