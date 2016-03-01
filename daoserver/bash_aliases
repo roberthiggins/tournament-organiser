@@ -7,3 +7,5 @@ alias score-keys='psql-db -c "select * from score_key;"'
 alias tournaments='psql-db -c "select * from tournament;"'
 alias player_scores='psql-db -c "select * from player_score;"'
 alias games='psql-db -c "select * from game;"'
+
+alias unit-tests='python -m unittest discover -s unit_tests --pattern=*.py'
