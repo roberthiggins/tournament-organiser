@@ -12,7 +12,8 @@
 #!/bin/sh
 
 #### OPTION HANDLING ####
-ENVS="db drawserver daoserver webserver rails-webserver"
+ENVS_NOT_USED="rails-webserver"
+ENVS="db drawserver daoserver webserver"
 if [ $# -ne 0 ]
     then
     ENVS="$@"
