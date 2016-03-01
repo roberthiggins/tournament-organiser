@@ -10,9 +10,8 @@
 
         <h2>Enter a Tournament</h2>
         <ul>
-            <li><a href="signup">Sign Up</a></li>
-            <li><a href="login">Login</a></li>
-            <li><a href="registerforatournament">Register for a Tournament</a></li>
+            <li><%= link_to 'Sign Up', new_user_registration_path %></li>
+            <li><%= link_to 'Login', new_user_session_path %></li>
             <li><%= link_to 'See a list of tournaments', controller: 'tournaments' %></li>
             <li>Update my player details</li>
             <li>Update application</li>
