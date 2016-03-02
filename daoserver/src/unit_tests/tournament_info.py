@@ -44,4 +44,4 @@ class TournamentInfo(TestCase):
         tourn.set_score(key='round_3_battle', min_val=0, max_val=25,
                         category=3, round_id=3)
         compare(tourn.get_score_keys_for_round(3)[0][1:],
-                ('round_3_battle', 25, 0, 3, 6, 3))
+                ('round_3_battle', 0, 25, 3, 6, 3))

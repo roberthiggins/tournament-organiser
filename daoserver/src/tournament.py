@@ -10,7 +10,7 @@ from sqlalchemy.sql.expression import and_
 from db_connections.entry_db import EntryDBConnection
 from db_connections.tournament_db import TournamentDBConnection
 from matching_strategy import RoundRobin
-from models.score import ScoreCategory
+from models.score import ScoreCategory, ScoreKey
 from models.tournament import Tournament as TournamentDB
 from models.tournament_round import TournamentRound
 from permissions import PermissionsChecker, PERMISSIONS
@@ -215,14 +215,11 @@ class Tournament(object):
         if not max_val:
             max_val = 20
 
-        score_key = self.tourn_db_conn.set_score_key(
-            key=key,
-            category=category,
-            min_val=min_val,
-            max_val=max_val)
+        key = ScoreKey(key, category, min_val, max_val)
+        key.write()
 
         if round_id is not None:
-            self.tourn_db_conn.set_score_key_for_round(score_key, round_id)
+            self.tourn_db_conn.set_score_key_for_round(key.id, round_id)
 
     @must_exist_in_db
     def get_score_keys_for_round(self, round_id='next'):

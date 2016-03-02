@@ -42,43 +42,6 @@ class TournamentDBConnection(object):
                         VALUES(DEFAULT, %s, %s, %s)",
                         [tournament, round_id, mission])
 
-    @db_conn(commit=True)
-    def set_score_key(self, key, category, min_val, max_val):
-        """
-        Create a score that entries can get in the tournament. This should be
-        called for all scores you want, e.g. round_1_battle, round_2_battle
-
-        Expects:
-            - a varchar candidate. The key will need to be unique and should
-            be a varchar.
-            - category - the score_category id
-            - min_val. Integer. nin val for the score. Default 0
-            - max_val. Integer. max val for the score. Default 20
-
-        Returns: throws ValueError and psycopg2.DatabaseError as appropriate
-        """
-        if not category or not key:
-            raise ValueError('Arguments missing from set_score_category call')
-        try:
-            min_val = int(min_val)
-        except ValueError:
-            raise ValueError('Minimum Score must be an integer')
-
-        try:
-            max_val = int(max_val)
-        except ValueError:
-            raise ValueError('Maximum Score must be an integer')
-
-        try:
-            cur.execute(
-                "INSERT INTO score_key VALUES(default, %s, %s, %s, %s) \
-                RETURNING id",
-                [key, max_val, min_val, category])
-            return cur.fetchone()[0]
-
-        except psycopg2.IntegrityError:
-            raise psycopg2.DatabaseError('Score already set')
-
     @db_conn()
     def get_score_keys_for_round(self, tournament_id, round_id):
         """
