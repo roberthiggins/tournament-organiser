@@ -190,10 +190,14 @@ class Tournament(object):
         tourn.num_rounds = int(num_rounds)
         tourn.write()
 
-        for extra_round in TournamentRound.query.filter(and_(
-            TournamentRound.tournament_name == self.tournament_id,
-            TournamentRound.ordering > int(num_rounds) )).all():
-                extra_round.delete()
+        rounds = TournamentRound.query.filter(
+            and_(
+                TournamentRound.tournament_name == self.tournament_id,
+                TournamentRound.ordering > int(num_rounds))
+            ).all()
+
+        for extra_round in rounds:
+            extra_round.delete()
 
     @must_exist_in_db
     # pylint: disable=R0913
