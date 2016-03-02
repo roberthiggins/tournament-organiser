@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y python-software-properties software-pro
 
 # The setup dir should contain the inital schema files for the db.
 ADD setup/ setup/
+ADD data/ data/
 
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres

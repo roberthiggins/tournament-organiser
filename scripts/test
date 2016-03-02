@@ -7,5 +7,10 @@ then
   exit 1
 fi
 
+# add some data to the db
+# TODO this should be moved into the behaviourtest script once the unit_tests
+# no longer need it
+docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB_NAME"'
+
 ./scripts/unittest
 ./scripts/behaviourtest
