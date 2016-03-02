@@ -12,37 +12,6 @@ class TournamentDBConnection(object):
     Connection class to the tournament database
     """
     @db_conn()
-    def get_mission(self, tournament, round_id):
-        """Get mission for given round"""
-        cur.execute("SELECT mission FROM tournament_round \
-                    WHERE tournament_name = %s AND ordering = %s",
-                    [tournament, round_id])
-        return cur.fetchone()[0]
-
-    @db_conn()
-    def get_missions(self, tournament):
-        """Get mission for given round"""
-        cur.execute("SELECT mission FROM tournament_round \
-                    WHERE tournament_name = %s",
-                    [tournament])
-        return [x[0] for x in cur.fetchall()]
-
-    @db_conn(commit=True)
-    def set_mission(self, tournament, round_id, mission):
-        """Set mission for given round"""
-        cur.execute("SELECT COUNT(*) > 0 FROM tournament_round \
-                    WHERE tournament_name = %s AND ordering = %s",
-                    [tournament, round_id])
-        if cur.fetchone()[0]:
-            cur.execute("UPDATE tournament_round SET mission = %s \
-                        WHERE tournament_name = %s AND ordering = %s",
-                        [mission, tournament, round_id])
-        else:
-            cur.execute("INSERT INTO tournament_round \
-                        VALUES(DEFAULT, %s, %s, %s)",
-                        [tournament, round_id, mission])
-
-    @db_conn()
     def get_score_keys_for_round(self, tournament_id, round_id):
         """
         Get all the score keys, and the information from their rows, for a

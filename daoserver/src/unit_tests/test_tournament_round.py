@@ -2,6 +2,7 @@
 Setting the number of rounds in a tournament
 """
 from flask.ext.testing import TestCase
+from testfixtures import compare
 
 from app import create_app
 from models.tournament import db as tournament_db
@@ -29,9 +30,9 @@ class SetRounds(TestCase):
         dao.num_rounds = 4;
         dao.write()
 
-        TournamentRound(name, 1).write()
-        TournamentRound(name, 2).write()
-        TournamentRound(name, 3).write()
+        TournamentRound(name, 1, 'mission_1').write()
+        TournamentRound(name, 2, 'mission_2').write()
+        TournamentRound(name, 3, 'mission_3').write()
         TournamentRound(name, 4).write()
 
     def test_set_rounds(self):
@@ -63,6 +64,39 @@ class SetRounds(TestCase):
         self.assertTrue(2 == len(TournamentRound.query.filter_by(
             tournament_name=name).all()))
 
+    def test_get_missions(self):
+        """get missions for the rounds"""
+        name = 'test_get_missions'
+        self.set_up_tournament(name)
+
+        tourn = Tournament(name)
+        compare(tourn.get_mission(1), 'mission_1')
+        compare(tourn.get_mission(4), 'TBA')
+
+        self.assertRaises(ValueError, tourn.get_mission, 'a')
+        self.assertRaises(ValueError, tourn.get_mission, 5)
+
+        tourn = Tournament(name)
+        compare(tourn.get_missions(),
+            ['mission_1','mission_2', 'mission_3', 'TBA'])
+
+    def test_set_mission(self):
+        """add a mission to the tournament round"""
+        name = 'test_set_mission'
+        self.set_up_tournament(name)
+
+        tourn = Tournament(name)
+        self.assertRaises(ValueError, tourn.set_mission, 'a', 'should_fail')
+        self.assertRaises(ValueError, tourn.set_mission, -1, 'should_fail')
+        self.assertRaises(ValueError, tourn.set_mission, 7, 'should_fail')
+
+        tourn.set_mission(5, 'mission_5')
+        self.assertTrue(tourn.get_mission(5), 'mission_5')
+        tourn.set_mission(4, 'mission_4')
+        self.assertTrue(tourn.get_mission(4), 'mission_4')
+        tourn.set_mission(2, 'mission_2')
+        self.assertTrue(tourn.get_mission(2), 'mission_2')
+
     def test_errors(self):
         """Illegal values"""
         name = 'test_errors'
@@ -72,5 +106,3 @@ class SetRounds(TestCase):
         self.assertRaises(ValueError, tourn.set_number_of_rounds, 'foo')
         self.assertRaises(ValueError, tourn.set_number_of_rounds, '')
         self.assertRaises(TypeError, tourn.set_number_of_rounds, None)
-
-

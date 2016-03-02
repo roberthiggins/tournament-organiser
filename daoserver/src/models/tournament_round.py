@@ -12,18 +12,28 @@ class TournamentRound(db.Model):
     """A row in the tournament_round table"""
 
     __tablename__ = 'tournament_round'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.Sequence('tournament_round_id_seq'))
     tournament_name = db.Column(
         db.String(50),
         db.ForeignKey(Tournament.name),
-        nullable=False)
-    ordering = db.Column(db.Integer, default=1, nullable=False)
+        primary_key=True)
+    ordering = db.Column(db.Integer, default=1, primary_key=True)
     mission = db.Column(db.String(20), default='TBA', nullable=False)
 
     def __init__(self, tournament, round_num, mission=None):
         self.tournament_name = tournament
-        self.ordering = round_num
         self.mission = mission
+
+        round_num = int(round_num)
+        if round_num <= 0:
+            raise ValueError('Round ording must be a positive integer')
+        if round_num > Tournament.query.filter_by(name=tournament).\
+            first().num_rounds + 1:
+                raise ValueError('Tournament {} only has {} rounds'.format(
+                    tournament,
+                    round_num
+                ))
+        self.ordering = round_num
 
     def __repr__(self):
         return '<TournamentRound ({}, {}, {})>'.format(

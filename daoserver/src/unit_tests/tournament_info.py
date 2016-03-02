@@ -6,7 +6,7 @@ from flask.ext.testing import TestCase
 from testfixtures import compare
 
 from app import create_app
-from models.tournament import db as tournament_db
+from models.tournament import db as tournament_db, Tournament as TournamentDAO
 from tournament import Tournament
 
 # pylint: disable=C0111,C0103,W0232
@@ -28,6 +28,7 @@ class TournamentInfo(TestCase):
     def test_get_score_keys(self):
         """Get the score keys for the round"""
         tourn = Tournament('ranking_test')
+        dao = TournamentDAO.query.filter_by(name='ranking_test').first()
 
         self.assertRaises(NotImplementedError, tourn.get_score_keys_for_round)
         compare(tourn.get_score_keys_for_round(1),
@@ -38,6 +39,8 @@ class TournamentInfo(TestCase):
 
         self.assertRaises(ValueError, tourn.get_score_keys_for_round, 3)
 
+        dao.num_rounds = 3
+        dao.write()
         tourn.set_mission(3, 'Third Mission')
         compare(tourn.get_score_keys_for_round(3), []) # no score yet
 

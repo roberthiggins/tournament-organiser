@@ -158,12 +158,22 @@ class Tournament(object):
     @must_exist_in_db
     def get_mission(self, round_id):
         """Get the mission for a given round"""
-        return self.tourn_db_conn.get_mission(self.tournament_id, round_id)
+
+        tournament_round = TournamentRound.query.\
+            filter(and_(TournamentRound.tournament_name == self.tournament_id,
+                        TournamentRound.ordering == int(round_id))
+                  ).first()
+
+        if tournament_round is not None:
+            return tournament_round.mission
+        raise ValueError('Round {} does not exist'.format(round_id))
 
     @must_exist_in_db
     def get_missions(self):
         """Get all missions for the tournament"""
-        return self.tourn_db_conn.get_missions(self.tournament_id)
+        rounds = TournamentRound.query.\
+            filter_by(tournament_name=self.tournament_id).all()
+        return [x.mission for x in rounds]
 
     @must_exist_in_db
     def round_info(self, round_id=0):
@@ -181,7 +191,16 @@ class Tournament(object):
     @must_exist_in_db
     def set_mission(self, round_id, mission):
         """Set the mission for a given round"""
-        self.tourn_db_conn.set_mission(self.tournament_id, round_id, mission)
+        round_id = int(round_id)
+        tournament_round = TournamentRound.query.\
+            filter_by(tournament_name=self.tournament_id, ordering=round_id).\
+            first()
+
+        if tournament_round is None:
+            TournamentRound(self.tournament_id, round_id, mission).write()
+        else:
+            tournament_round.mission = mission
+            tournament_round.write()
 
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
