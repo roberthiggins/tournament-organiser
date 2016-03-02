@@ -20,14 +20,16 @@ class TournamentRound(db.Model):
     ordering = db.Column(db.Integer, default=1, nullable=False)
     mission = db.Column(db.String(20), default='TBA', nullable=False)
 
-    def __init__(self, tournament, round_num):
+    def __init__(self, tournament, round_num, mission=None):
         self.tournament_name = tournament
         self.ordering = round_num
+        self.mission = mission
 
     def __repr__(self):
-        return '<TournamentRound ({}, {})>'.format(
+        return '<TournamentRound ({}, {}, {})>'.format(
             self.tournament_name,
-            self.ordering)
+            self.ordering,
+            self.mission)
 
     def write(self):
         """To the DB"""
