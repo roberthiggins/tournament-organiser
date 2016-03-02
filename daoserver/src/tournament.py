@@ -10,6 +10,7 @@ from sqlalchemy.sql.expression import and_
 from db_connections.entry_db import EntryDBConnection
 from db_connections.tournament_db import TournamentDBConnection
 from matching_strategy import RoundRobin
+from models.score import ScoreCategory
 from models.tournament import Tournament as TournamentDB
 from models.tournament_round import TournamentRound
 from permissions import PermissionsChecker, PERMISSIONS
@@ -70,8 +71,7 @@ class Tournament(object):
     @must_exist_in_db
     def create_score_category(self, category, percentage):
         """ Add a score category """
-        self.tourn_db_conn.create_score_category(
-            category, self.tournament_id, percentage)
+        ScoreCategory(self.tournament_id, category, percentage).write()
 
     @must_exist_in_db
     def details(self):
@@ -97,7 +97,11 @@ class Tournament(object):
         percentages.
         [{ 'name': 'Painting', 'percentage': 20, 'id': 1 }]
         """
-        return self.tourn_db_conn.list_score_categories(self.tournament_id)
+        categories = ScoreCategory.query.\
+            filter_by(tournament_id=self.tournament_id).all()
+        return [
+            {'id': x.id, 'name': x.display_name, 'percentage': x.percentage} \
+            for x in categories]
 
     @staticmethod
     def list_tournaments():

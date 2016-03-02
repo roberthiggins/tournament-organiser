@@ -43,49 +43,6 @@ class TournamentDBConnection(object):
                         [tournament, round_id, mission])
 
     @db_conn(commit=True)
-    def create_score_category(self, category, tournament_id, percentage):
-        """
-        Create a score category for a tournament.
-        Expects:
-            category - A human-readable name for the category
-            tournament_id - the tournament the category will be used for
-            pecentage - The percentage of the total score taken up by scores
-                in this category. For example, if you wanted battle to be 60
-                percent of the total tournament score, percentage would be 60
-        """
-        try:
-            percentage = int(percentage)
-        except ValueError:
-            raise ValueError('percentage must be an integer')
-
-        cur.execute(
-            "SELECT SUM(percentage) FROM score_category \
-            WHERE tournament_id = %s", [tournament_id])
-        existing = cur.fetchone()
-        existing_total = existing[0] if existing[0] is not None else 0
-        if (existing_total + percentage) > 100:
-            raise ValueError('percentage too high: {}'.format(category))
-
-        cur.execute(
-            "INSERT INTO score_category VALUES(DEFAULT, %s, %s, %s)",
-            [tournament_id, category, percentage]
-        )
-
-    @db_conn()
-    def list_score_categories(self, tournament_id):
-        """
-        Get score_categories associated with a tournament.
-        e.g. [{ 'name': 'painting', 'percentage': 20 }]
-        """
-        cur.execute(
-            "SELECT id, display_name, percentage FROM score_category \
-            WHERE tournament_id = %s", [tournament_id])
-        raw_list = cur.fetchall()
-        return [{'id': x[0],
-                 'name': x[1],
-                 'percentage': x[2]} for x in raw_list]
-
-    @db_conn(commit=True)
     def set_score_key(self, key, category, min_val, max_val):
         """
         Create a score that entries can get in the tournament. This should be

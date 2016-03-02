@@ -37,6 +37,9 @@ def create_app():
     from models.registration import db as registration_db
     registration_db.init_app(app)
 
+    from models.score import db as score_db
+    score_db.init_app(app)
+
     from dao import APP
     app.register_blueprint(APP)
 
