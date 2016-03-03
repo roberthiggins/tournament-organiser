@@ -33,8 +33,7 @@ class Tournament(object):
 
     def __init__(self, tournament_id=None, ranking_strategy=None, creator=None):
         self.tournament_id = tournament_id
-        self.exists_in_db = TournamentDB.query.filter_by(
-            name=tournament_id).first() is not None
+        self.exists_in_db = self.get_dao() is not None
         self.ranking_strategy = \
             ranking_strategy(tournament_id, self.list_score_categories) \
             if ranking_strategy \
@@ -66,6 +65,9 @@ class Tournament(object):
             PERMISSIONS['ENTER_SCORE'],
             dao.protected_object_id)
 
+    def get_dao(self):
+        return TournamentDB.query.filter_by(name=self.tournament_id).first()
+
     @must_exist_in_db
     def create_score_category(self, category, percentage):
         """ Add a score category """
@@ -77,7 +79,7 @@ class Tournament(object):
         Get details about a tournament. This includes entrants and format
         information
         """
-        details = TournamentDB.query.filter_by(name=self.tournament_id).first()
+        details = self.get_dao()
 
         return {
             'name': details.name,
@@ -187,7 +189,7 @@ class Tournament(object):
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
-        tourn = TournamentDB.query.filter_by(name=self.tournament_id).first()
+        tourn = self.get_dao()
         tourn.num_rounds = int(num_rounds)
         tourn.write()
 
