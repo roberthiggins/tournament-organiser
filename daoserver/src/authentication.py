@@ -14,6 +14,7 @@ def check_auth(username, password):
         if not username or not password:
             raise RuntimeError("Enter username and password")
 
+        # pylint: disable=no-member
         creds = AccountSecurity.query.filter_by(id=username).first().password
         if not sha256_crypt.verify(password, creds):
             raise RuntimeError("Username or password incorrect")

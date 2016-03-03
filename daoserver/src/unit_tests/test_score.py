@@ -10,6 +10,7 @@ from models.tournament import db, Tournament as TournamentDAO
 from models.tournament_round import TournamentRound
 from tournament import Tournament
 
+# pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class TestRoundScore(TestCase):
     def create_app(self):
         # pass in test configuration
@@ -25,7 +26,6 @@ class TestRoundScore(TestCase):
         """Get the score keys linked to the round"""
 
         tourn = Tournament('ranking_test')
-        dao = TournamentDAO.query.filter_by(name='ranking_test').first()
 
         # make a bogus tournament in the hopes we can select a key from another
         # tournament

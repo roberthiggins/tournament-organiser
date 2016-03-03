@@ -5,10 +5,10 @@ Checking whether users are players in tournaments, admins, organisers, etc.
 from flask.ext.testing import TestCase
 
 from app import create_app
-from models.account import Account
 from models.account import db as account_db
 from permissions import PermissionsChecker
 
+# pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class UserPermissions(TestCase):
 
     def create_app(self):
@@ -35,8 +35,6 @@ class UserPermissions(TestCase):
     def test_is_player(self):
         """users can be a player by being involved in a game"""
         checker = PermissionsChecker()
-
-        options = [None, '', 'lisa', 2, ]
 
         self.assertTrue(checker.is_game_player('lisa', 1))
         self.assertFalse(checker.is_game_player('lisa', 12))

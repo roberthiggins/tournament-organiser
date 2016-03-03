@@ -1,7 +1,7 @@
 """
 ORM module for a registration of a user into a tournament
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 from sqlalchemy.sql.expression import and_
 
@@ -9,6 +9,7 @@ from models.account import Account
 from models.db_connection import db
 from models.tournament import Tournament
 
+# pylint: disable=no-member
 class TournamentRegistration(db.Model):
     """A row in the registration table"""
 

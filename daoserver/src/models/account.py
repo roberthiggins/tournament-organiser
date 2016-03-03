@@ -1,7 +1,7 @@
 """
 ORM module for accounts
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 from passlib.hash import sha256_crypt
 
@@ -56,6 +56,7 @@ class Account(db.Model):
     @staticmethod
     def username_exists(username):
         """Check if a username exists for a player"""
+        # pylint: disable=no-member
         return Account.query.filter_by(username=username).first() is not None
 
 class AccountSecurity(db.Model):

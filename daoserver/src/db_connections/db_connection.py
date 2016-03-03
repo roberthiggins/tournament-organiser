@@ -36,9 +36,9 @@ class DBConnection(object):
 
 def db_conn(commit=False, cursor_factory=None):
     """A decorator that gives the function a db_conn to use (cur)"""
-    def decorator(func):                            # pylint: disable=C0111
+    def decorator(func):                            # pylint: disable=missing-docstring
         @wraps(func)
-        def wrapped(*args, **kwargs):               # pylint: disable=C0111
+        def wrapped(*args, **kwargs):               # pylint: disable=missing-docstring
 
             glob = func.func_globals
             sentinel = object()

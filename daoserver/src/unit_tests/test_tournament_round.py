@@ -9,6 +9,7 @@ from models.tournament import db as tournament_db
 from models.tournament_round import TournamentRound
 from tournament import Tournament
 
+# pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class SetRounds(TestCase):
 
     def create_app(self):
@@ -27,7 +28,7 @@ class SetRounds(TestCase):
         from models.tournament import Tournament as TournamentDAO
         dao = TournamentDAO(name)
         dao.date = date.today()
-        dao.num_rounds = 4;
+        dao.num_rounds = 4
         dao.write()
 
         TournamentRound(name, 1, 'mission_1').write()
@@ -78,7 +79,7 @@ class SetRounds(TestCase):
 
         compare(
             [x.mission for x in Tournament(name).get_dao().rounds],
-            ['mission_1','mission_2', 'mission_3', 'TBA'])
+            ['mission_1', 'mission_2', 'mission_3', 'TBA'])
 
     def test_set_mission(self):
         """add a mission to the tournament round"""

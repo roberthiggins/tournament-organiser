@@ -9,9 +9,7 @@ TODO:
     - the relationship here could be tidied up somewhat.
 
 """
-# pylint: disable=C0103
-
-from sqlalchemy.sql.expression import and_
+# pylint: disable=invalid-name
 
 from models.db_connection import db
 from models.tournament import Tournament
@@ -47,6 +45,7 @@ class ScoreCategory(db.Model):
         """To the DB"""
 
         # All the score percantages can only sum to 100 or less.
+        # pylint: disable=no-member
         existing = ScoreCategory.query.\
             filter_by(tournament_id=self.tournament_id).all()
         if (sum([x.percentage for x in existing]) + self.percentage) > 100:

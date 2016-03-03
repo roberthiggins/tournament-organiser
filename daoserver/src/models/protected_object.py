@@ -1,11 +1,11 @@
 """
 ORM module for protected_object table
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 from models.db_connection import db
 
-# pylint: disable=W0232
+# pylint: disable=no-init
 class ProtectedObject(db.Model):
     """
     A ProtectedObject is an object that can have access to it restricted by

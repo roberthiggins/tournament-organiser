@@ -18,7 +18,7 @@ from table_strategy import ProtestAvoidanceStrategy
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
-    def wrapped(self, *args, **kwargs):                 # pylint: disable=C0111
+    def wrapped(self, *args, **kwargs):                 # pylint: disable=missing-docstring
         if not self.exists_in_db:
             print 'Tournament not found: {}'.format(self.tournament_id)
             raise ValueError(
@@ -27,7 +27,7 @@ def must_exist_in_db(func):
         return func(self, *args, **kwargs)
     return wrapped
 
-# pylint: disable=E1101
+# pylint: disable=no-member
 class Tournament(object):
     """A tournament DAO"""
 
@@ -66,6 +66,7 @@ class Tournament(object):
             dao.protected_object_id)
 
     def get_dao(self):
+        """Convenience method to recover DAO"""
         return TournamentDB.query.filter_by(name=self.tournament_id).first()
 
     @must_exist_in_db

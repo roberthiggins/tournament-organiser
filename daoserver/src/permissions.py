@@ -1,7 +1,7 @@
 """
 Module to handle permissions for accounts trying to modify a tournament.
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import and_
@@ -23,7 +23,7 @@ def check_action_valid(action):
         raise ValueError(
             'Illegal action passed to check_permission {}'.format(action))
 
-# pylint: disable=W0232
+# pylint: disable=no-init,no-member
 class ProtObjAction(db.Model):
     """An action you can perform on a protected object, e.g. enter score"""
     __tablename__ = 'protected_object_action'
@@ -35,6 +35,7 @@ class ProtObjAction(db.Model):
             self.id,
             self.description)
 
+# pylint: disable=no-init,no-member
 class ProtObjPerm(db.Model):
     """
     Gain a permission to do a something ProtObjAction on a protected
@@ -71,7 +72,7 @@ class ProtObjPerm(db.Model):
             raise
 
 
-# pylint: disable=E0602
+# pylint: disable=E0602,no-member
 class PermissionsChecker(object):
     """
     Organisers and admins can add/remove players.
@@ -98,9 +99,11 @@ class PermissionsChecker(object):
         """
         check_action_valid(action)
 
+        # pylint: disable=no-member
         act_id = ProtObjAction.query.filter_by(description=action).first().id
 
         try:
+            # pylint: disable=no-member
             permission_id = ProtObjPerm.query.filter(
                 and_(
                     ProtObjPerm.protected_object_id == prot_obj_id,
@@ -116,8 +119,7 @@ class PermissionsChecker(object):
             [user, permission_id])
 
     # pylint: disable=R0913
-    def check_permission(self, action, user, for_user, tournament,
-                         game_id=None):
+    def check_permission(self, action, user, for_user, tournament):
         """
         Entry point method for checking permissions.
         Check that a user is entitled to perform action for tournament
@@ -130,8 +132,7 @@ class PermissionsChecker(object):
                 return True
             if user != for_user:
                 return False
-            return self.is_tournament_player(user, tournament) or \
-                self.is_tournament_player(user, tournament, game_id)
+            return self.is_tournament_player(user, tournament)
 
         return False
 
@@ -141,10 +142,10 @@ class PermissionsChecker(object):
         if user is None:
             return False
 
-        return Account.query.filter(
-                and_(Account.username == user,
-                     Account.is_superuser)
-            ).first() is not None
+        # pylint: disable=no-member
+        return Account.query.\
+            filter(and_(Account.username == user, Account.is_superuser)).\
+            first() is not None
 
     @db_conn()
     def is_organiser(self, user, tournament):
@@ -157,7 +158,7 @@ class PermissionsChecker(object):
 
     @db_conn()
     def is_tournament_player(self, user, tournament):
-        """user is a player in game."""
+        """User playing in tournament."""
         try:
             entry_id = self.entry_db.entry_id(tournament, user)
         except TypeError:

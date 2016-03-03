@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 import os
 import sys
 

@@ -24,7 +24,7 @@ def create_account(request):
 
     if request.method == 'POST':
         form = CreateAccountForm(request.POST)
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             form.save()
 
         response = from_dao('/addPlayer', form)
@@ -54,12 +54,12 @@ def create_or_update_user(login_creds):
     user = json.loads(from_dao('/userDetails/%s' % u_name).content).get(u_name)
 
     try:
-        # pylint: disable=E1101
+        # pylint: disable=no-member
         local_user = User.objects.get(username=u_name)
         local_user.set_password(p_word)
         local_user.email = user[0]
         local_user.save()
-    except User.DoesNotExist:                           # pylint: disable=E1101
+    except User.DoesNotExist:                           # pylint: disable=no-member
         User.objects.create_user(
             username=u_name,
             email=user[0],

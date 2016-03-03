@@ -1,9 +1,15 @@
+"""
+Test entering scores for games in a tournament
+"""
+
 from testfixtures import compare
 import unittest
 
 from db_connections.db_connection import db_conn
 from game import get_game_from_score
-class ScoreEnteringTests(unittest.TestCase):             # pylint: disable=R0904
+
+# pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable
+class ScoreEnteringTests(unittest.TestCase):
     """Comes from a range of files"""
 
     def test_get_game_from_score(self):

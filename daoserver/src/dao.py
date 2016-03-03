@@ -47,9 +47,9 @@ def unknown_error(err):
 
 def enforce_request_variables(*vars_to_enforce):
     """ A decorator that requires var exists in the request"""
-    def decorator(func):                                # pylint: disable=C0111
+    def decorator(func):                # pylint: disable=missing-docstring
         @wraps(func)
-        def wrapped(*args, **kwargs):                   # pylint: disable=C0111
+        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
 
             if request.method == 'GET':
                 return func(*args, **kwargs)
@@ -87,9 +87,9 @@ def requires_permission(action, error_msg):
     Assumptions:
         - the function scope includes the variables 'username' and 'tournament'
     """
-    def decorator(func):                                # pylint: disable=C0111
+    def decorator(func):                # pylint: disable=missing-docstring
         @wraps(func)
-        def wrapped(*args, **kwargs):                   # pylint: disable=C0111
+        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
 
             checker = PermissionsChecker()
             if request.authorization is None or not checker.check_permission(
@@ -117,6 +117,7 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     tournament names
     """
+    # pylint: disable=no-member
     details = [
         {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
         for x in TournamentDAO.query.all()]
@@ -414,5 +415,6 @@ def user_details(u_name=None):
     GET to get account details in url form
     TODO security
     """
+    # pylint: disable=no-member
     return jsonify({u_name: Account.query.filter_by(
         username=u_name).first().contact_email})

@@ -1,7 +1,7 @@
 """
 ORM module for a round in a tournament
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 from models.db_connection import db
 from models.tournament import Tournament
@@ -26,12 +26,13 @@ class TournamentRound(db.Model):
         round_num = int(round_num)
         if round_num <= 0:
             raise ValueError('Round ording must be a positive integer')
+        # pylint: disable=no-member
         if round_num > Tournament.query.filter_by(name=tournament).\
-            first().num_rounds + 1:
-                raise ValueError('Tournament {} only has {} rounds'.format(
-                    tournament,
-                    round_num
-                ))
+        first().num_rounds + 1:
+            raise ValueError('Tournament {} only has {} rounds'.format(
+                tournament,
+                round_num
+            ))
         self.ordering = round_num
 
     def __repr__(self):

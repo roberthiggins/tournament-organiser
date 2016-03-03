@@ -1,9 +1,9 @@
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 from django.conf.urls import url
 
 from public import public_views, views
 
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 urlpatterns = [
 
     # Public views

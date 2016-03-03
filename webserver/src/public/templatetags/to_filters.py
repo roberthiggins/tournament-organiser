@@ -3,7 +3,7 @@
 from django import template
 from django.template.defaulttags import register
 
-register = template.Library()                           # pylint: disable=C0103
+register = template.Library()                           # pylint: disable=invalid-name
 
 @register.filter
 def get_item(dictionary, key):

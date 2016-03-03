@@ -1,7 +1,7 @@
 """
 ORM module for a tournament
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 from models.db_connection import db
 from models.protected_object import ProtectedObject

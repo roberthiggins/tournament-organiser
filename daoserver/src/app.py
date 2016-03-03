@@ -27,7 +27,7 @@ def create_app():
 
     return app
 
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 if __name__ == "__main__":
 
     app = create_app()
@@ -35,10 +35,10 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 
-    # pylint: disable=W0232
+    # pylint: disable=no-init
     class DatetimeHandler(jsonpickle.handlers.BaseHandler):
         """Custom handler to get datetimes as ISO dates"""
-        def flatten(self, obj, data):   # pylint: disable=C0111,W0613,R0201
+        def flatten(self, obj, data):   # pylint: disable=missing-docstring,W0613,R0201
             return obj.isoformat()
 
     jsonpickle.handlers.registry.register(datetime.datetime, DatetimeHandler)

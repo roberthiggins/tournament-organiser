@@ -9,6 +9,7 @@ from models.account import Account
 from models.registration import TournamentRegistration
 from models.tournament import db as tournament_db, Tournament as TournamentDAO
 
+# pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class TournamentRegistrations(TestCase):
 
     tournament_1 = 'loving_strahotski'
@@ -35,11 +36,14 @@ class TournamentRegistrations(TestCase):
 
         TournamentRegistration(self.player_1, self.tournament_1).write()
         TournamentRegistration(self.player_1, self.tournament_3).write()
-        self.assertRaises(RuntimeError,
+        self.assertRaises(
+            RuntimeError,
             TournamentRegistration(self.player_1, self.tournament_1).write)
-        self.assertRaises(RuntimeError,
+        self.assertRaises(
+            RuntimeError,
             TournamentRegistration(self.player_1, self.tournament_2).write)
-        self.assertRaises(RuntimeError,
+        self.assertRaises(
+            RuntimeError,
             TournamentRegistration(self.player_1, self.tournament_3).write)
 
 

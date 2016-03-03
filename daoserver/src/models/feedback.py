@@ -1,7 +1,7 @@
 """
 ORM module for feedback from the user
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 import datetime
 
@@ -28,5 +28,6 @@ class Feedback(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
+        # pylint: disable=broad-except
         except Exception:
             db.session.rollback()

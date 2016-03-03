@@ -24,7 +24,7 @@ def create_tournament(request):
 
     if request.method == 'POST':
         form = AddTournamentForm(request.POST)
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             response = from_dao('/addTournament', form, request)
 
             if  response.status_code == 200:
@@ -72,7 +72,7 @@ def enter_score_by_entry(request, entry_id):
             username=user_info['username'],
             tournament=user_info['tournament_name'])
 
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             response = from_dao('/entertournamentscore', form, request)
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -111,7 +111,7 @@ def feedback(request):
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             response = from_dao('/placefeedback', form)
 
             if  response.status_code == 200:
@@ -158,7 +158,7 @@ def set_missions(request, tournament_id):
             tournament_id=tournament_id,
             rounds=rounds)
 
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             response = from_dao('/setMissions', form)
 
             if  response.status_code == 200:
@@ -185,7 +185,7 @@ def register_for_tournament(request):
 
     if request.method == 'POST':
         form = ApplyForTournamentForm(request.POST, tournament_list=t_list)
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             response = from_dao('/registerfortournament', form)
 
             if  response.status_code == 200:
@@ -214,7 +214,7 @@ def set_rounds(request, tournament_id):
 
     if request.method == 'POST':
         form = SetRoundsForm(request.POST, tournament_id=tournament_id)
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             response = from_dao('/setRounds', form)
 
             if  response.status_code == 200:
@@ -239,7 +239,7 @@ def suggest_improvement(request):
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             response = from_dao('/placefeedback', form)
 
             if  response.status_code == 200:
@@ -292,7 +292,7 @@ def tournament_setup(request, tournament_id):
             tournament_id=tournament_id,
             score_categories=categories)
 
-        if form.is_valid():                             # pylint: disable=E1101
+        if form.is_valid():                             # pylint: disable=no-member
             try:
                 response = from_dao('/setTournamentScore', form)
                 return HttpResponse(response)
