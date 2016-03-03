@@ -76,8 +76,8 @@ class SetRounds(TestCase):
         self.assertRaises(ValueError, tourn.get_mission, 'a')
         self.assertRaises(ValueError, tourn.get_mission, 5)
 
-        tourn = Tournament(name)
-        compare(tourn.get_missions(),
+        compare(
+            [x.mission for x in Tournament(name).get_dao().rounds],
             ['mission_1','mission_2', 'mission_3', 'TBA'])
 
     def test_set_mission(self):

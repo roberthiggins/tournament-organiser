@@ -153,13 +153,6 @@ class Tournament(object):
         raise ValueError('Round {} does not exist'.format(round_id))
 
     @must_exist_in_db
-    def get_missions(self):
-        """Get all missions for the tournament"""
-        rounds = TournamentRound.query.\
-            filter_by(tournament_name=self.tournament_id).all()
-        return [x.mission for x in rounds]
-
-    @must_exist_in_db
     def round_info(self, round_id=0):
         """
         Returns info about round.

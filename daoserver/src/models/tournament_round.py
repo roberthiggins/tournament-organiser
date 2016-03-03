@@ -17,7 +17,7 @@ class TournamentRound(db.Model):
         primary_key=True)
     ordering = db.Column(db.Integer, default=1, primary_key=True)
     mission = db.Column(db.String(20), default='TBA', nullable=False)
-    tournament = db.relationship(Tournament)
+    tournament = db.relationship(Tournament, backref='rounds')
 
     def __init__(self, tournament, round_num, mission=None):
         self.tournament_name = tournament

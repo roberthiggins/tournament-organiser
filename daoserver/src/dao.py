@@ -260,7 +260,8 @@ def login():
 def get_missions(tournament_id):
     """GET list of missions for a tournament."""
     return jsonpickle.encode(
-        Tournament(tournament_id).get_missions(), unpicklable=False)
+        [x.mission for x in Tournament(tournament_id).get_dao().rounds],
+        unpicklable=False)
 
 @APP.route('/setMissions', methods=['POST'])
 @enforce_request_variables('tournamentId', 'missions')
