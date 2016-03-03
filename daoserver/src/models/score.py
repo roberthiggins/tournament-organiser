@@ -15,6 +15,7 @@ from sqlalchemy.sql.expression import and_
 
 from models.db_connection import db
 from models.tournament import Tournament
+from models.tournament_round import TournamentRound
 
 class ScoreCategory(db.Model):
     """ A row from the score_category table"""
@@ -99,3 +100,32 @@ class ScoreKey(db.Model):
         except Exception:
             db.session.rollback()
             raise Exception('Score already set')
+
+class RoundScore(db.Model):
+    """A score for an entry in a round"""
+
+    __tablename__ = 'round_score'
+    score_key_id = db.Column(db.Integer,
+                             db.ForeignKey(ScoreKey.id),
+                             primary_key=True)
+    round_id = db.Column(db.Integer,
+                         db.ForeignKey(TournamentRound.id),
+                         primary_key=True)
+    score_key = db.relationship(ScoreKey)
+    round = db.relationship(TournamentRound)
+
+    def __init__(self, score_key, round_id):
+        self.score_key_id = score_key
+        self.round_id = int(round_id)
+
+    def __repr__(self):
+        return '<RoundScore ({}, {})>'.format(self.score_key_id, self.round_id)
+
+    def write(self):
+        """To the DB"""
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
