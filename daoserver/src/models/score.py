@@ -22,9 +22,11 @@ class ScoreCategory(db.Model):
     __tablename__ = 'score_category'
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.String(50),
-                              db.ForeignKey(Tournament.name))
+                              db.ForeignKey(Tournament.name),
+                              nullable=False)
     display_name = db.Column(db.String(50), nullable=False)
     percentage = db.Column(db.Integer, nullable=False, default=100)
+    tournament = db.relationship(Tournament)
 
     def __init__(self, tournament_id, display_name, percentage):
         self.tournament_id = tournament_id
@@ -68,6 +70,7 @@ class ScoreKey(db.Model):
     category = db.Column(db.Integer,
                          db.ForeignKey(ScoreCategory.id),
                          primary_key=True)
+    score_category = db.relationship(ScoreCategory)
 
     def __init__(self, key, category, min_val, max_val):
         self.key = key
