@@ -8,7 +8,6 @@ import datetime
 from sqlalchemy.sql.expression import and_
 
 from db_connections.entry_db import EntryDBConnection
-from db_connections.tournament_db import TournamentDBConnection
 from matching_strategy import RoundRobin
 from models.score import db as score_db, RoundScore, ScoreCategory, ScoreKey
 from models.tournament import Tournament as TournamentDB
@@ -33,7 +32,6 @@ class Tournament(object):
     """A tournament DAO"""
 
     def __init__(self, tournament_id=None, ranking_strategy=None, creator=None):
-        self.tourn_db_conn = TournamentDBConnection()
         self.tournament_id = tournament_id
         self.exists_in_db = TournamentDB.query.filter_by(
             name=tournament_id).first() is not None
@@ -241,8 +239,9 @@ class Tournament(object):
         key = ScoreKey(key, category, min_val, max_val)
         key.write()
 
+        # This score could be per-game rather than per-tournament
         if round_id is not None:
-            self.tourn_db_conn.set_score_key_for_round(key.id, round_id)
+            RoundScore(key.id, round_id).write()
 
     @must_exist_in_db
     def get_score_keys_for_round(self, round_id='next'):

@@ -14,7 +14,6 @@ from functools import wraps
 
 from authentication import check_auth
 from db_connections.entry_db import EntryDBConnection
-from db_connections.tournament_db import TournamentDBConnection
 from models.account import Account
 from models.feedback import Feedback
 from models.registration import TournamentRegistration
@@ -22,7 +21,6 @@ from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
 
 ENTRY_DB_CONN = EntryDBConnection()
-TOURNAMENT_DB_CONNECTION = TournamentDBConnection()
 
 APP = Blueprint('APP', __name__, url_prefix='')
 
