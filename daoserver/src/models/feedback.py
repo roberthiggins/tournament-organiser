@@ -5,9 +5,7 @@ ORM module for feedback from the user
 
 import datetime
 
-from flask.ext.sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from models.db_connection import db
 
 class Feedback(db.Model):
     """

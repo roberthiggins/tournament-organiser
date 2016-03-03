@@ -11,12 +11,10 @@ TODO:
 """
 # pylint: disable=C0103
 
-from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import and_
 
+from models.db_connection import db
 from models.tournament import Tournament
-
-db = SQLAlchemy()
 
 class ScoreCategory(db.Model):
     """ A row from the score_category table"""

@@ -3,10 +3,9 @@ ORM module for accounts
 """
 # pylint: disable=C0103
 
-from flask.ext.sqlalchemy import SQLAlchemy
 from passlib.hash import sha256_crypt
 
-db = SQLAlchemy()
+from models.db_connection import db
 
 class Account(db.Model):
     """Basic user account"""

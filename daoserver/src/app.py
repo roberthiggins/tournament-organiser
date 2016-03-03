@@ -19,26 +19,8 @@ def create_app():
             os.environ['DB_PORT_5432_TCP_PORT'],
             os.environ['DB_NAME'])
 
-    from models.account import db as account_db
-    account_db.init_app(app)
-
-    from models.feedback import db as feedback_db
-    feedback_db.init_app(app)
-
-    from models.protected_object import db as protected_object_db
-    protected_object_db.init_app(app)
-
-    from models.tournament import db as tournament_db
-    tournament_db.init_app(app)
-
-    from models.tournament_round import db as tournament_round_db
-    tournament_round_db.init_app(app)
-
-    from models.registration import db as registration_db
-    registration_db.init_app(app)
-
-    from models.score import db as score_db
-    score_db.init_app(app)
+    from models.db_connection import db as db_conn
+    db_conn.init_app(app)
 
     from dao import APP
     app.register_blueprint(APP)

@@ -3,10 +3,8 @@ ORM module for a round in a tournament
 """
 # pylint: disable=C0103
 
-from flask.ext.sqlalchemy import SQLAlchemy
+from models.db_connection import db
 from models.tournament import Tournament
-
-db = SQLAlchemy()
 
 class TournamentRound(db.Model):
     """A row in the tournament_round table"""

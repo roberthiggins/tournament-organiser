@@ -61,8 +61,10 @@ class TournamentRegistrations(TestCase):
         rego_1.write()
         rego_2 = TournamentRegistration(self.player_2, self.tournament_1)
         tournament_db.session.add(rego_2)
-        self.assertTrue(rego_1.clashes().name == self.tournament_2)
-        self.assertTrue(rego_2.clashes().name == self.tournament_2)
+        tournament_db.session.commit()
+
+        self.assertTrue(rego_1.clashes().name == self.tournament_1)
+        self.assertTrue(rego_2.clashes().name == self.tournament_1)
 
         rego_3 = TournamentRegistration(self.player_2, self.tournament_3)
         rego_3.write()

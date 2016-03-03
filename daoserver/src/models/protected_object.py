@@ -3,9 +3,7 @@ ORM module for protected_object table
 """
 # pylint: disable=C0103
 
-from flask.ext.sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from models.db_connection import db
 
 # pylint: disable=W0232
 class ProtectedObject(db.Model):

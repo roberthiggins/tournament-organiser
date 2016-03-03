@@ -3,10 +3,8 @@ ORM module for a tournament
 """
 # pylint: disable=C0103
 
-from flask.ext.sqlalchemy import SQLAlchemy
+from models.db_connection import db
 from models.protected_object import ProtectedObject
-
-db = SQLAlchemy()
 
 class Tournament(db.Model):
     """Represents a row in the tournament table"""
