@@ -8,6 +8,7 @@ from psycopg2.extras import DictCursor
 
 from db_connections.db_connection import db_conn
 from models.account import Account
+from models.tournament_entry import TournamentEntry
 
 class Entry(json.JSONEncoder):
     """
@@ -123,7 +124,6 @@ class EntryDBConnection(object):
         return unranked_list
 
     @db_conn()
-    # pylint: disable=E0602
     def entry_id(self, tournament_id, username):
         """
         Get the entry_id for the player in the tournament
@@ -131,16 +131,13 @@ class EntryDBConnection(object):
         Returns: Integer. The entry_id of entry, if one exists. Throws
             ValueErrors and RuntimeError if tournament or player don't exist.
         """
-        if tournament_id is None or username is None:
-            raise ValueError('Missing required fields to entry_id')
         if not Account.username_exists(username):
             raise ValueError('Unknown player: %s' % username)
 
-        cur.execute(
-            "SELECT id FROM entry \
-            WHERE player_id = %s AND tournament_id = %s",
-            [username, tournament_id])
-        return cur.fetchone()[0]
+        # pylint: disable=no-member
+        entry = TournamentEntry.query.\
+            filter_by(tournament_id=tournament_id, player_id=username).first()
+        return entry.id
 
     @db_conn()
     # pylint: disable=E0602
