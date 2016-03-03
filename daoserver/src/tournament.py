@@ -78,9 +78,6 @@ class Tournament(object):
         information
         """
         details = TournamentDB.query.filter_by(name=self.tournament_id).first()
-        if details is None:
-            raise RuntimeError('No information is available on "{}"'.format(
-                self.tournament_id))
 
         return {
             'name': details.name,
