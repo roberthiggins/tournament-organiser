@@ -17,6 +17,7 @@ from db_connections.entry_db import EntryDBConnection
 from models.account import Account
 from models.feedback import Feedback
 from models.registration import TournamentRegistration
+from models.tournament import Tournament as TournamentDAO
 from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
 
@@ -116,7 +117,11 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     tournament names
     """
-    return jsonpickle.encode(Tournament.list_tournaments(), unpicklable=False)
+    details = [
+        {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
+        for x in TournamentDAO.query.all()]
+
+    return jsonpickle.encode({'tournaments' : details}, unpicklable=False)
 
 @APP.route('/registerfortournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputUserName')

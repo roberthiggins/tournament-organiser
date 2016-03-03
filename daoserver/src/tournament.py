@@ -101,19 +101,6 @@ class Tournament(object):
             {'id': x.id, 'name': x.display_name, 'percentage': x.percentage} \
             for x in categories]
 
-    @staticmethod
-    def list_tournaments():
-        """
-        GET a list of tournaments
-        Returns json. The only key is 'tournaments' and the value is a list of
-        tournament names
-        """
-        details = [
-            {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
-            for x in TournamentDB.query.all()]
-
-        return {'tournaments' : details}
-
     @must_exist_in_db
     def make_draw(self, round_id=0):
         """Determines the draw for round. This draw is written to the db"""
