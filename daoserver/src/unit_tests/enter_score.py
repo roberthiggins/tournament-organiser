@@ -2,10 +2,13 @@
 Test entering scores for games in a tournament
 """
 
+from flask.ext.testing import TestCase
 from testfixtures import compare
 import unittest
 
+from app import create_app
 from db_connections.db_connection import db_conn
+from models.db_connection import db
 from game import get_game_from_score
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable
@@ -104,3 +107,83 @@ class ScoreEnteringTests(unittest.TestCase):
         compare(
             game.scores_entered(),
             [(5, 'round_2_battle', 5)])
+
+class EnterScore(TestCase):
+
+    player_1 = 'enter_score_account'
+    tournament_1 = 'enter_score_tournament'
+
+    def create_app(self):
+        # pass in test configuration
+        return create_app()
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+
+    def test_enter_score(self):
+        """
+        Enter a score for an entry
+        """
+
+        from models.tournament import Tournament
+        t = Tournament(self.tournament_1)
+        t.date = '2015-07-08'
+        t.num_rounds = 5
+        t.write()
+
+        from models.score import ScoreCategory, ScoreKey
+        cat = ScoreCategory(self.tournament_1, 'nonsense', 50)
+        cat.tournament = t
+        cat.write()
+
+        key = ScoreKey('some_key', cat.id, 0, 100)
+        key.score_category = cat
+        key.write()
+
+        from models.tournament_round import TournamentRound
+        rd = TournamentRound(self.tournament_1, 1, 'foo_mission_1')
+        rd.write()
+
+        from models.account import Account
+        Account(self.player_1, 'foo@bar.com').write()
+
+        from models.tournament_entry import TournamentEntry
+        entry = TournamentEntry(self.player_1, self.tournament_1)
+        entry.write()
+
+        from db_connections.entry_db import EntryDBConnection
+        self.assertRaises(
+            TypeError,
+            EntryDBConnection().enter_score,
+            entry.id,
+            'not_a_key',
+            5)
+        self.assertRaises(
+            ValueError,
+            EntryDBConnection().enter_score,
+            entry.id,
+            key.key,
+            -1)
+        self.assertRaises(
+            ValueError,
+            EntryDBConnection().enter_score,
+            entry.id,
+            key.key,
+            'a')
+        self.assertRaises(
+            ValueError,
+            EntryDBConnection().enter_score,
+            entry.id,
+            key.key,
+            101)
+        EntryDBConnection().enter_score(entry.id, key.key, 0)
+        self.assertRaises(
+            ValueError,
+            EntryDBConnection().enter_score,
+            entry.id,
+            key.key,
+            100)
+

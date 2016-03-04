@@ -38,7 +38,7 @@ class TestRoundScore(TestCase):
         cat.tournament = t
         cat.write()
 
-        key = ScoreKey('some_key', 0, 100, cat.id)
+        key = ScoreKey('some_key', cat.id, 0, 100)
         key.score_category = cat
         key.write()
 

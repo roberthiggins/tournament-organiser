@@ -5,9 +5,12 @@ This file contains code to connect to the entry_db
 from flask import json
 import psycopg2
 from psycopg2.extras import DictCursor
+from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
 from models.account import Account
+from models.db_connection import db
+from models.score import ScoreCategory, ScoreKey
 from models.tournament_entry import TournamentEntry
 
 class Entry(json.JSONEncoder):
@@ -35,6 +38,7 @@ class Entry(json.JSONEncoder):
     def __repr__(self):
         return self.entry_id
 
+# pylint: disable=no-member
 class EntryDBConnection(object):
     """
     Connection class to the entry database
@@ -54,31 +58,26 @@ class EntryDBConnection(object):
         Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
             there is an issue inserting the score.
         """
-        if not entry_id or not score_key or not score:
-            raise ValueError('Enter the required fields')
-
         try:
-            cur.execute(
-                "SELECT tournament_id FROM entry WHERE id = %s", [entry_id])
-            tournament_id = cur.fetchone()[0]
+            tournament_name = TournamentEntry.query.\
+                filter_by(id=entry_id).first().tournament.name
 
             # score_key should mean something in the context of the tournie
-            cur.execute(
-                "SELECT k.id, min_val, max_val FROM score_key k \
-                INNER JOIN score_category c ON k.category = c.id \
-                WHERE k.key = %s AND c.tournament_id = %s",
-                [score_key, tournament_id])
-            row = cur.fetchone()
-            score_id = row[0]
-            score = int(score)
+            key = db.session.query(ScoreKey).join(ScoreCategory).\
+                filter(and_(ScoreCategory.tournament_id == tournament_name,
+                            ScoreKey.key == score_key)
+                ).first()
 
-            if score < int(row[1]) or score > int(row[2]):
+            score = int(score)
+            if score < key.min_val or score > key.max_val:
                 raise ValueError()
 
             cur.execute(
                 "INSERT INTO score VALUES(%s, %s, %s)",
-                [entry_id, score_id, score])
+                [entry_id, key.id, score])
 
+        except AttributeError:
+            raise TypeError('Unknown category: {}'.format(score_key))
         except TypeError:
             raise TypeError('Unknown category: {}'.format(score_key))
         except ValueError:
@@ -143,28 +142,23 @@ class EntryDBConnection(object):
     # pylint: disable=E0602
     def entry_info(self, entry_id):
         """ Given an entry, get information about the user and tournament"""
-        if not entry_id:
-            raise ValueError('Missing required fields to entry_info')
         try:
             entry_id = int(entry_id)
         except ValueError:
             raise ValueError('Entry ID must be an integer')
 
         try:
-            cur.execute("SELECT a.username, t.name \
-                FROM entry e INNER JOIN account a on e.player_id = a.username \
-                INNER JOIN tournament t on e.tournament_id = t.name \
-                WHERE e.id = %s", [entry_id])
-            row = cur.fetchone()
-            if row is None:
-                raise ValueError('Entry ID not valid: {}'.format(entry_id))
+            entry = TournamentEntry.query.filter_by(id=entry_id).first()
+
             return {
                 'entry_id': entry_id,
-                'username': row[0],
-                'tournament_name': row[1],
+                'username': entry.account.username,
+                'tournament_name': entry.tournament.name,
             }
-        except psycopg2.DatabaseError as err:
-            raise RuntimeError(err)
+        except ValueError:
+            raise ValueError('Entry ID not valid: {}'.format(entry_id))
+        except AttributeError:
+            raise ValueError('Entry ID not valid: {}'.format(entry_id))
 
     @db_conn()
     # pylint: disable=E0602

@@ -20,7 +20,7 @@ class TournamentEntry(db.Model):
     tournament_id = db.Column(db.String(50), db.ForeignKey(Tournament.name))
 
     tournament = db.relationship(Tournament, backref='entries')
-    account = db.relationship(Account, backref='account')
+    account = db.relationship(Account, backref='entries')
 
     def __init__(self, player_id, tournament_id):
         self.player_id = player_id
