@@ -140,28 +140,6 @@ class EntryDBConnection(object):
 
     @db_conn()
     # pylint: disable=E0602
-    def entry_info(self, entry_id):
-        """ Given an entry, get information about the user and tournament"""
-        try:
-            entry_id = int(entry_id)
-        except ValueError:
-            raise ValueError('Entry ID must be an integer')
-
-        try:
-            entry = TournamentEntry.query.filter_by(id=entry_id).first()
-
-            return {
-                'entry_id': entry_id,
-                'username': entry.account.username,
-                'tournament_name': entry.tournament.name,
-            }
-        except ValueError:
-            raise ValueError('Entry ID not valid: {}'.format(entry_id))
-        except AttributeError:
-            raise ValueError('Entry ID not valid: {}'.format(entry_id))
-
-    @db_conn()
-    # pylint: disable=E0602
     def get_scores_for_entry(self, entry_id):
         """ Get all the score_key:score pairs for an entry"""
         cur.execute("SELECT key, score, category, min_val, max_val \

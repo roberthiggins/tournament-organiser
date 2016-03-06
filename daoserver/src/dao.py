@@ -18,6 +18,7 @@ from models.account import Account
 from models.feedback import Feedback
 from models.registration import TournamentRegistration
 from models.tournament import Tournament as TournamentDAO
+from models.tournament_entry import TournamentEntry
 from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
 
@@ -239,8 +240,23 @@ def get_entry_id(tournament_id, username):
 @APP.route('/entryInfo/<entry_id>', methods=['GET'])
 def entry_info(entry_id):
     """ Given entry_id, get info about player and tournament"""
-    return jsonpickle.encode(
-        ENTRY_DB_CONN.entry_info(entry_id), unpicklable=False)
+
+    try:
+        entry_id = int(entry_id)
+    except ValueError:
+        raise ValueError('Entry ID must be an integer')
+
+    try:
+        # pylint: disable=no-member
+        entry = TournamentEntry.query.filter_by(id=entry_id).first()
+
+        return jsonpickle.encode({
+            'entry_id': entry.id,
+            'username': entry.account.username,
+            'tournament_name': entry.tournament.name,
+        }, unpicklable=False)
+    except AttributeError:
+        raise ValueError('Entry ID not valid: {}'.format(entry_id))
 
 @APP.route('/login', methods=['POST'])
 @enforce_request_variables('inputUsername', 'inputPassword')

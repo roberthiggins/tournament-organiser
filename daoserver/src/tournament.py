@@ -11,6 +11,7 @@ from db_connections.entry_db import EntryDBConnection
 from matching_strategy import RoundRobin
 from models.score import db as score_db, RoundScore, ScoreCategory, ScoreKey
 from models.tournament import Tournament as TournamentDB
+from models.tournament_entry import TournamentEntry
 from models.tournament_round import TournamentRound
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
@@ -115,15 +116,15 @@ class Tournament(object):
                             table_number=match.table_number)
                 game.write_to_db()
                 if game.entry_1 is not None:
-                    entry_id = game.entry_1
-                    uname = EntryDBConnection().entry_info(entry_id)['username']
+                    uname = TournamentEntry.query.filter_by(id=game.entry_2).\
+                        first().username
                     PermissionsChecker().add_permission(
                         uname,
                         PERMISSIONS['ENTER_SCORE'],
                         game.protected_object_id)
                 if game.entry_2 is not None:
-                    entry_id = game.entry_2
-                    uname = EntryDBConnection().entry_info(entry_id)['username']
+                    uname = TournamentEntry.query.filter_by(id=game.entry_2).\
+                        first().username
                     PermissionsChecker().add_permission(
                         uname,
                         PERMISSIONS['ENTER_SCORE'],
