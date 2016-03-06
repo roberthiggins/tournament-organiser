@@ -7,7 +7,6 @@ import datetime
 
 from sqlalchemy.sql.expression import and_
 
-from db_connections.entry_db import EntryDBConnection
 from matching_strategy import RoundRobin
 from models.score import db as score_db, RoundScore, ScoreCategory, ScoreKey
 from models.tournament import Tournament as TournamentDB

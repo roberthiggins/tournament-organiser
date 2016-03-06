@@ -8,7 +8,6 @@ from psycopg2.extras import DictCursor
 from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
-from models.account import Account
 from models.db_connection import db
 from models.score import ScoreCategory, ScoreKey
 from models.tournament_entry import TournamentEntry
@@ -66,7 +65,7 @@ class EntryDBConnection(object):
             key = db.session.query(ScoreKey).join(ScoreCategory).\
                 filter(and_(ScoreCategory.tournament_id == tournament_name,
                             ScoreKey.key == score_key)
-                ).first()
+                      ).first()
 
             score = int(score)
             if score < key.min_val or score > key.max_val:
@@ -121,22 +120,6 @@ class EntryDBConnection(object):
         ]
 
         return unranked_list
-
-    @db_conn()
-    def entry_id(self, tournament_id, username):
-        """
-        Get the entry_id for the player in the tournament
-
-        Returns: Integer. The entry_id of entry, if one exists. Throws
-            ValueErrors and RuntimeError if tournament or player don't exist.
-        """
-        if not Account.username_exists(username):
-            raise ValueError('Unknown player: %s' % username)
-
-        # pylint: disable=no-member
-        entry = TournamentEntry.query.\
-            filter_by(tournament_id=tournament_id, player_id=username).first()
-        return entry.id
 
     @db_conn()
     # pylint: disable=E0602

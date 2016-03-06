@@ -222,11 +222,15 @@ def enter_tournament_score():
     if not tourn.exists_in_db:
         raise ValueError('Unknown tournament: {}'.format(tournament))
 
-    # pylint: disable=E0602
-    entry = ENTRY_DB_CONN.entry_id(tournament, username)
+    if not Account.username_exists(username):
+        raise ValueError('Unknown player: {}'.format(username))
+
+    # pylint: disable=E0602,no-member
+    entry_id = TournamentEntry.query.\
+            filter_by(tournament_id=tournament, player_id=username).first().id
 
     # pylint: disable=E0602
-    ENTRY_DB_CONN.enter_score(entry, key, value)
+    ENTRY_DB_CONN.enter_score(entry_id, key, value)
     return make_response(
         'Score entered for {}: {}'.format(username, value),
         200)
@@ -234,8 +238,15 @@ def enter_tournament_score():
 @APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
 def get_entry_id(tournament_id, username):
     """Get entry info from tournament and username"""
-    return jsonpickle.encode(
-        ENTRY_DB_CONN.entry_id(tournament_id, username), unpicklable=False)
+
+    if not Account.username_exists(username):
+        raise ValueError('Unknown player: {}'.format(username))
+
+    # pylint: disable=no-member
+    entry_id = TournamentEntry.query.\
+        filter_by(tournament_id=tournament_id, player_id=username).first().id
+
+    return jsonpickle.encode(entry_id, unpicklable=False)
 
 @APP.route('/entryInfo/<entry_id>', methods=['GET'])
 def entry_info(entry_id):

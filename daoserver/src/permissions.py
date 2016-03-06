@@ -7,9 +7,9 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
-from db_connections.entry_db import EntryDBConnection
 from models.account import Account
 from models.protected_object import ProtectedObject
+from models.tournament_entry import TournamentEntry
 
 PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',
@@ -81,9 +81,6 @@ class PermissionsChecker(object):
     Organisers and admins can modify scores.
     Etc.
     """
-
-    def __init__(self):
-        self.entry_db = EntryDBConnection()
 
     @db_conn(commit=True)
     def add_permission(self, user, action, prot_obj_id):
@@ -159,8 +156,14 @@ class PermissionsChecker(object):
     @db_conn()
     def is_tournament_player(self, user, tournament):
         """User playing in tournament."""
+
+        if not Account.username_exists(user):
+            raise ValueError('Unknown player: {}'.format(user))
+
         try:
-            entry_id = self.entry_db.entry_id(tournament, user)
+            entry_id = TournamentEntry.query.\
+                filter_by(tournament_id=tournament, player_id=user).\
+                first().id
         except TypeError:
             return False
 
