@@ -5,10 +5,12 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
-from models.score import db as score_db, RoundScore, ScoreCategory, ScoreKey
+from models.score import db as score_db, Score, RoundScore, ScoreCategory, \
+ScoreKey
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
 from models.tournament_round import TournamentRound
@@ -87,6 +89,40 @@ class Tournament(object):
             'date': details.date,
             'rounds': details.num_rounds,
         }
+
+    @must_exist_in_db
+    def enter_score(self, entry_id, score_key, score):
+        """
+        Enters a score for category into tournament for player.
+
+        Expects: All fields required
+            - entry_id - of the entry
+            - score_key - e.g. round_3_battle
+            - score - integer
+
+        Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
+            there is an issue inserting the score.
+        """
+        # score_key should mean something in the context of the tournie
+        key = score_db.session.query(ScoreKey).join(ScoreCategory).\
+            filter(and_(ScoreCategory.tournament_id == self.get_dao().name,
+                        ScoreKey.key == score_key)
+                  ).first()
+
+        try:
+            score = int(score)
+            if score < key.min_val or score > key.max_val:
+                raise ValueError()
+        except ValueError:
+            raise ValueError('Invalid score: {}'.format(score))
+        except AttributeError:
+            raise TypeError('Unknown category: {}'.format(score_key))
+
+        try:
+            Score(entry_id, key.id, score).write()
+        except IntegrityError:
+            raise ValueError(
+                '{} not entered. Score is already set'.format(score))
 
     @must_exist_in_db
     def list_score_categories(self):

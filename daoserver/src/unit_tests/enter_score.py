@@ -128,8 +128,8 @@ class EnterScore(TestCase):
         Enter a score for an entry
         """
 
-        from models.tournament import Tournament
-        t = Tournament(self.tournament_1)
+        from models.tournament import Tournament as TournamentDAO
+        t = TournamentDAO(self.tournament_1)
         t.date = '2015-07-08'
         t.num_rounds = 5
         t.write()
@@ -154,35 +154,35 @@ class EnterScore(TestCase):
         entry = TournamentEntry(self.player_1, self.tournament_1)
         entry.write()
 
-        from db_connections.entry_db import EntryDBConnection
+        from tournament import Tournament
         self.assertRaises(
             TypeError,
-            EntryDBConnection().enter_score,
+            Tournament(self.tournament_1).enter_score,
             entry.id,
             'not_a_key',
             5)
         self.assertRaises(
             ValueError,
-            EntryDBConnection().enter_score,
+            Tournament(self.tournament_1).enter_score,
             entry.id,
             key.key,
             -1)
         self.assertRaises(
             ValueError,
-            EntryDBConnection().enter_score,
+            Tournament(self.tournament_1).enter_score,
             entry.id,
             key.key,
             'a')
         self.assertRaises(
             ValueError,
-            EntryDBConnection().enter_score,
+            Tournament(self.tournament_1).enter_score,
             entry.id,
             key.key,
             101)
-        EntryDBConnection().enter_score(entry.id, key.key, 0)
+        Tournament(self.tournament_1).enter_score(entry.id, key.key, 0)
         self.assertRaises(
             ValueError,
-            EntryDBConnection().enter_score,
+            Tournament(self.tournament_1).enter_score,
             entry.id,
             key.key,
             100)

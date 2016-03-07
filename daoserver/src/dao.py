@@ -13,7 +13,6 @@ from flask import Blueprint, request, make_response, jsonify
 from functools import wraps
 
 from authentication import check_auth
-from db_connections.entry_db import EntryDBConnection
 from models.account import Account
 from models.feedback import Feedback
 from models.registration import TournamentRegistration
@@ -21,8 +20,6 @@ from models.tournament import Tournament as TournamentDAO
 from models.tournament_entry import TournamentEntry
 from permissions import PERMISSIONS, PermissionsChecker
 from tournament import Tournament
-
-ENTRY_DB_CONN = EntryDBConnection()
 
 APP = Blueprint('APP', __name__, url_prefix='')
 
@@ -230,7 +227,7 @@ def enter_tournament_score():
             filter_by(tournament_id=tournament, player_id=username).first().id
 
     # pylint: disable=E0602
-    ENTRY_DB_CONN.enter_score(entry_id, key, value)
+    tourn.enter_score(entry_id, key, value)
     return make_response(
         'Score entered for {}: {}'.format(username, value),
         200)

@@ -3,14 +3,9 @@ This file contains code to connect to the entry_db
 """
 
 from flask import json
-import psycopg2
 from psycopg2.extras import DictCursor
-from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
-from models.db_connection import db
-from models.score import ScoreCategory, ScoreKey
-from models.tournament_entry import TournamentEntry
 
 class Entry(json.JSONEncoder):
     """
@@ -42,50 +37,6 @@ class EntryDBConnection(object):
     """
     Connection class to the entry database
     """
-
-    @db_conn(commit=True)
-    # pylint: disable=E0602
-    def enter_score(self, entry_id, score_key, score):
-        """
-        Enters a score for category into tournament for player.
-
-        Expects: All fields required
-            - entry_id - of the entry
-            - score_key - e.g. round_3_battle
-            - score - integer
-
-        Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
-            there is an issue inserting the score.
-        """
-        try:
-            tournament_name = TournamentEntry.query.\
-                filter_by(id=entry_id).first().tournament.name
-
-            # score_key should mean something in the context of the tournie
-            key = db.session.query(ScoreKey).join(ScoreCategory).\
-                filter(and_(ScoreCategory.tournament_id == tournament_name,
-                            ScoreKey.key == score_key)
-                      ).first()
-
-            score = int(score)
-            if score < key.min_val or score > key.max_val:
-                raise ValueError()
-
-            cur.execute(
-                "INSERT INTO score VALUES(%s, %s, %s)",
-                [entry_id, key.id, score])
-
-        except AttributeError:
-            raise TypeError('Unknown category: {}'.format(score_key))
-        except TypeError:
-            raise TypeError('Unknown category: {}'.format(score_key))
-        except ValueError:
-            raise ValueError('Invalid score: %s' % score)
-        except psycopg2.DataError:
-            raise ValueError('Invalid score: %s' % score)
-        except psycopg2.IntegrityError:
-            raise ValueError(
-                '{} not entered. Score is already set'.format(score))
 
     @db_conn(cursor_factory=DictCursor)
     # pylint: disable=E0602
