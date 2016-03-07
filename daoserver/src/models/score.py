@@ -13,6 +13,7 @@ TODO:
 
 from models.db_connection import db
 from models.tournament import Tournament
+from models.tournament_entry import TournamentEntry
 from models.tournament_round import TournamentRound
 
 class ScoreCategory(db.Model):
@@ -122,6 +123,38 @@ class RoundScore(db.Model):
 
     def __repr__(self):
         return '<RoundScore ({}, {})>'.format(self.score_key_id, self.round_id)
+
+    def write(self):
+        """To the DB"""
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+class Score(db.Model):
+    """An individual score tied to a ScoreKey"""
+
+    __tablenamene__ = 'score'
+    entry_id = db.Column(db.Integer,
+                         db.ForeignKey(TournamentEntry.id),
+                         primary_key=True)
+    score_key_id = db.Column(db.Integer,
+                             db.ForeignKey(ScoreKey.id),
+                             primary_key=True)
+    value = db.Column(db.Integer)
+
+    def __init__(self, entry_id, score_key_id, value=None):
+        self.entry_id = entry_id
+        self.score_key_id = score_key_id
+        self.value = value
+
+    def __repr__(self):
+        return '<Score ({}, {}, {})>'.format(
+            self.entry_id,
+            self.score_key_id,
+            self.value)
 
     def write(self):
         """To the DB"""
