@@ -2,35 +2,10 @@
 This file contains code to connect to the entry_db
 """
 
-from flask import json
 from psycopg2.extras import DictCursor
 
 from db_connections.db_connection import db_conn
-
-class Entry(json.JSONEncoder):
-    """
-    A tournament is composed of entries who play each other. This is distinct
-    from users or accounts as there may be multiple players on a team, etc.
-    """
-
-    #pylint: disable=R0913
-    def __init__(
-            self,
-            entry_id=None,
-            username=None,
-            tournament_id=None,
-            game_history=None,
-            scores=None):
-        self.entry_id = entry_id
-        self.username = username
-        self.tournament_id = tournament_id
-        self.game_history = game_history
-        self.ranking = None
-        self.scores = scores
-        self.total_score = 0
-
-    def __repr__(self):
-        return self.entry_id
+from entry import Entry
 
 # pylint: disable=no-member
 class EntryDBConnection(object):

@@ -5,7 +5,7 @@ A game is simply a match between two entries. It is played on a table.
 """
 
 from db_connections.db_connection import db_conn
-from db_connections.entry_db import Entry
+from entry import Entry
 
 @db_conn()
 # pylint: disable=E0602

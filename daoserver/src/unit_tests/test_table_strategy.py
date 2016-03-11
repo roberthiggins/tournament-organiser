@@ -5,7 +5,7 @@ The process by which players are allocated to tables
 from testfixtures import compare
 import unittest
 
-from db_connections.entry_db import Entry
+from entry import Entry
 from table_strategy import ProtestAvoidanceStrategy, Table
 
 class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
