@@ -3,7 +3,6 @@ Module to make draws for tournaments
 """
 
 from collections import deque
-from db_connections.entry_db import EntryDBConnection
 
 class RoundRobin(object):
     """
@@ -14,17 +13,13 @@ class RoundRobin(object):
     following entry, etc.
     """
 
-    def __init__(self, tournament_id):
-        self.tournament_id = tournament_id
-        self.entry_db_conn = EntryDBConnection()
-
-    def match(self, round_to_draw):
+    def match(self, round_to_draw, entry_list):
         """
         Match the entrants into pairs.
 
         Returns: A list of Tuples - each is a pair of entrants.
         """
-        entry_list = deque(self.entry_db_conn.entry_list(self.tournament_id))
+        entry_list = deque(entry_list)
         entry_list.rotate(round_to_draw - 1)
         return self.determine_matchup(list(entry_list), [])
 

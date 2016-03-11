@@ -40,7 +40,7 @@ class Tournament(object):
             ranking_strategy(tournament_id, self.list_score_categories) \
             if ranking_strategy \
             else RankingStrategy(tournament_id, self.list_score_categories)
-        self.matching_strategy = RoundRobin(tournament_id)
+        self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
         self.creator_username = creator
 
@@ -140,7 +140,10 @@ class Tournament(object):
     @must_exist_in_db
     def make_draw(self, round_id=0):
         """Determines the draw for round. This draw is written to the db"""
-        match_ups = self.matching_strategy.match(int(round_id))
+        from db_connections.entry_db import EntryDBConnection
+        match_ups = self.matching_strategy.match(
+            int(round_id),
+            EntryDBConnection().entry_list(self.tournament_id) )
         draw = self.table_strategy.determine_tables(match_ups)
         try:
             from game import Game
