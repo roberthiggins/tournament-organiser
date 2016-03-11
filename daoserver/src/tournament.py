@@ -127,8 +127,40 @@ class Tournament(object):
     @must_exist_in_db
     def entries(self):
         """Get a list of Entry"""
-        from db_connections.entry_db import EntryDBConnection
-        return EntryDBConnection().entry_list(self.tournament_id)
+
+        def scores_for_entry(entry_id):
+            """ Get all the score_key:score pairs for an entry"""
+
+            scores = score_db.session.query(Score, ScoreKey, ScoreCategory).\
+                join(ScoreKey).join(ScoreCategory).join(TournamentDB).\
+                join(TournamentEntry).filter(Score.entry_id == entry_id).\
+                all()
+
+            return [
+                {
+                    'key': x[1].key,
+                    'score':x[0].value,
+                    'category': x[2].display_name,
+                    'min_val': x[1].min_val,
+                    'max_val': x[1].max_val,
+                } for x in scores
+            ]
+
+        from models.table_allocation import TableAllocation
+        from entry import Entry
+        entries = TournamentEntry.query.\
+            filter_by(tournament_id=self.tournament_id).all()
+
+        return [
+            Entry(
+                entry_id=entry.id,
+                username=entry.account.username,
+                tournament_id=entry.tournament.name,
+                game_history=[x.table_no for x in \
+                    TableAllocation.query.filter_by(entry_id=entry.id)],
+                scores=scores_for_entry(entry.id),
+            ) for entry in entries
+        ]
 
     @must_exist_in_db
     def list_score_categories(self):
