@@ -9,7 +9,8 @@ from matching_strategy import RoundRobin
 from models.db_connection import db
 from tournament import Tournament
 
-class DrawStrategyTests(TestCase):             # pylint: disable=R0904
+# pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable
+class DrawStrategyTests(TestCase):
     """Tests for `matching_strategy.py`."""
 
     def create_app(self):

@@ -341,8 +341,12 @@ def rank_entries(tournament_id):
     if not tourn.exists_in_db:
         return make_response(
             'Tournament {} doesn\'t exist'.format(tournament_id), 404)
+
+    from db_connections.entry_db import EntryDBConnection
     return jsonpickle.encode(
-        tourn.ranking_strategy.overall_ranking(), unpicklable=False)
+        tourn.ranking_strategy.overall_ranking(
+            EntryDBConnection().entry_list(tournament_id)),
+        unpicklable=False)
 
 @APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET', 'POST'])
 @enforce_request_variables('score_keys', 'mission')

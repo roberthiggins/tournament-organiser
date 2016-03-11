@@ -8,7 +8,6 @@ The default here is RankingStrategy. It is the null strategy so it will just
 return lists in the order they were handed in and will pick the first db entry
 as the winner of any given category.
 """
-from db_connections.entry_db import EntryDBConnection
 
 class RankingStrategy(object):
     """
@@ -18,7 +17,6 @@ class RankingStrategy(object):
 
     def __init__(self, tournament_id, score_categories_func):
         self.tournament_id = tournament_id
-        self.entry_db_conn = EntryDBConnection()
         self.score_categories = score_categories_func
 
     def total_score(self, scores):
@@ -43,21 +41,14 @@ class RankingStrategy(object):
 
         return sum([x['total_score'] for x in categories])
 
-    def overall_ranking(self, error_on_incomplete=False): # pylint: disable=W0613
+    def overall_ranking(self, entries, error_on_incomplete=False): # pylint: disable=W0613
         """
         Combines all scores for an overall ranking of entries.
 
         error_on_incomplete: when true this will raise a RuntimeError if any
             of the entrants have incopmlete scores.
         """
-        entries = self.entry_db_conn.entry_list(self.tournament_id)
         for i, entry in enumerate(entries):
             entry.total_score = self.total_score(entry.scores)
             entry.ranking = i + 1
         return entries
-
-    def ranking_by_category(self, category):
-        """Rank entries based on a specific score only"""
-        if not category:
-            return self.overall_ranking()
-        return self.overall_ranking()
