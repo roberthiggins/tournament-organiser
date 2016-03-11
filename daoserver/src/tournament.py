@@ -125,6 +125,12 @@ class Tournament(object):
                 '{} not entered. Score is already set'.format(score))
 
     @must_exist_in_db
+    def entries(self):
+        """Get a list of Entry"""
+        from db_connections.entry_db import EntryDBConnection
+        return EntryDBConnection().entry_list(self.tournament_id)
+
+    @must_exist_in_db
     def list_score_categories(self):
         """
         List all the score categories available to this tournie and their
@@ -140,10 +146,7 @@ class Tournament(object):
     @must_exist_in_db
     def make_draw(self, round_id=0):
         """Determines the draw for round. This draw is written to the db"""
-        from db_connections.entry_db import EntryDBConnection
-        match_ups = self.matching_strategy.match(
-            int(round_id),
-            EntryDBConnection().entry_list(self.tournament_id) )
+        match_ups = self.matching_strategy.match(int(round_id), self.entries())
         draw = self.table_strategy.determine_tables(match_ups)
         try:
             from game import Game
