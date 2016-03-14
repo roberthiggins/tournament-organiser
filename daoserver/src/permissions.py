@@ -115,7 +115,6 @@ class PermissionsChecker(object):
             "INSERT INTO account_protected_object_permission VALUES (%s, %s)",
             [user, permission_id])
 
-    # pylint: disable=R0913
     def check_permission(self, action, user, for_user, tournament):
         """
         Entry point method for checking permissions.
@@ -133,15 +132,13 @@ class PermissionsChecker(object):
 
         return False
 
-    @db_conn()
     def is_admin(self, user):
         """User is superuser"""
         if user is None:
             return False
 
         # pylint: disable=no-member
-        return Account.query.\
-            filter(and_(Account.username == user, Account.is_superuser)).\
+        return Account.query.filter_by(username=user, is_superuser=True).\
             first() is not None
 
     @db_conn()
@@ -153,25 +150,16 @@ class PermissionsChecker(object):
             [tournament, user])
         return cur.fetchone()[0]
 
-    @db_conn()
     def is_tournament_player(self, user, tournament):
         """User playing in tournament."""
 
         if not Account.username_exists(user):
             raise ValueError('Unknown player: {}'.format(user))
 
-        try:
-            entry_id = TournamentEntry.query.\
-                filter_by(tournament_id=tournament, player_id=user).\
-                first().id
-        except TypeError:
-            return False
+        return TournamentEntry.query.\
+            filter_by(tournament_id=tournament, player_id=user).first() \
+            is not None
 
-        cur.execute(
-            "SELECT count(*) > 0 FROM entry \
-            WHERE tournament_id = %s AND id = %s",
-            [tournament, entry_id])
-        return cur.fetchone()[0]
 
     @db_conn()
     def is_game_player(self, user, game_id):

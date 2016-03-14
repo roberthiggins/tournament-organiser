@@ -42,11 +42,8 @@ class UserPermissions(TestCase):
         self.assertFalse(checker.is_game_player('homer', 1))
 
         self.assertTrue(checker.is_tournament_player('lisa', 'ranking_test'))
-        self.assertRaises(
-            AttributeError,
-            checker.is_tournament_player,
-            'superman',
-            'ranking_test')
+        self.assertFalse(
+            checker.is_tournament_player('superman', 'ranking_test'))
 
     def test_is_organiser(self):
         """check if a user is an organiser"""
