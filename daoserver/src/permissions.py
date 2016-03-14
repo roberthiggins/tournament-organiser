@@ -1,7 +1,7 @@
 """
 Module to handle permissions for accounts trying to modify a tournament.
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,no-member
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import and_
@@ -23,7 +23,7 @@ def check_action_valid(action):
         raise ValueError(
             'Illegal action passed to check_permission {}'.format(action))
 
-# pylint: disable=no-init,no-member
+# pylint: disable=no-init
 class ProtObjAction(db.Model):
     """An action you can perform on a protected object, e.g. enter score"""
     __tablename__ = 'protected_object_action'
@@ -35,7 +35,7 @@ class ProtObjAction(db.Model):
             self.id,
             self.description)
 
-# pylint: disable=no-init,no-member
+# pylint: disable=no-init
 class ProtObjPerm(db.Model):
     """
     Gain a permission to do a something ProtObjAction on a protected
@@ -72,7 +72,7 @@ class ProtObjPerm(db.Model):
             raise
 
 
-# pylint: disable=E0602,no-member
+# pylint: disable=E0602
 class PermissionsChecker(object):
     """
     Organisers and admins can add/remove players.
@@ -83,6 +83,7 @@ class PermissionsChecker(object):
     """
 
     @db_conn(commit=True)
+    # pylint: disable=no-member
     def add_permission(self, user, action, prot_obj_id):
         """
         Give user permission to perform action on protected_obj
@@ -96,11 +97,9 @@ class PermissionsChecker(object):
         """
         check_action_valid(action)
 
-        # pylint: disable=no-member
         act_id = ProtObjAction.query.filter_by(description=action).first().id
 
         try:
-            # pylint: disable=no-member
             permission_id = ProtObjPerm.query.filter(
                 and_(
                     ProtObjPerm.protected_object_id == prot_obj_id,
@@ -137,7 +136,6 @@ class PermissionsChecker(object):
         if user is None:
             return False
 
-        # pylint: disable=no-member
         return Account.query.filter_by(username=user, is_superuser=True).\
             first() is not None
 
