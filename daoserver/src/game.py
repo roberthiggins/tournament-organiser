@@ -3,9 +3,11 @@ Module for storing games.
 
 A game is simply a match between two entries. It is played on a table.
 """
+# pylint: disable=no-member
 
 from db_connections.db_connection import db_conn
 from entry import Entry
+from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 
 @db_conn()
@@ -133,10 +135,8 @@ class Game(object):
         self.protected_object_id = game.protected_object.id
 
         if self.entry_1 is not None:
-            cur.execute(
-                "INSERT INTO game_entrant VALUES(%s, %s)",
-                [self.game_id, self.entry_1])
+            GameEntrant(
+                game, TournamentEntry.query.filter_by(id=self.entry_1)).write()
         if self.entry_2 is not None:
-            cur.execute(
-                "INSERT INTO game_entrant VALUES(%s, %s)",
-                [self.game_id, self.entry_2])
+            GameEntrant(
+                game, TournamentEntry.query.filter_by(id=self.entry_2)).write()
