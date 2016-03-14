@@ -14,3 +14,4 @@ docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB
 
 ./scripts/unittest
 ./scripts/behaviourtest
+./scripts/lint
