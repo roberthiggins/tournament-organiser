@@ -4,16 +4,26 @@ Test entering scores for games in a tournament
 
 from flask.ext.testing import TestCase
 from testfixtures import compare
-import unittest
 
 from app import create_app
 from db_connections.db_connection import db_conn
 from models.db_connection import db
+from models.tournament_game import TournamentGame
 from game import get_game_from_score
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable
-class ScoreEnteringTests(unittest.TestCase):
+class ScoreEnteringTests(TestCase):
     """Comes from a range of files"""
+
+    def create_app(self):
+        # pass in test configuration
+        return create_app()
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
 
     def test_get_game_from_score(self):
         """
@@ -81,7 +91,11 @@ class ScoreEnteringTests(unittest.TestCase):
         conn.commit()
 
         self.assertTrue(game.is_score_entered())
-        game.set_score_entered()
+        dao = TournamentGame(game.tournament_id,
+                             game.round_id,
+                             game.table_number)
+        dao.score_entered = True
+        dao.write()
         self.assertTrue(game.is_score_entered())
 
     def test_list_scores_for_game(self):

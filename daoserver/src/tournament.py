@@ -205,11 +205,11 @@ class Tournament(object):
 
                 # The person playing the bye gets no points at the time
                 if None in [game.entry_1, game.entry_2]:
-                    game.set_score_entered()
+                    game.get_dao().score_entered = True
+                    game.get_dao().write()
 
-        except ValueError as err:
-            if 'duplicate key value violates unique constraint "game_pkey"' \
-            not in str(err):
+        except IntegrityError as err:
+            if 'duplicate key' not in str(err):
                 raise err
 
         return draw

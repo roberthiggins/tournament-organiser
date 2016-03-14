@@ -6,6 +6,7 @@ A game is simply a match between two entries. It is played on a table.
 
 from db_connections.db_connection import db_conn
 from entry import Entry
+from models.tournament_game import TournamentGame
 
 @db_conn()
 # pylint: disable=E0602
@@ -41,7 +42,7 @@ def get_game_from_score(entry_id, score_key):
                 table_number=game_id_table[1],
                 protected_object_id=tournament_round_entry[2])
 
-# pylint: disable=E0602
+# pylint: disable=undefined-variable
 class Game(object):
     """
     Representation of a single match between entrants.
@@ -63,6 +64,11 @@ class Game(object):
         """The number of entrants in the game"""
         return 1 if None in [self.entry_1, self.entry_2] else 2
 
+    def get_dao(self):
+        """Gaet DAO object for self"""
+        # pylint: disable=no-member
+        return TournamentGame.query.filter_by(id=self.game_id).first()
+
     @db_conn()
     def is_score_entered(self):
         """
@@ -73,9 +79,7 @@ class Game(object):
         the game are entered. If yes we can update the game entry
         """
 
-        cur.execute("SELECT score_entered FROM game WHERE id = %s",
-                    [self.game_id])
-        if cur.fetchone()[0]:
+        if self.get_dao() is not None and self.get_dao().score_entered:
             return True
 
         # expected scores
@@ -92,15 +96,6 @@ class Game(object):
 
         return None not in scores_entered \
         and len(scores_entered) == (scores_for_round * self.num_entrants())
-
-    @db_conn(commit=True)
-    def set_score_entered(self):
-        """
-        Regardless of whether scores have actually been entered you can set
-        this to true in the game
-        """
-        cur.execute("UPDATE game SET score_entered = true WHERE id = %s",
-                    [self.game_id])
 
     @db_conn()
     def scores_entered(self):
@@ -126,27 +121,16 @@ class Game(object):
 
         return cur.fetchall()
 
-    @db_conn(commit=True)
     def write_to_db(self):
         """Write a game to db"""
 
-        # Get a protected_object_id
-        cur.execute("INSERT INTO protected_object VALUES(DEFAULT) RETURNING id")
-        protected_object_id = cur.fetchone()[0]
+        game = TournamentGame(self.tournament_id,
+                              self.round_id,
+                              self.table_number)
+        game.write()
 
-        cur.execute(
-            "INSERT INTO game \
-            VALUES(DEFAULT, %s, %s, %s, %s) RETURNING *",
-            [
-                self.round_id,
-                self.tournament_id,
-                self.table_number,
-                protected_object_id
-            ]
-        )
-        game = cur.fetchone()
-        self.game_id = game[0]
-        self.protected_object_id = game[4]
+        self.game_id = game.id
+        self.protected_object_id = game.protected_object.id
 
         if self.entry_1 is not None:
             cur.execute(
