@@ -12,7 +12,6 @@ from models.score import RoundScore, ScoreCategory, ScoreKey, Score, db
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 
-# pylint: disable=E0602
 def get_game_from_score(entry_id, score_key):
     """Given an entry and score_key, you should be able to work out the game"""
 
@@ -36,30 +35,30 @@ def get_game_from_score(entry_id, score_key):
         TournamentGame.round_num == tournament_round_entry[1],
         GameEntrant.entrant_id == tournament_round_entry[2])).first()
 
-    return Game(GameEntrant.query.filter_by(game_id=game.id).all(),
-                game_id=game.id,
+    return Game(game_id=game.id,
                 tournament_id=tournament_round_entry[0],
                 round_id=tournament_round_entry[1],
                 table_number=game.table_num,
                 protected_object_id=game.protected_object_id)
 
-# pylint: disable=undefined-variable
 class Game(object):
     """
     Representation of a single match between entrants.
     This might be a BYE
     """
 
-    #pylint: disable=R0913
-    def __init__(self, entrants, game_id=None, tournament_id=None,
+    # pylint: disable=too-many-arguments
+    def __init__(self, game_id=None, tournament_id=None,
                  round_id=None, table_number=None, protected_object_id=None):
         self.game_id = game_id
         self.tournament_id = tournament_id
         self.round_id = round_id
         self.table_number = table_number
+        self.protected_object_id = protected_object_id
+
+        entrants = GameEntrant.query.filter_by(game_id=game_id).all()
         self.entry_1 = entrants[0].entrant_id
         self.entry_2 = None if len(entrants) == 1 else entrants[1].entrant_id
-        self.protected_object_id = protected_object_id
 
     def num_entrants(self):
         """The number of entrants in the game"""
@@ -67,7 +66,6 @@ class Game(object):
 
     def get_dao(self):
         """Gaet DAO object for self"""
-        # pylint: disable=no-member
         return TournamentGame.query.filter_by(id=self.game_id).first()
 
     def is_score_entered(self):
