@@ -187,9 +187,7 @@ class Tournament(object):
                 game = Game(tournament=self.tournament_id,
                             round_num=round_id,
                             table_num=match.table_number)
-                entrants = map(
-                    lambda x: None if x == 'BYE' else x,
-                    match.entrants)
+                entrants = [None if x == 'BYE' else x for x in match.entrants]
 
                 for entrant in entrants:
                     if entrant is not None:

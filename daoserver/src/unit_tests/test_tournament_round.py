@@ -58,12 +58,12 @@ class SetRounds(TestCase):
         tourn = Tournament(name)
         tourn.set_number_of_rounds(6)
         # set_number_of_rounds only deletes excess rounds
-        self.assertTrue(4 == len(TournamentRound.query.filter_by(
-            tournament_name=name).all())) # thus still 4
+        self.assertTrue(len(TournamentRound.query.filter_by(
+            tournament_name=name).all()) == 4) # thus still 4
 
         tourn.set_number_of_rounds(2)
-        self.assertTrue(2 == len(TournamentRound.query.filter_by(
-            tournament_name=name).all()))
+        self.assertTrue(len(TournamentRound.query.filter_by(
+            tournament_name=name).all()) == 2)
 
     def test_get_missions(self):
         """get missions for the rounds"""

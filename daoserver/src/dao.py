@@ -6,11 +6,11 @@ should talk to this for functionality wherever possible.
 """
 
 import json
-import jsonpickle
 import re
+from functools import wraps
+import jsonpickle
 
 from flask import Blueprint, request, make_response, jsonify
-from functools import wraps
 
 from authentication import check_auth
 from models.account import Account

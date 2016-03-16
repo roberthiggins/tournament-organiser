@@ -3,8 +3,8 @@ Application for running the DAO API
 """
 
 import datetime
-import jsonpickle
 import os
+import jsonpickle
 
 from flask import Flask
 

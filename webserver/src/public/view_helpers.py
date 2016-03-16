@@ -1,6 +1,8 @@
 """
 Connector to perform requests to the DAO
 """
+# pylint: disable=no-member
+
 import os
 import requests
 

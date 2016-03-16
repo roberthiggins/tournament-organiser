@@ -2,8 +2,8 @@
 The process by which players are allocated to tables
 """
 
-from testfixtures import compare
 import unittest
+from testfixtures import compare
 
 from entry import Entry
 from table_strategy import ProtestAvoidanceStrategy, Table
