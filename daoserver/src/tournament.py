@@ -13,6 +13,7 @@ from models.score import db as score_db, Score, RoundScore, ScoreCategory, \
 ScoreKey
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
+from models.tournament_game import TournamentGame as Game
 from models.tournament_round import TournamentRound
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
@@ -181,32 +182,28 @@ class Tournament(object):
         match_ups = self.matching_strategy.match(int(round_id), self.entries())
         draw = self.table_strategy.determine_tables(match_ups)
         try:
-            from game import Game
             for match in draw:
-                game = Game(match.entrants,
-                            tournament_id=self.tournament_id,
-                            round_id=round_id,
-                            table_number=match.table_number)
-                game.write_to_db()
-                if game.entry_1 is not None:
-                    uname = TournamentEntry.query.filter_by(id=game.entry_2).\
-                        first().username
-                    PermissionsChecker().add_permission(
-                        uname,
-                        PERMISSIONS['ENTER_SCORE'],
-                        game.protected_object_id)
-                if game.entry_2 is not None:
-                    uname = TournamentEntry.query.filter_by(id=game.entry_2).\
-                        first().username
-                    PermissionsChecker().add_permission(
-                        uname,
-                        PERMISSIONS['ENTER_SCORE'],
-                        game.protected_object_id)
 
-                # The person playing the bye gets no points at the time
-                if None in [game.entry_1, game.entry_2]:
-                    game.get_dao().score_entered = True
-                    game.get_dao().write()
+                game = Game(tournament=self.tournament_id,
+                            round_num=round_id,
+                            table_num=match.table_number)
+                entrants = map(
+                    lambda x: None if x == 'BYE' else x,
+                    match.entrants)
+
+                for entrant in entrants:
+                    if entrant is not None:
+                        uname = TournamentEntry.query.\
+                            filter_by(id=entrant.entry_id).first().player_id
+                        PermissionsChecker().add_permission(
+                            uname,
+                            PERMISSIONS['ENTER_SCORE'],
+                            game.protected_object.id)
+                    else:
+                        # The person playing the bye gets no points at the time
+                        game.score_entered = True
+
+                game.write()
 
         except IntegrityError as err:
             if 'duplicate key' not in str(err):

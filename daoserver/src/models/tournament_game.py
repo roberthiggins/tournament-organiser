@@ -30,6 +30,7 @@ class TournamentGame(db.Model):
         self.round_num = round_num
         self.table_num = table_num
         self.protected_object = ProtectedObject()
+        self.protected_object.write()
         self.protected_object_id = self.protected_object.id
         self.score_entered = False
 

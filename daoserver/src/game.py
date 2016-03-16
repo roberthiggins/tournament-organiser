@@ -122,21 +122,3 @@ class Game(object):
             [self.tournament_id, self.round_id, (self.entry_1, self.entry_2)])
 
         return cur.fetchall()
-
-    def write_to_db(self):
-        """Write a game to db"""
-
-        game = TournamentGame(self.tournament_id,
-                              self.round_id,
-                              self.table_number)
-        game.write()
-
-        self.game_id = game.id
-        self.protected_object_id = game.protected_object.id
-
-        if self.entry_1 is not None:
-            GameEntrant(
-                game, TournamentEntry.query.filter_by(id=self.entry_1)).write()
-        if self.entry_2 is not None:
-            GameEntrant(
-                game, TournamentEntry.query.filter_by(id=self.entry_2)).write()

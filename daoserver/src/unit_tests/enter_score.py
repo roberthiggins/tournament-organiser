@@ -91,9 +91,7 @@ class ScoreEnteringTests(TestCase):
         conn.commit()
 
         self.assertTrue(game.is_score_entered())
-        dao = TournamentGame(game.tournament_id,
-                             game.round_id,
-                             game.table_number)
+        dao = game.get_dao()
         dao.score_entered = True
         dao.write()
         self.assertTrue(game.is_score_entered())
