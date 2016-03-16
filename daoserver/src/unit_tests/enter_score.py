@@ -8,7 +8,6 @@ from testfixtures import compare
 from app import create_app
 from db_connections.db_connection import db_conn
 from models.db_connection import db
-from models.tournament_game import TournamentGame
 from game import get_game_from_score
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable

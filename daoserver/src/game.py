@@ -5,9 +5,11 @@ A game is simply a match between two entries. It is played on a table.
 """
 # pylint: disable=no-member
 
+from sqlalchemy.sql.expression import and_
+
 from db_connections.db_connection import db_conn
 from entry import Entry
-from models.tournament_entry import TournamentEntry
+from models.score import RoundScore, ScoreCategory, ScoreKey, Score, db
 from models.tournament_game import TournamentGame
 
 @db_conn()
@@ -84,16 +86,10 @@ class Game(object):
         if self.get_dao() is not None and self.get_dao().score_entered:
             return True
 
-        # expected scores
-        cur.execute(
-            "SELECT count(*) \
-            FROM score_key k \
-            INNER JOIN round_score rs    ON rs.score_key_id = k.id \
-            INNER JOIN score_category sc ON sc.id = k.category \
-            WHERE sc.tournament_id = %s \
-                AND rs.round_id = %s",
-            [self.tournament_id, self.round_id])
-        scores_for_round = int(cur.fetchone()[0])
+        scores_for_round = len(ScoreKey.query.join(RoundScore).\
+            join(ScoreCategory).filter(
+                and_(RoundScore.round_id == self.round_id,
+                     ScoreCategory.tournament_id == self.tournament_id)).all())
         scores_entered = [x[2] for x in self.scores_entered()]
 
         return None not in scores_entered \
@@ -107,18 +103,10 @@ class Game(object):
         Returns:
             - a list of tuples (entry_id, score_key, score_entered)
         """
-        cur.execute(
-            "SELECT \
-                s.entry_id, \
-                k.key, \
-                s.value \
-            FROM score s \
-            INNER JOIN score_key k       ON s.score_key_id = k.id \
-            INNER JOIN round_score rs    ON rs.score_key_id = k.id \
-            INNER JOIN score_category sc ON sc.id = k.category \
-            WHERE sc.tournament_id = %s \
-                AND rs.round_id = %s \
-                AND s. entry_id IN %s",
-            [self.tournament_id, self.round_id, (self.entry_1, self.entry_2)])
 
-        return cur.fetchall()
+        scores_and_keys = db.session.query(Score, ScoreKey).join(ScoreKey).\
+            join(RoundScore).join(ScoreCategory).filter(and_(
+                ScoreCategory.tournament_id == self.tournament_id,
+                RoundScore.round_id == self.round_id,
+                Score.entry_id.in_((self.entry_1, self.entry_2)))).all()
+        return [(x[0].entry_id, x[1].key, x[0].value) for x in scores_and_keys]
