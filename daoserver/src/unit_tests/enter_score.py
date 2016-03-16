@@ -8,7 +8,7 @@ from testfixtures import compare
 from app import create_app
 from db_connections.db_connection import db_conn
 from models.db_connection import db
-from game import get_game_from_score
+from game import Game
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable
 class ScoreEnteringTests(TestCase):
@@ -30,10 +30,10 @@ class ScoreEnteringTests(TestCase):
         """
 
         # A regular player
-        game = get_game_from_score(5, 'sports')
+        game = Game.get_game_from_score(5, 'sports')
         self.assertTrue(game is not None)
 
-        game = get_game_from_score(5, 'round_1_battle')
+        game = Game.get_game_from_score(5, 'round_1_battle')
         self.assertTrue(game is not None)
         self.assertTrue(game.entry_1 is not None)
         self.assertTrue(game.entry_2 is not None)
@@ -42,21 +42,21 @@ class ScoreEnteringTests(TestCase):
 
 
         # A score that isn't tied to a game
-        game = get_game_from_score(1, 'number_tassles')
+        game = Game.get_game_from_score(1, 'number_tassles')
         self.assertTrue(game is None)
 
 
         # A player in a bye
-        game = get_game_from_score(4, 'round_1_battle')
+        game = Game.get_game_from_score(4, 'round_1_battle')
         self.assertTrue(game is not None)
         self.assertTrue(game.entry_1 == 4)
         self.assertTrue(game.entry_2 is None)
 
 
         # Poor data will return None rather than an error
-        game = get_game_from_score(15, 'round_1_battle')
+        game = Game.get_game_from_score(15, 'round_1_battle')
         self.assertTrue(game is None)
-        game = get_game_from_score(1, 'number_fdssfdtassles')
+        game = Game.get_game_from_score(1, 'number_fdssfdtassles')
         self.assertTrue(game is None)
 
 
@@ -64,14 +64,14 @@ class ScoreEnteringTests(TestCase):
     def test_score_entered(self):
 
         # A completed game
-        game = get_game_from_score(5, 'round_1_battle')
+        game = Game.get_game_from_score(5, 'round_1_battle')
         compare(game.entry_1, 3)
         compare(game.entry_2, 5)
         self.assertTrue(game.is_score_entered())
 
         # a bye should be false
         # TODO resolve Bye Scoring
-        game = get_game_from_score(4, 'round_1_battle')
+        game = Game.get_game_from_score(4, 'round_1_battle')
         compare(game.entry_1, 4)
         compare(game.entry_2, None)
         self.assertFalse(game.is_score_entered())
@@ -79,7 +79,7 @@ class ScoreEnteringTests(TestCase):
         # Ensure the rd2 game bart vs. maggie is listed as not scored. This
         # will force a full check. Maggie's score hasn't been entered.
         cur.execute("UPDATE game SET score_entered = False WHERE id = 5")
-        game = get_game_from_score(5, 'round_2_battle')
+        game = Game.get_game_from_score(5, 'round_2_battle')
 
         compare(game.entry_1, 6)
         compare(game.entry_2, 5)
@@ -101,20 +101,20 @@ class ScoreEnteringTests(TestCase):
         for by each entrant.
         """
         # Bye
-        game = get_game_from_score(4, 'round_1_battle')
+        game = Game.get_game_from_score(4, 'round_1_battle')
         compare(
             game.scores_entered(),
             [(4, 'round_1_battle', None), (4, 'sports', 5)])
 
         # Regular, completed game
-        game = get_game_from_score(2, 'round_1_battle')
+        game = Game.get_game_from_score(2, 'round_1_battle')
         compare(
             game.scores_entered(),
             [(6, 'round_1_battle', 0), (2, 'round_1_battle', 20),
              (6, 'sports', 5), (2, 'sports', 1)])
 
         # Game partially filled in
-        game = get_game_from_score(5, 'round_2_battle')
+        game = Game.get_game_from_score(5, 'round_2_battle')
         compare(
             game.scores_entered(),
             [(5, 'round_2_battle', 5)])

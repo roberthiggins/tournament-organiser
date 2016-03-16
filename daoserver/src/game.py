@@ -12,35 +12,6 @@ from models.score import RoundScore, ScoreCategory, ScoreKey, Score, db
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 
-def get_game_from_score(entry_id, score_key):
-    """Given an entry and score_key, you should be able to work out the game"""
-
-    tournament_round_entry = db.session.\
-        query(Score, ScoreKey, ScoreCategory, TournamentEntry, RoundScore).\
-        join(ScoreKey).join(ScoreCategory).join(TournamentEntry).\
-        join(RoundScore).filter(and_(
-            TournamentEntry.id == entry_id, ScoreKey.key == score_key)).first()
-
-    if tournament_round_entry is None:
-        return None
-
-    tournament_round_entry = [
-        tournament_round_entry[2].tournament_id,
-        tournament_round_entry[4].round_id,
-        tournament_round_entry[3].id
-    ]
-
-    game = TournamentGame.query.join(GameEntrant).filter(and_(
-        TournamentGame.tourn == tournament_round_entry[0],
-        TournamentGame.round_num == tournament_round_entry[1],
-        GameEntrant.entrant_id == tournament_round_entry[2])).first()
-
-    return Game(game_id=game.id,
-                tournament_id=tournament_round_entry[0],
-                round_id=tournament_round_entry[1],
-                table_number=game.table_num,
-                protected_object_id=game.protected_object_id)
-
 class Game(object):
     """
     Representation of a single match between entrants.
@@ -103,3 +74,35 @@ class Game(object):
                 RoundScore.round_id == self.round_id,
                 Score.entry_id.in_((self.entry_1, self.entry_2)))).all()
         return [(x[0].entry_id, x[1].key, x[0].value) for x in scores_and_keys]
+
+    @staticmethod
+    def get_game_from_score(entry_id, score_key):
+        """
+        Given an entry and score_key, you should be able to work out the game
+        """
+
+        tournament_round_entry = db.session.\
+            query(Score, ScoreKey, ScoreCategory, TournamentEntry, RoundScore).\
+            join(ScoreKey).join(ScoreCategory).join(TournamentEntry).\
+            join(RoundScore).filter(and_(TournamentEntry.id == entry_id,
+                                         ScoreKey.key == score_key)).first()
+
+        if tournament_round_entry is None:
+            return None
+
+        tournament_round_entry = [
+            tournament_round_entry[2].tournament_id,
+            tournament_round_entry[4].round_id,
+            tournament_round_entry[3].id
+        ]
+
+        game = TournamentGame.query.join(GameEntrant).filter(and_(
+            TournamentGame.tourn == tournament_round_entry[0],
+            TournamentGame.round_num == tournament_round_entry[1],
+            GameEntrant.entrant_id == tournament_round_entry[2])).first()
+
+        return Game(game_id=game.id,
+                    tournament_id=tournament_round_entry[0],
+                    round_id=tournament_round_entry[1],
+                    table_number=game.table_num,
+                    protected_object_id=game.protected_object_id)
