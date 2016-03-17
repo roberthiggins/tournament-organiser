@@ -1,0 +1,46 @@
+This is a guide to how to install everything, form the ground up, in a prod environment.
+
+1. Provision a VPS. It should be a KVM. This guide is made with Ubuntu 14.04+ in mind
+
+2. Jump on your new machine.
+
+3. Install some things
+
+    sudo apt-get install apache2
+    sudo apt-get install git
+
+4. Get the repo (note the account you want to get the version from)
+    git clone https://github.com/roberthiggins/Tournament_Organizer-.git /var/www/tournament-organiser
+    cd /var/www/tournament-organiser
+
+5. (optional) Make a default front page
+    sudo cp index.html /var/www/html/index.html
+
+6. Install Docker. Check the offical docs. They should look something like this. I install aufs-tools separately rather than using virtual-image. Note to use the appropriate repo when you update docker.list
+
+    apt-get update
+    apt-get install apt-transport-https ca-certificates 
+    apt-get install aufs-tools
+    apt-get install apparmor
+    apt-get upgrade
+
+    sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+    echo "deb https://apt.dockerproject.org/repo ubuntu-wily main" > /etc/apt/sources.list.d/docker.list
+    apt-get update
+    apt-get purge lxc-docker
+    apt-cache policy docker-engine
+
+    apt-get install docker-engine
+    service docker start
+    docker run hello-world
+
+7. Allow user to use docker without sudo
+    sudo groupadd docker
+    sudo gpasswd -a ${USER} docker
+    logout
+    log back in
+    sudo service docker restart
+
+8. Install all the things
+    # TODO set a custom password for the db
+    ./scripts/install_prod
