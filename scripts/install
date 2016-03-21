@@ -1,10 +1,7 @@
 # This is a an install script which will rebuild all the docker containers and
-# fire them all up. This is all you should have to run to get development set
-# up.
-
-# c.f. also the run script.
+# fire them all up.
+#
 # Use install script when:
-#     - You need to setup for the first time
 #     - You want to rebuild the containers from scratch
 #     - You have made changes to a Dockerfile and want to see them.
 

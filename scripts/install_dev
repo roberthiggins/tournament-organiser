@@ -1,0 +1,12 @@
+# This is an install script for development environments.
+#
+# This will make sure the development settings are configured propery.
+
+#! /bin/sh
+
+cp webserver/src/web/local_settings/development/local_settings.py webserver/src/web/
+
+./scripts/install $@
+
+sleep 5
+./scripts/smoketest

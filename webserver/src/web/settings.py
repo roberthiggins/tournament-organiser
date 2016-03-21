@@ -12,18 +12,6 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=a)f4_+^*7%0z#a*do-20dbg%a8=czyfqjndi65z%fqva-vqxm'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 ADMINS = [('Higgins', 'higgins@kingsofwar.co.nz'),]
@@ -127,3 +115,11 @@ LOGGING = {
         },
     }
 }
+
+# Include environment specific settings here.
+# So, if you want to build prod for example, you can copy an appropriate
+# local_settings.py in before you build.
+try:
+    from local_settings import *
+except ImportError as e:
+    pass

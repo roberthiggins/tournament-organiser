@@ -1,7 +1,6 @@
 # Prod install script for Tournament Organiser.
 #
-# This can be run from your dev machine and it will just do an install that
-# persists the db box.
+# This will make sure the prod settings are configured properly
 #
 # To do a prod install you need to run this file on prod
 
@@ -18,6 +17,7 @@ then
 fi
 
 # Install all the things
+cp webserver/src/web/local_settings/production/local_settings.py webserver/src/web/
 ./scripts/install db daoserver webserver
 
 if [[ $EXISTING_DB_CONTAINER ]]
