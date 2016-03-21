@@ -68,22 +68,9 @@ DATABASES = {
     }
 }
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#        'NAME': 'docker',
-#        'USER': 'docker',
-#        'PASSWORD': 'FuEm7l003bfd6zM',
-#        'HOST': os.environ['DB_PORT_5432_TCP_ADDR'],
-#        'PORT': os.environ['DB_PORT_5432_TCP_PORT'],
-#    }
-#}
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
 TIME_ZONE = 'UTC'
 
