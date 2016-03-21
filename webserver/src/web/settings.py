@@ -26,6 +26,7 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+ADMINS = [('Higgins', 'higgins@kingsofwar.co.nz'),]
 
 # Application definition
 
