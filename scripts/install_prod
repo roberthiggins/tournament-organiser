@@ -23,7 +23,6 @@ fi
 if [[ $EXISTING_DB_CONTAINER ]]
 then
     # Re-load the contents from the dump file to the new container.
-    docker exec -it db bash -c 
     docker cp /tmp/$FILE db:$FILE_PATH/
     COMMAND='psql -d "$DB_NAME" --file='$FILE_PATH/$FILE
     docker exec -it db bash -c "$COMMAND"
