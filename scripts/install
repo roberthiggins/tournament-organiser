@@ -59,7 +59,9 @@ for ENV in $ENVS
 do
     case $ENV in
         db)
-            sudo docker run -d -P --name db db_image
+            rm -f database/env_file
+            python -u scripts/make_db_env_file.py
+            sudo docker run --env-file=database/env_file -d -P --name db db_image
             sleep 10    # wait for db to finish startup
         ;;
         daoserver)

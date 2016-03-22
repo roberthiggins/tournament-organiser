@@ -42,7 +42,4 @@ RUN echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
 # Add VOLUMEs to allow backup of config, logs and databases
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
-ENV DB_NAME to-db
-ENV DB_PASSWORD FuEm7l003bfd6zM
-
 CMD bash ./bootstrap.sh

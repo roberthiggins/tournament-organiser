@@ -15,3 +15,4 @@ drawserver/drawbuilder/target/
 # Passwords for prod
 *env_config.ini
 config/production/*
+database/env_file
