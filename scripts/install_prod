@@ -18,6 +18,7 @@ fi
 
 # Install all the things
 cp config/production/config.ini webserver/env_config.ini
+cp config/production/config.ini daoserver/env_config.ini
 ./scripts/install db daoserver webserver
 
 if [[ $EXISTING_DB_CONTAINER ]]

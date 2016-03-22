@@ -4,6 +4,7 @@ Class to make a connection to the db
 
 from functools import wraps
 
+import ConfigParser
 import os
 import psycopg2
 
@@ -13,12 +14,14 @@ class DBConnection(object):
     """
     def __init__(self):
 
+        config = ConfigParser.ConfigParser()
+        config.read('/webapp/environment_config.ini')
         self.con = None
         self.config = {
             'db_host': os.environ['DB_PORT_5432_TCP_ADDR'],
-            'db_name': os.environ['DB_NAME'],
+            'db_name': config.get('DATABASE', 'DB_NAME'),
             'db_port': os.environ['DB_PORT_5432_TCP_PORT'],
-            'db_pass': os.environ['DB_PASSWORD']
+            'db_pass': config.get('DATABASE', 'DB_PASSWORD')
         }
         try:
             self.con = psycopg2.connect(

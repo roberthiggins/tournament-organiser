@@ -3,6 +3,7 @@ Application for running the DAO API
 """
 
 import datetime
+import ConfigParser
 import os
 import jsonpickle
 
@@ -11,13 +12,16 @@ from flask import Flask
 # pylint: disable=W0621
 def create_app():
     """Config for the app"""
+    config = ConfigParser.ConfigParser()
+    config.read('/webapp/environment_config.ini')
+
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = \
         'postgresql://docker:{}@{}:{}/{}'.format(
-            os.environ['DB_PASSWORD'],
+            config.get('DATABASE', 'DB_PASSWORD'),
             os.environ['DB_PORT_5432_TCP_ADDR'],
             os.environ['DB_PORT_5432_TCP_PORT'],
-            os.environ['DB_NAME'])
+            config.get('DATABASE', 'DB_NAME'))
 
     from models.db_connection import db as db_conn
     db_conn.init_app(app)

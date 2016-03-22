@@ -40,12 +40,7 @@ RUN pip install testfixtures
 # Add the source dir
 ADD src/ webapp/
 ADD bash_aliases /root/.bash_aliases
-
-# This should only work in the dev environment. Staging/Prod dbs will have
-# their passwords set separately. However this is an issue for Orchestration.
-# For now a default password will do.
-ENV DB_NAME to-db
-ENV DB_PASSWORD FuEm7l003bfd6zM
+ADD env_config.ini webapp/environment_config.ini
 
 # Config
 WORKDIR webapp/
