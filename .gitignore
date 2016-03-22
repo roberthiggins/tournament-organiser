@@ -11,3 +11,7 @@
 
 # drawbuilder taget
 drawserver/drawbuilder/target/
+
+# Passwords for prod
+*env_config.ini
+config/production/*
