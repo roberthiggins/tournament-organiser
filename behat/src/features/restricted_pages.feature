@@ -9,7 +9,7 @@ Feature: Restricted pages
     Scenario Outline:
         Given I am on "/<direct>"
         Then I should be on "/login?next=/<direct>"
-        Given I am on "/"
+        Given I am on "/devindex"
         When I follow "<link>"
         Then I should be on "/login?next=/<direct>"
 

@@ -4,7 +4,7 @@ Feature: Rank Entries Based on Scores
     So I can give prizes appropriately
 
     Scenario: Visit the page from the front page
-        Given I am on "/"
+        Given I am on "/devindex"
         Then I follow "See the current placings for ranking_test"
         Then I am on "/rankings/ranking_test"
         Then the response status code should be 200

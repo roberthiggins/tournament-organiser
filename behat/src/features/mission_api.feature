@@ -8,7 +8,6 @@ Feature: Interact with missions through the API
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
 
     Scenario: I want to get a list of missions for the tournament
         When I GET "/getMissions/mission_test" from the API

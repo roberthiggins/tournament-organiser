@@ -8,6 +8,7 @@ urlpatterns = [
 
     # Public views
     url(r'^$', public_views.index, name='index'),
+    url(r'^devindex$', public_views.dev_index, name='dev_index'),
     url(r'^login$', public_views.login, name='login'),
     url(r'^rankings/(?P<tournament_id>.+)$',
         public_views.tournament_rankings, name='tournament_rankings'),

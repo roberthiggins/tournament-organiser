@@ -10,6 +10,12 @@ Feature: See a list of tournaments
         Then I should see "See available tournaments below"
         Then I should see "northcon_2095 - 2095-06-01"
 
+        Given I am on "/devindex"
+        When I follow "See a list of tournaments"
+        Then I should be on "/tournaments"
+        Then I should see "See available tournaments below"
+        Then I should see "northcon_2095 - 2095-06-01"
+
     Scenario: I visit the page via the URL
         Given I am on "/tournaments"
         Then I should be on "/tournaments"

@@ -8,7 +8,6 @@ Feature: Set the number of rounds
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
 
     Scenario: I check the number of rounds in a tournament
         Given I am on "/setrounds/northcon_2095"

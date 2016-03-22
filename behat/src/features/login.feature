@@ -20,7 +20,7 @@ Feature: Login
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
+        Then I should be on "/devindex"
 
     Scenario Outline: I try to log in
         Given I am on "/login"
@@ -43,6 +43,5 @@ Feature: Login
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
         Given I am on "/login"
         Then I should see "You are already logged in"

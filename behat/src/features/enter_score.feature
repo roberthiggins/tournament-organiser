@@ -11,7 +11,6 @@ Feature: Enter a score for a player
         When I fill in "id_inputUsername" with "superman"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
 
     Scenario: Logged in
         Given I am on "/enterscore/1"
@@ -27,7 +26,6 @@ Feature: Enter a score for a player
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
         Given I am on "/enterscore/painting_test/rick_james"
         When I fill in "id_key" with "number_tassles"
         When I fill in "id_value" with "1"

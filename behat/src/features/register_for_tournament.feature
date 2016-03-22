@@ -8,10 +8,9 @@ Feature: Register for a Tournament
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
 
     Scenario: I visit the register page from the front page
-        Given I am on "/"
+        Given I am on "/devindex"
         When I follow "Register for a Tournament"
         Then I should see "Select a tournament to register for"
 

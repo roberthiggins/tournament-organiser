@@ -17,6 +17,10 @@ def index(request):                                     # pylint: disable=W0613
     """The index"""
     return render_to_response('index.html')
 
+def dev_index(request):                 # pylint: disable=unused-argument
+    """Some more tasks, used for dev only"""
+    return render_to_response('dev-index.html')
+
 def create_account(request):
     """Page to create a new account"""
 
@@ -104,7 +108,7 @@ def login(request):
             login_creds.add_error(None, 'Username or password incorrect') # pylint: disable=E1103
             return render_login(request, login_creds)
 
-        return HttpResponseRedirect(request.GET.get('next', '/'))
+        return HttpResponseRedirect(request.GET.get('next', '/devindex'))
 
     return render_login(request, login_creds)
 

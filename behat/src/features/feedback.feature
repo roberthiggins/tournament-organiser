@@ -8,19 +8,19 @@ Feature: Place feedback to improve the sight
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
 
     Scenario Outline: I navigate to the feedback section
-        Given I am on "/"
+        Given I am on "/<start_point>"
         When I follow "<link>"
         Then I should see "<intro>"
         Given I am on "/<url>"
         Then I should see "<intro>"
 
         Examples:
-            | url                       | link                  | intro                                                         |
-            | feedback                  | Place Feedback        | Please give us feedback on your experience on the site        |
-            | suggestimprovement        | Suggest Improvement   | Suggest a feature you would like to see on the site           |
+            | start_point       | url                       | link                  | intro                                                         |
+            | devindex          | feedback                  | Place Feedback        | Please give us feedback on your experience on the site        |
+            | devindex          | suggestimprovement        | Suggest Improvement   | Suggest a feature you would like to see on the site           |
+            |                   | suggestimprovement        | Suggest Improvement   | Suggest a feature you would like to see on the site           |
 
     Scenario Outline: I enter some information
         Given I am on "/<url>"

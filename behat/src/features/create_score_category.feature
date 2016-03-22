@@ -8,7 +8,6 @@ Feature: Create a score category for a tournament
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
         Given I am on "/createtournament"
         When I fill in "id_inputTournamentName" with "category_test"
         When I fill in "id_inputTournamentDate" with "2030-03-15"

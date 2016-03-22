@@ -8,7 +8,6 @@ Feature: Set the missions through the web front end.
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
 
     Scenario: I view the missions for a tournament
         Given I POST "tournamentId=mission_test&missions=[%22missionzz%22,%22boo%22,%22random%22]" to "/setMissions" from the API

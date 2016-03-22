@@ -8,10 +8,9 @@ Feature: Setup the scores a player can get in a tournament
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/"
 
     Scenario: I try to navigate to the page via the front page
-        Given I am on "/"
+        Given I am on "/devindex"
         When I follow "Setup Northcon_2095"
         Then I should be on "/tournamentsetup/northcon_2095"
         Then I should see "Score key"
