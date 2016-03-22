@@ -4,7 +4,7 @@
 
 #! /bin/sh
 
-cp webserver/src/web/local_settings/development/local_settings.py webserver/src/web/
+cp config/dev/config.ini webserver/env_config.ini
 
 ./scripts/install $@
 

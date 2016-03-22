@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import ConfigParser
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -119,7 +120,17 @@ LOGGING = {
 # Include environment specific settings here.
 # So, if you want to build prod for example, you can copy an appropriate
 # local_settings.py in before you build.
+# pylint: disable=invalid-name
 try:
-    from local_settings import *
-except ImportError as e:
+    config = ConfigParser.ConfigParser()
+    config.read('/webapp/environment_config.ini')
+
+    DEBUG = config.get('WEBSERVER', 'DEBUG')
+    SECRET_KEY = config.get('WEBSERVER', 'SECRET_KEY')
+    TEMPLATE_DEBUG = config.get('WEBSERVER', 'TEMPLATE_DEBUG')
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        config.get('WEBSERVER', 'HOST_IP')]
+except ImportError:
     pass

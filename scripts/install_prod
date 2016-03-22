@@ -17,7 +17,7 @@ then
 fi
 
 # Install all the things
-cp webserver/src/web/local_settings/production/local_settings.py webserver/src/web/
+cp config/production/config.ini webserver/env_config.ini
 ./scripts/install db daoserver webserver
 
 if [[ $EXISTING_DB_CONTAINER ]]
