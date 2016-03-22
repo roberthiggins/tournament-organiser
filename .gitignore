@@ -16,3 +16,4 @@ drawserver/drawbuilder/target/
 *env_config.ini
 config/production/*
 database/env_file
+smoketester/env_file
