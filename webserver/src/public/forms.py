@@ -83,7 +83,8 @@ class FeedbackForm(ErrorStringForm):                    # pylint: disable=no-ini
 class LoginForm(ErrorStringForm):                       # pylint: disable=no-init
     """ Login """
     inputUsername = forms.CharField(label='Username')
-    inputPassword = forms.CharField(label='Password')
+    inputPassword = forms.CharField(label='Password',
+                                    widget=forms.PasswordInput())
 
 class MissionWidget(forms.MultiWidget):
     """Widget to handle the input for the custom mission field"""
