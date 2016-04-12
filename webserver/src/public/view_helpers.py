@@ -29,10 +29,7 @@ def from_dao(url, form=None, request=None):
         if form is None:
             return requests.get(api, auth=auth)
 
-        if form.is_valid():
-            return requests.post(api, auth=auth, data=form.cleaned_data)
-
-        return HttpResponse(form.error_code(), status=400)
+        return requests.post(api, auth=auth, data=form.cleaned_data)
 
     except requests.exceptions.HTTPError as err:
         if err.code == 400:
