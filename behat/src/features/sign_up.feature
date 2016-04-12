@@ -33,21 +33,21 @@ Feature: Sign up
         # TODO check that the fields are cleared
 
         Examples:
-            | username  |email        | password    | confirm     | response                            |
-            | Jerry     |foo@bar.com  | password123 | password123 | Account created                     |
-            | jerry     |foo@bar.com  | password123 | password123 | Account created                     |
-            | jerry     |foo@bar.com  | password123 | password123 | Please choose another name          |
+            | username  |email        | password    | confirm     | response                                    |
+            | Jerry     |foo@bar.com  | password123 | password123 | Account created                             |
+            | jerry     |foo@bar.com  | password123 | password123 | Account created                             |
+            | jerry     |foo@bar.com  | password123 | password123 | A user with that username already exists    |
             # email is handled by django natively and is a hassle to check here
-            |           |             |             |             | Enter the required fields           |
-            |           |foo@bar.com  |             |             | Enter the required fields           |
-            | good      |foo@bar.com  |             |             | Enter the required fields           |
-# FIXME
-            | good      |foo@bar.com  | password123 |             | Please enter two matching passwords |
-            | good      |foo@bar.com  |             | password123 | Enter the required fields           |
-            | mr        |foo@bar.com  | chulmondley | warner      | Please enter two matching passwords |
-            | mr        |foo@bar.com  | password123 | password12  | Please enter two matching passwords |
-            | mr        |foo@bar.com  | password123 | password1234| Please enter two matching passwords |
-            | longymclongersone_who9foaiss8n |foo@bar.com  | password123 | password123 | Account created |
+            |           |             |             |             | This field is required                      |
+            |           |foo@bar.com  |             |             | This field is required                      |
+            | good      |foo@bar.com  |             |             | This field is required                      |
+            # FIXME
+            | good      |foo@bar.com  | password123 |             | This field is required                      |
+            | good      |foo@bar.com  |             | password123 | This field is required                      |
+            | mr        |foo@bar.com  | chulmondley | warner      | The two password fields didn't match        |
+            | mr        |foo@bar.com  | password123 | password12  | The two password fields didn't match        |
+            | mr        |foo@bar.com  | password123 | password1234| The two password fields didn't match        |
+            | longymclongersone_who9foaiss8n |foo@bar.com  | password123 | password123 | Account created        |
 
     Scenario: I want user details from the API
         When I GET "/userDetails/charlie_murphy" from the API

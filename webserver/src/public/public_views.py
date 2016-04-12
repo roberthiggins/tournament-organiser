@@ -31,12 +31,12 @@ def create_account(request):
         if form.is_valid():                             # pylint: disable=no-member
             form.save()
 
-        response = from_dao('/addPlayer', form)
+            response = from_dao('/addPlayer', form)
 
-        if  response.status_code == 200:
-            return HttpResponse(response)
-        else:
-            form.add_error(None, response.content)      # pylint: disable=E1103
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)  # pylint: disable=E1103
 
     return render_to_response(
         'create-a-player.html',
