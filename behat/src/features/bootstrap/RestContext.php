@@ -228,6 +228,23 @@ class RestContext extends BehatContext
     }
 
     /**
+     * @Then /^the API response should be a list of length (\d+)$/
+     */
+    public function theApiResponseShouldContainAListOfLength($expected){
+        $data = $this->_response->getBody(true);
+        if (!empty($data)) {
+            $len = sizeof(json_decode($data));
+            if ($len != $expected) {
+                throw new Exception("Array length was " . $len .
+                    ". Expected " . $expected);
+            }
+        } else {
+            throw new Exception("Response empty\n" .
+                $this->_response->getBody(true));
+        }
+    }
+
+    /**
      * @Then /^the API response status code should be (?P<code>\d+)$/
      */
     public function theApiResponseStatusCodeShouldBe($value){
