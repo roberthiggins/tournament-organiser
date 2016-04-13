@@ -99,8 +99,9 @@ class RestContext extends BehatContext
     public function theResponseIsJson()
     {
         $data = json_decode($this->_response->getBody(true));
-        if (empty($data)) {
-            throw new Exception("Response was not JSON\n" . $this->_response);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("Response was not JSON\n" .
+                $this->_response->getBody(true));
         }
     }
     /**
@@ -114,7 +115,8 @@ class RestContext extends BehatContext
                 throw new Exception("Property '".$propertyName."' is not set!\n");
             }
         } else {
-            throw new Exception("Response was not JSON\n" . $this->_response->getBody(true));
+            throw new Exception("Response was not JSON\n" .
+                $this->_response->getBody(true));
         }
     }
     /**
