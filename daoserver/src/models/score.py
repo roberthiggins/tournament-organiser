@@ -42,6 +42,16 @@ class ScoreCategory(db.Model):
             self.display_name,
             self.percentage)
 
+    def delete(self):
+        """From the DB"""
+        try:
+            db.session.delete(self)
+            db.session.expunge(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
     def write(self):
         """To the DB"""
 
