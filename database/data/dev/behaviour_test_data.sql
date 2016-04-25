@@ -186,6 +186,21 @@ BEGIN
 END $$;
 SELECT mission_test_setup();
 
+-- Make a tournament for the purposes of testing categories
+CREATE OR REPLACE FUNCTION category_test_setup() RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    tourn_name varchar := 'category_test';
+    protect_object_id int := 0;
+BEGIN
+
+    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3, protect_object_id);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'category_1', 15);
+
+    RETURN 0;
+END $$;
+SELECT category_test_setup();
+
 -- Make a tournament for the purposes of testing permissions
 CREATE OR REPLACE FUNCTION permission_test_setup() RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
