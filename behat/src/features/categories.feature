@@ -31,7 +31,33 @@ Feature: Modify the scoreing categories for a tournament
 
 
     Scenario: I get a list of categories from a tournament with none
-        When I GET "/getScoreCategories/mission_test" from the API
+        When I GET "/getScoreCategories/conquest_2095" from the API
         Then the API response status code should be 200
         Then the response is JSON
         Then the API response should be a list of length 0
+
+    Scenario: I modify the tournament categories through the API
+        When I POST "tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fantasticgibberish%22,%2221%22]" to "/setScoreCategories" from the API
+        Then the API response status code should be 200
+        Then I GET "/getScoreCategories/category_test" from the API
+        Then the API response status code should be 200
+        Then the API response should be a list of length 1
+        Then the API response should contain "fantasticgibberish"
+        Then the API response should not contain "category_1"
+
+    Scenario Outline: I try to modify the tournament categories through the API incorrectly
+        When I POST "<post>" to "/setScoreCategories" from the API
+        Then the API response status code should be 400
+        Then I GET "/getScoreCategories/southcon_2095" from the API
+        Then the API response status code should be 200
+        Then the API response should be a list of length 1
+        Then the API response should not contain "<category>"
+
+        Examples:
+            | category  | post                                                                                          |
+            | fooey     | categories=[%22categories_0%22]&categories_0=[%22fooey%22,%2221%22]                           |
+            | fooey     | tournamentId=category_test&categories_0=[%22fooey%22,%2221%22]                                 |
+            | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fooey%22]          |
+            | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%2221%22]             |
+            | fooey     | tournamentId=category_test&categories=[%22categories_1%22]&categories_0=[%22fooey%22,%2221%22] |
+            | fooey     | tournamentId=category_test&categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22fooey%22,%2221%22]&categories_0=[%22barey%22,%2221%22] |

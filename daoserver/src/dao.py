@@ -19,10 +19,11 @@ from models.registration import TournamentRegistration
 from models.tournament import Tournament as TournamentDAO
 from models.tournament_entry import TournamentEntry
 from permissions import PERMISSIONS, PermissionsChecker
-from tournament import Tournament
+from tournament import Tournament, ScoreCategoryPair
 
 APP = Blueprint('APP', __name__, url_prefix='')
 
+@APP.errorhandler(IndexError)
 @APP.errorhandler(TypeError)
 @APP.errorhandler(RuntimeError)
 @APP.errorhandler(ValueError)
@@ -393,22 +394,23 @@ def get_score_categories(tournament_id):
     except ValueError as err:
         return make_response(str(err), 404)
 
-@APP.route('/setScoreCategory', methods=['POST'])
-@enforce_request_variables('tournament', 'category', 'percentage')
-def set_score_category():                               # pylint: disable=E0602
+@APP.route('/setScoreCategories', methods=['POST'])
+@enforce_request_variables('tournamentId', 'categories')
+def set_score_categories():
     """
-    POST to create a score category.
-    Expects:
-        - tournament - the tournament name
-        - category - a human-readable key for the category
-        - percentage - the percentage of the overall score that will be
-                        comprised from this score.
+    POST to set tournament categories en masse
     """
-    # pylint: disable=E0602
-    tourn = Tournament(tournament)
-    # pylint: disable=E0602
-    tourn.create_score_category(category, percentage)
-    return make_response('Score category set: {}'.format(category), 200)
+    tourn = Tournament(tournamentId)
+
+    new_categories = []
+    for cat in json.loads(categories):
+        pair = json.loads(request.values.get(cat, []))
+        new_categories.append(ScoreCategoryPair(pair[0], pair[1]))
+
+    tourn.set_score_categories(new_categories)
+
+    return make_response('Score categories set: {}'.format(
+        [x.name for x in new_categories]), 200)
 
 @APP.route('/setTournamentScore', methods=['POST'])
 @enforce_request_variables('key', 'scoreCategory')

@@ -11,6 +11,8 @@ TODO:
 """
 # pylint: disable=invalid-name
 
+from sqlalchemy.sql.expression import and_
+
 from models.db_connection import db
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
@@ -46,7 +48,6 @@ class ScoreCategory(db.Model):
         """From the DB"""
         try:
             db.session.delete(self)
-            db.session.expunge(self)
             db.session.commit()
         except Exception:
             db.session.rollback()
@@ -58,7 +59,9 @@ class ScoreCategory(db.Model):
         # All the score percantages can only sum to 100 or less.
         # pylint: disable=no-member
         existing = ScoreCategory.query.\
-            filter_by(tournament_id=self.tournament_id).all()
+            filter(and_(ScoreCategory.tournament_id == self.tournament_id,
+                        ScoreCategory.display_name != self.display_name)).all()
+
         if (sum([x.percentage for x in existing]) + self.percentage) > 100:
             raise ValueError('percentage too high: {}'.format(self))
 

@@ -73,9 +73,35 @@ class Tournament(object):
         return TournamentDB.query.filter_by(name=self.tournament_id).first()
 
     @must_exist_in_db
-    def create_score_category(self, category, percentage):
-        """ Add a score category """
-        ScoreCategory(self.tournament_id, category, percentage).write()
+    def set_score_categories(self, new_categories):
+        """
+        Replace the existing score categories with those from the list. The list
+        should contain a ScoreCategorys
+        """
+
+        # check for duplicates
+        keys = [x.name for x in new_categories]
+        if len(keys) != len(set(keys)):
+            raise ValueError("You cannot set multiple keys with the same name")
+
+        to_delete = ScoreCategory.query.\
+            filter_by(tournament_id=self.tournament_id).all()
+
+        for cat in new_categories:
+            dao = ScoreCategory.query.\
+                filter_by(tournament_id=self.tournament_id,
+                          display_name=cat.name).first()
+
+            if dao is None:
+                dao = ScoreCategory(self.tournament_id,
+                                    cat.name, cat.percentage)
+            else:
+                to_delete = [x for x in to_delete if x.display_name != cat.name]
+            dao.percentage = int(cat.percentage)
+            dao.write()
+
+        for cat in to_delete:
+            cat.delete()
 
     @must_exist_in_db
     def details(self):
@@ -313,3 +339,11 @@ class Tournament(object):
         return [
             (x[0].id, x[0].key, x[0].min_val, x[0].max_val, x[0].category,
              x[1].score_key_id, x[1].round_id) for x in results]
+
+class ScoreCategoryPair(object):
+    """A holder object for score category information"""
+    def __init__(self, name, percentage):
+        self.name = name
+        self.percentage = float(percentage)
+        if self.percentage <= 0 or self.percentage > 100:
+            raise ValueError("Score categories must be between 1 and 100")
