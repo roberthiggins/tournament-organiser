@@ -410,7 +410,7 @@ def set_score_categories():
     tourn.set_score_categories(new_categories)
 
     return make_response('Score categories set: {}'.format(
-        [x.name for x in new_categories]), 200)
+        ', '.join([str(x.name) for x in new_categories])), 200)
 
 @APP.route('/setTournamentScore', methods=['POST'])
 @enforce_request_variables('key', 'scoreCategory')

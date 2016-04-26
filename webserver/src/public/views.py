@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from public.forms import AddTournamentForm, ApplyForTournamentForm, \
 EnterScoreForm, FeedbackForm, TournamentSetupForm, SetRoundsForm, \
-SetMissionsForm
+SetCategoriesForm, SetMissionsForm
 from public.view_helpers import from_dao
 
 @login_required
@@ -24,7 +24,7 @@ def create_tournament(request):
 
     if request.method == 'POST':
         form = AddTournamentForm(request.POST)
-        if form.is_valid():                             # pylint: disable=no-member
+        if form.is_valid():                     # pylint: disable=no-member
             response = from_dao('/addTournament', form, request)
 
             if  response.status_code == 200:
@@ -134,6 +134,46 @@ def logout(request):
     """ logout the user from current request """
     auth.logout(request)
     return HttpResponseRedirect('/')
+
+@login_required
+def set_categories(request, tournament_id):
+    """Set the scoring categories for a tournament"""
+    cats_request = from_dao('/getScoreCategories/{}'.format(tournament_id))
+    if cats_request.status_code != 200:
+        return HttpResponseNotFound(
+            'Tournament {} not found'.format(tournament_id))
+    cats = [[x['name'], x['percentage']] for x in \
+        json.loads(cats_request.content)]
+    form = SetCategoriesForm(tournament_id=tournament_id, categories=cats)
+
+    if request.method == 'POST':
+
+        form = SetCategoriesForm(request.POST,
+                                 tournament_id=tournament_id,
+                                 categories=cats)
+
+        if form.is_valid():
+            # We need to do some mangling. I suppose it could be built into the
+            # form but simpler to do it here.
+            form.cleaned_data['categories'] = json.dumps([
+                k for k, v in form.cleaned_data.iteritems() \
+                if k.startswith('categories_') and v != '[]'])
+
+            response = from_dao('/setScoreCategories', form)
+
+            if  response.status_code == 200:
+                return HttpResponse(response)
+            else:
+                form.add_error(None, response.content)
+
+    return render_to_response(
+        'set-categories.html',
+        {
+            'form': form,
+            'tournament': tournament_id,
+        },
+        RequestContext(request)
+    )
 
 @login_required
 def set_missions(request, tournament_id):

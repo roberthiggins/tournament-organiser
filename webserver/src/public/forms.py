@@ -86,6 +86,54 @@ class LoginForm(ErrorStringForm):                       # pylint: disable=no-ini
     inputPassword = forms.CharField(label='Password',
                                     widget=forms.PasswordInput())
 
+class CategoryWidget(forms.MultiWidget):
+    """Widget to handle the input for the custom category field"""
+    def __init__(self, *args, **kwargs):# pylint: disable=E1002
+        widgets = (forms.TextInput(), forms.TextInput())
+
+        super(CategoryWidget, self).__init__(widgets, *args, **kwargs)
+
+    def decompress(self, value):
+        return list(value) if value else []
+
+    def format_output(self, widget):
+        """Customize widget rendering. We need the inputs to look separate"""
+        elements = list(widget) if widget is not None else [None, None]
+        rendered_widget = {'elements': elements}
+
+        return render_to_string('category-input.html', rendered_widget)
+
+class CategoriesField(forms.MultiValueField):
+    """Custom field to handle a single category"""
+    def __init__(self, *args, **kwargs):
+        fields = (forms.CharField(), forms.CharField())
+        widget = CategoryWidget()
+
+        super(CategoriesField, self).__init__(
+            fields, widget=widget, *args, **kwargs)
+
+    def compress(self, data_list):
+        return json.dumps(data_list)
+
+class SetCategoriesForm(ErrorStringForm):
+    """Set the score categories for a tournament"""
+    def __init__(self, *args, **kwargs):
+        t_id = kwargs.pop('tournament_id')
+        initial_cats = kwargs.pop('categories', None)
+        num_fields = 5 # Should be enough
+
+        super(SetCategoriesForm, self).__init__(*args, **kwargs)
+
+        for fld in range(0, num_fields):
+            self.fields['categories_{}'.format(fld)] = CategoriesField(
+                label='', required=False)
+            if initial_cats is not None and len(initial_cats) > fld:
+                self.initial['categories_{}'.format(fld)] = initial_cats[fld]
+
+        self.fields['tournamentId'] = forms.CharField(
+            initial=t_id,
+            widget=forms.widgets.HiddenInput())
+
 class MissionWidget(forms.MultiWidget):
     """Widget to handle the input for the custom mission field"""
     def __init__(self, *args, **kwargs):# pylint: disable=E1002
