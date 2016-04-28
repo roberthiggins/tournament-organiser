@@ -51,14 +51,14 @@ class TestRoundScore(TestCase):
         score.write()
 
         round_1_keys_exp = [
-            ('round_1_battle', 0, 20, 3, 3, 1),
-            ('sports', 1, 5, 4, 5, 1)
+            ('round_1_battle', 0, 20),
+            ('sports', 1, 5)
         ]
-        round_1_keys_act = [x[1:] for x in tourn.get_score_keys_for_round(1)]
+        round_1_keys_act = [x[1:4] for x in tourn.get_score_keys_for_round(1)]
         compare(round_1_keys_exp, round_1_keys_act)
 
         round_2_keys_exp = [
-            ('round_2_battle', 0, 20, 3, 4, 2),
+            ('round_2_battle', 0, 20),
         ]
-        round_2_keys_act = [x[1:] for x in tourn.get_score_keys_for_round(2)]
+        round_2_keys_act = [x[1:4] for x in tourn.get_score_keys_for_round(2)]
         compare(round_2_keys_exp, round_2_keys_act)

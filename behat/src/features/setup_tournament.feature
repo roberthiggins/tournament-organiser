@@ -59,8 +59,8 @@ Feature: Setup the scores a player can get in a tournament
             |400  | tournamentId=northcon_2095 |
             |400  | minVal=2&maxVal=4 |
             |400  | tournamentId=northcon_2095&key=sports2&minVal=2&maxVal=4 |
-            |400  | tournamentId=northcon_1095&key=sports2&minVal=2&maxVal=4&scoreCategory=10 |
-            |200  | tournamentId=northcon_2095&key=sports&scoreCategory=10 |
-            |200  | tournamentId=northcon_2095&key=sports2&minVal=2&maxVal=4&scoreCategory=10 |
-            |200  | tournamentId=northcon_2095&key=sports3&minVal=2&scoreCategory=10 |
-            |200  | tournamentId=northcon_2095&key=sports4&maxVal=4&scoreCategory=10 |
+            |400  | tournamentId=northcon_1095&key=sports2&minVal=2&maxVal=4&scoreCategory=100 |
+            |200  | tournamentId=northcon_2095&key=sports&scoreCategory=100 |
+            |200  | tournamentId=northcon_2095&key=sports2&minVal=2&maxVal=4&scoreCategory=100|
+            |200  | tournamentId=northcon_2095&key=sports3&minVal=2&scoreCategory=100 |
+            |200  | tournamentId=northcon_2095&key=sports4&maxVal=4&scoreCategory=100 |

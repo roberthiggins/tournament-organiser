@@ -294,7 +294,11 @@ class Tournament(object):
 
     @must_exist_in_db
     def get_score_keys_for_round(self, round_id='next'):
-        """ Get all the score keys associated with this round"""
+        """
+        Get all the score keys associated with this round
+        Returns a list of tuples:
+            (id, key, min, max, category_id, score_key_id, round_id)
+        """
 
         #TODO get next round
         if round_id == 'next':
