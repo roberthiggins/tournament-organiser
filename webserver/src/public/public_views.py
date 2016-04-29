@@ -3,6 +3,7 @@ Basic URL mappings for the webserver
 """
 
 import json
+from ratelimit.decorators import ratelimit
 
 from django.contrib import auth
 from django.contrib.auth.models import User
@@ -13,6 +14,7 @@ from django.template import RequestContext
 from public.forms import CreateAccountForm, LoginForm
 from public.view_helpers import from_dao
 
+@ratelimit(key='ip', rate='100/m', block=True)
 def index(request):                                     # pylint: disable=W0613
     """The index"""
     return render_to_response('index.html')
@@ -21,6 +23,7 @@ def dev_index(request):                 # pylint: disable=unused-argument
     """Some more tasks, used for dev only"""
     return render_to_response('dev-index.html')
 
+@ratelimit(key='ip', rate='50/h', block=True)
 def create_account(request):
     """Page to create a new account"""
 
@@ -69,6 +72,7 @@ def create_or_update_user(login_creds):
             email=user[0],
             password=p_word)
 
+@ratelimit(key='ip', rate='100/m', block=True)
 def list_tournaments(request):
     """ Get a list of tournaments"""
     t_list = json.loads(from_dao('/listtournaments').content)['tournaments']
@@ -78,6 +82,7 @@ def list_tournaments(request):
         RequestContext(request)
     )
 
+@ratelimit(key='ip', rate='100/m', block=True)
 def login(request):
     """Login page"""
 
@@ -112,6 +117,7 @@ def login(request):
 
     return render_login(request, login_creds)
 
+@ratelimit(key='ip', rate='100/m', block=True)
 def render_login(request, form):
     """ Render the login page from the template """
     return render_to_response(
@@ -120,6 +126,7 @@ def render_login(request, form):
         RequestContext(request)
     )
 
+@ratelimit(key='ip', rate='100/m', block=True)
 def tournament(request, tournament_id):
     """ See information about a single tournament"""
     if tournament_id is None:
@@ -140,6 +147,7 @@ def tournament(request, tournament_id):
     except ValueError:
         return HttpResponse(response)
 
+@ratelimit(key='ip', rate='100/m', block=True)
 def tournament_draw(request, tournament_id, round_id):
     """Get the entire tournament draw for a single round of a tournament"""
     if tournament_id is None or round_id is None:
@@ -164,6 +172,7 @@ def tournament_draw(request, tournament_id, round_id):
         RequestContext(request)
     )
 
+@ratelimit(key='ip', rate='100/m', block=True)
 def tournament_rankings(request, tournament_id):
     """Get placings for the entries in the tournament"""
     if tournament_id is None:

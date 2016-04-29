@@ -1,5 +1,6 @@
 Django
 django-debug-toolbar==0.9.4
 django-extensions==0.8
+django-ratelimit
 django-registration==0.8.0
 requests
