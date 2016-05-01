@@ -34,7 +34,7 @@ class TestRoundScore(TestCase):
         t.num_rounds = 5
         t.write()
 
-        cat = ScoreCategory('foobar', 'nonsense', 50)
+        cat = ScoreCategory('foobar', 'nonsense', 50, False)
         cat.tournament = t
         cat.write()
 

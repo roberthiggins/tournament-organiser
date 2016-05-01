@@ -146,7 +146,7 @@ class EnterScore(TestCase):
         t.write()
 
         from models.score import ScoreCategory, ScoreKey
-        cat = ScoreCategory(self.tournament_1, 'nonsense', 50)
+        cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False)
         cat.tournament = t
         cat.write()
 

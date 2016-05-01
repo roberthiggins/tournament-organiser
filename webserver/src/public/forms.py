@@ -89,7 +89,7 @@ class LoginForm(ErrorStringForm):                       # pylint: disable=no-ini
 class CategoryWidget(forms.MultiWidget):
     """Widget to handle the input for the custom category field"""
     def __init__(self, *args, **kwargs):# pylint: disable=E1002
-        widgets = (forms.TextInput(), forms.TextInput())
+        widgets = (forms.TextInput(), forms.TextInput(), forms.CheckboxInput())
 
         super(CategoryWidget, self).__init__(widgets, *args, **kwargs)
 
@@ -98,7 +98,7 @@ class CategoryWidget(forms.MultiWidget):
 
     def format_output(self, widget):
         """Customize widget rendering. We need the inputs to look separate"""
-        elements = list(widget) if widget is not None else [None, None]
+        elements = list(widget) if widget is not None else [None, None, None]
         rendered_widget = {'elements': elements}
 
         return render_to_string('category-input.html', rendered_widget)
@@ -106,7 +106,7 @@ class CategoryWidget(forms.MultiWidget):
 class CategoriesField(forms.MultiValueField):
     """Custom field to handle a single category"""
     def __init__(self, *args, **kwargs):
-        fields = (forms.CharField(), forms.CharField())
+        fields = (forms.CharField(), forms.CharField(), forms.BooleanField())
         widget = CategoryWidget()
 
         super(CategoriesField, self).__init__(

@@ -142,7 +142,7 @@ def set_categories(request, tournament_id):
     if cats_request.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
-    cats = [[x['name'], x['percentage']] for x in \
+    cats = [[x['name'], x['percentage'], x['per_tournament']] for x in \
         json.loads(cats_request.content)]
     form = SetCategoriesForm(tournament_id=tournament_id, categories=cats)
 
@@ -157,7 +157,7 @@ def set_categories(request, tournament_id):
             # form but simpler to do it here.
             form.cleaned_data['categories'] = json.dumps([
                 k for k, v in form.cleaned_data.iteritems() \
-                if k.startswith('categories_') and v != '[]'])
+                if k.startswith('categories_') and v != '["", "", false]'])
 
             response = from_dao('/setScoreCategories', form)
 

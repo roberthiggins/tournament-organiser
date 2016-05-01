@@ -4,7 +4,7 @@ Feature: Modify the scoring categories for a tournament
     I need to be able to view and set the scoreing categories for a tournament (battle, sports, etc)
 
     Background: I set the categories for category_test
-        When I POST "tournamentId=category_test&categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22foo%22,%2210%22]&categories_1=[%22bar%22,%2210%22]" to "/setScoreCategories" from the API
+        When I POST "tournamentId=category_test&categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22foo%22,%2210%22,false]&categories_1=[%22bar%22,%2210%22, false]" to "/setScoreCategories" from the API
         Then the API response status code should be 200
         Given I am on "/login"
         When I fill in "id_inputUsername" with "charlie_murphy"
@@ -45,7 +45,7 @@ Feature: Modify the scoring categories for a tournament
         Then the API response should be a list of length 0
 
     Scenario: I modify the tournament categories through the API
-        When I POST "tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fantasticgibberish%22,%2221%22]" to "/setScoreCategories" from the API
+        When I POST "tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fantasticgibberish%22,%2221%22,true]" to "/setScoreCategories" from the API
         Then the API response status code should be 200
         Then I GET "/getScoreCategories/category_test" from the API
         Then the API response status code should be 200

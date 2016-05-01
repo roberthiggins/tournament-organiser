@@ -403,9 +403,9 @@ def set_score_categories():
     tourn = Tournament(tournamentId)
 
     new_categories = []
-    for cat in json.loads(categories):
-        pair = json.loads(request.values.get(cat, []))
-        new_categories.append(ScoreCategoryPair(pair[0], pair[1]))
+    for json_cat in json.loads(categories):
+        cat = json.loads(request.values.get(json_cat, []))
+        new_categories.append(ScoreCategoryPair(cat[0], cat[1], cat[2]))
 
     tourn.set_score_categories(new_categories)
 

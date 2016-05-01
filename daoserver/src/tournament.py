@@ -94,10 +94,13 @@ class Tournament(object):
 
             if dao is None:
                 dao = ScoreCategory(self.tournament_id,
-                                    cat.name, cat.percentage)
+                                    cat.name,
+                                    cat.percentage,
+                                    cat.per_tournament)
             else:
                 to_delete = [x for x in to_delete if x.display_name != cat.name]
             dao.percentage = int(cat.percentage)
+            dao.per_tournament = cat.per_tournament
             dao.write()
 
         for cat in to_delete:
@@ -194,13 +197,16 @@ class Tournament(object):
         """
         List all the score categories available to this tournie and their
         percentages.
-        [{ 'name': 'Painting', 'percentage': 20, 'id': 1 }]
+        [{ 'name': 'Painting', 'percentage': 20, 'id': 1,
+           'per_tournament': False }]
         """
         categories = ScoreCategory.query.\
             filter_by(tournament_id=self.tournament_id).all()
         return [
-            {'id': x.id, 'name': x.display_name, 'percentage': x.percentage} \
-            for x in categories]
+            {'id': x.id,
+             'name': x.display_name,
+             'percentage': x.percentage,
+             'per_tournament': x.per_tournament} for x in categories]
 
     @must_exist_in_db
     def make_draw(self, round_id=0):
@@ -342,8 +348,9 @@ class Tournament(object):
 
 class ScoreCategoryPair(object):
     """A holder object for score category information"""
-    def __init__(self, name, percentage):
+    def __init__(self, name, percentage, per_tourn):
         self.name = name
         self.percentage = float(percentage)
         if self.percentage <= 0 or self.percentage > 100:
             raise ValueError("Score categories must be between 1 and 100")
+        self.per_tournament = per_tourn
