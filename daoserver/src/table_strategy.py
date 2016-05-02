@@ -32,9 +32,6 @@ class Table(object):
         self.table_number = int(table_number)
         self.entrants = entrants
 
-    def __repr__(self):
-        return '(' + str(self.table_number) + ',' + str(self.entrants) + ')'
-
     def protest_score(self):
         """
         Get the protest score for a single game.

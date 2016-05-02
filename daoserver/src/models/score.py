@@ -180,3 +180,22 @@ class Score(db.Model):
         except Exception:
             db.session.rollback()
             raise
+
+
+def scores_for_entry(entry_id):
+    """ Get all the score_key:score pairs for an entry"""
+
+    scores = db.session.query(Score, ScoreKey, ScoreCategory).\
+        join(ScoreKey).join(ScoreCategory).join(Tournament).\
+        join(TournamentEntry).filter(Score.entry_id == entry_id).\
+        all()
+
+    return [
+        {
+            'key': x[1].key,
+            'score':x[0].value,
+            'category': x[2].display_name,
+            'min_val': x[1].min_val,
+            'max_val': x[1].max_val,
+        } for x in scores
+    ]

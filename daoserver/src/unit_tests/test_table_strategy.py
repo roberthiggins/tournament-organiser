@@ -5,7 +5,7 @@ The process by which players are allocated to tables
 import unittest
 from testfixtures import compare
 
-from models.tournament_entry import Entry
+from models.tournament_entry import TournamentEntry
 from table_strategy import ProtestAvoidanceStrategy, Table
 
 class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
@@ -13,8 +13,8 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
 
     def test_get_protest_score_for_game(self):
         """Test that individual games get the correct protest score"""
-        entry1 = Entry(entry_id='entry1', game_history=[1, 3])
-        entry2 = Entry(entry_id='entry2', game_history=[2, 3])
+        entry1 = TournamentEntry('entry1', 'foo', game_history=[1, 3])
+        entry2 = TournamentEntry('entry2', 'foo', game_history=[2, 3])
         game = [entry1, entry2]
 
         self.assertTrue(Table(1, game).protest_score() == 1)
@@ -37,12 +37,12 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         Protest object for a layout
         Should be something like [0s, 1s, 2s, totals]
         """
-        entry1 = Entry(entry_id='entry1', game_history=[1, 2])
-        entry2 = Entry(entry_id='entry1', game_history=[2, 1])
-        entry3 = Entry(entry_id='entry1', game_history=[3, 2])
-        entry4 = Entry(entry_id='entry1', game_history=[1, 3])
-        entry5 = Entry(entry_id='entry1', game_history=[2, 3])
-        entry6 = Entry(entry_id='entry1', game_history=[3, 1])
+        entry1 = TournamentEntry('entry1', 'foo', game_history=[1, 2])
+        entry2 = TournamentEntry('entry1', 'foo', game_history=[2, 1])
+        entry3 = TournamentEntry('entry1', 'foo', game_history=[3, 2])
+        entry4 = TournamentEntry('entry1', 'foo', game_history=[1, 3])
+        entry5 = TournamentEntry('entry1', 'foo', game_history=[2, 3])
+        entry6 = TournamentEntry('entry1', 'foo', game_history=[3, 1])
 
         func = ProtestAvoidanceStrategy.get_protest_score_for_layout
 
@@ -89,12 +89,12 @@ class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
         We can change the history and you should get different draws
         """
 
-        entry1 = Entry(entry_id='entry1', game_history=[1, 2])
-        entry2 = Entry(entry_id='entry2', game_history=[2, 1])
-        entry3 = Entry(entry_id='entry3', game_history=[3, 2])
-        entry4 = Entry(entry_id='entry4', game_history=[1, 3])
-        entry5 = Entry(entry_id='entry5', game_history=[2, 3])
-        entry6 = Entry(entry_id='entry6', game_history=[3, 1])
+        entry1 = TournamentEntry('entry1', 'foo', game_history=[1, 2])
+        entry2 = TournamentEntry('entry2', 'foo', game_history=[2, 1])
+        entry3 = TournamentEntry('entry3', 'foo', game_history=[3, 2])
+        entry4 = TournamentEntry('entry4', 'foo', game_history=[1, 3])
+        entry5 = TournamentEntry('entry5', 'foo', game_history=[2, 3])
+        entry6 = TournamentEntry('entry6', 'foo', game_history=[3, 1])
         games = [(entry1, entry2), (entry3, entry4), (entry5, entry6)]
         strategy = ProtestAvoidanceStrategy()
 

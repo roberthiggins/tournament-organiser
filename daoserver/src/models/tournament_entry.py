@@ -24,9 +24,10 @@ class TournamentEntry(db.Model):
     tournament = db.relationship(Tournament, backref='entries')
     account = db.relationship(Account, backref='entries')
 
-    def __init__(self, player_id, tournament_id):
+    def __init__(self, player_id, tournament_id, game_history=None):
         self.player_id = player_id
         self.tournament_id = tournament_id
+        self.game_history = game_history
 
     def __repr__(self):
         return '<TournamentEntry ({}, {}, {})>'.format(

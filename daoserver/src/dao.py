@@ -334,7 +334,9 @@ def rank_entries(tournament_id):
             'username': 'homer',
             'entry_id': 1,
             'tournament_id': 'some_tournie',
-            'scores': {'round_1': 10, 'round_2': 4 }
+            'scores': {'round_1': 10, 'round_2': 4 },
+            'total_score': 23.5,
+            'ranking': 3
         },
     ]
     """
@@ -344,7 +346,17 @@ def rank_entries(tournament_id):
             'Tournament {} doesn\'t exist'.format(tournament_id), 404)
 
     return jsonpickle.encode(
-        tourn.ranking_strategy.overall_ranking(tourn.entries()),
+        [
+            {
+                'username' : x.player_id,
+                'entry_id' : x.id,
+                'tournament_id' : tourn.tournament_id,
+                'scores' : x.scores,
+                'total_score' : x.total_score,
+                'ranking': x.ranking
+            } for x in \
+            tourn.ranking_strategy.overall_ranking(tourn.entries())
+        ],
         unpicklable=False)
 
 @APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET', 'POST'])
