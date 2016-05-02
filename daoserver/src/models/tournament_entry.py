@@ -4,6 +4,8 @@ ORM moduel for an entry in a tournament
 
 # pylint: disable=invalid-name
 
+from flask import json
+
 from models.account import Account
 from models.db_connection import db
 from models.tournament import Tournament
@@ -40,3 +42,25 @@ class TournamentEntry(db.Model):
         except Exception:
             db.session.rollback()
             raise
+
+
+class Entry(json.JSONEncoder):
+    """
+    A tournament is composed of entries who play each other. This is distinct
+    from users or accounts as there may be multiple players on a team, etc.
+    """
+
+    #pylint: disable=R0913
+    def __init__(
+            self,
+            entry_id=None,
+            username=None,
+            game_history=None,
+            scores=None):
+        self.entry_id = entry_id
+        self.username = username
+        self.game_history = game_history #
+        self.scores = scores #
+
+    def __repr__(self):
+        return str(self.entry_id)

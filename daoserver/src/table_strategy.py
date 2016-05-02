@@ -39,9 +39,6 @@ class Table(object):
         """
         Get the protest score for a single game.
         Returns a single protest score between 0 and len(entries)
-        Expects:
-            - an int for the table number
-            - A list of Entry
         """
         protests = 0
         try:

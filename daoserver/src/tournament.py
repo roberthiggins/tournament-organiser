@@ -177,7 +177,7 @@ class Tournament(object):
             ]
 
         from models.table_allocation import TableAllocation
-        from entry import Entry
+        from models.tournament_entry import Entry
         entries = TournamentEntry.query.\
             filter_by(tournament_id=self.tournament_id).all()
 
@@ -185,7 +185,6 @@ class Tournament(object):
             Entry(
                 entry_id=entry.id,
                 username=entry.account.username,
-                tournament_id=entry.tournament.name,
                 game_history=[x.table_no for x in \
                     TableAllocation.query.filter_by(entry_id=entry.id)],
                 scores=scores_for_entry(entry.id),
