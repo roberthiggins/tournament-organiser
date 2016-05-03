@@ -13,6 +13,7 @@ class TournamentRound(object):
     """A round consists of a number of games and a table strategy"""
 
     def __init__(self, tournament_id, round_num):
+        self.draw = None
         self.tournament_id = tournament_id
         self.round_num = int(round_num)
 

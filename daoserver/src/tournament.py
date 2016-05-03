@@ -192,13 +192,14 @@ class Tournament(object):
     @must_exist_in_db
     def make_draw(self, round_id=0):
         """Determines the draw for round. This draw is written to the db"""
-        match_ups = self.matching_strategy.match(int(round_id), self.entries())
-        draw = self.table_strategy.determine_tables(match_ups)
+        rnd = self.get_round(round_id)
+        match_ups = self.matching_strategy.match(rnd.round_num, self.entries())
+        rnd.draw = self.table_strategy.determine_tables(match_ups)
         try:
-            for match in draw:
+            for match in rnd.draw:
 
                 game = Game(tournament=self.tournament_id,
-                            round_num=round_id,
+                            round_num=rnd.round_num,
                             table_num=match.table_number)
                 entrants = [None if x == 'BYE' else x for x in match.entrants]
 
@@ -220,8 +221,6 @@ class Tournament(object):
             if 'duplicate key' not in str(err):
                 raise err
 
-        return draw
-
     @must_exist_in_db
     def get_round(self, round_num):
         """Get the relevant TournamentRound"""
@@ -238,15 +237,18 @@ class Tournament(object):
         Returns:
             - dict with three keys {score_keys, draw, mission}
         """
-        draw = [
-            {'table_number':t.table_number,
+        if self.get_round(round_id).draw is None:
+            self.make_draw(round_id)
+
+        draw_info = [
+            {'table_number': t.table_number,
              'entrants': [x if isinstance(x, str) else x.player_id \
                           for x in t.entrants]
-            } for t in self.make_draw(round_id)]
+            } for t in self.get_round(round_id).draw]
 
         return {
             'score_keys': self.get_round(round_id).get_score_keys(),
-            'draw': draw,
+            'draw': draw_info,
             'mission': self.get_round(round_id).get_mission()
         }
 
