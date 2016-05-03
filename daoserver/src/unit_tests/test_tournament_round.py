@@ -71,11 +71,9 @@ class SetRounds(TestCase):
         self.set_up_tournament(name)
 
         tourn = Tournament(name)
-        compare(tourn.get_mission(1), 'mission_1')
-        compare(tourn.get_mission(4), 'TBA')
-
-        self.assertRaises(ValueError, tourn.get_mission, 'a')
-        self.assertRaises(ValueError, tourn.get_mission, 5)
+        tourn.set_number_of_rounds(4)
+        compare(tourn.get_round(1).get_mission(), 'mission_1')
+        compare(tourn.get_round(4).get_mission(), 'TBA')
 
         compare(
             [x.mission for x in Tournament(name).get_dao().rounds],
@@ -87,16 +85,28 @@ class SetRounds(TestCase):
         self.set_up_tournament(name)
 
         tourn = Tournament(name)
-        self.assertRaises(ValueError, tourn.set_mission, 'a', 'should_fail')
-        self.assertRaises(ValueError, tourn.set_mission, -1, 'should_fail')
-        self.assertRaises(ValueError, tourn.set_mission, 7, 'should_fail')
+        tourn.set_number_of_rounds(5)
+        tourn.get_round(5).set_mission('mission_5')
+        self.assertTrue(tourn.get_round(5).get_mission(), 'mission_5')
+        tourn.get_round(4).set_mission('mission_4')
+        self.assertTrue(tourn.get_round(4).get_mission(), 'mission_4')
+        tourn.get_round(2).set_mission('mission_2')
+        self.assertTrue(tourn.get_round(2).get_mission(), 'mission_2')
 
-        tourn.set_mission(5, 'mission_5')
-        self.assertTrue(tourn.get_mission(5), 'mission_5')
-        tourn.set_mission(4, 'mission_4')
-        self.assertTrue(tourn.get_mission(4), 'mission_4')
-        tourn.set_mission(2, 'mission_2')
-        self.assertTrue(tourn.get_mission(2), 'mission_2')
+    def test_get_round(self):
+        """Test the round getter"""
+        name = 'test_get_round'
+        self.set_up_tournament(name)
+        tourn = Tournament(name)
+        tourn.set_number_of_rounds(2)
+
+        self.assertTrue(tourn.get_round(1).round_num == 1)
+        self.assertTrue(tourn.get_round(2).round_num == 2)
+
+        self.assertRaises(ValueError, tourn.get_round, 3)
+        self.assertRaises(ValueError, tourn.get_round, -1)
+        self.assertRaises(ValueError, tourn.get_round, 'a')
+        self.assertRaises(ValueError, tourn.get_round, 0)
 
     def test_errors(self):
         """Illegal values"""

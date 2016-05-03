@@ -15,10 +15,10 @@ from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame as Game
-from models.tournament_round import TournamentRound
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
+from tournament_round import TournamentRound
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
@@ -45,6 +45,11 @@ class Tournament(object):
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
         self.creator_username = creator
+        if self.exists_in_db:
+            self.rounds = [TournamentRound(self.tournament_id, rnd) \
+                for rnd in range(1, self.get_dao().num_rounds + 1)]
+        else:
+            self.rounds = []
 
     def add_to_db(self, date):
         """
@@ -218,17 +223,13 @@ class Tournament(object):
         return draw
 
     @must_exist_in_db
-    def get_mission(self, round_id):
-        """Get the mission for a given round"""
-
-        tournament_round = TournamentRound.query.\
-            filter(and_(TournamentRound.tournament_name == self.tournament_id,
-                        TournamentRound.ordering == int(round_id))
-                  ).first()
-
-        if tournament_round is not None:
-            return tournament_round.mission
-        raise ValueError('Round {} does not exist'.format(round_id))
+    def get_round(self, round_num):
+        """Get the relevant TournamentRound"""
+        try:
+            return [x for x in self.rounds if x.round_num == int(round_num)][0]
+        except IndexError:
+            raise ValueError('Tournament {} does not have a round {}'.format(
+                self.tournament_id, round_num))
 
     @must_exist_in_db
     def round_info(self, round_id=0):
@@ -246,22 +247,8 @@ class Tournament(object):
         return {
             'score_keys': self.get_score_keys_for_round(round_id),
             'draw': draw,
-            'mission': self.get_mission(round_id)
+            'mission': self.get_round(round_id).get_mission()
         }
-
-    @must_exist_in_db
-    def set_mission(self, round_id, mission):
-        """Set the mission for a given round"""
-        round_id = int(round_id)
-        tournament_round = TournamentRound.query.\
-            filter_by(tournament_name=self.tournament_id, ordering=round_id).\
-            first()
-
-        if tournament_round is None:
-            TournamentRound(self.tournament_id, round_id, mission).write()
-        else:
-            tournament_round.mission = mission
-            tournament_round.write()
 
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
@@ -270,14 +257,12 @@ class Tournament(object):
         tourn.num_rounds = int(num_rounds)
         tourn.write()
 
-        rounds = TournamentRound.query.filter(
-            and_(
-                TournamentRound.tournament_name == self.tournament_id,
-                TournamentRound.ordering > int(num_rounds))
-            ).all()
+        for rnd in [x for x in self.rounds if x.round_num > tourn.num_rounds]:
+            if rnd.get_dao() is not None:
+                rnd.get_dao().delete()
 
-        for extra_round in rounds:
-            extra_round.delete()
+        self.rounds = [TournamentRound(self.tournament_id, x) \
+            for x in range(1, num_rounds + 1)]
 
     @must_exist_in_db
     # pylint: disable=R0913

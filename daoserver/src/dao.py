@@ -305,7 +305,7 @@ def set_missions():
             You submitted missions {}'.format(tournamentId, rounds, missions))
 
     for i, mission in enumerate(json_missions):
-        tourn.set_mission(i + 1, mission)
+        tourn.get_round(i + 1).set_mission(mission)
 
     return make_response('Missions set: {}'.format(missions), 200)
 
@@ -374,7 +374,7 @@ def get_round_info(tournament_id, round_id):
     tourn = Tournament(tournament_id)
 
     if request.method == 'POST':
-        tourn.set_mission(round_id, mission)
+        tourn.get_round(round_id).set_mission(mission)
 
     # We will return all round info for all requests regardless of method
     return jsonpickle.encode(
