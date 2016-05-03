@@ -231,28 +231,6 @@ class Tournament(object):
                 self.tournament_id, round_num))
 
     @must_exist_in_db
-    def round_info(self, round_id=0):
-        """
-        Returns info about round.
-        Returns:
-            - dict with three keys {score_keys, draw, mission}
-        """
-        if self.get_round(round_id).draw is None:
-            self.make_draw(round_id)
-
-        draw_info = [
-            {'table_number': t.table_number,
-             'entrants': [x if isinstance(x, str) else x.player_id \
-                          for x in t.entrants]
-            } for t in self.get_round(round_id).draw]
-
-        return {
-            'score_keys': self.get_round(round_id).get_score_keys(),
-            'draw': draw_info,
-            'mission': self.get_round(round_id).get_mission()
-        }
-
-    @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
         tourn = self.get_dao()

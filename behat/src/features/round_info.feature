@@ -3,11 +3,17 @@ Feature: Get round info for display to the user
     As a tournament entrant
     So that I can know about scores, mission, etc.
 
+    Background: Set the missions for a round robin tournament
+        Given I POST "tournamentId=ranking_test&numRounds=2" to "/setRounds" from the API
+        Then the API response status code should be 200
+        Then I POST "tournamentId=ranking_test&missions=[%22mission_1%22,%22mission_2%22]" to "/setMissions" from the API
+        Then the API response status code should be 200
+
     Scenario: I get round info from the API
         When I GET "/roundInfo/ranking_test/1" from the API
         Then the response is JSON
         Then the API response should contain "round_1_battle"
-        Then the API response should contain "Kill"
+        Then the API response should contain "mission_1"
         Then the API response should not contain "round_2_battle"
         Then the API response should not contain "sports"
 

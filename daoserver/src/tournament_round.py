@@ -25,6 +25,24 @@ class TournamentRound(object):
                  DAO.ordering == self.round_num)).\
             first()
 
+    def get_info(self):
+        """
+        Returns info about round.
+        Returns:
+            - dict with three keys {score_keys, draw, mission}
+        """
+        draw_info = [
+            {'table_number': t.table_number,
+             'entrants': [x if isinstance(x, str) else x.player_id \
+                          for x in t.entrants]
+            } for t in list(self.draw)]
+
+        return {
+            'score_keys': self.get_score_keys(),
+            'draw': draw_info,
+            'mission': self.get_mission()
+        }
+
     def get_mission(self):
         """Return the name of the mission"""
         if self.get_dao() is not None:
