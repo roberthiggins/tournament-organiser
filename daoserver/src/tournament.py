@@ -245,7 +245,7 @@ class Tournament(object):
             } for t in self.make_draw(round_id)]
 
         return {
-            'score_keys': self.get_score_keys_for_round(round_id),
+            'score_keys': self.get_round(round_id).get_score_keys(),
             'draw': draw,
             'mission': self.get_round(round_id).get_mission()
         }
@@ -290,28 +290,6 @@ class Tournament(object):
         # This score could be per-game rather than per-tournament
         if round_id is not None:
             RoundScore(key.id, round_id).write()
-
-    @must_exist_in_db
-    def get_score_keys_for_round(self, round_id='next'):
-        """
-        Get all the score keys associated with this round
-        Returns a list of tuples:
-            (id, key, min, max, category_id, score_key_id, round_id)
-        """
-
-        #TODO get next round
-        if round_id == 'next':
-            raise NotImplementedError('next round is unknown')
-
-        results = score_db.session.query(ScoreKey, RoundScore).\
-            join(RoundScore).filter_by(round_id=round_id).all()
-
-        if len(results) == 0:
-            raise ValueError("Draw not ready. Mission not set. Contact TO")
-
-        return [
-            (x[0].id, x[0].key, x[0].min_val, x[0].max_val, x[0].category,
-             x[1].score_key_id, x[1].round_id) for x in results]
 
 class ScoreCategoryPair(object):
     """A holder object for score category information"""

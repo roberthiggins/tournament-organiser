@@ -6,6 +6,7 @@ a nice point of separation to reduce the complexity of a tournament.
 """
 from sqlalchemy.sql.expression import and_
 
+from models.score import db as score_db, RoundScore, ScoreKey
 from models.tournament_round import TournamentRound as DAO
 
 class TournamentRound(object):
@@ -37,3 +38,19 @@ class TournamentRound(object):
             self.get_dao().mission = mission_name
             self.get_dao().write()
 
+    def get_score_keys(self):
+        """
+        Get all the score keys associated with this round
+        Returns a list of tuples:
+            (id, key, min, max, category_id, score_key_id, round_id)
+        """
+
+        results = score_db.session.query(ScoreKey, RoundScore).\
+            join(RoundScore).filter_by(round_id=self.round_num).all()
+
+        if len(results) == 0:
+            raise ValueError("Draw not ready. Mission not set. Contact TO")
+
+        return [
+            (x[0].id, x[0].key, x[0].min_val, x[0].max_val, x[0].category,
+             x[1].score_key_id, x[1].round_id) for x in results]

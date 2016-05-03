@@ -26,6 +26,7 @@ class TestRoundScore(TestCase):
         """Get the score keys linked to the round"""
 
         tourn = Tournament('ranking_test')
+        tourn.set_number_of_rounds(5)
 
         # make a bogus tournament in the hopes we can select a key from another
         # tournament
@@ -54,11 +55,11 @@ class TestRoundScore(TestCase):
             ('round_1_battle', 0, 20),
             ('sports', 1, 5)
         ]
-        round_1_keys_act = [x[1:4] for x in tourn.get_score_keys_for_round(1)]
+        round_1_keys_act = [x[1:4] for x in tourn.get_round(1).get_score_keys()]
         compare(round_1_keys_exp, round_1_keys_act)
 
         round_2_keys_exp = [
             ('round_2_battle', 0, 20),
         ]
-        round_2_keys_act = [x[1:4] for x in tourn.get_score_keys_for_round(2)]
+        round_2_keys_act = [x[1:4] for x in tourn.get_round(2).get_score_keys()]
         compare(round_2_keys_exp, round_2_keys_act)
