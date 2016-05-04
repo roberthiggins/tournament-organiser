@@ -20,8 +20,6 @@ CREATE VIEW tournament_organiser_permissions AS
 CREATE VIEW game_permissions AS
     SELECT
         g.id            AS game_id,
-        g.tourn         AS tournament_name,
-        g.round_num     AS round_num,
         poa.description AS permission_description,
         a.username      AS username
     FROM game                                           g
