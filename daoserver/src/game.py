@@ -17,13 +17,10 @@ class Game(object):
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, game_id=None, tournament_id=None,
-                 round_id=None, table_number=None, protected_object_id=None):
+    def __init__(self, game_id=None, tournament_id=None, round_id=None):
         self.game_id = game_id
         self.tournament_id = tournament_id
         self.round_id = round_id
-        self.table_number = table_number
-        self.protected_object_id = protected_object_id
 
     def get_dao(self):
         """Gaet DAO object for self"""

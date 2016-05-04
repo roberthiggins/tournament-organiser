@@ -155,9 +155,7 @@ class ScoreEnteringTests(TestCase):
 
         return Game(game_id=game.id,
                     tournament_id=tournament_round_entry[0],
-                    round_id=tournament_round_entry[1],
-                    table_number=game.table_num,
-                    protected_object_id=game.protected_object_id)
+                    round_id=tournament_round_entry[1])
 
 class EnterScore(TestCase):
 
