@@ -35,10 +35,12 @@ class ScoreEnteringTests(TestCase):
 
         game = self.get_game_from_score(5, 'round_1_battle')
         self.assertTrue(game is not None)
-        self.assertTrue(game.entry_1 is not None)
-        self.assertTrue(game.entry_2 is not None)
-        self.assertTrue(game.entry_1 == 5 or game.entry_2 == 5)
-        self.assertTrue(game.entry_1 == 3 or game.entry_2 == 3)
+        self.assertTrue(game.get_dao().entrants[0].entrant_id is not None)
+        self.assertTrue(game.get_dao().entrants[1].entrant_id is not None)
+        self.assertTrue(game.get_dao().entrants[0].entrant_id == 5 \
+        or game.get_dao().entrants[1].entrant_id == 5)
+        self.assertTrue(game.get_dao().entrants[0].entrant_id == 3 \
+        or game.get_dao().entrants[1].entrant_id == 3)
 
 
         # A score that isn't tied to a game
@@ -49,8 +51,8 @@ class ScoreEnteringTests(TestCase):
         # A player in a bye
         game = self.get_game_from_score(4, 'round_1_battle')
         self.assertTrue(game is not None)
-        self.assertTrue(game.entry_1 == 4)
-        self.assertTrue(game.entry_2 is None)
+        self.assertTrue(game.get_dao().entrants[0].entrant_id == 4)
+        self.assertTrue(len(game.get_dao().entrants) == 1)
 
 
         # Poor data will return None rather than an error
@@ -65,15 +67,14 @@ class ScoreEnteringTests(TestCase):
 
         # A completed game
         game = self.get_game_from_score(5, 'round_1_battle')
-        compare(game.entry_1, 3)
-        compare(game.entry_2, 5)
+        compare(game.get_dao().entrants[0].entrant_id, 3)
+        compare(game.get_dao().entrants[1].entrant_id, 5)
         self.assertTrue(game.is_score_entered())
 
         # a bye should be false
         # TODO resolve Bye Scoring
         game = self.get_game_from_score(4, 'round_1_battle')
-        compare(game.entry_1, 4)
-        compare(game.entry_2, None)
+        compare(game.get_dao().entrants[0].entrant_id, 4)
         self.assertFalse(game.is_score_entered())
 
         # Ensure the rd2 game bart vs. maggie is listed as not scored. This
@@ -81,8 +82,8 @@ class ScoreEnteringTests(TestCase):
         cur.execute("UPDATE game SET score_entered = False WHERE id = 5")
         game = self.get_game_from_score(5, 'round_2_battle')
 
-        compare(game.entry_1, 6)
-        compare(game.entry_2, 5)
+        compare(game.get_dao().entrants[0].entrant_id, 6)
+        compare(game.get_dao().entrants[1].entrant_id, 5)
         self.assertFalse(game.is_score_entered())
 
         # Enter the final score for maggie

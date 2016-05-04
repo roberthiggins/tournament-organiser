@@ -7,7 +7,6 @@ A game is simply a match between two entries. It is played on a table.
 
 from sqlalchemy.sql.expression import and_
 
-from models.game_entry import GameEntrant
 from models.score import RoundScore, ScoreCategory, ScoreKey, Score, db
 from models.tournament_game import TournamentGame
 
@@ -25,10 +24,6 @@ class Game(object):
         self.round_id = round_id
         self.table_number = table_number
         self.protected_object_id = protected_object_id
-
-        entrants = GameEntrant.query.filter_by(game_id=game_id).all()
-        self.entry_1 = entrants[0].entrant_id
-        self.entry_2 = None if len(entrants) == 1 else entrants[1].entrant_id
 
     def get_dao(self):
         """Gaet DAO object for self"""
@@ -64,9 +59,10 @@ class Game(object):
             - a list of tuples (entry_id, score_key, score_entered)
         """
 
+        entry_ids = (x.entrant_id for x in self.get_dao().entrants)
         scores_and_keys = db.session.query(Score, ScoreKey).join(ScoreKey).\
             join(RoundScore).join(ScoreCategory).filter(and_(
                 ScoreCategory.tournament_id == self.tournament_id,
                 RoundScore.round_id == self.round_id,
-                Score.entry_id.in_((self.entry_1, self.entry_2)))).all()
+                Score.entry_id.in_(entry_ids))).all()
         return [(x[0].entry_id, x[1].key, x[0].value) for x in scores_and_keys]
