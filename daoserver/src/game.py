@@ -30,10 +30,6 @@ class Game(object):
         self.entry_1 = entrants[0].entrant_id
         self.entry_2 = None if len(entrants) == 1 else entrants[1].entrant_id
 
-    def num_entrants(self):
-        """The number of entrants in the game"""
-        return 1 if None in [self.entry_1, self.entry_2] else 2
-
     def get_dao(self):
         """Gaet DAO object for self"""
         return TournamentGame.query.filter_by(id=self.game_id).first()
@@ -56,8 +52,9 @@ class Game(object):
                      ScoreCategory.tournament_id == self.tournament_id)).all())
         scores_entered = [x[2] for x in self.scores_entered()]
 
+        scores_by_entrants = scores_for_round * len(self.get_dao().entrants)
         return None not in scores_entered \
-        and len(scores_entered) == (scores_for_round * self.num_entrants())
+        and len(scores_entered) == (scores_by_entrants)
 
     def scores_entered(self):
         """
