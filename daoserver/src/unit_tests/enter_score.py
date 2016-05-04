@@ -3,12 +3,18 @@ Test entering scores for games in a tournament
 """
 
 from flask.ext.testing import TestCase
+from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from app import create_app
 from db_connections.db_connection import db_conn
-from models.db_connection import db
 from game import Game
+from models.db_connection import db
+from models.game_entry import GameEntrant
+from models.score import RoundScore, ScoreCategory, ScoreKey, Score, \
+db as score_db
+from models.tournament_entry import TournamentEntry
+from models.tournament_game import TournamentGame
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable
 class ScoreEnteringTests(TestCase):
@@ -126,13 +132,6 @@ class ScoreEnteringTests(TestCase):
         Given an entry and score_key, you should be able to work out the game
         """
 
-        from sqlalchemy.sql.expression import and_
-        from models.game_entry import GameEntrant
-        from models.score import RoundScore, ScoreCategory, ScoreKey, Score, \
-        db as score_db
-        from models.tournament_entry import TournamentEntry
-        from models.tournament_game import TournamentGame
-
         tournament_round_entry = score_db.session.\
             query(Score, ScoreKey, ScoreCategory, TournamentEntry, RoundScore).\
             join(ScoreKey).join(ScoreCategory).join(TournamentEntry).\
@@ -183,7 +182,6 @@ class EnterScore(TestCase):
         t.num_rounds = 5
         t.write()
 
-        from models.score import ScoreCategory, ScoreKey
         cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False)
         cat.tournament = t
         cat.write()
@@ -199,7 +197,6 @@ class EnterScore(TestCase):
         from models.account import Account
         Account(self.player_1, 'foo@bar.com').write()
 
-        from models.tournament_entry import TournamentEntry
         entry = TournamentEntry(self.player_1, self.tournament_1)
         entry.write()
 
