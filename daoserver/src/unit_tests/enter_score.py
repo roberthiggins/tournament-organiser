@@ -43,13 +43,13 @@ class ScoreEnteringTests(TestCase):
         self.assertTrue(game is not None)
 
         game = self.get_game_from_score(5, 'round_1_battle')
-        self.assertTrue(game is not None)
-        self.assertTrue(game.get_dao().entrants[0].entrant_id is not None)
-        self.assertTrue(game.get_dao().entrants[1].entrant_id is not None)
-        self.assertTrue(game.get_dao().entrants[0].entrant_id == 5 \
-        or game.get_dao().entrants[1].entrant_id == 5)
-        self.assertTrue(game.get_dao().entrants[0].entrant_id == 3 \
-        or game.get_dao().entrants[1].entrant_id == 3)
+        entrants = game.get_dao().entrants.all()
+        self.assertTrue(entrants[0].entrant_id is not None)
+        self.assertTrue(entrants[1].entrant_id is not None)
+        self.assertTrue(entrants[0].entrant_id == 5 \
+        or entrants[1].entrant_id == 5)
+        self.assertTrue(entrants[0].entrant_id == 3 \
+        or entrants[1].entrant_id == 3)
 
 
         # A score that isn't tied to a game
@@ -59,9 +59,9 @@ class ScoreEnteringTests(TestCase):
 
         # A player in a bye
         game = self.get_game_from_score(4, 'round_1_battle')
-        self.assertTrue(game is not None)
-        self.assertTrue(game.get_dao().entrants[0].entrant_id == 4)
-        self.assertTrue(len(game.get_dao().entrants) == 1)
+        entrants = game.get_dao().entrants.all()
+        self.assertTrue(entrants[0].entrant_id == 4)
+        self.assertTrue(len(entrants) == 1)
 
 
         # Poor data will return None rather than an error
@@ -76,14 +76,16 @@ class ScoreEnteringTests(TestCase):
 
         # A completed game
         game = self.get_game_from_score(5, 'round_1_battle')
-        compare(game.get_dao().entrants[0].entrant_id, 3)
-        compare(game.get_dao().entrants[1].entrant_id, 5)
+        entrants = game.get_dao().entrants.all()
+        compare(entrants[0].entrant_id, 3)
+        compare(entrants[1].entrant_id, 5)
         self.assertTrue(game.is_score_entered())
 
         # a bye should be false
         # TODO resolve Bye Scoring
         game = self.get_game_from_score(4, 'round_1_battle')
-        compare(game.get_dao().entrants[0].entrant_id, 4)
+        entrants = game.get_dao().entrants.all()
+        compare(entrants[0].entrant_id, 4)
         self.assertFalse(game.is_score_entered())
 
         # Ensure the rd2 game bart vs. maggie is listed as not scored. This
@@ -91,18 +93,14 @@ class ScoreEnteringTests(TestCase):
         cur.execute("UPDATE game SET score_entered = False WHERE id = 5")
         game = self.get_game_from_score(5, 'round_2_battle')
 
-        compare(game.get_dao().entrants[0].entrant_id, 6)
-        compare(game.get_dao().entrants[1].entrant_id, 5)
+        entrants = game.get_dao().entrants.all()
+        compare(entrants[0].entrant_id, 6)
+        compare(entrants[1].entrant_id, 5)
         self.assertFalse(game.is_score_entered())
 
         # Enter the final score for maggie
         cur.execute("INSERT INTO score VALUES(6, 4, 2)")
         conn.commit()
-
-        self.assertTrue(game.is_score_entered())
-        dao = game.get_dao()
-        dao.score_entered = True
-        dao.write()
         self.assertTrue(game.is_score_entered())
 
     def test_list_scores_for_game(self):
@@ -135,29 +133,20 @@ class ScoreEnteringTests(TestCase):
         Given an entry and score_key, you should be able to work out the game
         """
 
-        tournament_round_entry = score_db.session.\
+        t_round_entry = score_db.session.\
             query(Score, ScoreKey, ScoreCategory, TournamentEntry, RoundScore).\
             join(ScoreKey).join(ScoreCategory).join(TournamentEntry).\
             join(RoundScore).filter(and_(TournamentEntry.id == entry_id,
                                          ScoreKey.key == score_key)).first()
 
-        if tournament_round_entry is None:
+        if t_round_entry is None:
             return None
 
-        tournament_round_entry = [
-            tournament_round_entry[2].tournament_id,
-            tournament_round_entry[4].round_id,
-            tournament_round_entry[3].id
-        ]
+        game_dao = TournamentGame.query.join(GameEntrant).filter(and_(
+            TournamentGame.tournament_round_id == t_round_entry[4].round_id,
+            GameEntrant.entrant_id == t_round_entry[3].id)).first()
 
-        game = TournamentGame.query.join(GameEntrant).filter(and_(
-            TournamentGame.tourn == tournament_round_entry[0],
-            TournamentGame.round_num == tournament_round_entry[1],
-            GameEntrant.entrant_id == tournament_round_entry[2])).first()
-
-        return Game(game_id=game.id,
-                    tournament_id=tournament_round_entry[0],
-                    round_id=tournament_round_entry[1])
+        return Game(game_id=game_dao.id)
 
 class EnterScore(TestCase):
 

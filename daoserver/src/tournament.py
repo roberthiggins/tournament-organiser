@@ -14,7 +14,7 @@ ScoreKey
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
-from models.tournament_game import TournamentGame as Game
+from models.tournament_game import TournamentGame
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
@@ -206,9 +206,7 @@ class Tournament(object):
         try:
             for match in rnd.draw:
 
-                game = Game(tournament=self.tournament_id,
-                            round_num=rnd.round_num,
-                            table_num=match.table_number)
+                game = TournamentGame(rnd.get_dao().id, match.table_number)
                 entrants = [None if x == 'BYE' else x for x in match.entrants]
 
                 for entrant in entrants:
@@ -248,6 +246,7 @@ class Tournament(object):
         from models.tournament_round import TournamentRound as TR
         for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
             rnd.round_scores.delete()
+            rnd.games.delete()
         tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
         from models.db_connection import db
         db.session.commit()

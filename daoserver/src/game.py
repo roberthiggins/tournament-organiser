@@ -17,10 +17,10 @@ class Game(object):
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, game_id=None, tournament_id=None, round_id=None):
+    def __init__(self, game_id):
         self.game_id = game_id
-        self.tournament_id = tournament_id
-        self.round_id = round_id
+        self.tournament_id = self.get_dao().tournament_round.tournament_name
+        self.round_id = self.get_dao().tournament_round.ordering
 
     def get_dao(self):
         """Gaet DAO object for self"""
@@ -44,7 +44,9 @@ class Game(object):
                      ScoreCategory.tournament_id == self.tournament_id)).all())
         scores_entered = [x[2] for x in self.scores_entered()]
 
-        scores_by_entrants = scores_for_round * len(self.get_dao().entrants)
+        scores_by_entrants = scores_for_round * \
+        len(self.get_dao().entrants.all())
+
         return None not in scores_entered \
         and len(scores_entered) == (scores_by_entrants)
 

@@ -94,7 +94,7 @@ class TournamentInjector(object):
         """Delete all scores for all tournaments injected"""
 
         for tourn in Tournament.query.filter(Tournament.id.in_(
-            tuple(self.tournament_ids))).all():
+                tuple(self.tournament_ids))).all():
 
             if tourn is None:
                 return

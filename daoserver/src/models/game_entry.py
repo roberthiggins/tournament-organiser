@@ -18,7 +18,8 @@ class GameEntrant(db.Model):
                            db.ForeignKey(TournamentEntry.id),
                            primary_key=True)
 
-    game = db.relationship(TournamentGame, backref='entrants')
+    game = db.relationship(TournamentGame,
+                           backref=db.backref('entrants', lazy='dynamic'))
     entrant = db.relationship(TournamentEntry)
 
     def __init__(self, game, entrant):

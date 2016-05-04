@@ -5,8 +5,8 @@ ORM module for a game in a tournament
 # pylint: disable=invalid-name,no-member
 
 from models.db_connection import db
-from models.tournament import Tournament
 from models.permissions import ProtectedObject
+from models.tournament_round import TournamentRound
 
 class TournamentGame(db.Model):
     """
@@ -14,20 +14,20 @@ class TournamentGame(db.Model):
     """
     __tablename__ = 'game'
     id = db.Column(db.Integer, db.Sequence('game_id_seq'), unique=True)
-    round_num = db.Column(db.Integer, primary_key=True)
-    tourn = db.Column(db.String(50),
-                      db.ForeignKey(Tournament.name),
-                      primary_key=True)
+    tournament_round_id = db.Column(db.Integer,
+                                    db.ForeignKey(TournamentRound.id,
+                                                  ondelete='CASCADE'))
     table_num = db.Column(db.Integer, primary_key=True)
     protected_object_id = db.Column(db.Integer,
                                     db.ForeignKey(ProtectedObject.id))
     score_entered = db.Column(db.Boolean)
 
     protected_object = db.relationship(ProtectedObject)
+    tournament_round = db.relationship(TournamentRound, \
+        backref=db.backref('games', lazy='dynamic'))
 
-    def __init__(self, tournament, round_num, table_num):
-        self.tourn = tournament
-        self.round_num = round_num
+    def __init__(self, round_id, table_num):
+        self.tournament_round_id = round_id
         self.table_num = table_num
         self.protected_object = ProtectedObject()
         self.protected_object.write()
@@ -36,7 +36,7 @@ class TournamentGame(db.Model):
 
     def __repr__(self):
         return '<TournamentGame {}, {}, {}>'.format(
-            self.tournament, self.round_num, self.table_num)
+            self.id, self.tournament_round_id, self.table_num)
 
     def write(self):
         """To the DB"""

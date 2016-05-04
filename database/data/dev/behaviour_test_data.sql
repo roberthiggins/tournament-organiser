@@ -49,13 +49,15 @@ DECLARE
     protected_action_id int := 0;
     permission_id int := 0;
     game_id int := 0;
+    round_1_id int := 0;
+    round_2_id int := 0;
     ranking_test_id int := 0;
 BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, 'ranking_test', '2095-08-12', DEFAULT, protect_object_id) RETURNING id INTO ranking_test_id;
-    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1, 'Kill');
-    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2, DEFAULT);
+    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1, 'Kill') RETURNING id INTO round_1_id;
+    INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2, DEFAULT) RETURNING id INTO round_2_id;
 
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90) RETURNING id INTO battlecategory;
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10) RETURNING id INTO sportscategory;
@@ -119,13 +121,13 @@ BEGIN
     SELECT id INTO protected_action_id FROM protected_object_action WHERE description = 'enter_score';
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 1, 'ranking_test', 1, protect_object_id) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_1_id, 1, protect_object_id) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 4);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('lisa', permission_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 1, 'ranking_test', 2, protect_object_id, True) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_1_id, 2, protect_object_id, True) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 2);
     INSERT INTO game_entrant VALUEs(game_id, 6);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
@@ -133,7 +135,7 @@ BEGIN
     INSERT INTO account_protected_object_permission VALUES ('maggie', permission_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 1, 'ranking_test', 3, protect_object_id, True) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_1_id, 3, protect_object_id, True) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 3);
     INSERT INTO game_entrant VALUEs(game_id, 5);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
@@ -144,13 +146,13 @@ BEGIN
     SELECT id INTO protected_action_id FROM protected_object_action WHERE description = 'enter_score';
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 2, 'ranking_test', 1, protect_object_id, True) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_2_id, 1, protect_object_id, True) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 3);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('marge', permission_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 2, 'ranking_test', 2, protect_object_id) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_2_id, 2, protect_object_id) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 6);
     INSERT INTO game_entrant VALUEs(game_id, 5);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
@@ -158,7 +160,7 @@ BEGIN
     INSERT INTO account_protected_object_permission VALUES ('bart', permission_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO game VALUES(DEFAULT, 2, 'ranking_test', 3, protect_object_id, True) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_2_id, 3, protect_object_id, True) RETURNING id INTO game_id;
     INSERT INTO game_entrant VALUEs(game_id, 2);
     INSERT INTO game_entrant VALUEs(game_id, 4);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
