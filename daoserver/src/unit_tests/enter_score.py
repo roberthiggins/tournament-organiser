@@ -30,10 +30,10 @@ class ScoreEnteringTests(TestCase):
         """
 
         # A regular player
-        game = Game.get_game_from_score(5, 'sports')
+        game = self.get_game_from_score(5, 'sports')
         self.assertTrue(game is not None)
 
-        game = Game.get_game_from_score(5, 'round_1_battle')
+        game = self.get_game_from_score(5, 'round_1_battle')
         self.assertTrue(game is not None)
         self.assertTrue(game.entry_1 is not None)
         self.assertTrue(game.entry_2 is not None)
@@ -42,21 +42,21 @@ class ScoreEnteringTests(TestCase):
 
 
         # A score that isn't tied to a game
-        game = Game.get_game_from_score(1, 'number_tassles')
+        game = self.get_game_from_score(1, 'number_tassles')
         self.assertTrue(game is None)
 
 
         # A player in a bye
-        game = Game.get_game_from_score(4, 'round_1_battle')
+        game = self.get_game_from_score(4, 'round_1_battle')
         self.assertTrue(game is not None)
         self.assertTrue(game.entry_1 == 4)
         self.assertTrue(game.entry_2 is None)
 
 
         # Poor data will return None rather than an error
-        game = Game.get_game_from_score(15, 'round_1_battle')
+        game = self.get_game_from_score(15, 'round_1_battle')
         self.assertTrue(game is None)
-        game = Game.get_game_from_score(1, 'number_fdssfdtassles')
+        game = self.get_game_from_score(1, 'number_fdssfdtassles')
         self.assertTrue(game is None)
 
 
@@ -64,14 +64,14 @@ class ScoreEnteringTests(TestCase):
     def test_score_entered(self):
 
         # A completed game
-        game = Game.get_game_from_score(5, 'round_1_battle')
+        game = self.get_game_from_score(5, 'round_1_battle')
         compare(game.entry_1, 3)
         compare(game.entry_2, 5)
         self.assertTrue(game.is_score_entered())
 
         # a bye should be false
         # TODO resolve Bye Scoring
-        game = Game.get_game_from_score(4, 'round_1_battle')
+        game = self.get_game_from_score(4, 'round_1_battle')
         compare(game.entry_1, 4)
         compare(game.entry_2, None)
         self.assertFalse(game.is_score_entered())
@@ -79,7 +79,7 @@ class ScoreEnteringTests(TestCase):
         # Ensure the rd2 game bart vs. maggie is listed as not scored. This
         # will force a full check. Maggie's score hasn't been entered.
         cur.execute("UPDATE game SET score_entered = False WHERE id = 5")
-        game = Game.get_game_from_score(5, 'round_2_battle')
+        game = self.get_game_from_score(5, 'round_2_battle')
 
         compare(game.entry_1, 6)
         compare(game.entry_2, 5)
@@ -101,23 +101,62 @@ class ScoreEnteringTests(TestCase):
         for by each entrant.
         """
         # Bye
-        game = Game.get_game_from_score(4, 'round_1_battle')
+        game = self.get_game_from_score(4, 'round_1_battle')
         compare(
             game.scores_entered(),
             [(4, 'round_1_battle', None), (4, 'sports', 5)])
 
         # Regular, completed game
-        game = Game.get_game_from_score(2, 'round_1_battle')
+        game = self.get_game_from_score(2, 'round_1_battle')
         compare(
             game.scores_entered(),
             [(6, 'round_1_battle', 0), (2, 'round_1_battle', 20),
              (6, 'sports', 5), (2, 'sports', 1)])
 
         # Game partially filled in
-        game = Game.get_game_from_score(5, 'round_2_battle')
+        game = self.get_game_from_score(5, 'round_2_battle')
         compare(
             game.scores_entered(),
             [(5, 'round_2_battle', 5)])
+
+    @staticmethod
+    def get_game_from_score(entry_id, score_key):
+        """
+        Given an entry and score_key, you should be able to work out the game
+        """
+
+        from sqlalchemy.sql.expression import and_
+        from models.game_entry import GameEntrant
+        from models.score import RoundScore, ScoreCategory, ScoreKey, Score, \
+        db as score_db
+        from models.tournament_entry import TournamentEntry
+        from models.tournament_game import TournamentGame
+
+        tournament_round_entry = score_db.session.\
+            query(Score, ScoreKey, ScoreCategory, TournamentEntry, RoundScore).\
+            join(ScoreKey).join(ScoreCategory).join(TournamentEntry).\
+            join(RoundScore).filter(and_(TournamentEntry.id == entry_id,
+                                         ScoreKey.key == score_key)).first()
+
+        if tournament_round_entry is None:
+            return None
+
+        tournament_round_entry = [
+            tournament_round_entry[2].tournament_id,
+            tournament_round_entry[4].round_id,
+            tournament_round_entry[3].id
+        ]
+
+        game = TournamentGame.query.join(GameEntrant).filter(and_(
+            TournamentGame.tourn == tournament_round_entry[0],
+            TournamentGame.round_num == tournament_round_entry[1],
+            GameEntrant.entrant_id == tournament_round_entry[2])).first()
+
+        return Game(game_id=game.id,
+                    tournament_id=tournament_round_entry[0],
+                    round_id=tournament_round_entry[1],
+                    table_number=game.table_num,
+                    protected_object_id=game.protected_object_id)
 
 class EnterScore(TestCase):
 
