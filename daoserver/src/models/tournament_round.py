@@ -17,7 +17,8 @@ class TournamentRound(db.Model):
         primary_key=True)
     ordering = db.Column(db.Integer, default=1, primary_key=True)
     mission = db.Column(db.String(20), default='TBA', nullable=False)
-    tournament = db.relationship(Tournament, backref='rounds')
+    tournament = db.relationship(Tournament,
+                                 backref=db.backref('rounds', lazy='dynamic'))
 
     def __init__(self, tournament, round_num, mission=None):
         self.tournament_name = tournament
@@ -45,15 +46,6 @@ class TournamentRound(db.Model):
         """To the DB"""
         try:
             db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
-    def delete(self):
-        """Remove from db"""
-        try:
-            db.session.delete(self)
             db.session.commit()
         except Exception:
             db.session.rollback()

@@ -245,12 +245,15 @@ class Tournament(object):
         tourn.num_rounds = int(num_rounds)
         tourn.write()
 
-        for rnd in [x for x in self.rounds if x.round_num > tourn.num_rounds]:
-            if rnd.get_dao() is not None:
-                rnd.get_dao().delete()
+        from models.tournament_round import TournamentRound as TR
+        for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
+            rnd.round_scores.delete()
+        tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
+        from models.db_connection import db
+        db.session.commit()
 
         self.rounds = [TournamentRound(self.tournament_id, x) \
-            for x in range(1, num_rounds + 1)]
+            for x in range(1, tourn.num_rounds + 1)]
 
     @must_exist_in_db
     # pylint: disable=R0913
