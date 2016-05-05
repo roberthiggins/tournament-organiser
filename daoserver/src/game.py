@@ -19,7 +19,6 @@ class Game(object):
     # pylint: disable=too-many-arguments
     def __init__(self, game_id):
         self.game_id = game_id
-        self.tournament_id = self.get_dao().tournament_round.tournament_name
 
     def get_dao(self):
         """Gaet DAO object for self"""
@@ -41,7 +40,8 @@ class Game(object):
             join(ScoreCategory).filter(
                 and_(RoundScore.round_id == \
                      self.get_dao().tournament_round.ordering,
-                     ScoreCategory.tournament_id == self.tournament_id)).all())
+                     ScoreCategory.tournament_id == \
+                     self.get_dao().tournament_round.tournament_name)).all())
         scores_entered = [x[2] for x in self.scores_entered()]
 
         scores_by_entrants = scores_for_round * \
@@ -61,7 +61,8 @@ class Game(object):
         entry_ids = (x.entrant_id for x in self.get_dao().entrants)
         scores_and_keys = db.session.query(Score, ScoreKey).join(ScoreKey).\
             join(RoundScore).join(ScoreCategory).filter(and_(
-                ScoreCategory.tournament_id == self.tournament_id,
+                ScoreCategory.tournament_id == \
+                self.get_dao().tournament_round.tournament_name,
                 RoundScore.round_id == self.get_dao().tournament_round.ordering,
                 Score.entry_id.in_(entry_ids))).all()
         return [(x[0].entry_id, x[1].key, x[0].value) for x in scores_and_keys]
