@@ -1,0 +1,83 @@
+"""
+An injector to create tournaments for unit tests
+"""
+# pylint: disable=no-member
+
+from datetime import datetime, timedelta
+
+from models.account import Account
+from models.db_connection import db
+from models.registration import TournamentRegistration as TRegistration
+from models.tournament import Tournament
+from models.tournament_entry import TournamentEntry
+from models.tournament_round import TournamentRound
+
+class TournamentInjector(object):
+    """Insert a tournament using the ORM. You can delete them as well"""
+
+    def __init__(self):
+        self.tournament_ids = set()
+        self.tournament_names = set()
+        self.accounts = set()
+
+    def inject(self, name, rounds=0, num_players=6, date=None):
+        """Create a tournament and inkect it into the db."""
+
+        # To avoid clashes we shift default tournament into the future
+        if date is None:
+            date = datetime.now() + timedelta(weeks=len(self.tournament_ids))
+
+        self.create_tournament(name, date, rounds)
+
+        self.create_players(name, num_players)
+
+        return
+
+    def delete(self):
+        """Remove all tournaments we have injected"""
+
+        # Some relations can't be deleted via relationship for some reason
+        if len(self.accounts) > 0:
+            # registrations and entries
+            TRegistration.query.filter(
+                TRegistration.tournament_id.in_(tuple(self.tournament_ids))).\
+                delete(synchronize_session=False)
+            TournamentEntry.query.filter(
+                TournamentEntry.tournament_id.\
+                in_(tuple(self.tournament_names))).\
+                delete(synchronize_session=False)
+
+            # Accounts
+            Account.query.filter(
+                Account.username.in_(tuple(self.accounts))).\
+                delete(synchronize_session=False)
+            self.accounts = set()
+
+        if len(self.tournament_ids) > 0:
+            TournamentRound.query.filter(TournamentRound.tournament_name.in_(
+                tuple(self.tournament_names))).delete(synchronize_session=False)
+            Tournament.query.filter(
+                Tournament.id.in_(tuple(self.tournament_ids))).\
+                delete(synchronize_session=False)
+            self.tournament_ids = set()
+            self.tournament_names = set()
+
+        db.session.commit()
+        return
+
+    def create_tournament(self, name, date, rounds=0):
+        """Create a tournament"""
+        tourn = Tournament(name)
+        tourn.num_rounds = rounds
+        tourn.date = date
+        tourn.write()
+        self.tournament_ids.add(tourn.id)
+        self.tournament_names.add(tourn.name)
+
+    def create_players(self, tourn_name, num_players):
+        """Create some accounts and enter them in the tournament"""
+        for entry_no in range(1, num_players + 1):
+            player_name = '{}_player_{}'.format(tourn_name, entry_no)
+            Account(player_name, '{}@test.com'.format(player_name)).write()
+            TournamentEntry(player_name, tourn_name).write()
+            self.accounts.add(player_name)
