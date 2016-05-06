@@ -15,8 +15,11 @@ from models.score import RoundScore, ScoreCategory, ScoreKey, Score, \
 db as score_db
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
+from models.tournament_round import TournamentRound
 
-# pylint: disable=no-member,no-init,invalid-name,missing-docstring,undefined-variable
+from unit_tests.tournament_injector import TournamentInjector
+
+# pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
 class ScoreEnteringTests(TestCase):
     """Comes from a range of files"""
 
@@ -158,7 +161,7 @@ class ScoreEnteringTests(TestCase):
 
 class EnterScore(TestCase):
 
-    player_1 = 'enter_score_account'
+    player = 'enter_score_account'
     tournament_1 = 'enter_score_tournament'
 
     def create_app(self):
@@ -167,38 +170,26 @@ class EnterScore(TestCase):
 
     def setUp(self):
         db.create_all()
+        self.injector = TournamentInjector()
+        self.injector.inject(self.tournament_1, rounds=5)
+        TournamentRound(self.tournament_1, 1, 'foo_mission_1').write()
+        self.injector.add_player(self.tournament_1, self.player)
 
     def tearDown(self):
+        self.injector.delete()
         db.session.remove()
 
     def test_enter_score(self):
         """
         Enter a score for an entry
         """
-
-        from models.tournament import Tournament as TournamentDAO
-        t = TournamentDAO(self.tournament_1)
-        t.date = '2015-07-08'
-        t.num_rounds = 5
-        t.write()
-
         cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False)
-        cat.tournament = t
         cat.write()
-
-        key = ScoreKey('some_key', cat.id, 0, 100)
-        key.score_category = cat
+        key = ScoreKey('test_enter_score_key', cat.id, 0, 100)
         key.write()
 
-        from models.tournament_round import TournamentRound
-        rd = TournamentRound(self.tournament_1, 1, 'foo_mission_1')
-        rd.write()
-
-        from models.account import Account
-        Account(self.player_1, 'foo@bar.com').write()
-
-        entry = TournamentEntry(self.player_1, self.tournament_1)
-        entry.write()
+        entry = TournamentEntry.query.filter_by(
+            player_id=self.player, tournament_id=self.tournament_1).first()
 
         from tournament import Tournament
         self.assertRaises(
@@ -232,4 +223,3 @@ class EnterScore(TestCase):
             entry.id,
             key.key,
             100)
-
