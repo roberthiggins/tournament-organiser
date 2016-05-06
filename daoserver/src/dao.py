@@ -132,10 +132,8 @@ def apply_for_tournament():
         - inputUserName - Username of player applying
         - inputTournamentName - Tournament as returned by GET /listtournaments
     """
-    # pylint: disable=E0602
-    return make_response(
-        TournamentRegistration(inputUserName, inputTournamentName).write(),
-        200)
+    TournamentRegistration(inputUserName, inputTournamentName).write()
+    return make_response('Application Submitted', 200)
 
 @APP.route('/addTournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')

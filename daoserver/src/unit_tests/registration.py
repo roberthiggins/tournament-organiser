@@ -12,12 +12,6 @@ from models.tournament import db as tournament_db, Tournament as TournamentDAO
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class TournamentRegistrations(TestCase):
 
-    tournament_1 = 'loving_strahotski'
-    tournament_2 = 'loving_casey'
-    tournament_3 = 'hating_chuck'
-    player_1 = 'strahotski'
-    player_2 = 'captain_awesome'
-
     def create_app(self):
 
         # pass in test configuration
@@ -31,45 +25,34 @@ class TournamentRegistrations(TestCase):
 
     def test_register(self):
         """Register a user for a tournament"""
-
-        Account(self.player_1, 'spy@strahotski.com').write()
-
-        TournamentRegistration(self.player_1, self.tournament_1).write()
-        TournamentRegistration(self.player_1, self.tournament_3).write()
-        self.assertRaises(
-            RuntimeError,
-            TournamentRegistration(self.player_1, self.tournament_1).write)
-        self.assertRaises(
-            RuntimeError,
-            TournamentRegistration(self.player_1, self.tournament_2).write)
-        self.assertRaises(
-            RuntimeError,
-            TournamentRegistration(self.player_1, self.tournament_3).write)
-
-
-    def test_clash_detection(self):
-        """Check if a registration clashes with another tournament entry"""
-
-        Account(self.player_2, 'captain@strahotski.com').write()
-        tournament = TournamentDAO(self.tournament_3)
+        tournament_1 = 'loving_strahotski'
+        tournament_2 = 'loving_casey'
+        tournament_3 = 'hating_chuck'
+        player_1 = 'strahotski'
+        tournament = TournamentDAO(tournament_3)
         tournament.date = datetime.date.today() + datetime.timedelta(days=1)
         tournament.write()
-        tournament = TournamentDAO(self.tournament_1)
+        tournament = TournamentDAO(tournament_1)
         tournament.date = datetime.date.today()
         tournament.write()
-        tournament = TournamentDAO(self.tournament_2)
+        tournament = TournamentDAO(tournament_2)
         tournament.date = datetime.date.today()
         tournament.write()
+        Account(player_1, 'spy@strahotski.com').write()
 
-        rego_1 = TournamentRegistration(self.player_2, self.tournament_2)
-        rego_1.write()
-        rego_2 = TournamentRegistration(self.player_2, self.tournament_1)
-        tournament_db.session.add(rego_2)
-        tournament_db.session.commit()
-
-        self.assertTrue(rego_1.clashes().name == self.tournament_1)
-        self.assertTrue(rego_2.clashes().name == self.tournament_1)
-
-        rego_3 = TournamentRegistration(self.player_2, self.tournament_3)
-        rego_3.write()
-        self.assertTrue(rego_3.clashes().name == self.tournament_3)
+        # First rego good
+        TournamentRegistration(player_1, tournament_1).write()
+        # another day good
+        TournamentRegistration(player_1, tournament_3).write()
+        # Repeat bad
+        self.assertRaises(
+            ValueError,
+            TournamentRegistration(player_1, tournament_1).write)
+        # Same day bad
+        self.assertRaises(
+            ValueError,
+            TournamentRegistration(player_1, tournament_2).write)
+        # Repeat bad
+        self.assertRaises(
+            ValueError,
+            TournamentRegistration(player_1, tournament_3).write)
