@@ -68,6 +68,12 @@ class TournamentInjector(object):
         db.session.commit()
         return
 
+    def add_player(self, tournament_name, username, email='foo@bar.com'):
+        """Create player account and enter them"""
+        Account(username, email).write()
+        TournamentEntry(username, tournament_name).write()
+        self.accounts.add(username)
+
     def create_tournament(self, name, date, rounds=0):
         """Create a tournament"""
         tourn = Tournament(name)
