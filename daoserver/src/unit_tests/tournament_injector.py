@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from models.account import Account
 from models.db_connection import db
 from models.registration import TournamentRegistration as TRegistration
+from models.score import RoundScore, ScoreCategory, ScoreKey, Score
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
 from models.tournament_round import TournamentRound
@@ -35,6 +36,8 @@ class TournamentInjector(object):
 
     def delete(self):
         """Remove all tournaments we have injected"""
+
+        self.delete_scores()
 
         # Some relations can't be deleted via relationship for some reason
         if len(self.accounts) > 0:
@@ -81,3 +84,17 @@ class TournamentInjector(object):
             Account(player_name, '{}@test.com'.format(player_name)).write()
             TournamentEntry(player_name, tourn_name).write()
             self.accounts.add(player_name)
+
+    def delete_scores(self):
+        """Delete all scores for all tournaments injected"""
+        categories = Tournament.query.filter(Tournament.id.in_(
+            tuple(self.tournament_ids))).first().score_categories
+        for cat in categories:
+            keys = cat.score_keys
+            for key in keys:
+                RoundScore.query.filter(
+                    RoundScore.score_key_id == key.id).delete()
+                Score.query.filter(Score.score_key_id == key.id).delete()
+                ScoreKey.query.filter_by(id=key.id).delete()
+            ScoreCategory.query.filter_by(id=cat.id).delete()
+        db.session.commit()

@@ -349,7 +349,7 @@ def rank_entries(tournament_id):
                 'username' : x.player_id,
                 'entry_id' : x.id,
                 'tournament_id' : tourn.tournament_id,
-                'scores' : x.scores,
+                'scores' : x.score_info,
                 'total_score' : x.total_score,
                 'ranking': x.ranking
             } for x in \

@@ -10,7 +10,7 @@ from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
 from models.score import db as score_db, Score, RoundScore, ScoreCategory, \
-ScoreKey, scores_for_entry
+ScoreKey
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
@@ -169,7 +169,15 @@ class Tournament(object):
         for entry in entries:
             entry.game_history = [x.table_no for x in \
                 TableAllocation.query.filter_by(entry_id=entry.id)]
-            entry.scores = scores_for_entry(entry.id)
+            entry.score_info = [
+                {
+                    'key': x.score_key.key,
+                    'score': x.value,
+                    'category': x.score_key.score_category.display_name,
+                    'min_val': x.score_key.min_val,
+                    'max_val': x.score_key.max_val,
+                } for x in entry.scores
+            ]
 
         return entries
 

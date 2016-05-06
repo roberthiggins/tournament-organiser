@@ -19,18 +19,22 @@ class RankingStrategy(object):
         self.tournament_id = tournament_id
         self.score_categories = score_categories_func
 
-    def total_score(self, scores):
+    def total_score(self, entry):
         """
         Calculate the total score for the entry
+        entry should be a TournamentEntry
         """
 
         categories = self.score_categories()
+        scores = entry.scores
         for cat in categories:
             agg_score = sum(
-                [x['score'] for x in scores if x['category'] == cat['name'] \
-                and x['score'] is not None])
+                [x.value for x in scores \
+                if x.score_key.score_category.display_name == cat['name'] \
+                and x.value is not None])
             agg_total = sum(
-                [x['max_val'] for x in scores if x['category'] == cat['name']])
+                [x.score_key.max_val for x in scores \
+                if x.score_key.score_category.display_name == cat['name']])
             try:
                 agg_score = float(agg_score)
                 agg_total = float(agg_total)
@@ -49,6 +53,6 @@ class RankingStrategy(object):
             of the entrants have incopmlete scores.
         """
         for i, entry in enumerate(entries):
-            entry.total_score = self.total_score(entry.scores)
+            entry.total_score = self.total_score(entry)
             entry.ranking = i + 1
         return entries

@@ -28,7 +28,7 @@ class ScoreCategory(db.Model):
     display_name = db.Column(db.String(50), nullable=False)
     per_tournament = db.Column(db.Boolean, nullable=False, default=False)
     percentage = db.Column(db.Integer, nullable=False, default=100)
-    tournament = db.relationship(Tournament)
+    tournament = db.relationship(Tournament, backref='score_categories')
 
     def __init__(self, tournament_id, display_name, percentage, per_tourn):
         self.tournament_id = tournament_id
@@ -86,7 +86,7 @@ class ScoreKey(db.Model):
     category = db.Column(db.Integer,
                          db.ForeignKey(ScoreCategory.id),
                          primary_key=True)
-    score_category = db.relationship(ScoreCategory)
+    score_category = db.relationship(ScoreCategory, backref='score_keys')
 
     def __init__(self, key, category, min_val, max_val):
         self.key = key
@@ -161,6 +161,9 @@ class Score(db.Model):
                              primary_key=True)
     value = db.Column(db.Integer)
 
+    entry = db.relationship(TournamentEntry, backref='scores')
+    score_key = db.relationship(ScoreKey)
+
     def __init__(self, entry_id, score_key_id, value=None):
         self.entry_id = entry_id
         self.score_key_id = score_key_id
@@ -180,22 +183,3 @@ class Score(db.Model):
         except Exception:
             db.session.rollback()
             raise
-
-
-def scores_for_entry(entry_id):
-    """ Get all the score_key:score pairs for an entry"""
-
-    scores = db.session.query(Score, ScoreKey, ScoreCategory).\
-        join(ScoreKey).join(ScoreCategory).join(Tournament).\
-        join(TournamentEntry).filter(Score.entry_id == entry_id).\
-        all()
-
-    return [
-        {
-            'key': x[1].key,
-            'score':x[0].value,
-            'category': x[2].display_name,
-            'min_val': x[1].min_val,
-            'max_val': x[1].max_val,
-        } for x in scores
-    ]
