@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from models.account import Account
 from models.db_connection import db
 from models.registration import TournamentRegistration as TRegistration
-from models.score import RoundScore, ScoreCategory, ScoreKey, Score
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
 from models.tournament_round import TournamentRound
@@ -93,14 +92,16 @@ class TournamentInjector(object):
 
     def delete_scores(self):
         """Delete all scores for all tournaments injected"""
-        categories = Tournament.query.filter(Tournament.id.in_(
-            tuple(self.tournament_ids))).first().score_categories
-        for cat in categories:
-            keys = cat.score_keys
-            for key in keys:
-                RoundScore.query.filter(
-                    RoundScore.score_key_id == key.id).delete()
-                Score.query.filter(Score.score_key_id == key.id).delete()
-                ScoreKey.query.filter_by(id=key.id).delete()
-            ScoreCategory.query.filter_by(id=cat.id).delete()
+
+        for tourn in Tournament.query.filter(Tournament.id.in_(
+            tuple(self.tournament_ids))).all():
+
+            for rnd in tourn.rounds:
+                rnd.round_scores.delete()
+
+            for cat in tourn.score_categories:
+                for key in cat.score_keys:
+                    key.scores.delete()
+                cat.score_keys.delete()
+            tourn.score_categories.delete()
         db.session.commit()

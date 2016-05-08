@@ -28,7 +28,8 @@ class ScoreCategory(db.Model):
     display_name = db.Column(db.String(50), nullable=False)
     per_tournament = db.Column(db.Boolean, nullable=False, default=False)
     percentage = db.Column(db.Integer, nullable=False, default=100)
-    tournament = db.relationship(Tournament, backref='score_categories')
+    tournament = db.relationship(Tournament, backref=db.backref(
+        'score_categories', lazy='dynamic'))
 
     def __init__(self, tournament_id, display_name, percentage, per_tourn):
         self.tournament_id = tournament_id
@@ -86,7 +87,8 @@ class ScoreKey(db.Model):
     category = db.Column(db.Integer,
                          db.ForeignKey(ScoreCategory.id),
                          primary_key=True)
-    score_category = db.relationship(ScoreCategory, backref='score_keys')
+    score_category = db.relationship(ScoreCategory, backref=db.backref(
+        'score_keys', lazy='dynamic'))
 
     def __init__(self, key, category, min_val, max_val):
         self.key = key
@@ -131,7 +133,8 @@ class RoundScore(db.Model):
                          db.ForeignKey(TournamentRound.id),
                          primary_key=True)
     score_key = db.relationship(ScoreKey)
-    round = db.relationship(TournamentRound)
+    round = db.relationship(TournamentRound,
+                            backref=db.backref('round_scores', lazy='dynamic'))
 
     def __init__(self, score_key, round_id):
         self.score_key_id = score_key
@@ -162,7 +165,8 @@ class Score(db.Model):
     value = db.Column(db.Integer)
 
     entry = db.relationship(TournamentEntry, backref='scores')
-    score_key = db.relationship(ScoreKey)
+    score_key = db.relationship(ScoreKey,
+                                backref=db.backref('scores', lazy='dynamic'))
 
     def __init__(self, entry_id, score_key_id, value=None):
         self.entry_id = entry_id
