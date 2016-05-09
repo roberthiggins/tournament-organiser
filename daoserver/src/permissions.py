@@ -7,7 +7,8 @@ from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
 from models.account import Account
-from models.permissions import ProtObjAction, ProtObjPerm
+from models.permissions import AccountProtectedObjectPermission, \
+ProtObjAction, ProtObjPerm
 from models.tournament_entry import TournamentEntry
 
 PERMISSIONS = {
@@ -31,8 +32,6 @@ class PermissionsChecker(object):
     Etc.
     """
 
-    @db_conn(commit=True)
-    # pylint: disable=no-member
     def add_permission(self, user, action, prot_obj_id):
         """
         Give user permission to perform action on protected_obj
@@ -59,9 +58,7 @@ class PermissionsChecker(object):
             permission.write()
             permission_id = permission.id
 
-        cur.execute(
-            "INSERT INTO account_protected_object_permission VALUES (%s, %s)",
-            [user, permission_id])
+        AccountProtectedObjectPermission(user, permission_id).write()
 
     def check_permission(self, action, user, for_user, tournament):
         """
