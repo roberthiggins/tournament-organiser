@@ -96,6 +96,9 @@ class TournamentInjector(object):
         for tourn in Tournament.query.filter(Tournament.id.in_(
             tuple(self.tournament_ids))).all():
 
+            if tourn is None:
+                return
+
             for rnd in tourn.rounds:
                 rnd.round_scores.delete()
 
