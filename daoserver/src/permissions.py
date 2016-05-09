@@ -73,7 +73,9 @@ class PermissionsChecker(object):
                 return True
             if user != for_user:
                 return False
-            return self.is_tournament_player(user, tournament)
+            return TournamentEntry.query.\
+                filter_by(tournament_id=tournament, player_id=user).first() \
+                is not None
 
         return False
 
@@ -93,17 +95,6 @@ class PermissionsChecker(object):
             WHERE tournament_name = %s AND username = %s",
             [tournament, user])
         return cur.fetchone()[0]
-
-    def is_tournament_player(self, user, tournament):
-        """User playing in tournament."""
-
-        if not Account.username_exists(user):
-            raise ValueError('Unknown player: {}'.format(user))
-
-        return TournamentEntry.query.\
-            filter_by(tournament_id=tournament, player_id=user).first() \
-            is not None
-
 
     @db_conn()
     def is_game_player(self, user, game_id):

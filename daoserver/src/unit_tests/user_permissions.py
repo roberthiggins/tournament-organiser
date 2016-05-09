@@ -41,10 +41,6 @@ class UserPermissions(TestCase):
         self.assertFalse(checker.is_game_player('superman', 1))
         self.assertFalse(checker.is_game_player('homer', 1))
 
-        self.assertTrue(checker.is_tournament_player('lisa', 'ranking_test'))
-        self.assertFalse(
-            checker.is_tournament_player('superman', 'ranking_test'))
-
     def test_is_organiser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
@@ -72,13 +68,11 @@ class UserPermissions(TestCase):
         self.assertRaises(ValueError, checker.check_permission, 'ENTER_SCORE',
                           None, None, None)
 
-        self.assertRaises(
-            ValueError,
-            checker.check_permission,
+        self.assertFalse(checker.check_permission(
             'enter_score',
             None,
             None,
-            None)
+            None))
         self.assertTrue(checker.check_permission(
             'enter_score',
             'lex_luthor',
