@@ -198,7 +198,7 @@ class Tournament(object):
              'per_tournament': x.per_tournament} for x in categories]
 
     @must_exist_in_db
-    def make_draw(self, round_id=0):
+    def make_draw(self, round_id=1):
         """Determines the draw for round. This draw is written to the db"""
         rnd = self.get_round(round_id)
         match_ups = self.matching_strategy.match(rnd.round_num, self.entries())
