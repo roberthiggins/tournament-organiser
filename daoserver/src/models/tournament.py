@@ -4,7 +4,7 @@ ORM module for a tournament
 # pylint: disable=invalid-name
 
 from models.db_connection import db
-from models.protected_object import ProtectedObject
+from models.permissions import ProtectedObject
 
 class Tournament(db.Model):
     """Represents a row in the tournament table"""

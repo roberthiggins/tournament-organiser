@@ -6,7 +6,7 @@ ORM module for a game in a tournament
 
 from models.db_connection import db
 from models.tournament import Tournament
-from models.protected_object import ProtectedObject
+from models.permissions import ProtectedObject
 
 class TournamentGame(db.Model):
     """

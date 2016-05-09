@@ -8,7 +8,7 @@ from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
 from models.account import Account
-from models.protected_object import ProtectedObject
+from models.permissions import ProtectedObject
 from models.tournament_entry import TournamentEntry
 
 PERMISSIONS = {
