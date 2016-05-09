@@ -16,12 +16,6 @@ PERMISSIONS = {
 }
 
 
-def check_action_valid(action):
-    """Only actions found in PERMISSIONS are allowed"""
-    if action is None or action not in PERMISSIONS.values():
-        raise ValueError(
-            'Illegal action passed to check_permission {}'.format(action))
-
 # pylint: disable=E0602
 class PermissionsChecker(object):
     """
@@ -31,6 +25,14 @@ class PermissionsChecker(object):
     Organisers and admins can modify scores.
     Etc.
     """
+
+
+    @staticmethod
+    def check_action_valid(action):
+        """Only actions found in PERMISSIONS are allowed"""
+        if action is None or action not in PERMISSIONS.values():
+            raise ValueError(
+                'Illegal action passed to check_permission {}'.format(action))
 
     def add_permission(self, user, action, prot_obj_id):
         """
@@ -43,7 +45,7 @@ class PermissionsChecker(object):
         e.g. - to_of_southcon, enter_score, southcon
              - player_of_game_3, enter_score, game_3
         """
-        check_action_valid(action)
+        self.check_action_valid(action)
 
         act_id = ProtObjAction.query.filter_by(description=action).first().id
 
@@ -66,7 +68,7 @@ class PermissionsChecker(object):
         Check that a user is entitled to perform action for tournament
         """
 
-        check_action_valid(action)
+        self.check_action_valid(action)
 
         if action == PERMISSIONS['ENTER_SCORE']:
             if Account.query.filter_by(username=user, is_superuser=True).\
