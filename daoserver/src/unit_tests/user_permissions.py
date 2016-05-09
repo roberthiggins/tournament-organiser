@@ -5,7 +5,7 @@ Checking whether users are players in tournaments, admins, organisers, etc.
 from flask.ext.testing import TestCase
 
 from app import create_app
-from models.account import db as account_db
+from models.account import db as account_db, Account
 from permissions import PermissionsChecker
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
@@ -23,14 +23,17 @@ class UserPermissions(TestCase):
 
     def test_is_admin(self):
         """check if a user is an admin"""
-        checker = PermissionsChecker()
+        self.assertTrue(Account.query.filter_by(
+            username=None, is_superuser=True).first() is None)
+        self.assertTrue(Account.query.filter_by(
+            username='', is_superuser=True).first() is None)
+        self.assertTrue(Account.query.filter_by(
+            username='charlie_murphy', is_superuser=True).first() is None)
+        self.assertTrue(Account.query.filter_by(
+            username='not_a_person', is_superuser=True).first() is None)
 
-        self.assertFalse(checker.is_admin(None))
-        self.assertFalse(checker.is_admin(''))
-        self.assertFalse(checker.is_admin('charlie_murphy'))
-        self.assertFalse(checker.is_admin('not_a_person'))
-
-        self.assertTrue(checker.is_admin('superman'))
+        self.assertTrue(Account.query.filter_by(
+            username='superman', is_superuser=True).first() is not None)
 
     def test_is_player(self):
         """users can be a player by being involved in a game"""

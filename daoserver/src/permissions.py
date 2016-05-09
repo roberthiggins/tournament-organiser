@@ -69,7 +69,8 @@ class PermissionsChecker(object):
         check_action_valid(action)
 
         if action == PERMISSIONS['ENTER_SCORE']:
-            if self.is_admin(user) or self.is_organiser(user, tournament):
+            if Account.query.filter_by(username=user, is_superuser=True).\
+                first() is not None or self.is_organiser(user, tournament):
                 return True
             if user != for_user:
                 return False
@@ -78,14 +79,6 @@ class PermissionsChecker(object):
                 is not None
 
         return False
-
-    def is_admin(self, user):
-        """User is superuser"""
-        if user is None:
-            return False
-
-        return Account.query.filter_by(username=user, is_superuser=True).\
-            first() is not None
 
     @db_conn()
     def is_organiser(self, user, tournament):
