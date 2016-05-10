@@ -10,3 +10,11 @@ from flask.ext.sqlalchemy import SQLAlchemy
 # pylint: disable=invalid-name
 db = SQLAlchemy()
 
+def write_to_db(dao):
+    """Write the DAO to the db"""
+    try:
+        db.session.add(dao)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
