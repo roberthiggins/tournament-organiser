@@ -22,12 +22,3 @@ class Feedback(db.Model):
 
     def __repr__(self):
         return '<User {} - {} - {}>'.format(self.id, self.time, self.feedback)
-
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        # pylint: disable=broad-except
-        except Exception:
-            db.session.rollback()

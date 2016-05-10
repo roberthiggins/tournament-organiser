@@ -12,6 +12,8 @@ import jsonpickle
 
 from flask import Blueprint, request, make_response, jsonify
 
+from sqlalchemy.exc import IntegrityError
+
 from authentication import check_auth
 from models.account import Account
 from models.db_connection import write_to_db
@@ -318,7 +320,10 @@ def place_feedback():
     _feedback = request.form['inputFeedback'].strip('\n\r\t+')
     if re.match(r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
-    Feedback(_feedback).write()
+    try:
+        write_to_db(Feedback(_feedback))
+    except IntegrityError:
+        pass
 
     return make_response("Thanks for you help improving the site", 200)
 
