@@ -161,7 +161,7 @@ class EnterScore(TestCase):
         db.create_all()
         self.injector = TournamentInjector()
         self.injector.inject(self.tournament_1, rounds=5)
-        TournamentRound(self.tournament_1, 1, 'foo_mission_1').write()
+        db.session.add(TournamentRound(self.tournament_1, 1, 'foo_mission_1'))
         self.injector.add_player(self.tournament_1, self.player)
 
     def tearDown(self):

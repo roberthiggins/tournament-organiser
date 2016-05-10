@@ -43,12 +43,12 @@ class TestRoundScore(TestCase):
         key.score_category = cat
         key.write()
 
-        rd = TournamentRound('foobar', 1, 'foo_mission_1')
-        rd.write()
+        rnd = TournamentRound('foobar', 1, 'foo_mission_1')
+        db.session.add(rnd)
 
         score = RoundScore(key.id, 1)
         score.score_id = key
-        score.round = rd
+        score.round = rnd
         score.write()
 
         round_1_keys_exp = [

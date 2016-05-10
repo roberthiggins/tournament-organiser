@@ -14,6 +14,7 @@ from flask import Blueprint, request, make_response, jsonify
 
 from authentication import check_auth
 from models.account import Account
+from models.db_connection import write_to_db
 from models.feedback import Feedback
 from models.registration import TournamentRegistration
 from models.tournament import Tournament as TournamentDAO

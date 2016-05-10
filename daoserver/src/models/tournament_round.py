@@ -41,12 +41,3 @@ class TournamentRound(db.Model):
             self.tournament_name,
             self.ordering,
             self.mission)
-
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise

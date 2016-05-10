@@ -31,10 +31,10 @@ class SetRounds(TestCase):
         dao.num_rounds = 4
         dao.write()
 
-        TournamentRound(name, 1, 'mission_1').write()
-        TournamentRound(name, 2, 'mission_2').write()
-        TournamentRound(name, 3, 'mission_3').write()
-        TournamentRound(name, 4).write()
+        tournament_db.session.add(TournamentRound(name, 1, 'mission_1'))
+        tournament_db.session.add(TournamentRound(name, 2, 'mission_2'))
+        tournament_db.session.add(TournamentRound(name, 3, 'mission_3'))
+        tournament_db.session.add(TournamentRound(name, 4))
 
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""
