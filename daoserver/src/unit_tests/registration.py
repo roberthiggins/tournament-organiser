@@ -22,7 +22,7 @@ class TournamentRegistrations(TestCase):
         db.create_all()
         self.injector = TournamentInjector()
         self.applicant = 'test_register_applicant_1'
-        Account(self.applicant, 'spy@strahotski.com').write()
+        db.session.add(Account(self.applicant, 'spy@strahotski.com'))
 
     def tearDown(self):
         TReg.query.filter_by(player_id=self.applicant).delete()

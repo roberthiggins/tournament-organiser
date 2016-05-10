@@ -5,7 +5,7 @@ ORM module for accounts
 
 from passlib.hash import sha256_crypt
 
-from models.db_connection import db
+from models.db_connection import db, write_to_db
 
 class Account(db.Model):
     """Basic user account"""
@@ -25,16 +25,6 @@ class Account(db.Model):
             self.contact_email,
             self.is_superuser)
 
-    def write(self, commit=True):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            if commit:
-                db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
     def delete(self):
         """Remove from db"""
         try:
@@ -47,11 +37,8 @@ class Account(db.Model):
     @staticmethod
     def add_account(account):
         """Add an account. Username cannot exist"""
-        Account(account['user_name'], account['email']).write()
-        AccountSecurity(
-            account['user_name'],
-            sha256_crypt.encrypt(account['password'])
-        ).write()
+        write_to_db(Account(account['user_name'], account['email']))
+        write_to_db(AccountSecurity(account['user_name'], account['password']))
 
     @staticmethod
     def username_exists(username):
@@ -71,18 +58,7 @@ class AccountSecurity(db.Model):
 
     def __init__(self, username, password):
         self.id = username
-        self.password = password
+        self.password = sha256_crypt.encrypt(password)
 
     def __repr__(self):
-        return '<AccountSecurity ({}, {})>'.format(
-            self.id,
-            self.password)
-
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
+        return '<AccountSecurity ({}, {})>'.format(self.id, self.password)

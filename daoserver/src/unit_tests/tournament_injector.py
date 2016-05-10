@@ -6,7 +6,7 @@ An injector to create tournaments for unit tests
 from datetime import datetime, timedelta
 
 from models.account import Account
-from models.db_connection import db
+from models.db_connection import db, write_to_db
 from models.registration import TournamentRegistration as TRegistration
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
@@ -69,7 +69,7 @@ class TournamentInjector(object):
 
     def add_player(self, tournament_name, username, email='foo@bar.com'):
         """Create player account and enter them"""
-        Account(username, email).write()
+        write_to_db(Account(username, email))
         TournamentEntry(username, tournament_name).write()
         self.accounts.add(username)
 
@@ -86,7 +86,7 @@ class TournamentInjector(object):
         """Create some accounts and enter them in the tournament"""
         for entry_no in range(1, num_players + 1):
             player_name = '{}_player_{}'.format(tourn_name, entry_no)
-            Account(player_name, '{}@test.com'.format(player_name)).write()
+            write_to_db(Account(player_name, '{}@test.com'.format(player_name)))
             TournamentEntry(player_name, tourn_name).write()
             self.accounts.add(player_name)
 
