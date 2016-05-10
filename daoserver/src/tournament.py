@@ -72,7 +72,7 @@ class Tournament(object):
         PermissionsChecker().add_permission(
             self.creator_username,
             PERMISSIONS['ENTER_SCORE'],
-            dao.protected_object_id)
+            dao.protected_object)
 
     def get_dao(self):
         """Convenience method to recover DAO"""
@@ -216,7 +216,7 @@ class Tournament(object):
                         PermissionsChecker().add_permission(
                             uname,
                             PERMISSIONS['ENTER_SCORE'],
-                            game.protected_object.id)
+                            game.protected_object)
                     else:
                         # The person playing the bye gets no points at the time
                         game.score_entered = True

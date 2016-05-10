@@ -34,7 +34,7 @@ class PermissionsChecker(object):
             raise ValueError(
                 'Illegal action passed to check_permission {}'.format(action))
 
-    def add_permission(self, user, action, prot_obj_id):
+    def add_permission(self, user, action, prot_obj):
         """
         Give user permission to perform action on protected_obj
 
@@ -52,11 +52,11 @@ class PermissionsChecker(object):
         try:
             permission_id = ProtObjPerm.query.filter(
                 and_(
-                    ProtObjPerm.protected_object_id == prot_obj_id,
+                    ProtObjPerm.protected_object_id == prot_obj.id,
                     ProtObjPerm.protected_object_action_id == act_id)
                 ).first().id
         except AttributeError:
-            permission = ProtObjPerm(prot_obj_id, act_id)
+            permission = ProtObjPerm(prot_obj.id, act_id)
             permission.write()
             permission_id = permission.id
 

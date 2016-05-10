@@ -16,9 +16,11 @@ class Tournament(db.Model):
     protected_object_id = db.Column(
         db.Integer,
         db.ForeignKey(ProtectedObject.id))
+    protected_object = db.relationship(ProtectedObject)
 
     def __init__(self, name):
         self.name = name
+        self.protected_object = ProtectedObject()
 
     def __repr__(self):
         return '<Tournament {}>'.format(self.name)
@@ -26,9 +28,7 @@ class Tournament(db.Model):
     def write(self):
         """To the DB"""
         try:
-            protected_object = ProtectedObject()
-            protected_object.write()
-            self.protected_object_id = protected_object.id
+            db.session.add(self.protected_object)
             db.session.add(self)
             db.session.commit()
         except Exception:
