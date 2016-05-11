@@ -15,7 +15,7 @@ from flask import Blueprint, request, make_response, jsonify
 from sqlalchemy.exc import IntegrityError
 
 from authentication import check_auth
-from models.account import Account
+from models.account import Account, add_account
 from models.db_connection import write_to_db
 from models.feedback import Feedback
 from models.registration import TournamentRegistration
@@ -173,7 +173,7 @@ def validate_user_email(email):
 
 @APP.route('/addPlayer', methods=['POST'])
 @enforce_request_variables('username', 'email', 'password1', 'password2')
-def add_account():
+def create_account():
     """
     POST to add an account
     Expects:
@@ -194,9 +194,8 @@ def add_account():
         return make_response("A user with the username {} already exists! \
             Please choose another name".format(username), 400)
 
-    Account.add_account({'user_name': username,
-                         'email' : email,
-                         'password': password1})
+    add_account(username, email, password1)
+
     return make_response('<p>Account created! You submitted the following \
         fields:</p><ul><li>User Name: {}</li><li>Email: {}\
         </li></ul>'.format(username, email), 200)

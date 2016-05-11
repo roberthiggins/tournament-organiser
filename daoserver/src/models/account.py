@@ -25,21 +25,6 @@ class Account(db.Model):
             self.contact_email,
             self.is_superuser)
 
-    def delete(self):
-        """Remove from db"""
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
-    @staticmethod
-    def add_account(account):
-        """Add an account. Username cannot exist"""
-        write_to_db(Account(account['user_name'], account['email']))
-        write_to_db(AccountSecurity(account['user_name'], account['password']))
-
     @staticmethod
     def username_exists(username):
         """Check if a username exists for a player"""
@@ -55,6 +40,8 @@ class AccountSecurity(db.Model):
         db.ForeignKey(Account.username),
         primary_key=True)
     password = db.Column(db.String(100), nullable=False)
+    account = db.relationship(Account, backref='security')
+
 
     def __init__(self, username, password):
         self.id = username
@@ -62,3 +49,8 @@ class AccountSecurity(db.Model):
 
     def __repr__(self):
         return '<AccountSecurity ({}, {})>'.format(self.id, self.password)
+
+def add_account(username, email, password):
+    """Add an account to the db"""
+    write_to_db(Account(username, email))
+    write_to_db(AccountSecurity(username, password))
