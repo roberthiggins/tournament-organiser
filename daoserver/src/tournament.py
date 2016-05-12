@@ -68,7 +68,7 @@ class Tournament(object):
 
         dao = TournamentDB(self.tournament_id)
         dao.date = date
-        dao.write()
+        write_to_db(dao)
 
         PermissionsChecker().add_permission(
             self.creator_username,
@@ -242,7 +242,7 @@ class Tournament(object):
         """Set the number of rounds in a tournament"""
         tourn = self.get_dao()
         tourn.num_rounds = int(num_rounds)
-        tourn.write()
+        write_to_db(tourn)
 
         from models.tournament_round import TournamentRound as TR
         for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():

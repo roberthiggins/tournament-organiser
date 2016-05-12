@@ -29,7 +29,7 @@ class SetRounds(TestCase):
         dao = TournamentDAO(name)
         dao.date = date.today()
         dao.num_rounds = 4
-        dao.write()
+        tournament_db.session.add(dao)
 
         tournament_db.session.add(TournamentRound(name, 1, 'mission_1'))
         tournament_db.session.add(TournamentRound(name, 2, 'mission_2'))

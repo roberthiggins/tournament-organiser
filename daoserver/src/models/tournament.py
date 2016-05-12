@@ -21,16 +21,7 @@ class Tournament(db.Model):
     def __init__(self, name):
         self.name = name
         self.protected_object = ProtectedObject()
+        db.session.add(self.protected_object)
 
     def __repr__(self):
         return '<Tournament {}>'.format(self.name)
-
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self.protected_object)
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise

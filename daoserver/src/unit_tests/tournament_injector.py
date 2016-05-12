@@ -78,7 +78,7 @@ class TournamentInjector(object):
         tourn = Tournament(name)
         tourn.num_rounds = rounds
         tourn.date = date
-        tourn.write()
+        write_to_db(tourn)
         self.tournament_ids.add(tourn.id)
         self.tournament_names.add(tourn.name)
 

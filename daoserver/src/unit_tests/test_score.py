@@ -34,7 +34,7 @@ class TestRoundScore(TestCase):
         t = TournamentDAO('foobar')
         t.date = '2015-07-08'
         t.num_rounds = 5
-        t.write()
+        db.session.add(t)
 
         cat = ScoreCategory('foobar', 'nonsense', 50, False)
         cat.tournament = t
