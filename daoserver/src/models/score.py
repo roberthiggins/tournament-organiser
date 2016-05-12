@@ -143,15 +143,6 @@ class RoundScore(db.Model):
     def __repr__(self):
         return '<RoundScore ({}, {})>'.format(self.score_key_id, self.round_id)
 
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
 class Score(db.Model):
     """An individual score tied to a ScoreKey"""
 

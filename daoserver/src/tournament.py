@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
+from models.db_connection import write_to_db
 from models.score import db as score_db, Score, RoundScore, ScoreCategory, \
 ScoreKey
 from models.table_allocation import TableAllocation
@@ -279,7 +280,7 @@ class Tournament(object):
 
         # This score could be per-game rather than per-tournament
         if round_id is not None:
-            RoundScore(key.id, round_id).write()
+            write_to_db(RoundScore(key.id, round_id))
 
 class ScoreCategoryPair(object):
     """A holder object for score category information"""

@@ -5,6 +5,7 @@ from flask.ext.testing import TestCase
 from testfixtures import compare
 
 from app import create_app
+from models.db_connection import db
 from models.score import RoundScore, ScoreCategory, ScoreKey
 from models.tournament import db, Tournament as TournamentDAO
 from models.tournament_round import TournamentRound
@@ -49,7 +50,7 @@ class TestRoundScore(TestCase):
         score = RoundScore(key.id, 1)
         score.score_id = key
         score.round = rnd
-        score.write()
+        db.session.add(score)
 
         round_1_keys_exp = [
             ('round_1_battle', 0, 20),
