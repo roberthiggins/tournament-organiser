@@ -222,7 +222,7 @@ class Tournament(object):
                         # The person playing the bye gets no points at the time
                         game.score_entered = True
 
-                game.write()
+                write_to_db(game)
 
         except IntegrityError as err:
             if 'duplicate key' not in str(err):
