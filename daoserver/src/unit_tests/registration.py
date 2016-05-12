@@ -3,10 +3,11 @@ Players registering for tournaments
 """
 import datetime
 from flask.ext.testing import TestCase
+from sqlalchemy.exc import IntegrityError
 
 from app import create_app
 from models.account import Account
-from models.db_connection import db
+from models.db_connection import db, write_to_db
 from models.registration import TournamentRegistration as TReg
 
 from unit_tests.tournament_injector import TournamentInjector
@@ -30,7 +31,7 @@ class TournamentRegistrations(TestCase):
         self.injector.delete()
         db.session.remove()
 
-    def test_register(self):
+    def test_clashes(self):
         """Register a user for a tournament"""
         t_1 = 'test_register_1'
         self.injector.inject(t_1, num_players=0)
@@ -38,11 +39,39 @@ class TournamentRegistrations(TestCase):
         self.injector.inject(t_2, num_players=0)
         t_3 = 'test_register_3'
         self.injector.inject(t_3, num_players=0, date=datetime.datetime.now())
+        t_4 = 'test_register_4'
+        self.injector.inject(t_4, num_players=0)
 
-        TReg(self.applicant, t_1).write()
-        TReg(self.applicant, t_2).write()
+        write_to_db(TReg(self.applicant, t_1))
+        write_to_db(TReg(self.applicant, t_2))
+
+        self.assertFalse(TReg(self.applicant, t_4).clashes())
+
         # Repeat bad
-        self.assertRaises(ValueError, TReg(self.applicant, t_1).write)
-        self.assertRaises(ValueError, TReg(self.applicant, t_2).write)
+        self.assertRaises(ValueError, TReg(self.applicant, t_1).clashes)
+        self.assertRaises(ValueError, TReg(self.applicant, t_2).clashes)
         # Same day bad
-        self.assertRaises(ValueError, TReg(self.applicant, t_3).write)
+        self.assertRaises(ValueError, TReg(self.applicant, t_3).clashes)
+
+    def test_insert(self):
+        """Register a user for a tournament"""
+        t_1 = 'test_register_1'
+        self.injector.inject(t_1, num_players=0)
+        t_2 = 'test_register_2'
+        self.injector.inject(t_2, num_players=0)
+        t_3 = 'test_register_3'
+        self.injector.inject(t_3, num_players=0, date=datetime.datetime.now())
+        t_4 = 'test_register_4'
+        self.injector.inject(t_4, num_players=0)
+
+        write_to_db(TReg(self.applicant, t_1))
+        write_to_db(TReg(self.applicant, t_2))
+
+
+        # Repeat bad
+        self.assertRaises(IntegrityError, write_to_db,
+                          TReg(self.applicant, t_1))
+        self.assertRaises(IntegrityError, write_to_db,
+                          TReg(self.applicant, t_2))
+        # Same day bad, but that needs to be caught by clashes
+        write_to_db(TReg(self.applicant, t_3))

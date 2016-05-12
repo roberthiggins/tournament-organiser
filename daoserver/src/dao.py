@@ -135,7 +135,14 @@ def apply_for_tournament():
         - inputUserName - Username of player applying
         - inputTournamentName - Tournament as returned by GET /listtournaments
     """
-    TournamentRegistration(inputUserName, inputTournamentName).write()
+    rego = TournamentRegistration(inputUserName, inputTournamentName)
+    rego.clashes()
+
+    try:
+        write_to_db(rego)
+    except IntegrityError:
+        raise ValueError("Check username and tournament")
+
     return make_response('Application Submitted', 200)
 
 @APP.route('/addTournament', methods=['POST'])

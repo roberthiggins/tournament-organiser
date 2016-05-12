@@ -3,7 +3,6 @@ ORM module for a registration of a user into a tournament
 """
 # pylint: disable=invalid-name, no-member
 
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.account import Account
@@ -38,8 +37,13 @@ class TournamentRegistration(db.Model):
             self.tournament_id,
             self.tournament.name)
 
-    def write(self):
-        """To the DB"""
+    def clashes(self):
+        """
+        Check to see if the registration clashes with a registration to
+        another tournament.
+
+        You cannot enter two tournaments for the same day.
+        """
 
         candidate = Tournament.query.filter_by(id=self.tournament_id).first()
         clash = TournamentRegistration.query.join(Tournament).filter(
@@ -47,16 +51,7 @@ class TournamentRegistration(db.Model):
                  Tournament.date == candidate.date)).first()
 
         if clash is None:
-            try:
-                db.session.add(self)
-                db.session.commit()
-                return
-            except IntegrityError:
-                db.session.rollback()
-                raise ValueError("Check username and tournament")
-            except Exception:
-                db.session.rollback()
-                raise
+            return False
 
         if clash.tournament_id == self.tournament_id:
             raise ValueError("You've already applied to {}".format(
