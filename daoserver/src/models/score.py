@@ -9,7 +9,7 @@ TODO:
     - the relationship here could be tidied up somewhat.
 
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,no-member
 
 from sqlalchemy.sql.expression import and_
 
@@ -57,11 +57,12 @@ class ScoreCategory(db.Model):
             db.session.rollback()
             raise
 
-    def write(self):
-        """To the DB"""
-
-        # All the score percantages can only sum to 100 or less.
-        # pylint: disable=no-member
+    def clashes(self):
+        """
+        Check that the ScoreCategory will work in the proposed tournament. This
+        means that the total score percentage for all categories in the
+        tournament won't exceed 100%
+        """
         existing = ScoreCategory.query.\
             filter(and_(ScoreCategory.tournament_id == self.tournament_id,
                         ScoreCategory.display_name != self.display_name)).all()
@@ -69,12 +70,7 @@ class ScoreCategory(db.Model):
         if (sum([x.percentage for x in existing]) + self.percentage) > 100:
             raise ValueError('percentage too high: {}'.format(self))
 
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
+        return False
 
 class ScoreKey(db.Model):
     """A row in the score_key table"""

@@ -38,7 +38,7 @@ class TestRoundScore(TestCase):
 
         cat = ScoreCategory('foobar', 'nonsense', 50, False)
         cat.tournament = t
-        cat.write()
+        db.session.add(cat)
 
         key = ScoreKey('some_key', cat.id, 0, 100)
         key.score_category = cat

@@ -9,7 +9,7 @@ from testfixtures import compare
 from app import create_app
 from db_connections.db_connection import db_conn
 from game import Game
-from models.db_connection import db
+from models.db_connection import db, write_to_db
 from models.game_entry import GameEntrant
 from models.score import RoundScore, ScoreCategory, ScoreKey, Score, \
 db as score_db
@@ -173,7 +173,7 @@ class EnterScore(TestCase):
         Enter a score for an entry
         """
         cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False)
-        cat.write()
+        write_to_db(cat)
         key = ScoreKey('test_enter_score_key', cat.id, 0, 100)
         db.session.add(key)
 

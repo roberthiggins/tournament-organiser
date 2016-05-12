@@ -108,7 +108,8 @@ class Tournament(object):
                 to_delete = [x for x in to_delete if x.display_name != cat.name]
             dao.percentage = int(cat.percentage)
             dao.per_tournament = cat.per_tournament
-            dao.write()
+            dao.clashes()
+            write_to_db(dao)
 
         for cat in to_delete:
             cat.delete()
