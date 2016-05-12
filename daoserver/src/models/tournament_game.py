@@ -4,7 +4,7 @@ ORM module for a game in a tournament
 
 # pylint: disable=invalid-name,no-member
 
-from models.db_connection import db
+from models.db_connection import db, write_to_db
 from models.permissions import ProtectedObject
 from models.tournament_round import TournamentRound
 
@@ -30,7 +30,7 @@ class TournamentGame(db.Model):
         self.tournament_round_id = round_id
         self.table_num = table_num
         self.protected_object = ProtectedObject()
-        self.protected_object.write()
+        write_to_db(self.protected_object)
         self.protected_object_id = self.protected_object.id
         self.score_entered = False
 
@@ -41,10 +41,6 @@ class TournamentGame(db.Model):
     def write(self):
         """To the DB"""
         try:
-
-            if self.protected_object is not None:
-                self.protected_object.write()
-
             db.session.add(self)
             db.session.commit()
         except Exception:

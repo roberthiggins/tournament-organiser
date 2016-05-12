@@ -17,15 +17,6 @@ class ProtectedObject(db.Model):
     def __repr__(self):
         return '<ProtectedObject {}>'.format(self.id)
 
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
 class ProtObjAction(db.Model):
     """An action you can perform on a protected object, e.g. enter score"""
     __tablename__ = 'protected_object_action'
@@ -63,15 +54,6 @@ class ProtObjPerm(db.Model):
             self.protected_object_id,
             self.protected_object_action_id)
 
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
 class AccountProtectedObjectPermission(db.Model):
     """ Join table for account and protected_object_permission"""
     __tablename__ = 'account_protected_object_permission'
@@ -89,12 +71,3 @@ class AccountProtectedObjectPermission(db.Model):
         return '<AccountProtectedObjectPermission ({}, {})>'.format(
             self.account_username,
             self.protected_object_permission_id)
-
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
