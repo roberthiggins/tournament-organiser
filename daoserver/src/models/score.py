@@ -159,12 +159,3 @@ class Score(db.Model):
             self.entry_id,
             self.score_key_id,
             self.value)
-
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
