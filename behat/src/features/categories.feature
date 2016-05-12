@@ -4,7 +4,7 @@ Feature: Modify the scoring categories for a tournament
     I need to be able to view and set the scoreing categories for a tournament (battle, sports, etc)
 
     Background: I set the categories for category_test
-        When I POST "tournamentId=category_test&categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22foo%22,%2210%22,false]&categories_1=[%22bar%22,%2210%22, false]" to "/setScoreCategories" from the API
+        When I POST "tournamentId=category_test&categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22foo%22,%2210%22,false,%2210%22,%2210%22]&categories_1=[%22bar%22,%2210%22,false,%2210%22,%2210%22]" to "/setScoreCategories" from the API
         Then the API response status code should be 200
         Given I am on "/login"
         When I fill in "id_inputUsername" with "charlie_murphy"
@@ -45,7 +45,7 @@ Feature: Modify the scoring categories for a tournament
         Then the API response should be a list of length 0
 
     Scenario: I modify the tournament categories through the API
-        When I POST "tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fantasticgibberish%22,%2221%22,true]" to "/setScoreCategories" from the API
+        When I POST "tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fantasticgibberish%22,%2221%22,true,%2210%22,%2210%22]" to "/setScoreCategories" from the API
         Then the API response status code should be 200
         Then I GET "/getScoreCategories/category_test" from the API
         Then the API response status code should be 200
@@ -62,9 +62,10 @@ Feature: Modify the scoring categories for a tournament
         Then the API response should not contain "<category>"
 
         Examples:
-            | category  | post                                                                                          |
-            | fooey     | categories=[%22categories_0%22]&categories_0=[%22fooey%22,%2221%22]                           |
-            | fooey     | tournamentId=category_test&categories_0=[%22fooey%22,%2221%22]                                 |
+            | category  | post                                                                                           |
+            | fooey     | categories=[%22categories_0%22]&categories_0=[%22fooey%22,%2221%22,true,%2210%22,%2210%22]     |
+            | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fooey%22,%2221%22,true,%2210%22]     |
+            | fooey     | tournamentId=category_test&categories_0=[%22fooey%22,%2221%22,true,%2210%22,%2210%22]          |
             | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fooey%22]          |
             | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%2221%22]             |
             | fooey     | tournamentId=category_test&categories=[%22categories_1%22]&categories_0=[%22fooey%22,%2221%22] |
@@ -114,10 +115,15 @@ Feature: Modify the scoring categories for a tournament
         Then the "id_categories_0_0" field should contain "bar"
         Then I fill in "id_categories_0_0" with "<cat>"
         Then I fill in "id_categories_0_1" with "<val>"
+        Then I fill in "id_categories_0_3" with "1"
+        Then I fill in "id_categories_0_4" with "1"
         Then I fill in "id_categories_1_0" with ""
         Then I fill in "id_categories_1_1" with ""
+        Then I fill in "id_categories_1_3" with "1"
+        Then I fill in "id_categories_1_4" with "1"
         Then I press "Set"
         Then I GET "/getScoreCategories/category_test" from the API
+        Then the API response status code should be 200
         Then the API response should be a list of length 2
         Then the API response should contain "foo"
         Then the API response should contain "10"
@@ -134,12 +140,17 @@ Feature: Modify the scoring categories for a tournament
             | null      | null  |
             | none      | None  |
 
+
     Scenario: I try to add the same category multiple times
         Given I am on "/setcategories/category_test"
         Then I fill in "id_categories_0_0" with "foo"
         Then I fill in "id_categories_0_1" with "1"
+        Then I fill in "id_categories_0_3" with "1"
+        Then I fill in "id_categories_0_4" with "1"
         Then I fill in "id_categories_1_0" with "foo"
         Then I fill in "id_categories_1_1" with "1"
+        Then I fill in "id_categories_1_3" with "1"
+        Then I fill in "id_categories_1_4" with "1"
         Then I press "Set"
         Then I should see "multiple"
 
@@ -149,8 +160,12 @@ Feature: Modify the scoring categories for a tournament
         Then the "id_categories_0_0" field should contain "bar"
         Then I fill in "id_categories_0_0" with "oneohone"
         Then I fill in "id_categories_0_1" with "101"
+        Then I fill in "id_categories_0_3" with "1"
+        Then I fill in "id_categories_0_4" with "1"
         Then I fill in "id_categories_1_0" with "negativeone"
         Then I fill in "id_categories_1_1" with "-1"
+        Then I fill in "id_categories_1_3" with "1"
+        Then I fill in "id_categories_1_4" with "1"
         Then I press "Set"
         Then I GET "/getScoreCategories/category_test" from the API
         Then the API response should be a list of length 2
@@ -163,3 +178,30 @@ Feature: Modify the scoring categories for a tournament
         Then the API response should not contain "negativeone"
         Then the API response should not contain "-1"
 
+
+    Scenario Outline: I fill in the min and max values
+        Given I am on "/setcategories/category_test"
+        Then I fill in "id_categories_0_0" with "cat_1"
+        Then I fill in "id_categories_0_1" with "10"
+        Then I fill in "id_categories_0_3" with "<min>"
+        Then I fill in "id_categories_0_4" with "<max>"
+        Then I fill in "id_categories_1_0" with ""
+        Then I fill in "id_categories_1_1" with ""
+        Then I fill in "id_categories_1_3" with ""
+        Then I fill in "id_categories_1_4" with ""
+        Then I press "Set"
+        Then the response status code should be 200
+        Then I should see "<message>"
+
+        Examples:
+            | min | max | message                                |
+            | 3   | 2   | Min Score must be less than Max Score  |
+            | a   | b   | Min and Max Scores must be integers    |
+            | 3   | c   | Min and Max Scores must be integers    |
+            | d   | 2   | Min and Max Scores must be integers    |
+            |     | 2   | Min and Max Scores must be set         |
+            | 3   |     | Min and Max Scores must be set         |
+            |     |     | Min and Max Scores must be set         |
+            | -1  | 2   | Min and Max Scores must be positive    |
+            | 3   | -1  | Min and Max Scores must be positive    |
+            | 1   | 2   | Score categories set                   |

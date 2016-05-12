@@ -172,7 +172,7 @@ class EnterScore(TestCase):
         """
         Enter a score for an entry
         """
-        cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False)
+        cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False, 0, 100)
         write_to_db(cat)
         key = ScoreKey('test_enter_score_key', cat.id, 0, 100)
         db.session.add(key)

@@ -89,7 +89,8 @@ class LoginForm(ErrorStringForm):                       # pylint: disable=no-ini
 class CategoryWidget(forms.MultiWidget):
     """Widget to handle the input for the custom category field"""
     def __init__(self, *args, **kwargs):# pylint: disable=E1002
-        widgets = (forms.TextInput(), forms.TextInput(), forms.CheckboxInput())
+        widgets = (forms.TextInput(), forms.TextInput(), forms.CheckboxInput(),
+                   forms.TextInput(), forms.TextInput())
 
         super(CategoryWidget, self).__init__(widgets, *args, **kwargs)
 
@@ -98,7 +99,8 @@ class CategoryWidget(forms.MultiWidget):
 
     def format_output(self, widget):
         """Customize widget rendering. We need the inputs to look separate"""
-        elements = list(widget) if widget is not None else [None, None, None]
+        elements = list(widget) if widget is not None \
+            else [None, None, None, None, None]
         rendered_widget = {'elements': elements}
 
         return render_to_string('category-input.html', rendered_widget)
@@ -106,7 +108,8 @@ class CategoryWidget(forms.MultiWidget):
 class CategoriesField(forms.MultiValueField):
     """Custom field to handle a single category"""
     def __init__(self, *args, **kwargs):
-        fields = (forms.CharField(), forms.CharField(), forms.BooleanField())
+        fields = (forms.CharField(), forms.CharField(), forms.BooleanField(),
+                  forms.CharField(), forms.CharField())
         widget = CategoryWidget()
 
         super(CategoriesField, self).__init__(
@@ -133,6 +136,10 @@ class SetCategoriesForm(ErrorStringForm):
         self.fields['tournamentId'] = forms.CharField(
             initial=t_id,
             widget=forms.widgets.HiddenInput())
+
+    def empty_field(self):
+        """A string example of an empty field"""
+        return '["", "", false, "", ""]'
 
 class MissionWidget(forms.MultiWidget):
     """Widget to handle the input for the custom mission field"""

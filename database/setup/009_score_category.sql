@@ -9,6 +9,8 @@ CREATE TABLE score_category(
     tournament_id       VARCHAR NOT NULL REFERENCES tournament(name),
     display_name        VARCHAR NOT NULL,
     percentage          INTEGER NOT NULL DEFAULT 100,
-    per_tournament      BOOLEAN NOT NULL DEFAULT FALSE
+    per_tournament      BOOLEAN NOT NULL DEFAULT FALSE,
+    min_val             INTEGER,
+    max_val             INTEGER
 );
 COMMENT ON COLUMN score_category.percentage IS 'The raw score should be multiplied by this.';

@@ -103,7 +103,9 @@ class Tournament(object):
                 dao = ScoreCategory(self.tournament_id,
                                     cat.name,
                                     cat.percentage,
-                                    cat.per_tournament)
+                                    cat.per_tournament,
+                                    cat.min_val,
+                                    cat.max_val,)
             else:
                 to_delete = [x for x in to_delete if x.display_name != cat.name]
             dao.percentage = int(cat.percentage)
@@ -197,7 +199,9 @@ class Tournament(object):
             {'id': x.id,
              'name': x.display_name,
              'percentage': x.percentage,
-             'per_tournament': x.per_tournament} for x in categories]
+             'per_tournament': x.per_tournament,
+             'min_val': x.min_val,
+             'max_val': x.max_val} for x in categories]
 
     @must_exist_in_db
     def make_draw(self, round_id=1):
@@ -286,11 +290,24 @@ class Tournament(object):
         if round_id is not None:
             write_to_db(RoundScore(key.id, round_id))
 
+# pylint: disable=too-many-arguments
 class ScoreCategoryPair(object):
     """A holder object for score category information"""
-    def __init__(self, name, percentage, per_tourn):
+    def __init__(self, name, percentage, per_tourn, min_val, max_val):
         self.name = name
         self.percentage = float(percentage)
         if self.percentage <= 0 or self.percentage > 100:
-            raise ValueError("Score categories must be between 1 and 100")
+            raise ValueError("Percentage must be between 1 and 100")
         self.per_tournament = per_tourn
+
+        if not min_val or not max_val:
+            raise ValueError("Min and Max Scores must be set")
+        try:
+            self.min_val = int(min_val)
+            self.max_val = int(max_val)
+        except ValueError:
+            raise ValueError("Min and Max Scores must be integers")
+        if self.min_val <= 0 or self.max_val <= 0:
+            raise ValueError("Min and Max Scores must be positive")
+        if self.min_val > self.max_val:
+            raise ValueError("Min Score must be less than Max Score")

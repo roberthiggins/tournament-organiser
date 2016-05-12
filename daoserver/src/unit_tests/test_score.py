@@ -36,7 +36,7 @@ class TestRoundScore(TestCase):
         t.num_rounds = 5
         db.session.add(t)
 
-        cat = ScoreCategory('foobar', 'nonsense', 50, False)
+        cat = ScoreCategory('foobar', 'nonsense', 50, False, 0, 100)
         cat.tournament = t
         db.session.add(cat)
 

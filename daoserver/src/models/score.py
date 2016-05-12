@@ -9,7 +9,7 @@ TODO:
     - the relationship here could be tidied up somewhat.
 
 """
-# pylint: disable=invalid-name,no-member
+# pylint: disable=invalid-name,no-member,too-many-arguments
 
 from sqlalchemy.sql.expression import and_
 
@@ -26,15 +26,28 @@ class ScoreCategory(db.Model):
                               db.ForeignKey(Tournament.name),
                               nullable=False)
     display_name = db.Column(db.String(50), nullable=False)
+    min_val = db.Column(db.Integer)
+    max_val = db.Column(db.Integer)
     per_tournament = db.Column(db.Boolean, nullable=False, default=False)
     percentage = db.Column(db.Integer, nullable=False, default=100)
     tournament = db.relationship(Tournament, backref=db.backref(
         'score_categories', lazy='dynamic'))
 
-    def __init__(self, tournament_id, display_name, percentage, per_tourn):
+    def __init__(self, tournament_id, display_name, percentage, per_tourn,
+                 min_val, max_val):
         self.tournament_id = tournament_id
         self.display_name = display_name
         self.per_tournament = per_tourn
+        try:
+            self.min_val = int(min_val)
+        except ValueError:
+            raise ValueError('Minimum Score must be an integer')
+
+        try:
+            self.max_val = int(max_val)
+        except ValueError:
+            raise ValueError('Maximum Score must be an integer')
+
         try:
             percentage = int(percentage)
         except ValueError:
@@ -42,11 +55,13 @@ class ScoreCategory(db.Model):
         self.percentage = int(percentage)
 
     def __repr__(self):
-        return '<ScoreCategory ({}, {}, {}, {})>'.format(
+        return '<ScoreCategory ({}, {}, {}, {}, {}, {})>'.format(
             self.tournament_id,
             self.display_name,
             self.percentage,
-            self.per_tournament)
+            self.per_tournament,
+            self.min_val,
+            self.max_val)
 
     def delete(self):
         """From the DB"""

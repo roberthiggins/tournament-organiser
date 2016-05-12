@@ -429,7 +429,8 @@ def set_score_categories():
     new_categories = []
     for json_cat in json.loads(categories):
         cat = json.loads(request.values.get(json_cat, []))
-        new_categories.append(ScoreCategoryPair(cat[0], cat[1], cat[2]))
+        new_categories.append(
+            ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
 
     tourn.set_score_categories(new_categories)
 

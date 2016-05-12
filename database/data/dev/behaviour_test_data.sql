@@ -3,8 +3,8 @@ INSERT INTO tournament VALUES (DEFAULT, 'northcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'southcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
 
-INSERT INTO score_category VALUES(DEFAULT, 'southcon_2095', 'some_category', DEFAULT);
-INSERT INTO score_category VALUES(100, 'northcon_2095', 'leastnortherly', DEFAULT);
+INSERT INTO score_category VALUES(DEFAULT, 'southcon_2095', 'some_category', DEFAULT, DEFAULT, 1, 10);
+INSERT INTO score_category VALUES(100, 'northcon_2095', 'leastnortherly', DEFAULT, DEFAULT, 1, 10);
 
 -- Set up some users
 DO $$
@@ -18,7 +18,7 @@ BEGIN
 
     INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tournie_id;
 
-    INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT) RETURNING id INTO fanciness;
+    INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT, DEFAULT, 1, 10) RETURNING id INTO fanciness;
     INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', 4, 15, fanciness);
     INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', 2, 28, fanciness);
 
@@ -59,8 +59,8 @@ BEGIN
     INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 1, 'Kill') RETURNING id INTO round_1_id;
     INSERT INTO tournament_round VALUES(DEFAULT, 'ranking_test', 2, DEFAULT) RETURNING id INTO round_2_id;
 
-    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90) RETURNING id INTO battlecategory;
-    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10) RETURNING id INTO sportscategory;
+    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90, DEFAULT, 0, 20) RETURNING id INTO battlecategory;
+    INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10, DEFAULT, 1, 5) RETURNING id INTO sportscategory;
     INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', 0, 20, battlecategory) RETURNING id INTO rd1key;
     INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', 0, 20, battlecategory) RETURNING id INTO rd2key;
     INSERT INTO score_key VALUES (DEFAULT, 'sports', 1, 5, sportscategory) RETURNING id INTO sportskey;
@@ -198,7 +198,7 @@ BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3, protect_object_id);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'category_1', 15);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'category_1', 15, DEFAULT, 1, 10);
 
     RETURN 0;
 END $$;
