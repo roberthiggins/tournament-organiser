@@ -72,50 +72,50 @@ BEGIN
     INSERT INTO account_security VALUES ('homer', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('homer', ranking_test_id);
     INSERT INTO entry VALUES(default, 'homer', 'ranking_test') RETURNING id INTO eid;
-    INSERT INTO score VALUES(eid, rd1key, 20);
+    INSERT INTO score VALUES(DEFAULT, eid, rd1key, 20);
     INSERT INTO table_allocation VALUES(eid, 1, 1);
-    INSERT INTO score VALUES(eid, rd2key, 15);
+    INSERT INTO score VALUES(DEFAULT, eid, rd2key, 15);
     INSERT INTO table_allocation VALUES(eid, 2, 2);
-    INSERT INTO score VALUES(eid, sportskey, 1);
+    INSERT INTO score VALUES(DEFAULT, eid, sportskey, 1);
 
 
     INSERT INTO account VALUES ('marge', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('marge', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('marge', ranking_test_id);
     INSERT INTO entry VALUES(default, 'marge', 'ranking_test') RETURNING id INTO eid;
-    INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO score VALUES(DEFAULT, eid, rd1key, 0);
     INSERT INTO table_allocation VALUES(eid, 2, 1);
-    INSERT INTO score VALUES(eid, rd2key, DEFAULT);
-    INSERT INTO score VALUES(eid, sportskey, 5);
+    INSERT INTO score VALUES(DEFAULT, eid, rd2key, DEFAULT);
+    INSERT INTO score VALUES(DEFAULT, eid, sportskey, 5);
 
     INSERT INTO account VALUES ('lisa', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('lisa', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('lisa', ranking_test_id);
     INSERT INTO entry VALUES(default, 'lisa', 'ranking_test') RETURNING id INTO eid;
-    INSERT INTO score VALUES(eid, rd1key, DEFAULT);
-    INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO score VALUES(DEFAULT, eid, rd1key, DEFAULT);
+    INSERT INTO score VALUES(DEFAULT, eid, rd2key, 5);
     INSERT INTO table_allocation VALUES(eid, 2, 2);
-    INSERT INTO score VALUES(eid, sportskey, 5);
+    INSERT INTO score VALUES(DEFAULT, eid, sportskey, 5);
 
     INSERT INTO account VALUES ('bart', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('bart', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('bart', ranking_test_id);
     INSERT INTO entry VALUES(default, 'bart', 'ranking_test') RETURNING id INTO eid;
-    INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO score VALUES(DEFAULT, eid, rd1key, 0);
     INSERT INTO table_allocation VALUES(eid, 2, 1);
-    INSERT INTO score VALUES(eid, rd2key, 5);
+    INSERT INTO score VALUES(DEFAULT, eid, rd2key, 5);
     INSERT INTO table_allocation VALUES(eid, 1, 2);
-    INSERT INTO score VALUES(eid, sportskey, 5);
+    INSERT INTO score VALUES(DEFAULT, eid, sportskey, 5);
 
     INSERT INTO account VALUES ('maggie', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('maggie', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO registration VALUES('maggie', ranking_test_id);
     INSERT INTO entry VALUES(default, 'maggie', 'ranking_test') RETURNING id INTO eid;
-    INSERT INTO score VALUES(eid, rd1key, 0);
+    INSERT INTO score VALUES(DEFAULT, eid, rd1key, 0);
     INSERT INTO table_allocation VALUES(eid, 1, 1);
-     --INSERT INTO score VALUES(eid, rd2key, 5);
+     --INSERT INTO score VALUES(DEFAULT, eid, rd2key, 5);
     INSERT INTO table_allocation VALUES(eid, 1, 2);
-    INSERT INTO score VALUES(eid, sportskey, 5);
+    INSERT INTO score VALUES(DEFAULT, eid, sportskey, 5);
 
     -- The draw for round 1 has already been completed.
     SELECT id INTO protected_action_id FROM protected_object_action WHERE description = 'enter_score';

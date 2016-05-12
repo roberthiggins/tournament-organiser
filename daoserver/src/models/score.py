@@ -148,12 +148,9 @@ class Score(db.Model):
     """An individual score tied to a ScoreKey"""
 
     __tablenamene__ = 'score'
-    entry_id = db.Column(db.Integer,
-                         db.ForeignKey(TournamentEntry.id),
-                         primary_key=True)
-    score_key_id = db.Column(db.Integer,
-                             db.ForeignKey(ScoreKey.id),
-                             primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    entry_id = db.Column(db.Integer, db.ForeignKey(TournamentEntry.id))
+    score_key_id = db.Column(db.Integer, db.ForeignKey(ScoreKey.id))
     value = db.Column(db.Integer)
 
     entry = db.relationship(TournamentEntry, backref='scores')
@@ -166,7 +163,8 @@ class Score(db.Model):
         self.value = value
 
     def __repr__(self):
-        return '<Score ({}, {}, {})>'.format(
+        return '<Score ({}, {}, {}, {})>'.format(
+            self.id,
             self.entry_id,
             self.score_key_id,
             self.value)

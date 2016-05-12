@@ -99,7 +99,7 @@ class ScoreEnteringTests(TestCase):
         self.assertFalse(game.is_score_entered())
 
         # Enter the final score for maggie
-        cur.execute("INSERT INTO score VALUES(6, 4, 2)")
+        cur.execute("INSERT INTO score VALUES(DEFAULT, 6, 4, 2)")
         conn.commit()
         self.assertTrue(game.is_score_entered())
 
