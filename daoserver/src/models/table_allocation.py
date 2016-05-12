@@ -27,12 +27,3 @@ class TableAllocation(db.Model):
             self.entry_id,
             self.table_no,
             self.round_no)
-
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
