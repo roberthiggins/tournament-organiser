@@ -35,16 +35,6 @@ class TournamentEntry(db.Model):
             self.player_id,
             self.tournament_id)
 
-    def write(self):
-        """To the DB"""
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
-
 class Entry(json.JSONEncoder):
     """
     A tournament is composed of entries who play each other. This is distinct

@@ -70,7 +70,7 @@ class TournamentInjector(object):
     def add_player(self, tournament_name, username, email='foo@bar.com'):
         """Create player account and enter them"""
         write_to_db(Account(username, email))
-        TournamentEntry(username, tournament_name).write()
+        write_to_db(TournamentEntry(username, tournament_name))
         self.accounts.add(username)
 
     def create_tournament(self, name, date, rounds=0):
@@ -87,7 +87,7 @@ class TournamentInjector(object):
         for entry_no in range(1, num_players + 1):
             player_name = '{}_player_{}'.format(tourn_name, entry_no)
             write_to_db(Account(player_name, '{}@test.com'.format(player_name)))
-            TournamentEntry(player_name, tourn_name).write()
+            write_to_db(TournamentEntry(player_name, tourn_name))
             self.accounts.add(player_name)
 
     def delete_scores(self):
