@@ -93,35 +93,21 @@ class ScoreKey(db.Model):
     __tablename__ = 'score_key'
     id = db.Column(db.Integer, db.Sequence('score_key_id_seq'), unique=True)
     key = db.Column(db.String(50), primary_key=True)
-    min_val = db.Column(db.Integer)
-    max_val = db.Column(db.Integer)
     category = db.Column(db.Integer,
                          db.ForeignKey(ScoreCategory.id),
                          primary_key=True)
     score_category = db.relationship(ScoreCategory, backref=db.backref(
         'score_keys', lazy='dynamic'))
 
-    def __init__(self, key, category, min_val, max_val):
+    def __init__(self, key, category):
         self.key = key
         self.category = category
 
-        try:
-            self.min_val = int(min_val)
-        except ValueError:
-            raise ValueError('Minimum Score must be an integer')
-
-        try:
-            self.max_val = int(max_val)
-        except ValueError:
-            raise ValueError('Maximum Score must be an integer')
-
     def __repr__(self):
-        return '<ScoreKey ({}, {}, {}, {}, {})>'.format(
+        return '<ScoreKey ({}, {}, {})>'.format(
             self.id,
             self.key,
-            self.category,
-            self.min_val,
-            self.max_val)
+            self.category)
 
 class RoundScore(db.Model):
     """A score for an entry in a round"""

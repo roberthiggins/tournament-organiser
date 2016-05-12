@@ -66,8 +66,8 @@ Feature: Enter a score for a player
         Then I should see "<content>"
         Examples:
             |score | content                                    |
-            | 1    | Invalid score: 1                           |
-            | 29   | Invalid score: 29                          |
+            | 3    | Invalid score: 3                           |
+            | 16   | Invalid score: 16                          |
             | 5    | Score entered for rick_james: 5            |
             | 6    | 6 not entered. Score is already set        |
 
@@ -124,5 +124,3 @@ Feature: Enter a score for a player
         Then the response status code should be 200
         Then I should not see "Permission denied"
         Then I should see "1 not entered. Score is already set"
-
-    Scenario: to

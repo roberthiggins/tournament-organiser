@@ -33,7 +33,7 @@ class RankingStrategy(object):
                 if x.score_key.score_category.display_name == cat['name'] \
                 and x.value is not None])
             agg_total = sum(
-                [x.score_key.max_val for x in scores \
+                [x.score_key.score_category.max_val for x in scores \
                 if x.score_key.score_category.display_name == cat['name']])
             try:
                 agg_score = float(agg_score)

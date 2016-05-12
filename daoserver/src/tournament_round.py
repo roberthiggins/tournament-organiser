@@ -72,5 +72,6 @@ class TournamentRound(object):
             raise ValueError("Draw not ready. Mission not set. Contact TO")
 
         return [
-            (x[0].id, x[0].key, x[0].min_val, x[0].max_val, x[0].category,
-             x[1].score_key_id, x[1].round_id) for x in results]
+            (x[0].id, x[0].key, x[0].score_category.min_val,
+             x[0].score_category.max_val, x[0].category, x[1].score_key_id,
+             x[1].round_id) for x in results]

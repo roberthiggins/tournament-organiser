@@ -218,5 +218,3 @@ class TournamentSetupForm(ErrorStringForm):             # pylint: disable=no-ini
         )
 
     key = forms.CharField(label='Score key', )
-    maxVal = forms.CharField(label='Min Score', required=False)
-    minVal = forms.CharField(label='Max Score', required=False)

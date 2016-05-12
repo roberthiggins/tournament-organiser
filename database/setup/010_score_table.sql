@@ -1,8 +1,6 @@
 CREATE TABLE score_key (
     id                  SERIAL UNIQUE,
     key                 VARCHAR NOT NULL,
-    min_val             INTEGER,
-    max_val             INTEGER,
     category            INTEGER NOT NULL REFERENCES score_category(id),
     PRIMARY KEY (key, category)
 );

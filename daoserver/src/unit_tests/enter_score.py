@@ -174,7 +174,7 @@ class EnterScore(TestCase):
         """
         cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False, 0, 100)
         write_to_db(cat)
-        key = ScoreKey('test_enter_score_key', cat.id, 0, 100)
+        key = ScoreKey('test_enter_score_key', cat.id)
         db.session.add(key)
 
         entry = TournamentEntry.query.filter_by(

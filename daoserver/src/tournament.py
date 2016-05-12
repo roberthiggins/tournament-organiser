@@ -151,7 +151,8 @@ class Tournament(object):
 
         try:
             score = int(score)
-            if score < key.min_val or score > key.max_val:
+            if score < key.score_category.min_val or \
+            score > key.score_category.max_val:
                 raise ValueError()
         except ValueError:
             raise ValueError('Invalid score: {}'.format(score))
@@ -178,8 +179,8 @@ class Tournament(object):
                     'key': x.score_key.key,
                     'score': x.value,
                     'category': x.score_key.score_category.display_name,
-                    'min_val': x.score_key.min_val,
-                    'max_val': x.score_key.max_val,
+                    'min_val': x.score_key.score_category.min_val,
+                    'max_val': x.score_key.score_category.max_val,
                 } for x in entry.scores
             ]
 
@@ -262,7 +263,7 @@ class Tournament(object):
 
     @must_exist_in_db
     # pylint: disable=R0913
-    def set_score(self, key, category, min_val=0, max_val=20, round_id=None):
+    def set_score(self, key, category, round_id=None):
         """
         Set a score category that a player is eligible for in a tournament.
 
@@ -275,12 +276,7 @@ class Tournament(object):
             - (opt) max_val - for score - default 20
             - (opt) round_id - the score is for the round
         """
-        if not min_val:
-            min_val = 0
-        if not max_val:
-            max_val = 20
-
-        key = ScoreKey(key, category, min_val, max_val)
+        key = ScoreKey(key, category)
         try:
             write_to_db(key)
         except IntegrityError:
