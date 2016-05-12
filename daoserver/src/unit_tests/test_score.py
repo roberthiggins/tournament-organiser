@@ -42,7 +42,7 @@ class TestRoundScore(TestCase):
 
         key = ScoreKey('some_key', cat.id, 0, 100)
         key.score_category = cat
-        key.write()
+        db.session.add(key)
 
         rnd = TournamentRound('foobar', 1, 'foo_mission_1')
         db.session.add(rnd)

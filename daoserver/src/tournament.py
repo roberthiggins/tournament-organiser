@@ -276,7 +276,10 @@ class Tournament(object):
             max_val = 20
 
         key = ScoreKey(key, category, min_val, max_val)
-        key.write()
+        try:
+            write_to_db(key)
+        except IntegrityError:
+            raise Exception('Score already set')
 
         # This score could be per-game rather than per-tournament
         if round_id is not None:

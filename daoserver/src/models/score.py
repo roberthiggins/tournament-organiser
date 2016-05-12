@@ -112,16 +112,6 @@ class ScoreKey(db.Model):
             self.min_val,
             self.max_val)
 
-    def write(self):
-        """To the DB"""
-
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise Exception('Score already set')
-
 class RoundScore(db.Model):
     """A score for an entry in a round"""
 
