@@ -43,6 +43,4 @@ urlpatterns = [
         views.set_rounds, name='set_rounds'),
     url(r'^suggestimprovement$',
         views.suggest_improvement, name='suggest_improvement'),
-    url(r'^tournamentsetup/(?P<tournament_id>.+)$',
-        views.tournament_setup, name='tournament_setup'),
 ]

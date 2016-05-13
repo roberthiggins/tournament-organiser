@@ -437,20 +437,6 @@ def set_score_categories():
     return make_response('Score categories set: {}'.format(
         ', '.join([str(x.name) for x in new_categories])), 200)
 
-@APP.route('/setTournamentScore', methods=['POST'])
-@enforce_request_variables('key', 'scoreCategory')
-def set_tournament_score():                             # pylint: disable=E0602
-    """
-    POST to set a score category that a player is eligible for in a tournament.
-    """
-    tourn = Tournament(request.values.get('tournamentId', None))
-    # pylint: disable=E0602
-    tourn.set_score(
-        key=key,
-        category=scoreCategory,
-        round_id=request.values.get('round'))
-    return make_response('Score created', 200)
-
 @APP.route('/tournamentDetails/<t_name>', methods=['GET'])
 def tournament_details(t_name=None):
     """

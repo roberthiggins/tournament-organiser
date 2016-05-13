@@ -10,8 +10,7 @@ from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
 from models.db_connection import write_to_db
-from models.score import db as score_db, Score, RoundScore, ScoreCategory, \
-ScoreKey
+from models.score import db as score_db, Score, ScoreCategory, ScoreKey
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
@@ -112,6 +111,13 @@ class Tournament(object):
             dao.per_tournament = cat.per_tournament
             dao.clashes()
             write_to_db(dao)
+
+            try:
+                if ScoreKey.query.filter_by(key=cat.name,
+                                            category=dao.id).first() is None:
+                    write_to_db(ScoreKey(cat.name, dao.id))
+            except IntegrityError:
+                raise Exception('Score already set')
 
         for cat in to_delete:
             cat.delete()
@@ -260,31 +266,6 @@ class Tournament(object):
 
         self.rounds = [TournamentRound(self.tournament_id, x) \
             for x in range(1, tourn.num_rounds + 1)]
-
-    @must_exist_in_db
-    # pylint: disable=R0913
-    def set_score(self, key, category, round_id=None):
-        """
-        Set a score category that a player is eligible for in a tournament.
-
-        For example, use this to specify that a tourn has a 'round_1_battle'
-        score for each player.
-
-        Expected:
-            - key - unique name e.g. round_4_comp
-            - (opt) min_val - for score - default 0
-            - (opt) max_val - for score - default 20
-            - (opt) round_id - the score is for the round
-        """
-        key = ScoreKey(key, category)
-        try:
-            write_to_db(key)
-        except IntegrityError:
-            raise Exception('Score already set')
-
-        # This score could be per-game rather than per-tournament
-        if round_id is not None:
-            write_to_db(RoundScore(key.id, round_id))
 
 # pylint: disable=too-many-arguments
 class ScoreCategoryPair(object):

@@ -201,20 +201,3 @@ class SetRoundsForm(ErrorStringForm):
             initial=t_id,
             widget=forms.widgets.HiddenInput())
     numRounds = forms.CharField(label='Number of rounds')
-
-class TournamentSetupForm(ErrorStringForm):             # pylint: disable=no-init
-    """Setup a tournament. Mostly set the scores you can get"""
-    def __init__(self, *args, **kwargs):                # pylint: disable=E1002
-        t_id = kwargs.pop('tournament_id')
-        score_categories = kwargs.pop('score_categories')
-        super(TournamentSetupForm, self).__init__(*args, **kwargs)
-        # pylint: disable=no-member
-        self.fields['tournamentId'] = forms.CharField(
-            initial=t_id,
-            widget=forms.widgets.HiddenInput())
-        self.fields['scoreCategory'] = forms.ChoiceField(
-            label='What type of score is this?',
-            choices=score_categories
-        )
-
-    key = forms.CharField(label='Score key', )

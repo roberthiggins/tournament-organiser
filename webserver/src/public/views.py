@@ -12,7 +12,7 @@ HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from public.forms import AddTournamentForm, ApplyForTournamentForm, \
-EnterScoreForm, FeedbackForm, TournamentSetupForm, SetRoundsForm, \
+EnterScoreForm, FeedbackForm, SetRoundsForm, \
 SetCategoriesForm, SetMissionsForm
 from public.view_helpers import from_dao
 
@@ -311,39 +311,3 @@ def score_categories(tournament_id):
         ]
     except urllib2.HTTPError:
         return []
-
-@login_required
-def tournament_setup(request, tournament_id):
-    """Add a score to a tournament"""
-
-    t_details = from_dao('/tournamentDetails/{}'.format(tournament_id))
-    if t_details.status_code != 200:
-        return HttpResponseNotFound(
-            'Tournament {} not found'.format(tournament_id))
-
-    categories = score_categories(tournament_id)
-    form = TournamentSetupForm(
-        tournament_id=tournament_id,
-        score_categories=categories)
-
-    if request.method == 'POST':
-        form = TournamentSetupForm(
-            request.POST,
-            tournament_id=tournament_id,
-            score_categories=categories)
-
-        if form.is_valid():                             # pylint: disable=no-member
-            try:
-                response = from_dao('/setTournamentScore', form)
-                return HttpResponse(response)
-            except urllib2.HTTPError:
-                form.add_error(None, response.content)
-
-    return render_to_response(
-        'tournament-setup.html',
-        {
-            'form': form,
-            'name': tournament_id
-        },
-        RequestContext(request)
-    )

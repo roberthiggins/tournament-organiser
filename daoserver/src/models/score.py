@@ -97,7 +97,7 @@ class ScoreKey(db.Model):
                          db.ForeignKey(ScoreCategory.id),
                          primary_key=True)
     score_category = db.relationship(ScoreCategory, backref=db.backref(
-        'score_keys', lazy='dynamic'))
+        'score_keys', lazy='dynamic', cascade='all, delete-orphan'))
 
     def __init__(self, key, category):
         self.key = key
