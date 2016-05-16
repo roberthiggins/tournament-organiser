@@ -38,21 +38,27 @@ class ScoreCategory(db.Model):
         self.tournament_id = tournament_id
         self.display_name = display_name
         self.per_tournament = per_tourn
+
         try:
             self.min_val = int(min_val)
-        except ValueError:
-            raise ValueError('Minimum Score must be an integer')
-
-        try:
             self.max_val = int(max_val)
         except ValueError:
-            raise ValueError('Maximum Score must be an integer')
+            raise ValueError('Min and Max Scores must be integers')
+        except TypeError:
+            raise ValueError('Min and Max Scores must be integers')
+        if self.max_val <= 0:
+            raise ValueError("Max Score must be positive")
+        if self.min_val < 0:
+            raise ValueError("Min Score cannot be negative")
+        if self.min_val > self.max_val:
+            raise ValueError("Min Score must be less than Max Score")
 
         try:
-            percentage = int(percentage)
-        except ValueError:
-            raise ValueError('percentage must be an integer')
-        self.percentage = int(percentage)
+            self.percentage = int(percentage)
+            if self.percentage <= 0 or self.percentage > 100:
+                raise TypeError()
+        except TypeError:
+            raise ValueError("Percentage must be between 1 and 100")
 
     def __repr__(self):
         return '<ScoreCategory ({}, {}, {}, {}, {}, {})>'.format(

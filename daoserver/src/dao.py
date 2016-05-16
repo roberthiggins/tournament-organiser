@@ -435,7 +435,7 @@ def set_score_categories():
     tourn.set_score_categories(new_categories)
 
     return make_response('Score categories set: {}'.format(
-        ', '.join([str(x.name) for x in new_categories])), 200)
+        ', '.join([str(cat.display_name) for cat in new_categories])), 200)
 
 @APP.route('/tournamentDetails/<t_name>', methods=['GET'])
 def tournament_details(t_name=None):

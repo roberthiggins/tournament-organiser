@@ -181,7 +181,7 @@ Feature: Modify the scoring categories for a tournament
 
     Scenario Outline: I fill in the min and max values
         Given I am on "/setcategories/category_test"
-        Then I fill in "id_categories_0_0" with "cat_1"
+        Then I fill in "id_categories_0_0" with "<cat>"
         Then I fill in "id_categories_0_1" with "10"
         Then I fill in "id_categories_0_3" with "<min>"
         Then I fill in "id_categories_0_4" with "<max>"
@@ -194,14 +194,17 @@ Feature: Modify the scoring categories for a tournament
         Then I should see "<message>"
 
         Examples:
-            | min | max | message                                |
-            | 3   | 2   | Min Score must be less than Max Score  |
-            | a   | b   | Min and Max Scores must be integers    |
-            | 3   | c   | Min and Max Scores must be integers    |
-            | d   | 2   | Min and Max Scores must be integers    |
-            |     | 2   | Min and Max Scores must be set         |
-            | 3   |     | Min and Max Scores must be set         |
-            |     |     | Min and Max Scores must be set         |
-            | -1  | 2   | Min and Max Scores must be positive    |
-            | 3   | -1  | Min and Max Scores must be positive    |
-            | 1   | 2   | Score categories set                   |
+            | cat | min | max | message                                |
+            | cat | 3   | 2   | Min Score must be less than Max Score  |
+            | cat | a   | b   | Min and Max Scores must be integers    |
+            | cat | 3   | c   | Min and Max Scores must be integers    |
+            | cat | d   | 2   | Min and Max Scores must be integers    |
+            | cat |     | 2   | Min and Max Scores must be integers    |
+            | cat | 3   |     | Min and Max Scores must be integers    |
+            | cat |     |     | Min and Max Scores must be integers    |
+            | cat | -1  | 2   | Min Score cannot be negative           |
+            | cat | 3   | -1  | Max Score must be positive             |
+            | cat | 0   | 0   | Max Score must be positive             |
+            |     | 1   | 1   | Category must have a name              |
+            | cat | 1   | 1   | Score categories set                   |
+            | cat | 1   | 2   | Score categories set                   |

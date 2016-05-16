@@ -86,7 +86,7 @@ class Tournament(object):
         """
 
         # check for duplicates
-        keys = [x.name for x in new_categories]
+        keys = [cat.display_name for cat in new_categories]
         if len(keys) != len(set(keys)):
             raise ValueError("You cannot set multiple keys with the same name")
 
@@ -96,26 +96,27 @@ class Tournament(object):
         for cat in new_categories:
             dao = ScoreCategory.query.\
                 filter_by(tournament_id=self.tournament_id,
-                          display_name=cat.name).first()
+                          display_name=cat.display_name).first()
 
             if dao is None:
                 dao = ScoreCategory(self.tournament_id,
-                                    cat.name,
+                                    cat.display_name,
                                     cat.percentage,
                                     cat.per_tournament,
                                     cat.min_val,
                                     cat.max_val,)
             else:
-                to_delete = [x for x in to_delete if x.display_name != cat.name]
+                to_delete = [x for x in to_delete \
+                if x.display_name != cat.display_name]
             dao.percentage = int(cat.percentage)
             dao.per_tournament = cat.per_tournament
             dao.clashes()
             write_to_db(dao)
 
             try:
-                if ScoreKey.query.filter_by(key=cat.name,
+                if ScoreKey.query.filter_by(key=cat.display_name,
                                             category=dao.id).first() is None:
-                    write_to_db(ScoreKey(cat.name, dao.id))
+                    write_to_db(ScoreKey(cat.display_name, dao.id))
             except IntegrityError:
                 raise Exception('Score already set')
 
@@ -271,20 +272,21 @@ class Tournament(object):
 class ScoreCategoryPair(object):
     """A holder object for score category information"""
     def __init__(self, name, percentage, per_tourn, min_val, max_val):
-        self.name = name
-        self.percentage = float(percentage)
-        if self.percentage <= 0 or self.percentage > 100:
-            raise ValueError("Percentage must be between 1 and 100")
-        self.per_tournament = per_tourn
+        if not name:
+            raise ValueError('Category must have a name')
 
-        if not min_val or not max_val:
-            raise ValueError("Min and Max Scores must be set")
+        try:
+            self.percentage = int(percentage)
+        except TypeError:
+            raise ValueError('Percentage must be an integer (1-100)')
+
         try:
             self.min_val = int(min_val)
             self.max_val = int(max_val)
         except ValueError:
-            raise ValueError("Min and Max Scores must be integers")
-        if self.min_val <= 0 or self.max_val <= 0:
-            raise ValueError("Min and Max Scores must be positive")
-        if self.min_val > self.max_val:
-            raise ValueError("Min Score must be less than Max Score")
+            raise ValueError('Min and Max Scores must be integers')
+        except TypeError:
+            raise ValueError('Min and Max Scores must be integers')
+
+        self.display_name = name
+        self.per_tournament = per_tourn
