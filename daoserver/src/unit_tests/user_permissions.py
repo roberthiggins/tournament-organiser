@@ -5,7 +5,8 @@ Checking whether users are players in tournaments, admins, organisers, etc.
 from flask.ext.testing import TestCase
 
 from app import create_app
-from models.account import db as account_db, Account
+from models.account import db as account_db, Account, AccountSecurity, \
+add_account
 from permissions import PermissionsChecker
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
@@ -17,23 +18,19 @@ class UserPermissions(TestCase):
 
     def setUp(self):
         account_db.create_all()
+        self.acc_1 = 'test_add_account_admin'
 
     def tearDown(self):
+        AccountSecurity.query.filter_by(id=self.acc_1).delete()
+        Account.query.filter_by(username=self.acc_1).delete()
+        account_db.session.commit()
+
         account_db.session.remove()
 
-    def test_is_admin(self):
-        """check if a user is an admin"""
-        self.assertTrue(Account.query.filter_by(
-            username=None, is_superuser=True).first() is None)
-        self.assertTrue(Account.query.filter_by(
-            username='', is_superuser=True).first() is None)
-        self.assertTrue(Account.query.filter_by(
-            username='charlie_murphy', is_superuser=True).first() is None)
-        self.assertTrue(Account.query.filter_by(
-            username='not_a_person', is_superuser=True).first() is None)
-
-        self.assertTrue(Account.query.filter_by(
-            username='superman', is_superuser=True).first() is not None)
+    def test_add_account(self):
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1')
+        self.assertFalse(Account.query.\
+            filter_by(username=self.acc_1).first().is_superuser)
 
     def test_is_player(self):
         """users can be a player by being involved in a game"""
