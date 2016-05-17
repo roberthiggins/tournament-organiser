@@ -266,8 +266,13 @@ class Tournament(object):
         from models.db_connection import db
         db.session.commit()
 
-        self.rounds = [TournamentRound(self.tournament_id, x) \
-            for x in range(1, tourn.num_rounds + 1)]
+        existing_rnds = len(tourn.rounds.filter().all())
+        for rnd in range(existing_rnds + 1, tourn.num_rounds + 1):
+            db.session.add(TR(self.tournament_id, rnd))
+        db.session.commit()
+
+        self.rounds = [TournamentRound(self.tournament_id, rnd) \
+            for rnd in range(1, tourn.num_rounds + 1)]
 
 # pylint: disable=too-many-arguments
 class ScoreCategoryPair(object):

@@ -311,8 +311,12 @@ def set_missions():
         raise ValueError('Tournament {} has {} rounds. \
             You submitted missions {}'.format(tournamentId, rounds, missions))
 
+    from models.tournament_round import TournamentRound as TR
     for i, mission in enumerate(json_missions):
-        tourn.get_round(i + 1).set_mission(mission)
+        rnd = tourn.get_round(i + 1).get_dao()
+        # pylint: disable=no-member
+        rnd.mission = mission if mission else TR.__table__.c.mission.default.arg
+        write_to_db(rnd)
 
     return make_response('Missions set: {}'.format(missions), 200)
 

@@ -57,13 +57,14 @@ class SetRounds(TestCase):
 
         tourn = Tournament(name)
         tourn.set_number_of_rounds(6)
-        # set_number_of_rounds only deletes excess rounds
-        self.assertTrue(len(TournamentRound.query.filter_by(
-            tournament_name=name).all()) == 4) # thus still 4
+        compare(
+            len(TournamentRound.query.filter_by(tournament_name=name).all()),
+            6)
 
         tourn.set_number_of_rounds(2)
-        self.assertTrue(len(TournamentRound.query.filter_by(
-            tournament_name=name).all()) == 2)
+        compare(
+            len(TournamentRound.query.filter_by(tournament_name=name).all()),
+            2)
 
     def test_get_missions(self):
         """get missions for the rounds"""
@@ -78,20 +79,6 @@ class SetRounds(TestCase):
         compare(
             [x.mission for x in Tournament(name).get_dao().rounds],
             ['mission_1', 'mission_2', 'mission_3', 'TBA'])
-
-    def test_set_mission(self):
-        """add a mission to the tournament round"""
-        name = 'test_set_mission'
-        self.set_up_tournament(name)
-
-        tourn = Tournament(name)
-        tourn.set_number_of_rounds(5)
-        tourn.get_round(5).set_mission('mission_5')
-        self.assertTrue(tourn.get_round(5).get_mission(), 'mission_5')
-        tourn.get_round(4).set_mission('mission_4')
-        self.assertTrue(tourn.get_round(4).get_mission(), 'mission_4')
-        tourn.get_round(2).set_mission('mission_2')
-        self.assertTrue(tourn.get_round(2).get_mission(), 'mission_2')
 
     def test_get_round(self):
         """Test the round getter"""

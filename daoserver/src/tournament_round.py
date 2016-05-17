@@ -6,7 +6,6 @@ a nice point of separation to reduce the complexity of a tournament.
 """
 from sqlalchemy.sql.expression import and_
 
-from models.db_connection import write_to_db
 from models.tournament_round import TournamentRound as DAO
 
 class TournamentRound(object):
@@ -47,11 +46,3 @@ class TournamentRound(object):
         if self.get_dao() is not None and self.get_dao().mission:
             return self.get_dao().mission
         return 'TBA'
-
-    def set_mission(self, mission_name):
-        """Set the name of the mission"""
-        if self.get_dao() is None:
-            write_to_db(DAO(self.tournament_id, self.round_num, mission_name))
-        else:
-            self.get_dao().mission = mission_name
-            write_to_db(self.get_dao())

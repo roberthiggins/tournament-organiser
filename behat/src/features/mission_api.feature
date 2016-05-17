@@ -48,4 +48,4 @@ Feature: Interact with missions through the API
         Then the "id_missions_0" field should contain "mission_1"
         Then the "id_missions_1" field should contain "mission_2"
         Then the "id_missions_2" field should not contain "mission_3"
-        Then the "id_missions_2" field should contain ""
+        Then the "id_missions_2" field should contain "TBA"
