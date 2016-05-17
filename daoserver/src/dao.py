@@ -313,7 +313,7 @@ def set_missions():
 
     from models.tournament_round import TournamentRound as TR
     for i, mission in enumerate(json_missions):
-        rnd = tourn.get_round(i + 1).get_dao()
+        rnd = tourn.get_round(i + 1)
         # pylint: disable=no-member
         rnd.mission = mission if mission else TR.__table__.c.mission.default.arg
         write_to_db(rnd)
@@ -387,21 +387,19 @@ def get_round_info(tournament_id, round_id):
     """
     tourn = Tournament(tournament_id)
     rnd = tourn.get_round(round_id)
-
-    if rnd.draw is None:
-        tourn.make_draw(round_id)
+    draw = tourn.make_draw(round_id)
 
     draw_info = [
         {'table_number': t.table_number,
          'entrants': [x if isinstance(x, str) else x.player_id \
                       for x in t.entrants]
-        } for t in list(rnd.draw)]
+        } for t in draw]
 
     # We will return all round info for all requests regardless of method
     return jsonpickle.encode(
         {
             'draw': draw_info,
-            'mission': rnd.get_dao().mission
+            'mission': rnd.mission
         },
         unpicklable=False)
 

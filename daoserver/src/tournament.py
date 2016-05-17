@@ -216,12 +216,12 @@ class Tournament(object):
     def make_draw(self, round_id=1):
         """Determines the draw for round. This draw is written to the db"""
         rnd = self.get_round(round_id)
-        match_ups = self.matching_strategy.match(rnd.round_num, self.entries())
-        rnd.draw = self.table_strategy.determine_tables(match_ups)
+        match_ups = self.matching_strategy.match(rnd.ordering, self.entries())
+        draw = self.table_strategy.determine_tables(match_ups)
         try:
-            for match in rnd.draw:
+            for match in draw:
 
-                game = TournamentGame(rnd.get_dao().id, match.table_number)
+                game = TournamentGame(rnd.id, match.table_number)
                 entrants = [None if x == 'BYE' else x for x in match.entrants]
 
                 for entrant in entrants:
@@ -242,11 +242,14 @@ class Tournament(object):
             if 'duplicate key' not in str(err):
                 raise err
 
+        return draw
+
     @must_exist_in_db
     def get_round(self, round_num):
         """Get the relevant TournamentRound"""
         try:
-            return [x for x in self.rounds if x.round_num == int(round_num)][0]
+            rnd = [x for x in self.rounds if x.round_num == int(round_num)][0]
+            return rnd.get_dao()
         except IndexError:
             raise ValueError('Tournament {} does not have a round {}'.format(
                 self.tournament_id, round_num))
