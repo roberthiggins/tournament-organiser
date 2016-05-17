@@ -23,20 +23,3 @@ class TournamentRound(object):
             and_(DAO.tournament_name == self.tournament_id,
                  DAO.ordering == self.round_num)).\
             first()
-
-    def get_info(self):
-        """
-        Returns info about round.
-        Returns:
-            - dict with three keys {score_keys, draw, mission}
-        """
-        draw_info = [
-            {'table_number': t.table_number,
-             'entrants': [x if isinstance(x, str) else x.player_id \
-                          for x in t.entrants]
-            } for t in list(self.draw)]
-
-        return {
-            'draw': draw_info,
-            'mission': self.get_dao().mission
-        }

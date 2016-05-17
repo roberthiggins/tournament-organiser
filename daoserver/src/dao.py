@@ -394,8 +394,19 @@ def get_round_info(tournament_id, round_id):
     if rnd.draw is None:
         tourn.make_draw(round_id)
 
+    draw_info = [
+        {'table_number': t.table_number,
+         'entrants': [x if isinstance(x, str) else x.player_id \
+                      for x in t.entrants]
+        } for t in list(rnd.draw)]
+
     # We will return all round info for all requests regardless of method
-    return jsonpickle.encode(rnd.get_info(), unpicklable=False)
+    return jsonpickle.encode(
+        {
+            'draw': draw_info,
+            'mission': rnd.get_dao().mission
+        },
+        unpicklable=False)
 
 @APP.route('/setRounds', methods=['POST'])
 @enforce_request_variables('numRounds', 'tournamentId')
