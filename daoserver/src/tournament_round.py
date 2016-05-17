@@ -38,11 +38,5 @@ class TournamentRound(object):
 
         return {
             'draw': draw_info,
-            'mission': self.get_mission()
+            'mission': self.get_dao().mission
         }
-
-    def get_mission(self):
-        """Return the name of the mission"""
-        if self.get_dao() is not None and self.get_dao().mission:
-            return self.get_dao().mission
-        return 'TBA'

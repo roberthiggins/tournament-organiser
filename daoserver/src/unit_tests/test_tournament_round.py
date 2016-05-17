@@ -73,8 +73,8 @@ class SetRounds(TestCase):
 
         tourn = Tournament(name)
         tourn.set_number_of_rounds(4)
-        compare(tourn.get_round(1).get_mission(), 'mission_1')
-        compare(tourn.get_round(4).get_mission(), 'TBA')
+        compare(tourn.get_round(1).get_dao().mission, 'mission_1')
+        compare(tourn.get_round(4).get_dao().mission, 'TBA')
 
         compare(
             [x.mission for x in Tournament(name).get_dao().rounds],
