@@ -21,9 +21,11 @@ class UserPermissions(TestCase):
 
     def setUp(self):
         account_db.create_all()
-        self.acc_1 = 'test_add_account_admin'
-        self.accounts = [self.acc_1]
+        self.acc_1 = 'test_add_account_creator'
+        self.acc_2 = 'test_add_account_admin'
+        self.accounts = [self.acc_1, self.acc_2]
         self.tourn_1 = 'test_user_permissions_tournament_1'
+        self.tourn_2 = 'test_user_permissions_tournament_2'
 
     def tearDown(self):
         AccountProtectedObjectPermission.query.\
@@ -35,6 +37,7 @@ class UserPermissions(TestCase):
         Account.query.filter(Account.username.in_(self.accounts)).\
             delete(synchronize_session=False)
         TournamentDAO.query.filter_by(name=self.tourn_1).delete()
+        TournamentDAO.query.filter_by(name=self.tourn_2).delete()
         account_db.session.commit()
 
         account_db.session.remove()
@@ -62,10 +65,29 @@ class UserPermissions(TestCase):
                 else:
                     self.assertFalse(checker.is_organiser(user, tourn))
 
-    def test_check_permissions(self):
-        """Test the entrypoint method"""
+    def test_superuser(self):
+        """check if a user is an organiser"""
         checker = PermissionsChecker()
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1')
+        add_account(self.acc_2, 'foo@bar.com', 'pwd1')
+        Account.query.filter_by(username=self.acc_2).first().is_superuser = True
 
+        Tournament(self.tourn_1, creator=self.acc_1).add_to_db('2110-12-25')
+        Tournament(self.tourn_2).add_to_db('2110-12-25')
+        self.assertTrue(checker.check_permission(
+            'enter_score',
+            self.acc_2,
+            None,
+            self.tourn_1))
+        self.assertTrue(checker.check_permission(
+            'enter_score',
+            self.acc_2,
+            None,
+            self.tourn_2))
+
+    def test_check_permissions_bad_values(self):
+        """malformed values"""
+        checker = PermissionsChecker()
         self.assertRaises(
             ValueError, checker.check_permission, None, None, None, None)
         self.assertRaises(
@@ -80,31 +102,33 @@ class UserPermissions(TestCase):
             None,
             None,
             None))
-        self.assertTrue(checker.check_permission(
-            'enter_score',
-            'lex_luthor',
-            None,
-            'permission_test'))
-        self.assertTrue(checker.check_permission(
-            'enter_score',
-            'superman',
-            None,
-            'permission_test'))
+
+    def test_check_permissions(self):
+        """Test the entrypoint method"""
+        checker = PermissionsChecker()
+
+        # player for themselves
         self.assertTrue(checker.check_permission(
             'enter_score',
             'permission_test_player',
             'permission_test_player',
             'permission_test'))
+
+        # player for random user
         self.assertFalse(checker.check_permission(
             'enter_score',
             'permission_test_player',
             'charlie_murphy',
             'permission_test'))
+
+        # player who is not superuser
         self.assertFalse(checker.check_permission(
             'enter_score',
             'permission_test_player',
             None,
             'permission_test'))
+
+        # random user
         self.assertFalse(checker.check_permission(
             'enter_score',
             'charlie_murphy',

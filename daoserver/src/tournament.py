@@ -69,10 +69,11 @@ class Tournament(object):
         dao.date = date
         write_to_db(dao)
 
-        PermissionsChecker().add_permission(
-            self.creator_username,
-            PERMISSIONS['ENTER_SCORE'],
-            dao.protected_object)
+        if self.creator_username is not None:
+            PermissionsChecker().add_permission(
+                self.creator_username,
+                PERMISSIONS['ENTER_SCORE'],
+                dao.protected_object)
 
     def get_dao(self):
         """Convenience method to recover DAO"""
