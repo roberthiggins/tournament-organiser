@@ -7,10 +7,13 @@ from datetime import datetime, timedelta
 
 from models.account import Account
 from models.db_connection import db, write_to_db
+from models.permissions import AccountProtectedObjectPermission
 from models.registration import TournamentRegistration as TRegistration
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
 from models.tournament_round import TournamentRound
+
+from permissions import PermissionsChecker, PERMISSIONS
 
 class TournamentInjector(object):
     """Insert a tournament using the ORM. You can delete them as well"""
@@ -50,6 +53,9 @@ class TournamentInjector(object):
                 delete(synchronize_session=False)
 
             # Accounts
+            AccountProtectedObjectPermission.query.filter(
+                AccountProtectedObjectPermission.account_username.\
+                in_(self.accounts)).delete(synchronize_session=False)
             Account.query.filter(
                 Account.username.in_(tuple(self.accounts))).\
                 delete(synchronize_session=False)
@@ -81,6 +87,14 @@ class TournamentInjector(object):
         write_to_db(tourn)
         self.tournament_ids.add(tourn.id)
         self.tournament_names.add(tourn.name)
+
+        creator_name = '{}_creator'.format(tourn.name)
+        write_to_db(Account(creator_name, '{}@bar.com'.format(creator_name)))
+        self.accounts.add(creator_name)
+        PermissionsChecker().add_permission(
+            creator_name,
+            PERMISSIONS['ENTER_SCORE'],
+            tourn.protected_object)
 
     def create_players(self, tourn_name, num_players):
         """Create some accounts and enter them in the tournament"""
