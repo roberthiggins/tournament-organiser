@@ -22,13 +22,18 @@ class UserPermissions(TestCase):
     def setUp(self):
         account_db.create_all()
         self.acc_1 = 'test_add_account_admin'
+        self.accounts = [self.acc_1]
         self.tourn_1 = 'test_user_permissions_tournament_1'
 
     def tearDown(self):
         AccountProtectedObjectPermission.query.\
-            filter_by(account_username=self.acc_1).delete()
-        AccountSecurity.query.filter_by(id=self.acc_1).delete()
-        Account.query.filter_by(username=self.acc_1).delete()
+            filter(AccountProtectedObjectPermission.account_username.\
+                   in_(self.accounts)).delete(synchronize_session=False)
+        AccountSecurity.query.\
+            filter(AccountSecurity.id.in_(self.accounts)).\
+            delete(synchronize_session=False)
+        Account.query.filter(Account.username.in_(self.accounts)).\
+            delete(synchronize_session=False)
         TournamentDAO.query.filter_by(name=self.tourn_1).delete()
         account_db.session.commit()
 
