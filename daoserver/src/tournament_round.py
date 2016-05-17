@@ -7,7 +7,6 @@ a nice point of separation to reduce the complexity of a tournament.
 from sqlalchemy.sql.expression import and_
 
 from models.db_connection import write_to_db
-from models.score import db as score_db, RoundScore, ScoreKey
 from models.tournament_round import TournamentRound as DAO
 
 class TournamentRound(object):
@@ -39,14 +38,13 @@ class TournamentRound(object):
             } for t in list(self.draw)]
 
         return {
-            'score_keys': self.get_score_keys(),
             'draw': draw_info,
             'mission': self.get_mission()
         }
 
     def get_mission(self):
         """Return the name of the mission"""
-        if self.get_dao() is not None:
+        if self.get_dao() is not None and self.get_dao().mission:
             return self.get_dao().mission
         return 'TBA'
 
@@ -57,21 +55,3 @@ class TournamentRound(object):
         else:
             self.get_dao().mission = mission_name
             write_to_db(self.get_dao())
-
-    def get_score_keys(self):
-        """
-        Get all the score keys associated with this round
-        Returns a list of tuples:
-            (id, key, min, max, category_id, score_key_id, round_id)
-        """
-
-        results = score_db.session.query(ScoreKey, RoundScore).\
-            join(RoundScore).filter_by(round_id=self.round_num).all()
-
-        if len(results) == 0:
-            raise ValueError("Draw not ready. Mission not set. Contact TO")
-
-        return [
-            (x[0].id, x[0].key, x[0].score_category.min_val,
-             x[0].score_category.max_val, x[0].category, x[1].score_key_id,
-             x[1].round_id) for x in results]

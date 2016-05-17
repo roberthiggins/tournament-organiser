@@ -12,10 +12,9 @@ Feature: Get round info for display to the user
     Scenario: I get round info from the API
         When I GET "/roundInfo/ranking_test/1" from the API
         Then the response is JSON
-        Then the API response should contain "round_1_battle"
+        Then the API response should contain "draw"
         Then the API response should contain "mission_1"
-        Then the API response should not contain "round_2_battle"
-        Then the API response should not contain "sports"
+        Then the API response should not contain "mission_2"
 
     Scenario Outline: I send malformed data
         When I GET "/roundInfo/<tourn>/<round>" from the API
