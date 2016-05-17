@@ -7,7 +7,10 @@ from flask.ext.testing import TestCase
 from app import create_app
 from models.account import db as account_db, Account, AccountSecurity, \
 add_account
+from models.permissions import AccountProtectedObjectPermission
+from models.tournament import Tournament as TournamentDAO
 from permissions import PermissionsChecker
+from tournament import Tournament
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class UserPermissions(TestCase):
@@ -19,10 +22,14 @@ class UserPermissions(TestCase):
     def setUp(self):
         account_db.create_all()
         self.acc_1 = 'test_add_account_admin'
+        self.tourn_1 = 'test_user_permissions_tournament_1'
 
     def tearDown(self):
+        AccountProtectedObjectPermission.query.\
+            filter_by(account_username=self.acc_1).delete()
         AccountSecurity.query.filter_by(id=self.acc_1).delete()
         Account.query.filter_by(username=self.acc_1).delete()
+        TournamentDAO.query.filter_by(name=self.tourn_1).delete()
         account_db.session.commit()
 
         account_db.session.remove()
@@ -44,13 +51,17 @@ class UserPermissions(TestCase):
     def test_is_organiser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
-
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1')
+        Tournament(self.tourn_1, creator=self.acc_1).add_to_db('2110-12-25')
         options = [None, 'ranking_test', 'not_a_tournament', '', 'lisa', \
-            'not_a_person', 'superman', 'permission_test', 'lex_luthor']
+            'not_a_person', 'superman', 'permission_test', self.tourn_1, \
+            self.acc_1]
+
+        self.assertTrue(checker.is_organiser(self.acc_1, self.tourn_1))
 
         for user in options:
             for tourn in options:
-                if user == 'lex_luthor' and tourn == 'permission_test':
+                if user == self.acc_1 and tourn == self.tourn_1:
                     self.assertTrue(checker.is_organiser(user, tourn))
                 else:
                     self.assertFalse(checker.is_organiser(user, tourn))
