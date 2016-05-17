@@ -12,6 +12,8 @@ from models.tournament import Tournament as TournamentDAO
 from permissions import PermissionsChecker
 from tournament import Tournament
 
+from unit_tests.tournament_injector import TournamentInjector
+
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class UserPermissions(TestCase):
 
@@ -26,8 +28,10 @@ class UserPermissions(TestCase):
         self.accounts = [self.acc_1, self.acc_2]
         self.tourn_1 = 'test_user_permissions_tournament_1'
         self.tourn_2 = 'test_user_permissions_tournament_2'
+        self.injector = TournamentInjector()
 
     def tearDown(self):
+        self.injector.delete()
         AccountProtectedObjectPermission.query.\
             filter(AccountProtectedObjectPermission.account_username.\
                    in_(self.accounts)).delete(synchronize_session=False)
@@ -106,31 +110,34 @@ class UserPermissions(TestCase):
     def test_check_permissions(self):
         """Test the entrypoint method"""
         checker = PermissionsChecker()
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1') # random user
+        self.injector.inject(self.tourn_1, num_players=2)
+        t_player_1 = '{}_player_1'.format(self.tourn_1)
 
         # player for themselves
         self.assertTrue(checker.check_permission(
             'enter_score',
-            'permission_test_player',
-            'permission_test_player',
-            'permission_test'))
+            t_player_1,
+            t_player_1,
+            self.tourn_1))
 
         # player for random user
         self.assertFalse(checker.check_permission(
             'enter_score',
-            'permission_test_player',
-            'charlie_murphy',
-            'permission_test'))
+            t_player_1,
+            self.acc_1,
+            self.tourn_1))
 
         # player who is not superuser
         self.assertFalse(checker.check_permission(
             'enter_score',
-            'permission_test_player',
+            t_player_1,
             None,
-            'permission_test'))
+            self.tourn_1))
 
         # random user
         self.assertFalse(checker.check_permission(
             'enter_score',
-            'charlie_murphy',
+            self.acc_1,
             None,
-            'permission_test'))
+            self.tourn_1))
