@@ -373,7 +373,7 @@ def rank_entries(tournament_id):
         ],
         unpicklable=False)
 
-@APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET', 'POST'])
+@APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET'])
 @enforce_request_variables('score_keys', 'mission')
 # pylint: disable=E0602
 def get_round_info(tournament_id, round_id):
@@ -387,9 +387,6 @@ def get_round_info(tournament_id, round_id):
     """
     tourn = Tournament(tournament_id)
     rnd = tourn.get_round(round_id)
-
-    if request.method == 'POST':
-        rnd.set_mission(mission)
 
     if rnd.draw is None:
         tourn.make_draw(round_id)
