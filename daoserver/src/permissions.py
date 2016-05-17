@@ -90,16 +90,3 @@ class PermissionsChecker(object):
             WHERE tournament_name = %s AND username = %s",
             [tournament, user])
         return cur.fetchone()[0]
-
-    @db_conn()
-    def is_game_player(self, user, game_id):
-        """user is a player in game."""
-
-        try:
-            cur.execute(
-                "SELECT count(*) > 0 FROM game_permissions \
-                WHERE game_id = %s AND username = %s",
-                [game_id, user])
-            return cur.fetchone()[0]
-        except ValueError:
-            return False

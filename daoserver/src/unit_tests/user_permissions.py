@@ -39,15 +39,6 @@ class UserPermissions(TestCase):
         self.assertFalse(Account.query.\
             filter_by(username=self.acc_1).first().is_superuser)
 
-    def test_is_player(self):
-        """users can be a player by being involved in a game"""
-        checker = PermissionsChecker()
-
-        self.assertTrue(checker.is_game_player('lisa', 1))
-        self.assertFalse(checker.is_game_player('lisa', 12))
-        self.assertFalse(checker.is_game_player('superman', 1))
-        self.assertFalse(checker.is_game_player('homer', 1))
-
     def test_is_organiser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
