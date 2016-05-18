@@ -44,3 +44,11 @@ CREATE TABLE game_score (
     PRIMARY KEY (entry_id, game_id, score_id)
 );
 COMMENT ON TABLE game_score IS 'A score for a single game';
+
+CREATE TABLE tournament_score (
+    entry_id            INTEGER REFERENCES entry(id),
+    tournament_id       INTEGER REFERENCES tournament(id),
+    score_id            INTEGER REFERENCES score(id),
+    PRIMARY KEY (entry_id, tournament_id, score_id)
+);
+COMMENT ON TABLE tournament_score IS 'A one-off score for a tournament';

@@ -189,3 +189,31 @@ class GameScore(db.Model):
             self.entry_id,
             self.game_id,
             self.score_id)
+
+class TournamentScore(db.Model):
+    """A one-off score for a tournament"""
+    __tablename__ = 'tournament_score'
+    entry_id = db.Column(db.Integer, db.ForeignKey(TournamentEntry.id),
+                         primary_key=True)
+    tournament_id = db.Column(db.Integer, db.ForeignKey(Tournament.id),
+                              primary_key=True)
+    score_id = db.Column(db.Integer, db.ForeignKey(Score.id),
+                         primary_key=True)
+
+
+    entry = db.relationship(TournamentEntry, \
+        backref=db.backref('tournament_scores', lazy='dynamic'))
+    tournament = db.relationship(Tournament, \
+        backref=db.backref('tournament_scores', lazy='dynamic'))
+    score = db.relationship(Score)
+
+    def __init__(self, entry_id, tournament_id, score_id):
+        self.entry_id = entry_id
+        self.tournament_id = tournament_id
+        self.score_id = score_id
+
+    def __repr__(self):
+        return '<TournamentScore (entry: {}, tournament: {}, score:{})>'.format(
+            self.entry_id,
+            self.tournament_id,
+            self.score_id)
