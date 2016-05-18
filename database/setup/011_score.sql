@@ -36,3 +36,11 @@ CREATE TABLE round_score(
     score_key_id        INTEGER REFERENCES score_key(id),
     round_id            INTEGER REFERENCES tournament_round(id)
 );
+
+CREATE TABLE game_score (
+    entry_id    INTEGER REFERENCES entry(id),
+    game_id     INTEGER REFERENCES game(id),
+    score_id    INTEGER REFERENCES score(id),
+    PRIMARY KEY (entry_id, game_id, score_id)
+);
+COMMENT ON TABLE game_score IS 'A score for a single game';

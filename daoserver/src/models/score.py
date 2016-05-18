@@ -16,6 +16,7 @@ from sqlalchemy.sql.expression import and_
 from models.db_connection import db
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
+from models.tournament_game import TournamentGame
 from models.tournament_round import TournamentRound
 
 class ScoreCategory(db.Model):
@@ -160,3 +161,31 @@ class Score(db.Model):
             self.entry_id,
             self.score_key_id,
             self.value)
+
+class GameScore(db.Model):
+    """A Score entered in a game"""
+    __tablename__ = 'game_score'
+    entry_id = db.Column(db.Integer, db.ForeignKey(TournamentEntry.id),
+                         primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey(TournamentGame.id),
+                        primary_key=True)
+    score_id = db.Column(db.Integer, db.ForeignKey(Score.id),
+                         primary_key=True)
+
+
+    entry = db.relationship(TournamentEntry,
+                            backref=db.backref('game_scores', lazy='dynamic'))
+    game = db.relationship(TournamentGame,
+                           backref=db.backref('game_scores', lazy='dynamic'))
+    score = db.relationship(Score)
+
+    def __init__(self, entry_id, game_id, score_id):
+        self.entry_id = entry_id
+        self.game_id = game_id
+        self.score_id = score_id
+
+    def __repr__(self):
+        return '<GameScore (entry: {}, game: {}, score:{})>'.format(
+            self.entry_id,
+            self.game_id,
+            self.score_id)
