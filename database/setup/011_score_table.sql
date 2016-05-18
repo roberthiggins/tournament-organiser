@@ -14,3 +14,8 @@ CREATE TABLE score (
     PRIMARY KEY (entry_id, score_key_id)
 );
 COMMENT ON TABLE score IS 'An entry will have lots of scores.';
+
+CREATE TABLE round_score(
+    score_key_id        INTEGER REFERENCES score_key(id),
+    round_id            INTEGER REFERENCES tournament_round(id)
+);

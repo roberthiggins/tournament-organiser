@@ -9,8 +9,3 @@ CREATE TABLE tournament_round(
     PRIMARY KEY(tournament_name, ordering)
 );
 COMMENT ON TABLE tournament_round IS 'The higher the order number the later the round.';
-
-CREATE TABLE round_score(
-    score_key_id        INTEGER REFERENCES score_key(id),
-    round_id            INTEGER REFERENCES tournament_round(id)
-);
