@@ -190,6 +190,16 @@ class Tournament(object):
         return entries
 
     @must_exist_in_db
+    def get_game_dao(self, round_num, table_num):
+        """
+        Get game_dao given table_num and round_num
+        """
+        return TournamentGame.query.join(TR).filter(
+            and_(TR.ordering == round_num,
+                 TournamentGame.table_num == table_num)).first()
+
+
+    @must_exist_in_db
     def list_score_categories(self):
         """
         List all the score categories available to this tournie and their
