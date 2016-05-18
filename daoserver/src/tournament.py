@@ -208,6 +208,27 @@ class Tournament(object):
                     format(score, game_id))
             raise err
 
+    @staticmethod
+    def is_score_entered(game_dao):
+        """
+        Determine if all the scores have been entered for this game.
+        Not that, if false, the result will be double checked and possibly
+        updated
+        """
+        if game_dao is not None and game_dao.score_entered:
+            return True
+
+        per_round_scores = game_dao.tournament_round.tournament.\
+            score_categories.filter_by(per_tournament=False).all()
+        scores_expected = len(per_round_scores) * len(game_dao.entrants.all())
+
+        if len(game_dao.game_scores.all()) == scores_expected:
+            game_dao.score_entered = True
+            write_to_db(game_dao)
+            return True
+
+        return False
+
     @must_exist_in_db
     def entries(self):
         """Get a list of Entry"""

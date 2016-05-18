@@ -8,7 +8,6 @@ from testfixtures import compare
 
 from app import create_app
 from db_connections.db_connection import db_conn
-from game import Game
 from models.db_connection import db, write_to_db
 from models.game_entry import GameEntrant
 from models.score import ScoreCategory, ScoreKey, TournamentScore, GameScore, \
@@ -44,7 +43,7 @@ class ScoreEnteringTests(TestCase):
         self.assertTrue(game is not None)
 
         game = self.get_game_by_round(5, 1)
-        entrants = game.get_dao().entrants.all()
+        entrants = game.entrants.all()
         self.assertTrue(entrants[0].entrant_id is not None)
         self.assertTrue(entrants[1].entrant_id is not None)
         self.assertTrue(entrants[0].entrant_id == 5 \
@@ -55,7 +54,7 @@ class ScoreEnteringTests(TestCase):
 
         # A player in a bye
         game = self.get_game_by_round(4, 1)
-        entrants = game.get_dao().entrants.all()
+        entrants = game.entrants.all()
         self.assertTrue(entrants[0].entrant_id == 4)
         self.assertTrue(len(entrants) == 1)
 
@@ -72,52 +71,35 @@ class ScoreEnteringTests(TestCase):
 
         # A completed game
         game = self.get_game_by_round(5, 1)
-        entrants = game.get_dao().entrants.all()
+        entrants = game.entrants.all()
         compare(entrants[0].entrant_id, 3)
         compare(entrants[1].entrant_id, 5)
-        self.assertTrue(game.is_score_entered())
+        self.assertTrue(Tournament.is_score_entered(game))
 
         # a bye should be false
         # TODO resolve Bye Scoring
         game = self.get_game_by_round(4, 1)
-        entrants = game.get_dao().entrants.all()
+        entrants = game.entrants.all()
         compare(entrants[0].entrant_id, 4)
-        self.assertFalse(game.is_score_entered())
+        self.assertFalse(Tournament.is_score_entered(game))
 
         # Ensure the rd2 game bart vs. maggie is listed as not scored. This
         # will force a full check. Maggie's score hasn't been entered.
         cur.execute("UPDATE game SET score_entered = False WHERE id = 5")
         game = self.get_game_by_round(5, 2)
 
-        entrants = game.get_dao().entrants.all()
+        entrants = game.entrants.all()
         compare(entrants[0].entrant_id, 6)
         compare(entrants[1].entrant_id, 5)
-        self.assertFalse(game.is_score_entered())
+        self.assertFalse(Tournament.is_score_entered(game))
 
         # Enter the final score for maggie
-        dao = game.get_dao()
-        Tournament('ranking_test').enter_score(6, 'round_2_battle', 2, dao.id)
+        Tournament('ranking_test').enter_score(6, 'round_2_battle', 2, game.id)
         conn.commit()
-        self.assertFalse(game.is_score_entered())
-        Tournament('ranking_test').enter_score(6, 'round_2_sports', 5, dao.id)
+        self.assertFalse(Tournament.is_score_entered(game))
+        Tournament('ranking_test').enter_score(6, 'round_2_sports', 5, game.id)
         conn.commit()
-        self.assertTrue(game.is_score_entered())
-
-    def test_list_scores_for_game(self):
-        """
-        Games have a scores_entered which should return all the scores entered
-        for by each entrant.
-        """
-        # Bye
-        game = self.get_game_by_round(4, 1)
-        compare(game.scores_entered(), [])
-
-        # Regular, completed game
-        game = self.get_game_by_round(2, 1)
-        compare(
-            game.scores_entered(),
-            [(6, 'round_1_battle', 0), (2, 'round_1_battle', 20),
-             (6, 'round_1_sports', 5), (2, 'round_1_sports', 1)])
+        self.assertTrue(Tournament.is_score_entered(game))
 
     @staticmethod
     def get_game_by_round(entry_id, round_num):
@@ -132,14 +114,10 @@ class ScoreEnteringTests(TestCase):
 
         if round_dao is None:
             return None
-        game_dao = TournamentGame.query.join(GameEntrant).\
+        return TournamentGame.query.join(GameEntrant).\
             join(TournamentEntry).filter(
                 and_(TournamentGame.tournament_round_id == round_dao.id,
                      TournamentEntry.id == entry_id)).first()
-
-        if game_dao is None:
-            return None
-        return Game(game_id=game_dao.id)
 
 class EnterScore(TestCase):
 
