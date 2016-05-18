@@ -17,6 +17,7 @@ from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 from models.tournament_round import TournamentRound
 
+from tournament import Tournament
 from unit_tests.tournament_injector import TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
@@ -163,52 +164,70 @@ class EnterScore(TestCase):
         self.injector.inject(self.tournament_1, rounds=5)
         db.session.add(TournamentRound(self.tournament_1, 1, 'foo_mission_1'))
         self.injector.add_player(self.tournament_1, self.player)
+        self.category_1 = ScoreCategory(self.tournament_1, 'nonsense', 50,
+                                        False, 0, 100)
+        write_to_db(self.category_1)
+        self.key_1 = ScoreKey('test_enter_score_key', self.category_1.id)
+        write_to_db(self.key_1)
 
     def tearDown(self):
         self.injector.delete()
         db.session.remove()
 
-    def test_enter_score(self):
-        """
-        Enter a score for an entry
-        """
-        cat = ScoreCategory(self.tournament_1, 'nonsense', 50, False, 0, 100)
-        write_to_db(cat)
-        key = ScoreKey('test_enter_score_key', cat.id)
-        db.session.add(key)
-
+    def test_enter_score_bad_values(self):
+        """These should all fail for one reason or another"""
         entry = TournamentEntry.query.filter_by(
             player_id=self.player, tournament_id=self.tournament_1).first()
 
-        from tournament import Tournament
+        # bad entry
+        self.assertRaises(
+            AttributeError,
+            Tournament(self.tournament_1).enter_score,
+            10000000,
+            self.key_1.key,
+            5)
+        # bad key
         self.assertRaises(
             TypeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
             'not_a_key',
             5)
+        # bad score - low
         self.assertRaises(
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            key.key,
+            self.key_1.key,
             -1)
+        # bad score - high
         self.assertRaises(
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            key.key,
-            'a')
-        self.assertRaises(
-            ValueError,
-            Tournament(self.tournament_1).enter_score,
-            entry.id,
-            key.key,
+            self.key_1.key,
             101)
-        Tournament(self.tournament_1).enter_score(entry.id, key.key, 0)
+        # bad score - character
         self.assertRaises(
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            key.key,
+            self.key_1.key,
+            'a')
+
+    def test_enter_score(self):
+        """
+        Enter a score for an entry
+        """
+        entry = TournamentEntry.query.filter_by(
+            player_id=self.player, tournament_id=self.tournament_1).first()
+
+        Tournament(self.tournament_1).enter_score(entry.id, self.key_1.key, 0)
+
+        # score already entered
+        self.assertRaises(
+            ValueError,
+            Tournament(self.tournament_1).enter_score,
+            entry.id,
+            self.key_1.key,
             100)

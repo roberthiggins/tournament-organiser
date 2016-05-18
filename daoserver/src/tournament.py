@@ -164,9 +164,13 @@ class Tournament(object):
 
         try:
             write_to_db(Score(entry_id, key.id, score))
-        except IntegrityError:
-            raise ValueError(
-                '{} not entered. Score is already set'.format(score))
+        except IntegrityError as err:
+            if 'already exists' in err.__repr__():
+                raise ValueError(
+                    '{} not entered. Score is already set'.format(score))
+            elif 'is not present in table "entry"' in err.__repr__():
+                raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
+                    format(score, entry_id))
 
     @must_exist_in_db
     def entries(self):
