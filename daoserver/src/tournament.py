@@ -15,10 +15,10 @@ from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
+from models.tournament_round import TournamentRound as TR
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy
-from tournament_round import TournamentRound
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
@@ -45,11 +45,6 @@ class Tournament(object):
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
         self.creator_username = creator
-        if self.exists_in_db:
-            self.rounds = [TournamentRound(self.tournament_id, rnd) \
-                for rnd in range(1, self.get_dao().num_rounds + 1)]
-        else:
-            self.rounds = []
 
     def add_to_db(self, date):
         """
@@ -247,12 +242,11 @@ class Tournament(object):
     @must_exist_in_db
     def get_round(self, round_num):
         """Get the relevant TournamentRound"""
-        try:
-            rnd = [x for x in self.rounds if x.round_num == int(round_num)][0]
-            return rnd.get_dao()
-        except IndexError:
+        if int(round_num) not in range(1, self.get_dao().num_rounds + 1):
             raise ValueError('Tournament {} does not have a round {}'.format(
                 self.tournament_id, round_num))
+
+        return self.get_dao().rounds.filter_by(ordering=round_num).first()
 
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
@@ -261,7 +255,6 @@ class Tournament(object):
         tourn.num_rounds = int(num_rounds)
         write_to_db(tourn)
 
-        from models.tournament_round import TournamentRound as TR
         for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
             rnd.round_scores.delete()
             rnd.games.delete()
@@ -273,9 +266,6 @@ class Tournament(object):
         for rnd in range(existing_rnds + 1, tourn.num_rounds + 1):
             db.session.add(TR(self.tournament_id, rnd))
         db.session.commit()
-
-        self.rounds = [TournamentRound(self.tournament_id, rnd) \
-            for rnd in range(1, tourn.num_rounds + 1)]
 
 # pylint: disable=too-many-arguments
 class ScoreCategoryPair(object):
