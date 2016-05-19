@@ -16,7 +16,8 @@ class TournamentGame(db.Model):
     id = db.Column(db.Integer, db.Sequence('game_id_seq'), unique=True)
     tournament_round_id = db.Column(db.Integer,
                                     db.ForeignKey(TournamentRound.id,
-                                                  ondelete='CASCADE'))
+                                                  ondelete='CASCADE'),
+                                    primary_key=True)
     table_num = db.Column(db.Integer, primary_key=True)
     protected_object_id = db.Column(db.Integer,
                                     db.ForeignKey(ProtectedObject.id))

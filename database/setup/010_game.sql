@@ -1,9 +1,10 @@
 create table game(
-    id                  serial unique PRIMARY KEY,
+    id                  serial unique,
     tournament_round_id integer NOT NULL references tournament_round(id),
     table_num           integer,
     protected_object_id integer references protected_object(id),
-    score_entered       boolean DEFAULT False
+    score_entered       boolean DEFAULT False,
+    PRIMARY KEY (tournament_round_id, table_num)
 );
 
 CREATE TABLE game_entrant(

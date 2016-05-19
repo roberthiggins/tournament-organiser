@@ -10,6 +10,7 @@ from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
 from models.db_connection import write_to_db
+from models.game_entry import GameEntrant
 from models.score import db as score_db, Score, ScoreCategory, ScoreKey
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
@@ -227,30 +228,33 @@ class Tournament(object):
         rnd = self.get_round(round_id)
         match_ups = self.matching_strategy.match(rnd.ordering, self.entries())
         draw = self.table_strategy.determine_tables(match_ups)
-        try:
-            for match in draw:
+        for match in draw:
 
+            entrants = [None if x == 'BYE' else x for x in match.entrants]
+
+            game = TournamentGame.query.filter_by(
+                tournament_round_id=rnd.id,
+                table_num=match.table_number).first()
+            if game is None:
                 game = TournamentGame(rnd.id, match.table_number)
-                entrants = [None if x == 'BYE' else x for x in match.entrants]
                 write_to_db(game)
 
-                for entrant in entrants:
-                    if entrant is not None:
-                        dao = TournamentEntry.query.\
-                            filter_by(id=entrant.id).first()
+            for entrant in entrants:
+                if entrant is not None:
+                    dao = TournamentEntry.query.\
+                        filter_by(id=entrant.id).first()
+                    game_entrant = GameEntrant.query.filter_by(
+                        game_id=game.id, entrant_id=dao.id).first()
+                    if game_entrant is None:
                         write_to_db(GameEntrant(game.id, dao.id))
                         PermissionsChecker().add_permission(
                             dao.player_id,
                             PERMISSIONS['ENTER_SCORE'],
                             game.protected_object)
-                    else:
-                        # The person playing the bye gets no points at the time
-                        game.score_entered = True
-                        write_to_db(game)
-
-        except IntegrityError as err:
-            if 'duplicate key' not in str(err):
-                raise err
+                else:
+                    # The person playing the bye gets no points at the time
+                    game.score_entered = True
+                    write_to_db(game)
 
         return draw
 
