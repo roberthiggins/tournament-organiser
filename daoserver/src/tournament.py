@@ -9,9 +9,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
-from models.db_connection import write_to_db
+from models.db_connection import db, write_to_db
 from models.game_entry import GameEntrant
-from models.score import db as score_db, Score, ScoreCategory, ScoreKey
+from models.score import Score, ScoreCategory, ScoreKey
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
@@ -148,7 +148,7 @@ class Tournament(object):
             there is an issue inserting the score.
         """
         # score_key should mean something in the context of the tournie
-        key = score_db.session.query(ScoreKey).join(ScoreCategory).\
+        key = db.session.query(ScoreKey).join(ScoreCategory).\
             filter(and_(ScoreCategory.tournament_id == self.get_dao().name,
                         ScoreKey.key == score_key)
                   ).first()
@@ -280,7 +280,6 @@ class Tournament(object):
                 GameEntrant.query.filter_by(game_id=game.id).delete()
             rnd.games.delete()
         tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
-        from models.db_connection import db
         db.session.commit()
 
         existing_rnds = len(tourn.rounds.filter().all())
