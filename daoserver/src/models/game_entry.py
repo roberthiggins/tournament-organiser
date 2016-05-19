@@ -22,9 +22,9 @@ class GameEntrant(db.Model):
                            backref=db.backref('entrants', lazy='dynamic'))
     entrant = db.relationship(TournamentEntry)
 
-    def __init__(self, game, entrant):
-        self.game = game
-        self.entrant = entrant
+    def __init__(self, game_id, entrant_id):
+        self.game_id = game_id
+        self.entrant_id = entrant_id
 
     def __repr__(self):
-        return '<GameEntrant {}, {}>'.format(self.game.id, self.entrant.id)
+        return '<GameEntrant {}, {}>'.format(self.game_id, self.entrant_id)
