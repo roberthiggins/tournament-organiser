@@ -20,7 +20,8 @@ class GameEntrant(db.Model):
 
     game = db.relationship(TournamentGame,
                            backref=db.backref('entrants', lazy='dynamic'))
-    entrant = db.relationship(TournamentEntry)
+    entrant = db.relationship(TournamentEntry, \
+        backref=db.backref('game_entries', lazy='dynamic'))
 
     def __init__(self, game_id, entrant_id):
         self.game_id = game_id
