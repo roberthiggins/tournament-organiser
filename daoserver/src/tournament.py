@@ -232,20 +232,21 @@ class Tournament(object):
 
                 game = TournamentGame(rnd.id, match.table_number)
                 entrants = [None if x == 'BYE' else x for x in match.entrants]
+                write_to_db(game)
 
                 for entrant in entrants:
                     if entrant is not None:
-                        uname = TournamentEntry.query.\
-                            filter_by(id=entrant.id).first().player_id
+                        dao = TournamentEntry.query.\
+                            filter_by(id=entrant.id).first()
+                        write_to_db(GameEntrant(game.id, dao.id))
                         PermissionsChecker().add_permission(
-                            uname,
+                            dao.player_id,
                             PERMISSIONS['ENTER_SCORE'],
                             game.protected_object)
                     else:
                         # The person playing the bye gets no points at the time
                         game.score_entered = True
-
-                write_to_db(game)
+                        write_to_db(game)
 
         except IntegrityError as err:
             if 'duplicate key' not in str(err):
@@ -271,6 +272,8 @@ class Tournament(object):
 
         for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
             rnd.round_scores.delete()
+            for game in rnd.games:
+                GameEntrant.query.filter_by(game_id=game.id).delete()
             rnd.games.delete()
         tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
         from models.db_connection import db
