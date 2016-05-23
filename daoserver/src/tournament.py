@@ -153,6 +153,7 @@ class Tournament(object):
                         ScoreKey.key == score_key)
                   ).first()
 
+        # Validate the score
         try:
             score = int(score)
             if score < key.score_category.min_val or \
@@ -163,16 +164,24 @@ class Tournament(object):
         except AttributeError:
             raise TypeError('Unknown category: {}'.format(score_key))
 
+        # Has it already been entered?
+        existing_score = TournamentScore.query.join(Score).join(ScoreKey).\
+            filter(and_(TournamentScore.entry_id == entry_id,
+                        TournamentScore.tournament_id == self.get_dao().id,
+                        ScoreKey.id == key.id)).first()
+        if existing_score is not None:
+            raise ValueError(
+                '{} not entered. Score is already set'.format(score))
+
         try:
             score_dao = Score(entry_id, key.id, score)
-            write_to_db(score_dao)
-            write_to_db(
+            db.session.add(score_dao)
+            db.session.add(
                 TournamentScore(entry_id, self.get_dao().id, score_dao.id))
+            db.session.commit()
         except IntegrityError as err:
-            if 'already exists' in err.__repr__():
-                raise ValueError(
-                    '{} not entered. Score is already set'.format(score))
-            elif 'is not present in table "entry"' in err.__repr__():
+            db.session.rollback()
+            if 'is not present in table "entry"' in err.__repr__():
                 raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
                     format(score, entry_id))
 
