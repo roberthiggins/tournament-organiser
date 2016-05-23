@@ -79,6 +79,10 @@ class TournamentInjector(object):
         write_to_db(TournamentEntry(username, tournament_name))
         self.accounts.add(username)
 
+    def add_round(self, tourn_name, round_num, mission):
+        """Add a TournamentRound. Caller's job to ensure clash avoidance"""
+        write_to_db(TournamentRound(tourn_name, int(round_num), mission))
+
     def create_tournament(self, name, date, rounds=0):
         """Create a tournament"""
         tourn = Tournament(name)
