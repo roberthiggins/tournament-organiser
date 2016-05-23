@@ -41,6 +41,8 @@ class TournamentInjector(object):
 
         self.delete_scores()
 
+        self.delete_games()
+
         # Some relations can't be deleted via relationship for some reason
         if len(self.accounts) > 0:
             # registrations and entries
@@ -107,6 +109,25 @@ class TournamentInjector(object):
             write_to_db(Account(player_name, '{}@test.com'.format(player_name)))
             write_to_db(TournamentEntry(player_name, tourn_name))
             self.accounts.add(player_name)
+
+    def delete_games(self):
+        """
+        Delete games and their entrants.
+        Scores need to be deleted before calling.
+        """
+        for tourn in Tournament.query.filter(Tournament.id.in_(
+                tuple(self.tournament_ids))).all():
+
+            # remove all the game entrants.
+            tourn_entries = TournamentEntry.query.filter(
+                TournamentEntry.tournament_id.\
+                in_(tuple(self.tournament_names))).all()
+            for ent in tourn_entries:
+                ent.game_entries.delete(synchronize_session=False)
+
+            # Now the games
+            for rnd in tourn.rounds:
+                rnd.games.delete()
 
     def delete_scores(self):
         """Delete all scores for all tournaments injected"""
