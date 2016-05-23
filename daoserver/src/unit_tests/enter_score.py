@@ -11,7 +11,7 @@ from db_connections.db_connection import db_conn
 from game import Game
 from models.db_connection import db, write_to_db
 from models.game_entry import GameEntrant
-from models.score import ScoreCategory, ScoreKey
+from models.score import ScoreCategory, ScoreKey, TournamentScore
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 from models.tournament_round import TournamentRound
@@ -216,8 +216,14 @@ class EnterScore(TestCase):
         """
         entry = TournamentEntry.query.filter_by(
             player_id=self.player, tournament_id=self.tournament_1).first()
+        tourn = Tournament(self.tournament_1)
 
-        Tournament(self.tournament_1).enter_score(entry.id, self.key_1.key, 0)
+        # a one-off score
+        tourn.enter_score(entry.id, self.key_1.key, 0)
+        scores = TournamentScore.query.\
+            filter_by(entry_id=entry.id, tournament_id=tourn.get_dao().id).all()
+        compare(len(scores), 1)
+        compare(scores[0].score.value, 0)
 
         # score already entered
         self.assertRaises(

@@ -11,7 +11,7 @@ from sqlalchemy.sql.expression import and_
 from matching_strategy import RoundRobin
 from models.db_connection import db, write_to_db
 from models.game_entry import GameEntrant
-from models.score import Score, ScoreCategory, ScoreKey
+from models.score import Score, ScoreCategory, ScoreKey, TournamentScore
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
@@ -164,7 +164,10 @@ class Tournament(object):
             raise TypeError('Unknown category: {}'.format(score_key))
 
         try:
-            write_to_db(Score(entry_id, key.id, score))
+            score_dao = Score(entry_id, key.id, score)
+            write_to_db(score_dao)
+            write_to_db(
+                TournamentScore(entry_id, self.get_dao().id, score_dao.id))
         except IntegrityError as err:
             if 'already exists' in err.__repr__():
                 raise ValueError(

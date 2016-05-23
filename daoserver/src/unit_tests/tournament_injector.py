@@ -116,6 +116,8 @@ class TournamentInjector(object):
             for rnd in tourn.rounds:
                 rnd.round_scores.delete()
 
+            tourn.tournament_scores.delete()
+
             for cat in tourn.score_categories:
                 for key in cat.score_keys:
                     key.scores.delete()
