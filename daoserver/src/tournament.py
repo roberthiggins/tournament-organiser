@@ -5,13 +5,14 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
 from models.db_connection import db, write_to_db
 from models.game_entry import GameEntrant
-from models.score import Score, ScoreCategory, ScoreKey, TournamentScore
+from models.score import Score, ScoreCategory, ScoreKey, TournamentScore, \
+GameScore
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
@@ -135,7 +136,7 @@ class Tournament(object):
         }
 
     @must_exist_in_db
-    def enter_score(self, entry_id, score_key, score):
+    def enter_score(self, entry_id, score_key, score, game_id=None):
         """
         Enters a score for category into tournament for player.
 
@@ -165,25 +166,47 @@ class Tournament(object):
             raise TypeError('Unknown category: {}'.format(score_key))
 
         # Has it already been entered?
-        existing_score = TournamentScore.query.join(Score).join(ScoreKey).\
-            filter(and_(TournamentScore.entry_id == entry_id,
-                        TournamentScore.tournament_id == self.get_dao().id,
-                        ScoreKey.id == key.id)).first()
-        if existing_score is not None:
+        if game_id is None:
+            existing_score = TournamentScore.query.join(Score).join(ScoreKey).\
+                filter(and_(TournamentScore.entry_id == entry_id,
+                            TournamentScore.tournament_id == self.get_dao().id,
+                            ScoreKey.id == key.id)).first() is not None
+        else:
+            try:
+                existing_score = GameScore.query.join(Score).\
+                    filter(and_(GameScore.entry_id == entry_id, \
+                                GameScore.game_id == game_id,
+                                Score.score_key_id == key.id)).\
+                    first() is not None
+            except DataError:
+                db.session.rollback()
+                raise AttributeError('{} not entered. Game {} cannot be found'.\
+                    format(score, game_id))
+
+        if existing_score:
             raise ValueError(
                 '{} not entered. Score is already set'.format(score))
 
         try:
             score_dao = Score(entry_id, key.id, score)
             db.session.add(score_dao)
-            db.session.add(
-                TournamentScore(entry_id, self.get_dao().id, score_dao.id))
+            db.session.flush()
+
+            if game_id is not None:
+                db.session.add(GameScore(entry_id, game_id, score_dao.id))
+            else:
+                db.session.add(
+                    TournamentScore(entry_id, self.get_dao().id, score_dao.id))
             db.session.commit()
         except IntegrityError as err:
             db.session.rollback()
             if 'is not present in table "entry"' in err.__repr__():
                 raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
                     format(score, entry_id))
+            elif 'is not present in table "game"' in err.__repr__():
+                raise AttributeError('{} not entered. Game {} cannot be found'.\
+                    format(score, game_id))
+            raise err
 
     @must_exist_in_db
     def entries(self):

@@ -186,7 +186,7 @@ class GameScore(db.Model):
         self.score_id = score_id
 
     def __repr__(self):
-        return '<GameScore (entry: {}, game: {}, score:{})>'.format(
+        return '<GameScore (entry: {}, game: {}, score_id:{})>'.format(
             self.entry_id,
             self.game_id,
             self.score_id)
