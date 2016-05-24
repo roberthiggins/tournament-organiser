@@ -11,7 +11,8 @@ from db_connections.db_connection import db_conn
 from game import Game
 from models.db_connection import db, write_to_db
 from models.game_entry import GameEntrant
-from models.score import ScoreCategory, ScoreKey, TournamentScore
+from models.score import ScoreCategory, ScoreKey, TournamentScore, GameScore, \
+Score
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 from models.tournament_round import TournamentRound
@@ -232,3 +233,15 @@ class EnterScore(TestCase):
             entry.id,
             self.key_1.key,
             100)
+
+    def test_enter_score_cleanup(self):
+        """make sure no scores are added accidentally"""
+        game_scores = len(GameScore.query.all())
+        tournament_scores = len(TournamentScore.query.all())
+        scores = len(Score.query.all())
+
+        self.test_enter_score_bad_values()
+
+        compare(game_scores, len(GameScore.query.all()))
+        compare(tournament_scores, len(TournamentScore.query.all()))
+        compare(scores, len(Score.query.all()))
