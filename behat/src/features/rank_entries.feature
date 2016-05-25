@@ -22,8 +22,8 @@ Feature: Rank Entries Based on Scores
         Then the response status code should be 200
         Then I should see "homer"
         Then I should see "marge"
-        Then I should see "80.75"
-        Then I should see "21.25"
+        Then I should see "84.75"
+        Then I should see "10.00"
 
     Scenario: I get rankings for a tournament that doesn't exist
         Given I am on "rankings/foo"
@@ -39,8 +39,8 @@ Feature: Rank Entries Based on Scores
         Then the response is JSON
         Then the API response should contain "homer"
         Then the API response should contain "marge"
-        Then the API response should contain "80.75"
-        Then the API response should contain "21.25"
+        Then the API response should contain "84.75"
+        Then the API response should contain "10.00"
 
     Scenario: I get rankings for a tournament that doesn't exist
         Given I GET "/rankEntries/foo" from the API

@@ -123,4 +123,4 @@ Feature: Enter a score for a player
         Then I press "Enter Score"
         Then the response status code should be 200
         Then I should not see "Permission denied"
-        Then I should see "1 not entered. Score is already set"
+        Then I should see "Score entered for lisa: 1"

@@ -95,7 +95,11 @@ class ScoreEnteringTests(TestCase):
         self.assertFalse(game.is_score_entered())
 
         # Enter the final score for maggie
-        cur.execute("INSERT INTO score VALUES(DEFAULT, 6, 4, 2)")
+        dao = game.get_dao()
+        Tournament('ranking_test').enter_score(6, 'round_2_battle', 2, dao.id)
+        conn.commit()
+        self.assertFalse(game.is_score_entered())
+        Tournament('ranking_test').enter_score(6, 'round_2_sports', 5, dao.id)
         conn.commit()
         self.assertTrue(game.is_score_entered())
 
@@ -106,22 +110,14 @@ class ScoreEnteringTests(TestCase):
         """
         # Bye
         game = self.get_game_by_round(4, 1)
-        compare(
-            game.scores_entered(),
-            [(4, 'round_1_battle', None), (4, 'sports', 5)])
+        compare(game.scores_entered(), [])
 
         # Regular, completed game
         game = self.get_game_by_round(2, 1)
         compare(
             game.scores_entered(),
             [(6, 'round_1_battle', 0), (2, 'round_1_battle', 20),
-             (6, 'sports', 5), (2, 'sports', 1)])
-
-        # Game partially filled in
-        game = self.get_game_by_round(5, 2)
-        compare(
-            game.scores_entered(),
-            [(5, 'round_2_battle', 5)])
+             (6, 'round_1_sports', 5), (2, 'round_1_sports', 1)])
 
     @staticmethod
     def get_game_by_round(entry_id, round_num):
