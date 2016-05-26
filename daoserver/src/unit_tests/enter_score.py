@@ -20,8 +20,10 @@ from tournament import Tournament
 from unit_tests.tournament_injector import TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
-class ScoreEnteringTests(TestCase):
+class TestScoreEntered(TestCase):
     """Comes from a range of files"""
+
+    tournament_1 = 'score_entered_tournament'
 
     def create_app(self):
         # pass in test configuration
@@ -29,8 +31,16 @@ class ScoreEnteringTests(TestCase):
 
     def setUp(self):
         db.create_all()
+        self.injector = TournamentInjector()
+        self.injector.inject(self.tournament_1, rounds=5, num_players=5)
+        db.session.add(TournamentRound(self.tournament_1, 1, 'foo_mission_1'))
+        db.session.add(TournamentRound(self.tournament_1, 2, 'foo_mission_2'))
+        db.session.flush()
+        Tournament(self.tournament_1).make_draw(1)
+        Tournament(self.tournament_1).make_draw(2)
 
     def tearDown(self):
+        self.injector.delete()
         db.session.remove()
 
     def test_get_game_from_score(self):
@@ -64,6 +74,22 @@ class ScoreEnteringTests(TestCase):
         self.assertTrue(game is None)
         game = self.get_game_by_round(1, 12)
         self.assertTrue(game is None)
+
+
+    @db_conn()
+    def test_no_scores(self):
+        """
+        There should be an error when you check a game before score categories \
+        are assigned to it.
+        """
+        entry_1_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 1),
+            tournament_id=self.tournament_1).first().id
+        game = self.get_game_by_round(entry_1_id, 1)
+        self.assertRaises(
+            AttributeError,
+            Tournament(self.tournament_1).is_score_entered,
+            game)
 
 
     @db_conn()

@@ -221,9 +221,14 @@ class Tournament(object):
         if game_dao is not None and game_dao.score_entered:
             return True
 
-        per_round_scores = game_dao.tournament_round.tournament.\
-            score_categories.filter_by(per_tournament=False).all()
-        scores_expected = len(per_round_scores) * len(game_dao.entrants.all())
+        per_round_scores = len(game_dao.tournament_round.tournament.\
+            score_categories.filter_by(per_tournament=False).all())
+        if per_round_scores <= 0:
+            raise AttributeError(
+                '{} does not have any scores associated with it'.\
+                format(game_dao))
+
+        scores_expected = per_round_scores * len(game_dao.entrants.all())
 
         if len(game_dao.game_scores.all()) == scores_expected:
             game_dao.score_entered = True
