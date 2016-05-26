@@ -9,7 +9,7 @@ from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
-from models.db_connection import db, write_to_db
+from models.db_connection import db
 from models.game_entry import GameEntrant
 from models.score import Score, ScoreCategory, ScoreKey, TournamentScore, \
 GameScore
@@ -64,13 +64,14 @@ class Tournament(object):
 
         dao = TournamentDB(self.tournament_id)
         dao.date = date
-        write_to_db(dao)
+        db.session.add(dao)
 
         if self.creator_username is not None:
             PermissionsChecker().add_permission(
                 self.creator_username,
                 PERMISSIONS['ENTER_SCORE'],
                 dao.protected_object)
+        db.session.commit()
 
     def get_dao(self):
         """Convenience method to recover DAO"""
@@ -109,12 +110,14 @@ class Tournament(object):
             dao.percentage = int(cat.percentage)
             dao.per_tournament = cat.per_tournament
             dao.clashes()
-            write_to_db(dao)
+            db.session.add(dao)
+            db.session.flush()
 
             try:
                 if ScoreKey.query.filter_by(key=cat.display_name,
                                             category=dao.id).first() is None:
-                    write_to_db(ScoreKey(cat.display_name, dao.id))
+                    db.session.add(ScoreKey(cat.display_name, dao.id))
+                    db.session.commit()
             except IntegrityError:
                 raise Exception('Score already set')
 
@@ -224,7 +227,8 @@ class Tournament(object):
 
         if len(game_dao.game_scores.all()) == scores_expected:
             game_dao.score_entered = True
-            write_to_db(game_dao)
+            db.session.add(game_dao)
+            db.session.commit()
             return True
 
         return False
@@ -293,7 +297,8 @@ class Tournament(object):
                 table_num=match.table_number).first()
             if game is None:
                 game = TournamentGame(rnd.id, match.table_number)
-                write_to_db(game)
+                db.session.add(game)
+                db.session.flush()
 
             for entrant in entrants:
                 if entrant is not None:
@@ -302,7 +307,7 @@ class Tournament(object):
                     game_entrant = GameEntrant.query.filter_by(
                         game_id=game.id, entrant_id=dao.id).first()
                     if game_entrant is None:
-                        write_to_db(GameEntrant(game.id, dao.id))
+                        db.session.add(GameEntrant(game.id, dao.id))
                         PermissionsChecker().add_permission(
                             dao.player_id,
                             PERMISSIONS['ENTER_SCORE'],
@@ -310,8 +315,9 @@ class Tournament(object):
                 else:
                     # The person playing the bye gets no points at the time
                     game.score_entered = True
-                    write_to_db(game)
+                    db.session.add(game)
 
+        db.session.commit()
         return draw
 
     @must_exist_in_db
@@ -328,7 +334,7 @@ class Tournament(object):
         """Set the number of rounds in a tournament"""
         tourn = self.get_dao()
         tourn.num_rounds = int(num_rounds)
-        write_to_db(tourn)
+        db.session.add(tourn)
 
         for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
             rnd.round_scores.delete()
@@ -336,7 +342,7 @@ class Tournament(object):
                 GameEntrant.query.filter_by(game_id=game.id).delete()
             rnd.games.delete()
         tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
-        db.session.commit()
+        db.session.flush()
 
         existing_rnds = len(tourn.rounds.filter().all())
         for rnd in range(existing_rnds + 1, tourn.num_rounds + 1):
