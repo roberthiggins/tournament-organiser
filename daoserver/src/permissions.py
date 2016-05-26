@@ -6,7 +6,7 @@ Module to handle permissions for accounts trying to modify a tournament.
 from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
-from models.db_connection import write_to_db
+from models.db_connection import db
 from models.account import Account
 from models.permissions import AccountProtectedObjectPermission, \
 ProtObjAction, ProtObjPerm
@@ -58,9 +58,11 @@ class PermissionsChecker(object):
 
         if permission is None:
             permission = ProtObjPerm(prot_obj.id, act_id)
-            write_to_db(permission)
+            db.session.add(permission)
+            db.session.flush()
 
-        write_to_db(AccountProtectedObjectPermission(user, permission.id))
+        db.session.add(AccountProtectedObjectPermission(user, permission.id))
+        db.session.commit()
 
     def check_permission(self, action, user, for_user, tournament):
         """
