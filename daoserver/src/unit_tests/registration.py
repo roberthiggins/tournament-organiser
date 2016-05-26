@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app import create_app
 from models.account import Account
-from models.db_connection import db, write_to_db
+from models.db_connection import db
 from models.registration import TournamentRegistration as TReg
 
 from unit_tests.tournament_injector import TournamentInjector
@@ -42,8 +42,9 @@ class TournamentRegistrations(TestCase):
         t_4 = 'test_register_4'
         self.injector.inject(t_4, num_players=0)
 
-        write_to_db(TReg(self.applicant, t_1))
-        write_to_db(TReg(self.applicant, t_2))
+        db.session.add(TReg(self.applicant, t_1))
+        db.session.add(TReg(self.applicant, t_2))
+        db.session.flush()
 
         self.assertFalse(TReg(self.applicant, t_4).clashes())
 
@@ -64,14 +65,19 @@ class TournamentRegistrations(TestCase):
         t_4 = 'test_register_4'
         self.injector.inject(t_4, num_players=0)
 
-        write_to_db(TReg(self.applicant, t_1))
-        write_to_db(TReg(self.applicant, t_2))
-
+        db.session.add(TReg(self.applicant, t_1))
+        db.session.add(TReg(self.applicant, t_2))
+        db.session.commit()
 
         # Repeat bad
-        self.assertRaises(IntegrityError, write_to_db,
-                          TReg(self.applicant, t_1))
-        self.assertRaises(IntegrityError, write_to_db,
-                          TReg(self.applicant, t_2))
+        db.session.add(TReg(self.applicant, t_1))
+        self.assertRaises(IntegrityError, db.session.commit)
+        db.session.rollback()
+
+        db.session.add(TReg(self.applicant, t_2))
+        self.assertRaises(IntegrityError, db.session.commit)
+        db.session.rollback()
+
         # Same day bad, but that needs to be caught by clashes
-        write_to_db(TReg(self.applicant, t_3))
+        db.session.add(TReg(self.applicant, t_3))
+        db.session.commit()
