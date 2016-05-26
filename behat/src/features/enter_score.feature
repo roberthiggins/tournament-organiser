@@ -13,11 +13,11 @@ Feature: Enter a score for a player
         When I press "Login"
 
     Scenario: Logged in
-        Given I am on "/enterscore/1"
+        Given I am on "/enterscore/ranking_test/bart"
 
     Scenario: Logged out
         Given I am on "/logout"
-        Given I am on "/enterscore/1"
+        Given I am on "/enterscore/ranking_test/bart"
         Then I should be on "/login"
 
     Scenario: No permissions
@@ -40,7 +40,6 @@ Feature: Enter a score for a player
         Then the response status code should be <code>
         Examples:
             |tournament         |username       |destination                    |code   |
-            |painting_test      |rick_james     |/enterscore/1                  |200    |
             |                   |rick_james     |/enterscore//rick_james        |404    |
             |painting_test      |               |/enterscore/painting_test/     |404    |
             |foobar             |rick_james     |/enterscore/foobar/rick_james  |404    |
@@ -55,10 +54,9 @@ Feature: Enter a score for a player
             | 400  | 0  |
             | 404  | a  |
             | 404  | 1a |
-            | 200  | 1  |
 
     Scenario Outline: I enter some scores
-        Given I am on "/enterscore/1"
+        Given I am on "/enterscore/painting_test/rick_james"
         Then I fill in "id_key" with "number_tassles"
         Then I fill in "id_value" with "<score>"
         Then I press "Enter Score"
@@ -100,11 +98,10 @@ Feature: Enter a score for a player
     # TODO User controls
     Scenario: another player
         Given I am on "/logout"
-        Given I am on "/enterscore/4"
+        Given I am on "/enterscore/ranking_test/lisa"
         When I fill in "id_inputUsername" with "bart"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/enterscore/4"
         When I fill in "id_key" with "round_2_battle"
         When I fill in "id_value" with "1"
         Then I press "Enter Score"
@@ -113,11 +110,10 @@ Feature: Enter a score for a player
 
     Scenario: A non super user
         Given I am on "/logout"
-        Given I am on "/enterscore/4"
+        Given I am on "/enterscore/ranking_test/lisa"
         When I fill in "id_inputUsername" with "lisa"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        Then I should be on "/enterscore/4"
         When I fill in "id_key" with "round_2_battle"
         When I fill in "id_value" with "1"
         Then I press "Enter Score"
