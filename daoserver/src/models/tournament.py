@@ -22,6 +22,7 @@ class Tournament(db.Model):
         self.name = name
         self.protected_object = ProtectedObject()
         db.session.add(self.protected_object)
+        db.session.flush()
 
     def __repr__(self):
         return '<Tournament {}>'.format(self.name)
