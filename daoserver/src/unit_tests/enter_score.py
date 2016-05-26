@@ -8,7 +8,7 @@ from testfixtures import compare
 
 from app import create_app
 from db_connections.db_connection import db_conn
-from models.db_connection import db, write_to_db
+from models.db_connection import db
 from models.game_entry import GameEntrant
 from models.score import ScoreCategory, ScoreKey, TournamentScore, GameScore, \
 Score
@@ -139,16 +139,19 @@ class EnterScore(TestCase):
         # per tournament category
         self.category_1 = ScoreCategory(self.tournament_1, 'per_tourn', 50,
                                         True, 0, 100)
-        write_to_db(self.category_1)
+        db.session.add(self.category_1)
+        db.session.flush()
         self.key_1 = ScoreKey('test_enter_score_key_1', self.category_1.id)
-        write_to_db(self.key_1)
+        db.session.add(self.key_1)
 
         # per round category
         self.category_2 = ScoreCategory(self.tournament_1, 'per_round', 50,
                                         False, 0, 100)
-        write_to_db(self.category_2)
+        db.session.add(self.category_2)
+        db.session.flush()
         self.key_2 = ScoreKey('test_enter_score_key_2', self.category_2.id)
-        write_to_db(self.key_2)
+        db.session.add(self.key_2)
+        db.session.commit()
 
     def tearDown(self):
         self.injector.delete()
