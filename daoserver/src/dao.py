@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 
 from authentication import check_auth
 from models.account import Account, add_account
-from models.db_connection import write_to_db
+from models.db_connection import db
 from models.feedback import Feedback
 from models.registration import TournamentRegistration
 from models.tournament import Tournament as TournamentDAO
@@ -140,7 +140,8 @@ def apply_for_tournament():
     rego.clashes()
 
     try:
-        write_to_db(rego)
+        db.session.add(rego)
+        db.session.commit()
     except IntegrityError:
         raise ValueError("Check username and tournament")
 
@@ -317,8 +318,9 @@ def set_missions():
         rnd = tourn.get_round(i + 1)
         # pylint: disable=no-member
         rnd.mission = mission if mission else TR.__table__.c.mission.default.arg
-        write_to_db(rnd)
+        db.session.add(rnd)
 
+    db.session.commit()
     return make_response('Missions set: {}'.format(missions), 200)
 
 @APP.route('/placefeedback', methods=['POST'])
@@ -332,7 +334,8 @@ def place_feedback():
     if re.match(r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
     try:
-        write_to_db(Feedback(_feedback))
+        db.session.add(Feedback(_feedback))
+        db.session.commit()
     except IntegrityError:
         pass
 
