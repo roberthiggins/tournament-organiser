@@ -47,27 +47,31 @@ class TestScoreEntered(TestCase):
         """
         You should be able to determine game from entry_id and the score_key
         """
+        entry_2_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 2),
+            tournament_id=self.tournament_1).first().id
+        entry_3_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 3),
+            tournament_id=self.tournament_1).first().id
+        entry_4_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 4),
+            tournament_id=self.tournament_1).first().id
 
         # A regular player
-        game = self.get_game_by_round(5, 1)
+        game = self.get_game_by_round(entry_4_id, 1)
         self.assertTrue(game is not None)
 
-        game = self.get_game_by_round(5, 1)
-        entrants = game.entrants.all()
-        self.assertTrue(entrants[0].entrant_id is not None)
-        self.assertTrue(entrants[1].entrant_id is not None)
-        self.assertTrue(entrants[0].entrant_id == 5 \
-        or entrants[1].entrant_id == 5)
-        self.assertTrue(entrants[0].entrant_id == 3 \
-        or entrants[1].entrant_id == 3)
-
+        game = self.get_game_by_round(entry_4_id, 1)
+        entrants = [x.entrant_id for x in game.entrants.all()]
+        compare(len(entrants), 2)
+        self.assertTrue(entry_4_id in entrants)
+        self.assertTrue(entry_2_id in entrants)
 
         # A player in a bye
-        game = self.get_game_by_round(4, 1)
-        entrants = game.entrants.all()
-        self.assertTrue(entrants[0].entrant_id == 4)
-        self.assertTrue(len(entrants) == 1)
-
+        game = self.get_game_by_round(entry_3_id, 1)
+        entrants = [x.entrant_id for x in game.entrants.all()]
+        compare(len(entrants), 1)
+        self.assertTrue(entry_3_id in entrants)
 
         # Poor data will return None rather than an error
         game = self.get_game_by_round(15, 1)
