@@ -5,7 +5,7 @@ ORM module for accounts
 
 from passlib.hash import sha256_crypt
 
-from models.db_connection import db, write_to_db
+from models.db_connection import db
 
 class Account(db.Model):
     """Basic user account"""
@@ -50,7 +50,9 @@ class AccountSecurity(db.Model):
     def __repr__(self):
         return '<AccountSecurity ({}, {})>'.format(self.id, self.password)
 
-def add_account(username, email, password):
+def add_account(username, email, password, commit=True):
     """Add an account to the db"""
-    write_to_db(Account(username, email))
-    write_to_db(AccountSecurity(username, password))
+    db.session.add(Account(username, email))
+    db.session.add(AccountSecurity(username, password))
+    if commit:
+        db.session.commit()

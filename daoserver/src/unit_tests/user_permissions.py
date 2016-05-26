@@ -47,14 +47,14 @@ class UserPermissions(TestCase):
         account_db.session.remove()
 
     def test_add_account(self):
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1')
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
         self.assertFalse(Account.query.\
             filter_by(username=self.acc_1).first().is_superuser)
 
     def test_is_organiser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1')
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
         Tournament(self.tourn_1, creator=self.acc_1).add_to_db('2110-12-25')
         options = [None, 'ranking_test', 'not_a_tournament', '', 'lisa', \
             'not_a_person', 'superman', 'permission_test', self.tourn_1, \
@@ -72,8 +72,8 @@ class UserPermissions(TestCase):
     def test_superuser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1')
-        add_account(self.acc_2, 'foo@bar.com', 'pwd1')
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
+        add_account(self.acc_2, 'foo@bar.com', 'pwd1', commit=False)
         Account.query.filter_by(username=self.acc_2).first().is_superuser = True
 
         Tournament(self.tourn_1, creator=self.acc_1).add_to_db('2110-12-25')
@@ -110,7 +110,7 @@ class UserPermissions(TestCase):
     def test_check_permissions(self):
         """Test the entrypoint method"""
         checker = PermissionsChecker()
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1') # random user
+        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False) # random
         self.injector.inject(self.tourn_1, num_players=2)
         t_player_1 = '{}_player_1'.format(self.tourn_1)
 
