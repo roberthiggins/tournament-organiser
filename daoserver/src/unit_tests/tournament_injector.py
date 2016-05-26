@@ -6,7 +6,7 @@ An injector to create tournaments for unit tests
 from datetime import datetime, timedelta
 
 from models.account import Account
-from models.db_connection import db, write_to_db
+from models.db_connection import db
 from models.permissions import AccountProtectedObjectPermission
 from models.registration import TournamentRegistration as TRegistration
 from models.tournament import Tournament
@@ -77,25 +77,29 @@ class TournamentInjector(object):
 
     def add_player(self, tournament_name, username, email='foo@bar.com'):
         """Create player account and enter them"""
-        write_to_db(Account(username, email))
-        write_to_db(TournamentEntry(username, tournament_name))
+        db.session.add(Account(username, email))
+        db.session.flush()
+        db.session.add(TournamentEntry(username, tournament_name))
+        db.session.flush()
         self.accounts.add(username)
 
     def add_round(self, tourn_name, round_num, mission):
         """Add a TournamentRound. Caller's job to ensure clash avoidance"""
-        write_to_db(TournamentRound(tourn_name, int(round_num), mission))
+        db.session.add(TournamentRound(tourn_name, int(round_num), mission))
 
     def create_tournament(self, name, date, rounds=0):
         """Create a tournament"""
         tourn = Tournament(name)
         tourn.num_rounds = rounds
         tourn.date = date
-        write_to_db(tourn)
+        db.session.add(tourn)
+        db.session.flush()
         self.tournament_ids.add(tourn.id)
         self.tournament_names.add(tourn.name)
 
         creator_name = '{}_creator'.format(tourn.name)
-        write_to_db(Account(creator_name, '{}@bar.com'.format(creator_name)))
+        db.session.add(Account(creator_name, '{}@bar.com'.format(creator_name)))
+        db.session.flush()
         self.accounts.add(creator_name)
         PermissionsChecker().add_permission(
             creator_name,
@@ -105,10 +109,12 @@ class TournamentInjector(object):
     def create_players(self, tourn_name, num_players):
         """Create some accounts and enter them in the tournament"""
         for entry_no in range(1, num_players + 1):
-            player_name = '{}_player_{}'.format(tourn_name, entry_no)
-            write_to_db(Account(player_name, '{}@test.com'.format(player_name)))
-            write_to_db(TournamentEntry(player_name, tourn_name))
-            self.accounts.add(player_name)
+            play_name = '{}_player_{}'.format(tourn_name, entry_no)
+            db.session.add(Account(play_name, '{}@test.com'.format(play_name)))
+            db.session.flush()
+            db.session.add(TournamentEntry(play_name, tourn_name))
+            db.session.flush()
+            self.accounts.add(play_name)
 
     def delete_games(self):
         """
