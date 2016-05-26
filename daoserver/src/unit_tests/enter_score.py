@@ -98,37 +98,61 @@ class TestScoreEntered(TestCase):
 
     @db_conn()
     def test_score_entered(self):
+        # Add a score category
+        category_1 = ScoreCategory(self.tournament_1, 'per_round', 50, False,
+                                   0, 100)
+        db.session.add(category_1)
+        db.session.flush()
+        key_1 = ScoreKey('test_score_entered_key_1', category_1.id)
+        db.session.add(key_1)
+        db.session.flush()
+
+        tourn = Tournament(self.tournament_1)
+
+        entry_2_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 2),
+            tournament_id=self.tournament_1).first().id
+        entry_3_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 3),
+            tournament_id=self.tournament_1).first().id
+        entry_4_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 4),
+            tournament_id=self.tournament_1).first().id
+        entry_5_id = TournamentEntry.query.filter_by(
+            player_id='{}_player_{}'.format(self.tournament_1, 5),
+            tournament_id=self.tournament_1).first().id
 
         # A completed game
-        game = self.get_game_by_round(5, 1)
-        entrants = game.entrants.all()
-        compare(entrants[0].entrant_id, 3)
-        compare(entrants[1].entrant_id, 5)
+        game = self.get_game_by_round(entry_4_id, 1)
+        tourn.enter_score(entry_2_id, key_1.key, 2, game.id)
+        tourn.enter_score(entry_4_id, key_1.key, 4, game.id)
+        entrants = [x.entrant_id for x in game.entrants.all()]
+        self.assertTrue(entry_2_id in entrants)
+        self.assertTrue(entry_4_id in entrants)
         self.assertTrue(Tournament.is_score_entered(game))
 
-        # a bye should be false
-        # TODO resolve Bye Scoring
-        game = self.get_game_by_round(4, 1)
-        entrants = game.entrants.all()
-        compare(entrants[0].entrant_id, 4)
+        # A BYE will only have one entrant
+        game = self.get_game_by_round(entry_3_id, 1)
+        tourn.enter_score(entry_3_id, key_1.key, 3, game.id)
+        entrants = [x.entrant_id for x in game.entrants.all()]
+        compare(len(entrants), 1)
+        self.assertTrue(entry_3_id in entrants)
+        self.assertTrue(Tournament.is_score_entered(game))
+
+        # Ensure the rd2 game entry_4 vs. entry_5 is listed as not scored. This
+        # will force a full check. entry_5's score hasn't been entered.
+        cur.execute("UPDATE game SET score_entered = False WHERE id = {}".\
+            format(entry_4_id))
+        game = self.get_game_by_round(entry_4_id, 2)
+        entrants = [x.entrant_id for x in game.entrants.all()]
+        tourn.enter_score(entry_4_id, key_1.key, 4, game.id)
+        self.assertTrue(entry_4_id in entrants)
+        self.assertTrue(entry_5_id in entrants)
         self.assertFalse(Tournament.is_score_entered(game))
 
-        # Ensure the rd2 game bart vs. maggie is listed as not scored. This
-        # will force a full check. Maggie's score hasn't been entered.
-        cur.execute("UPDATE game SET score_entered = False WHERE id = 5")
-        game = self.get_game_by_round(5, 2)
-
-        entrants = game.entrants.all()
-        compare(entrants[0].entrant_id, 6)
-        compare(entrants[1].entrant_id, 5)
-        self.assertFalse(Tournament.is_score_entered(game))
-
-        # Enter the final score for maggie
-        Tournament('ranking_test').enter_score(6, 'round_2_battle', 2, game.id)
-        conn.commit()
-        self.assertFalse(Tournament.is_score_entered(game))
-        Tournament('ranking_test').enter_score(6, 'round_2_sports', 5, game.id)
-        conn.commit()
+        # Enter the final score for entry_5
+        tourn = Tournament(self.tournament_1)
+        tourn.enter_score(entry_5_id, key_1.key, 5, game.id)
         self.assertTrue(Tournament.is_score_entered(game))
 
     @staticmethod
