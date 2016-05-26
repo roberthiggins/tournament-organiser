@@ -5,6 +5,7 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
+from decimal import Decimal as Dec
 import json
 import re
 from functools import wraps
@@ -349,7 +350,7 @@ def rank_entries(tournament_id):
             'entry_id': 1,
             'tournament_id': 'some_tournie',
             'scores': {'round_1': 10, 'round_2': 4 },
-            'total_score': 23.5,
+            'total_score': 23.50, # always 2dp
             'ranking': 3
         },
     ]
@@ -366,7 +367,7 @@ def rank_entries(tournament_id):
                 'entry_id' : x.id,
                 'tournament_id' : tourn.tournament_id,
                 'scores' : x.score_info,
-                'total_score' : x.total_score,
+                'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
                 'ranking': x.ranking
             } for x in \
             tourn.ranking_strategy.overall_ranking(tourn.entries())
