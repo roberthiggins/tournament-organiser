@@ -1,5 +1,13 @@
 """
 An injector to create tournaments for unit tests
+
+If you want to check that this has cleaned up after itself you can run db-usage
+or something similar to:
+
+    SELECT schemaname,relname,n_live_tup
+    FROM pg_stat_user_tables
+    ORDER BY n_live_tup DESC;
+
 """
 # pylint: disable=no-member
 
