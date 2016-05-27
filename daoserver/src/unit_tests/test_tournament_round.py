@@ -5,7 +5,7 @@ from flask.ext.testing import TestCase
 from testfixtures import compare
 
 from app import create_app
-from models.tournament import db as tournament_db
+from models.tournament import db
 from models.tournament_round import TournamentRound
 from tournament import Tournament
 
@@ -17,10 +17,10 @@ class SetRounds(TestCase):
         return create_app()
 
     def setUp(self):
-        tournament_db.create_all()
+        db.create_all()
 
     def tearDown(self):
-        tournament_db.session.remove()
+        db.session.remove()
 
     def set_up_tournament(self, name):
         """While using a live db we still need to hack this"""
@@ -29,12 +29,12 @@ class SetRounds(TestCase):
         dao = TournamentDAO(name)
         dao.date = date.today()
         dao.num_rounds = 4
-        tournament_db.session.add(dao)
+        db.session.add(dao)
 
-        tournament_db.session.add(TournamentRound(name, 1, 'mission_1'))
-        tournament_db.session.add(TournamentRound(name, 2, 'mission_2'))
-        tournament_db.session.add(TournamentRound(name, 3, 'mission_3'))
-        tournament_db.session.add(TournamentRound(name, 4))
+        db.session.add(TournamentRound(name, 1, 'mission_1'))
+        db.session.add(TournamentRound(name, 2, 'mission_2'))
+        db.session.add(TournamentRound(name, 3, 'mission_3'))
+        db.session.add(TournamentRound(name, 4))
 
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""
