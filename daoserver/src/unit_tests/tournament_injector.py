@@ -15,7 +15,8 @@ from datetime import datetime, timedelta
 
 from models.account import Account
 from models.db_connection import db
-from models.permissions import AccountProtectedObjectPermission
+from models.permissions import AccountProtectedObjectPermission, \
+ProtectedObject, ProtObjPerm
 from models.registration import TournamentRegistration as TRegistration
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
@@ -53,14 +54,7 @@ class TournamentInjector(object):
 
         self.delete_accounts()
 
-        if len(self.tournament_ids) > 0:
-            TournamentRound.query.filter(TournamentRound.tournament_name.in_(
-                tuple(self.tournament_names))).delete(synchronize_session=False)
-            Tournament.query.filter(
-                Tournament.id.in_(tuple(self.tournament_ids))).\
-                delete(synchronize_session=False)
-            self.tournament_ids = set()
-            self.tournament_names = set()
+        self.delete_tournaments()
 
         db.session.commit()
         return
@@ -170,3 +164,26 @@ class TournamentInjector(object):
                 cat.score_keys.delete()
             tourn.score_categories.delete()
         db.session.commit()
+
+    def delete_tournaments(self):
+        """Delete tournaments and their rounds"""
+
+        if not len(self.tournament_ids):
+            return
+
+        TournamentRound.query.filter(TournamentRound.tournament_name.in_(
+            tuple(self.tournament_names))).delete(synchronize_session=False)
+
+        tourns = Tournament.query.filter(Tournament.id.in_(self.tournament_ids))
+        permission_ids = [t.protected_object.id for t in tourns.all()]
+
+        tourns.delete(synchronize_session=False)
+        ProtObjPerm.query.\
+            filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
+            delete(synchronize_session=False)
+        ProtectedObject.query.\
+            filter(ProtectedObject.id.in_(permission_ids)).\
+            delete(synchronize_session=False)
+
+        self.tournament_ids = set()
+        self.tournament_names = set()
