@@ -11,6 +11,7 @@ from sqlalchemy.sql.expression import and_
 from matching_strategy import RoundRobin
 from models.db_connection import db
 from models.game_entry import GameEntrant
+from models.permissions import ProtObjAction, ProtObjPerm
 from models.score import Score, ScoreCategory, ScoreKey, TournamentScore, \
 GameScore
 from models.table_allocation import TableAllocation
@@ -349,9 +350,17 @@ class Tournament(object):
                     PermissionsChecker().remove_permission(
                         entrant.entrant.player_id,
                         PERMISSIONS['ENTER_SCORE'],
-                        entrant.game.protected_object)
+                        game.protected_object)
                 entrants.delete()
-            rnd.games.delete()
+                act_id = ProtObjAction.query.\
+                    filter_by(description=PERMISSIONS['ENTER_SCORE']).first().id
+                ProtObjPerm.query.filter_by(
+                    protected_object_id=game.protected_object.id,
+                    protected_object_action_id=act_id).delete()
+                prot_obj = game.protected_object
+                db.session.delete(game)
+                db.session.delete(prot_obj)
+
         tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
         db.session.flush()
 

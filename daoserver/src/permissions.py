@@ -98,15 +98,13 @@ class PermissionsChecker(object):
 
         act_id = ProtObjAction.query.filter_by(description=action).first().id
 
-        permission = ProtObjPerm.query.filter(
-            and_(
-                ProtObjPerm.protected_object_id == prot_obj.id,
-                ProtObjPerm.protected_object_action_id == act_id)
-            ).first()
+        permission_id = ProtObjPerm.query.\
+            filter_by(protected_object_id=prot_obj.id,
+                      protected_object_action_id=act_id).first().id
 
         AccountProtectedObjectPermission.query.\
             filter_by(account_username=user,
-                      protected_object_permission_id=permission.id).delete()
+                      protected_object_permission_id=permission_id).delete()
 
         db.session.commit()
 
