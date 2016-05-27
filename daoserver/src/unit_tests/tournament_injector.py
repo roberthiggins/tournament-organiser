@@ -16,13 +16,13 @@ from datetime import datetime, timedelta
 from models.account import Account
 from models.db_connection import db
 from models.permissions import AccountProtectedObjectPermission, \
-ProtectedObject, ProtObjPerm
+ProtectedObject, ProtObjAction, ProtObjPerm
 from models.registration import TournamentRegistration as TRegistration
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
 from models.tournament_round import TournamentRound
 
-from permissions import PermissionsChecker, PERMISSIONS
+from permissions import PermissionsChecker, PERMISSIONS, set_up_permissions
 
 class TournamentInjector(object):
     """Insert a tournament using the ORM. You can delete them as well"""
@@ -31,6 +31,8 @@ class TournamentInjector(object):
         self.tournament_ids = set()
         self.tournament_names = set()
         self.accounts = set()
+        self.existing_perms = set([o.id for o in ProtObjAction.query.all()])
+        set_up_permissions()
 
     def inject(self, name, rounds=0, num_players=6, date=None):
         """Create a tournament and inkect it into the db."""
@@ -58,6 +60,11 @@ class TournamentInjector(object):
         self.delete_accounts()
 
         self.delete_tournaments()
+
+        ProtObjAction.query.\
+            filter(~ProtObjAction.id.in_(self.existing_perms)).\
+            delete(synchronize_session=False)
+        self.existing_perms = set()
 
         db.session.commit()
         return

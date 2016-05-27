@@ -9,6 +9,8 @@ import jsonpickle
 
 from flask import Flask
 
+from permissions import set_up_permissions
+
 # pylint: disable=W0621
 def create_app():
     """Config for the app"""
@@ -47,3 +49,5 @@ if __name__ == "__main__":
 
     jsonpickle.handlers.registry.register(datetime.datetime, DatetimeHandler)
     jsonpickle.handlers.registry.register(datetime.date, DatetimeHandler)
+
+    set_up_permissions(commit=True)

@@ -1,3 +1,5 @@
+INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_score');
+
 -- Set up some tournaments
 INSERT INTO tournament VALUES (DEFAULT, 'northcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'southcon_2095', '2095-06-01');

@@ -16,6 +16,18 @@ PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',
 }
 
+def set_up_permissions(commit=False):
+    """
+    Add all the permissions listed in PERMISSIONS to the db
+    These are all the action you can take.
+    """
+    # pylint: disable=unused-variable
+    for key, value in PERMISSIONS.iteritems():
+        if ProtObjAction.query.filter_by(description=value).first() is None:
+            db.session.add(ProtObjAction(value))
+    db.session.flush()
+    if commit:
+        db.session.commit()
 
 # pylint: disable=E0602
 class PermissionsChecker(object):

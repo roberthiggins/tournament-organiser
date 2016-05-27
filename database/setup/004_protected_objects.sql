@@ -25,7 +25,6 @@ CREATE TABLE protected_object_action(
     description VARCHAR NOT NULL
 );
 COMMENT ON TABLE protected_object_action IS 'An abstract action that could be performed on a protected_object. "Enter Score", "add player", etc.';
-INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_score');
 
 CREATE TABLE protected_object_permission(
     id                          SERIAL UNIQUE,
