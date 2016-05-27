@@ -50,7 +50,10 @@ class TournamentInjector(object):
 
         self.delete_scores()
 
-        self.delete_games()
+        from tournament import Tournament as Tourn
+        tourns = Tournament.query.filter(Tournament.id.in_(self.tournament_ids))
+        for tourn in tourns.all():
+            Tourn(tourn.name).set_number_of_rounds(0)
 
         self.delete_accounts()
 
@@ -123,25 +126,6 @@ class TournamentInjector(object):
 
         self.accounts = set()
 
-    def delete_games(self):
-        """
-        Delete games and their entrants.
-        Scores need to be deleted before calling.
-        """
-        for tourn in Tournament.query.filter(Tournament.id.in_(
-                tuple(self.tournament_ids))).all():
-
-            # remove all the game entrants.
-            tourn_entries = TournamentEntry.query.filter(
-                TournamentEntry.tournament_id.\
-                in_(tuple(self.tournament_names))).all()
-            for ent in tourn_entries:
-                ent.game_entries.delete(synchronize_session=False)
-
-            # Now the games
-            for rnd in tourn.rounds:
-                rnd.games.delete()
-
     def delete_scores(self):
         """Delete all scores for all tournaments injected"""
 
@@ -170,9 +154,6 @@ class TournamentInjector(object):
 
         if not len(self.tournament_ids):
             return
-
-        TournamentRound.query.filter(TournamentRound.tournament_name.in_(
-            tuple(self.tournament_names))).delete(synchronize_session=False)
 
         tourns = Tournament.query.filter(Tournament.id.in_(self.tournament_ids))
         permission_ids = [t.protected_object.id for t in tourns.all()]
