@@ -73,10 +73,10 @@ BEGIN
     INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', battlecategory) RETURNING id INTO rd2key;
     INSERT INTO score_key VALUES (DEFAULT, 'round_1_sports', sportscategory) RETURNING id INTO rd1sportskey;
     INSERT INTO score_key VALUES (DEFAULT, 'round_2_sports', sportscategory) RETURNING id INTO rd2sportskey;
-    INSERT INTO round_score VALUES(rd1key, 1);
-    INSERT INTO round_score VALUES(rd1sportskey, 1);
-    INSERT INTO round_score VALUES(rd2key, 2);
-    INSERT INTO round_score VALUES(rd2sportskey, 2);
+    INSERT INTO round_score VALUES(rd1key, round_1_id);
+    INSERT INTO round_score VALUES(rd1sportskey, round_1_id);
+    INSERT INTO round_score VALUES(rd2key, round_2_id);
+    INSERT INTO round_score VALUES(rd2sportskey, round_2_id);
 
     INSERT INTO account VALUES ('homer', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('homer', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
