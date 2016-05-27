@@ -242,21 +242,24 @@ def enter_tournament_score():
         'Score entered for {}: {}'.format(username, value),
         200)
 
-@APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
 def get_entry_id(tournament_id, username):
     """Get entry info from tournament and username"""
-
     if not Account.username_exists(username):
         raise ValueError('Unknown player: {}'.format(username))
 
     # pylint: disable=no-member
-    entry_id = TournamentEntry.query.\
+    return TournamentEntry.query.\
         filter_by(tournament_id=tournament_id, player_id=username).first().id
 
-    return jsonpickle.encode(entry_id, unpicklable=False)
+
+@APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
+def get_entry_id_from_tournament(tournament_id, username):
+    """Get entry info from tournament and username"""
+    return jsonpickle.encode(get_entry_id(tournament_id, username),
+                             unpicklable=False)
 
 @APP.route('/entryInfo/<entry_id>', methods=['GET'])
-def entry_info(entry_id):
+def entry_info_from_id(entry_id):
     """ Given entry_id, get info about player and tournament"""
 
     try:
@@ -275,6 +278,11 @@ def entry_info(entry_id):
         }, unpicklable=False)
     except AttributeError:
         raise ValueError('Entry ID not valid: {}'.format(entry_id))
+
+@APP.route('/entryInfo/<tournament_id>/<username>', methods=['GET'])
+def entry_info_from_tournament(tournament_id, username):
+    """ Given entry_id, get info about player and tournament"""
+    return entry_info_from_id(get_entry_id(tournament_id, username))
 
 @APP.route('/login', methods=['POST'])
 @enforce_request_variables('inputUsername', 'inputPassword')

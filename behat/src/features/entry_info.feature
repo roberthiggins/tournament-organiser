@@ -4,7 +4,7 @@ Feature: Get information about an entry
     I want to be able to get basic information about an entry
 
     Scenario: Use the API to get information
-        When I GET "/entryInfo/1" from the API
+        When I GET "/entryInfo/ranking_test/lisa" from the API
         Then the response is JSON
 
     Scenario Outline: Malformed
