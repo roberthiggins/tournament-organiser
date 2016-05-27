@@ -84,6 +84,32 @@ class PermissionsChecker(object):
 
         return False
 
+    def remove_permission(self, user, action, prot_obj):
+        """
+        Remove user permission to perform action on protected_obj
+
+        Assumptions:
+            action must be a permissions.PERMISSIONS
+            protected_obj should be a protected_object id
+
+        e.g. - player_of_game_3, enter_score, game_3
+        """
+        self.check_action_valid(action)
+
+        act_id = ProtObjAction.query.filter_by(description=action).first().id
+
+        permission = ProtObjPerm.query.filter(
+            and_(
+                ProtObjPerm.protected_object_id == prot_obj.id,
+                ProtObjPerm.protected_object_action_id == act_id)
+            ).first()
+
+        AccountProtectedObjectPermission.query.\
+            filter_by(account_username=user,
+                      protected_object_permission_id=permission.id).delete()
+
+        db.session.commit()
+
     @db_conn()
     def is_organiser(self, user, tournament):
         """user is an organiser of tournament"""

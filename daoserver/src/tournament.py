@@ -344,7 +344,13 @@ class Tournament(object):
         for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
             rnd.round_scores.delete()
             for game in rnd.games:
-                GameEntrant.query.filter_by(game_id=game.id).delete()
+                entrants = GameEntrant.query.filter_by(game_id=game.id)
+                for entrant in entrants.all():
+                    PermissionsChecker().remove_permission(
+                        entrant.entrant.player_id,
+                        PERMISSIONS['ENTER_SCORE'],
+                        entrant.game.protected_object)
+                entrants.delete()
             rnd.games.delete()
         tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
         db.session.flush()

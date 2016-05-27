@@ -3,11 +3,14 @@ Checking whether users are players in tournaments, admins, organisers, etc.
 """
 
 from flask.ext.testing import TestCase
+from testfixtures import compare
 
 from app import create_app
 from models.account import db, Account, AccountSecurity, add_account
-from models.permissions import AccountProtectedObjectPermission
+from models.permissions import ProtectedObject, ProtObjAction, ProtObjPerm, \
+AccountProtectedObjectPermission as AccountProtectedObjectPerm
 from permissions import PermissionsChecker
+from tournament import Tournament
 
 from unit_tests.tournament_injector import TournamentInjector
 
@@ -26,9 +29,9 @@ class UserPermissions(TestCase):
         self.injector = TournamentInjector()
 
     def tearDown(self):
-        AccountProtectedObjectPermission.query.\
-            filter(AccountProtectedObjectPermission.account_username == \
-            self.acc_1).delete(synchronize_session=False)
+        AccountProtectedObjectPerm.query.\
+            filter(AccountProtectedObjectPerm.account_username == self.acc_1).\
+            delete(synchronize_session=False)
         AccountSecurity.query.filter_by(id=self.acc_1).\
             delete(synchronize_session=False)
         Account.query.filter_by(username=self.acc_1).\
@@ -127,3 +130,25 @@ class UserPermissions(TestCase):
             self.acc_1,
             None,
             self.tourn_1))
+
+    def test_remove_permissions(self):
+        """Test that users can have their permissions removed"""
+
+        checker = PermissionsChecker()
+        self.injector.inject(self.tourn_1)
+        creator = '{}_creator'.format(self.tourn_1)
+        tourn_prot_obj = Tournament(self.tourn_1).get_dao().protected_object
+
+        prot_objs = len(ProtectedObject.query.all())
+        prot_obj_actions = len(ProtObjAction.query.all())
+        prot_obj_perms = len(ProtObjPerm.query.all())
+        acc_perms = len(AccountProtectedObjectPerm.query.all())
+
+        self.assertTrue(checker.is_organiser(creator, self.tourn_1))
+        checker.remove_permission(creator, 'enter_score', tourn_prot_obj)
+        self.assertFalse(checker.is_organiser(creator, self.tourn_1))
+        compare(prot_objs, len(ProtectedObject.query.all()))
+        compare(prot_obj_actions, len(ProtObjAction.query.all()))
+        compare(prot_obj_perms, len(ProtObjPerm.query.all()))
+        # the one account should now have lost it's permissions
+        compare(acc_perms - 1, len(AccountProtectedObjectPerm.query.all()))
