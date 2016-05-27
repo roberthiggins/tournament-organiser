@@ -9,6 +9,8 @@ from models.tournament import db
 from models.tournament_round import TournamentRound
 from tournament import Tournament
 
+from unit_tests.tournament_injector import TournamentInjector
+
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class SetRounds(TestCase):
 
@@ -18,28 +20,16 @@ class SetRounds(TestCase):
 
     def setUp(self):
         db.create_all()
+        self.injector = TournamentInjector()
 
     def tearDown(self):
+        self.injector.delete()
         db.session.remove()
-
-    def set_up_tournament(self, name):
-        """While using a live db we still need to hack this"""
-        from datetime import date
-        from models.tournament import Tournament as TournamentDAO
-        dao = TournamentDAO(name)
-        dao.date = date.today()
-        dao.num_rounds = 4
-        db.session.add(dao)
-
-        db.session.add(TournamentRound(name, 1, 'mission_1'))
-        db.session.add(TournamentRound(name, 2, 'mission_2'))
-        db.session.add(TournamentRound(name, 3, 'mission_3'))
-        db.session.add(TournamentRound(name, 4))
 
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""
         name = 'test_set_rounds'
-        self.set_up_tournament(name)
+        self.injector.inject(name, rounds=4)
 
         tourn = Tournament(name)
         self.assertTrue(tourn.details()['rounds'] == 4)
@@ -53,7 +43,7 @@ class SetRounds(TestCase):
     def test_tournament_round_deletion(self):
         """Check that the rounds get deleted when rounds are reduced"""
         name = 'test_tournament_round_deletion'
-        self.set_up_tournament(name)
+        self.injector.inject(name, rounds=4)
 
         tourn = Tournament(name)
         tourn.set_number_of_rounds(6)
@@ -69,7 +59,10 @@ class SetRounds(TestCase):
     def test_get_missions(self):
         """get missions for the rounds"""
         name = 'test_get_missions'
-        self.set_up_tournament(name)
+        self.injector.inject(name, rounds=3)
+        self.injector.add_round(name, 1, 'mission_1')
+        self.injector.add_round(name, 2, 'mission_2')
+        self.injector.add_round(name, 3, 'mission_3')
 
         tourn = Tournament(name)
         tourn.set_number_of_rounds(4)
@@ -83,7 +76,8 @@ class SetRounds(TestCase):
     def test_get_round(self):
         """Test the round getter"""
         name = 'test_get_round'
-        self.set_up_tournament(name)
+        self.injector.inject(name)
+
         tourn = Tournament(name)
         tourn.set_number_of_rounds(2)
 
@@ -98,9 +92,16 @@ class SetRounds(TestCase):
     def test_errors(self):
         """Illegal values"""
         name = 'test_errors'
-        self.set_up_tournament(name)
+        self.injector.inject(name)
 
         tourn = Tournament(name)
+        self.assertRaises(ValueError, tourn.set_number_of_rounds, 'foo')
+        self.assertRaises(ValueError, tourn.set_number_of_rounds, '')
+        self.assertRaises(TypeError, tourn.set_number_of_rounds, None)
+
+        name_2 = 'test_errors_2'
+        self.injector.inject(name_2, rounds=5)
+        tourn = Tournament(name_2)
         self.assertRaises(ValueError, tourn.set_number_of_rounds, 'foo')
         self.assertRaises(ValueError, tourn.set_number_of_rounds, '')
         self.assertRaises(TypeError, tourn.set_number_of_rounds, None)
