@@ -5,46 +5,38 @@ Checking whether users are players in tournaments, admins, organisers, etc.
 from flask.ext.testing import TestCase
 
 from app import create_app
-from models.account import db as account_db, Account, AccountSecurity, \
-add_account
+from models.account import db, Account, AccountSecurity, add_account
 from models.permissions import AccountProtectedObjectPermission
-from models.tournament import Tournament as TournamentDAO
 from permissions import PermissionsChecker
-from tournament import Tournament
 
 from unit_tests.tournament_injector import TournamentInjector
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class UserPermissions(TestCase):
 
+    acc_1 = 'test_add_account_creator'
+    tourn_1 = 'test_user_permissions_tournament_1'
+
     def create_app(self):
         # pass in test configuration
         return create_app()
 
     def setUp(self):
-        account_db.create_all()
-        self.acc_1 = 'test_add_account_creator'
-        self.acc_2 = 'test_add_account_admin'
-        self.accounts = [self.acc_1, self.acc_2]
-        self.tourn_1 = 'test_user_permissions_tournament_1'
-        self.tourn_2 = 'test_user_permissions_tournament_2'
+        db.create_all()
         self.injector = TournamentInjector()
 
     def tearDown(self):
-        self.injector.delete()
         AccountProtectedObjectPermission.query.\
-            filter(AccountProtectedObjectPermission.account_username.\
-                   in_(self.accounts)).delete(synchronize_session=False)
-        AccountSecurity.query.\
-            filter(AccountSecurity.id.in_(self.accounts)).\
+            filter(AccountProtectedObjectPermission.account_username == \
+            self.acc_1).delete(synchronize_session=False)
+        AccountSecurity.query.filter_by(id=self.acc_1).\
             delete(synchronize_session=False)
-        Account.query.filter(Account.username.in_(self.accounts)).\
+        Account.query.filter_by(username=self.acc_1).\
             delete(synchronize_session=False)
-        TournamentDAO.query.filter_by(name=self.tourn_1).delete()
-        TournamentDAO.query.filter_by(name=self.tourn_2).delete()
-        account_db.session.commit()
+        db.session.commit()
 
-        account_db.session.remove()
+        self.injector.delete()
+        db.session.remove()
 
     def test_add_account(self):
         add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
@@ -54,17 +46,18 @@ class UserPermissions(TestCase):
     def test_is_organiser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
-        Tournament(self.tourn_1, creator=self.acc_1).add_to_db('2110-12-25')
+        self.injector.inject(self.tourn_1)
+        creator = '{}_creator'.format(self.tourn_1)
+
         options = [None, 'ranking_test', 'not_a_tournament', '', 'lisa', \
             'not_a_person', 'superman', 'permission_test', self.tourn_1, \
-            self.acc_1]
+            creator]
 
-        self.assertTrue(checker.is_organiser(self.acc_1, self.tourn_1))
+        self.assertTrue(checker.is_organiser(creator, self.tourn_1))
 
         for user in options:
             for tourn in options:
-                if user == self.acc_1 and tourn == self.tourn_1:
+                if user == creator and tourn == self.tourn_1:
                     self.assertTrue(checker.is_organiser(user, tourn))
                 else:
                     self.assertFalse(checker.is_organiser(user, tourn))
@@ -73,21 +66,14 @@ class UserPermissions(TestCase):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
         add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
-        add_account(self.acc_2, 'foo@bar.com', 'pwd1', commit=False)
-        Account.query.filter_by(username=self.acc_2).first().is_superuser = True
+        Account.query.filter_by(username=self.acc_1).first().is_superuser = True
+        self.injector.inject(self.tourn_1)
 
-        Tournament(self.tourn_1, creator=self.acc_1).add_to_db('2110-12-25')
-        Tournament(self.tourn_2).add_to_db('2110-12-25')
         self.assertTrue(checker.check_permission(
             'enter_score',
-            self.acc_2,
+            self.acc_1,
             None,
             self.tourn_1))
-        self.assertTrue(checker.check_permission(
-            'enter_score',
-            self.acc_2,
-            None,
-            self.tourn_2))
 
     def test_check_permissions_bad_values(self):
         """malformed values"""
