@@ -51,25 +51,7 @@ class TournamentInjector(object):
 
         self.delete_games()
 
-        # Some relations can't be deleted via relationship for some reason
-        if len(self.accounts) > 0:
-            # registrations and entries
-            TRegistration.query.filter(
-                TRegistration.tournament_id.in_(tuple(self.tournament_ids))).\
-                delete(synchronize_session=False)
-            TournamentEntry.query.filter(
-                TournamentEntry.tournament_id.\
-                in_(tuple(self.tournament_names))).\
-                delete(synchronize_session=False)
-
-            # Accounts
-            AccountProtectedObjectPermission.query.filter(
-                AccountProtectedObjectPermission.account_username.\
-                in_(self.accounts)).delete(synchronize_session=False)
-            Account.query.filter(
-                Account.username.in_(tuple(self.accounts))).\
-                delete(synchronize_session=False)
-            self.accounts = set()
+        self.delete_accounts()
 
         if len(self.tournament_ids) > 0:
             TournamentRound.query.filter(TournamentRound.tournament_name.in_(
@@ -123,6 +105,29 @@ class TournamentInjector(object):
             db.session.add(TournamentEntry(play_name, tourn_name))
             db.session.flush()
             self.accounts.add(play_name)
+
+    def delete_accounts(self):
+        """Delete user accounts and sundry we have injected"""
+        if not len(self.accounts):
+            return
+
+        # Some relations can't be deleted via relationship for some reason
+        # registrations and entries
+        TRegistration.query.\
+            filter(TRegistration.tournament_id.in_(self.tournament_ids)).\
+            delete(synchronize_session=False)
+        TournamentEntry.query.\
+            filter(TournamentEntry.tournament_id.in_(self.tournament_names)).\
+            delete(synchronize_session=False)
+
+        # Accounts
+        AccountProtectedObjectPermission.query.filter(
+            AccountProtectedObjectPermission.account_username.\
+            in_(self.accounts)).delete(synchronize_session=False)
+        Account.query.filter(Account.username.in_(self.accounts)).\
+            delete(synchronize_session=False)
+
+        self.accounts = set()
 
     def delete_games(self):
         """
