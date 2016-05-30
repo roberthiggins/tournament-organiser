@@ -62,10 +62,14 @@ do
             rm -f database/env_file
             python -u scripts/make_db_env_file.py
             sudo docker run --env-file=database/env_file -d -P --name db db_image
+            rm -f database/env_file
             sleep 10    # wait for db to finish startup
         ;;
         daoserver)
-            sudo docker run --name=daoserver -d -p 5001:5000 --link=db daoserver_image
+            rm -f daoserver/env_file
+            python -u scripts/make_daoserver_env_file.py
+            sudo docker run --env-file=daoserver/env_file --name=daoserver -d -p 5001:5000 --link=db daoserver_image
+            rm -f daoserver/env_file
         ;;
         webserver)
             sudo docker run --name=webserver -d -p 5000:8000 --link=db --link=daoserver webserver_image
