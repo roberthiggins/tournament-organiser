@@ -4,10 +4,10 @@
 
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
-RUN apt-get install -y php5 php5-curl
+RUN apt-get update && apt-get install -y php5 php5-curl
 
 # Get Composer
-RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y curl
 RUN curl -sS https://getcomposer.org/installer | php
 ADD composer.json /
 RUN php /composer.phar install
