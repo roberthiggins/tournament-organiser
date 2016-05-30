@@ -1,0 +1,13 @@
+# Travis CI build script. This gets run by github before any pushes to github
+# are accepted. Note you should always push to dev and then pull from master
+# once the tests pass.
+
+language: python
+
+python:
+  - "2.7"
+
+install:
+  - pip install -r requirements.txt
+
+script: python unit_test.py
