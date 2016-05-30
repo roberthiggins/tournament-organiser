@@ -9,33 +9,19 @@ MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 # Python
 RUN apt-get update && apt-get install -y python
 
+# We need to attach to the db. Docker suggests that normally you
+# shouldn't run update manually. However it is the only way to get
+# python-dev or postgresql to install
+RUN apt-get update && apt-get install -y postgresql python-dev libpq-dev
+
 # Getting pip.
 # For some reason I can get it via apt-get. So we do it the hard way.
 RUN apt-get install -y curl
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 RUN python get-pip.py
 
-# Install flask
-RUN pip install flask
-
-# passlib for passwords
-RUN pip install passlib
-
-# We need to attach to the db. Docker suggests that normally you
-# shouldn't run update manually. However it is the only way to get
-# python-dev or postgresql to install
-RUN apt-get update && apt-get install -y postgresql python-dev libpq-dev
-RUN pip install psycopg2 Flask-SQLAlchemy Flask-Migrate Flask-Testing
-
-# jsonpickle is used for serializing objects into JSON
-RUN pip install jsonpickle
-
-# Django is used for email validation
-RUN pip install django
-
-# Unit tests only
-RUN pip install testfixtures
-# End Unit test installs
+ADD ./requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
 
 # Add the source dir
 ADD src/ webapp/
