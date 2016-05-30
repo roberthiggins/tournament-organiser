@@ -2,7 +2,7 @@
 Checking whether users are players in tournaments, admins, organisers, etc.
 """
 
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from testfixtures import compare
 
 from app import create_app

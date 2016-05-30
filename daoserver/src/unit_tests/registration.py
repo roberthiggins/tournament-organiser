@@ -2,7 +2,7 @@
 Players registering for tournaments
 """
 import datetime
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
 
 from app import create_app

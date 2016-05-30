@@ -1,7 +1,7 @@
 """
 Setting the number of rounds in a tournament
 """
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from testfixtures import compare
 
 from app import create_app

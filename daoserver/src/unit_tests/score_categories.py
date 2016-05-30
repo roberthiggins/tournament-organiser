@@ -2,7 +2,7 @@
 Test entering scores for games in a tournament
 """
 
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
