@@ -23,19 +23,14 @@ RUN apt-get update && apt-get install -y python-software-properties software-pro
 
 # The setup dir should contain the inital schema files for the db.
 ADD setup/ setup/
+ADD data/ data/
+ADD bootstrap.sh bootstrap.sh
 
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres
 
-# Create a PostgreSQL role named ``docker`` with ``docker`` as the password and
-# then create a database `docker` owned by the ``docker`` role. Then fill that
-# database from the files in the setup directory.
-# IMPORTANT ASSUMPTION: We assume that all the files in the setup dir are
-# ordered correctly. This can be done by prefixing a number to the filename.
-RUN    /etc/init.d/postgresql start &&\
-    psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'FuEm7l003bfd6zM';" &&\
-    createdb -O docker docker &&\
-    for i in setup/*.sql; do psql --file=$i -d docker ;done
+# Expose the PostgreSQL port
+EXPOSE 5432
 
 # Adjust PostgreSQL configuration so that remote connections to the
 # database are possible. 
@@ -44,13 +39,7 @@ RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.3/main/pg_hba.co
 # And add ``listen_addresses`` to ``/etc/postgresql/9.3/main/postgresql.conf``
 RUN echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
 
-# Expose the PostgreSQL port
-EXPOSE 5432
-
 # Add VOLUMEs to allow backup of config, logs and databases
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
-# Set the default command to run when starting the container
-CMD ["/usr/lib/postgresql/9.3/bin/postgres", "-D", "/var/lib/postgresql/9.3/main", "-c", "config_file=/etc/postgresql/9.3/main/postgresql.conf"]
-
-
+CMD bash ./bootstrap.sh

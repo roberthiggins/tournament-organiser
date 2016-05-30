@@ -1,0 +1,40 @@
+# Prod install script for Tournament Organiser.
+#
+# This will make sure the prod settings are configured properly
+#
+# To do a prod install you need to run this file on prod
+
+FILE_PATH=/var/lib/postgresql/
+FILE=$(date +"%Y-%m-%d_%H-%M-%S")_backup.sql
+EXISTING_DB_CONTAINER=$(docker ps | grep "\ db$" | awk '{print $1}')
+
+if [[ $EXISTING_DB_CONTAINER ]]
+then
+    # Dump the contents of the db to your local machine
+    COMMAND='pg_dump --data-only "$DB_NAME" > '$FILE_PATH/$FILE
+    docker exec -it db bash -c "$COMMAND"
+    docker cp db:$FILE_PATH/$FILE /tmp/
+fi
+
+# Install all the things
+cp config/production/config.ini webserver/env_config.ini
+cp config/production/config.ini daoserver/env_config.ini
+cp config/production/config.ini database/env_config.ini
+
+./scripts/install db daoserver webserver
+
+if [[ $EXISTING_DB_CONTAINER ]]
+then
+    # Re-load the contents from the dump file to the new container.
+    docker cp /tmp/$FILE db:$FILE_PATH/
+    COMMAND='psql -d "$DB_NAME" --file='$FILE_PATH/$FILE
+    docker exec -it db bash -c "$COMMAND"
+fi
+
+# Smoketest
+sleep 5
+./scripts/smoketest
+
+# TODO There needs to be a failsafe for stopping the install script from running in prod environments
+
+# TODO maybe make another backup

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Draw for Round {{round}}, {{tournament_id}}{% endblock %}
+
+{% block intro %}
+    <p>Draw for Round {{round}}, {{tournament_id}}</p>
+    {%  if not draw|length %}
+        <p>No draw is available</p>
+    {% else %}
+        <p>Mission: {{mission}}</p>
+        <table border="1">
+            <tr>
+                <td>Table</td>
+                <td>Player 1</td>
+                <td>Player 2</td>
+            </tr>
+            {% for entry in draw %}
+                <tr>
+                    <td>
+                        {{entry.table_number}}
+                    </td>
+                    <td>
+                        {{entry.entrants.0}}
+                    </td>
+                    <td>
+                        {{entry.entrants.1}}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

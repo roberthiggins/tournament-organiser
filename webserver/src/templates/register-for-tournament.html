@@ -1,33 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
- 
-    <head>
-        <title>Tournament Organiser Register for a Tournament</title>
-    </head>
+{% extends "base.html" %}
 
-    <body>
-        <div class="red" style="background: red; display:none"><ul></ul></div>
-        <div class="green" style="background: green; display:none"><ul></ul></div>
-        <p>You can register for a tournament here:</p>
-        <form class="form-register-for-tournament">
-            <label for="inputTournamentName">Select a tournament to register for</label>
-            <select name="inputTournamentName" id="inputTournamentName">
-                <option value="">-- Select a Tournament --</option>
-                {% for n in tournaments %}
-                    <option value="{{ n }}">{{ n }}</option>
-                {% endfor %}
-            </select>
-            <label for="inputUserName" class="sr-only">Your Username</label>
-            <input type="name" name="inputUserName" id="inputUserName" class="form-control" placeholder="Username" required autofocus>
-             
-            <button id="btnRegister" class="btn btn-lg btn-primary btn-block" type="button">Apply</button>
-        </form>
+{% block title %}Register for a Tournament{% endblock %}
 
-    </body>
+{% block intro %}<p>You can register for a tournament here</p>{% endblock %}
 
-    <script type="text/javascript"
-src="../static/js/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript"
-src="../static/js/register-for-tournament.js"></script>
-
-</html>
+{% block form %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Apply</button>
+    </form>
+{% endblock %}

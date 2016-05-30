@@ -5,21 +5,107 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
-import os
+from decimal import Decimal as Dec
+import json
 import re
+from functools import wraps
+import jsonpickle
 
-from flask import Flask, request, make_response, json
+from flask import Blueprint, request, make_response, jsonify
 
-from feedback_db import FeedbackDBConnection
-from player_db import PlayerDBConnection
-from tournament_db import TournamentDBConnection
-from registration_db import RegistrationDBConnection
+from sqlalchemy.exc import IntegrityError
 
-APP = Flask(__name__)
-FEEDBACK_DB_CONN = FeedbackDBConnection()
-PLAYER_DB_CONN = PlayerDBConnection()
-TOURNAMENT_DB_CONN = TournamentDBConnection()
-REGISTRATION_DB_CONN = RegistrationDBConnection()
+from authentication import check_auth
+from models.account import Account, add_account
+from models.db_connection import db
+from models.feedback import Feedback
+from models.registration import TournamentRegistration
+from models.tournament import Tournament as TournamentDAO
+from models.tournament_entry import TournamentEntry
+from permissions import PERMISSIONS, PermissionsChecker
+from tournament import Tournament, ScoreCategoryPair
+
+APP = Blueprint('APP', __name__, url_prefix='')
+
+@APP.errorhandler(IndexError)
+@APP.errorhandler(TypeError)
+@APP.errorhandler(RuntimeError)
+@APP.errorhandler(ValueError)
+def input_error(err):
+    """Input errors"""
+    print type(err).__name__
+    print err
+    import traceback
+    traceback.print_exc()
+    return make_response(str(err), 400)
+
+@APP.errorhandler(Exception)
+def unknown_error(err):
+    """All other exceptions are essentially just raised with logging"""
+    print type(err).__name__
+    print err
+    import traceback
+    traceback.print_exc()
+    return make_response(str(err), 500)
+
+def enforce_request_variables(*vars_to_enforce):
+    """ A decorator that requires var exists in the request"""
+    def decorator(func):                # pylint: disable=missing-docstring
+        @wraps(func)
+        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
+
+            if request.method == 'GET':
+                return func(*args, **kwargs)
+
+            glob = func.func_globals
+            sentinel = object()
+            old_values = {}
+
+            for var in vars_to_enforce:
+                value = request.form[var] if var in request.form \
+                    else request.values.get(var, None)
+                if not value:
+                    return make_response('Enter the required fields', 400)
+
+                old_values[var] = glob.get(var, sentinel)
+                glob[var] = value
+
+            try:
+                res = func(*args, **kwargs)
+            finally:
+                for var in vars_to_enforce:
+                    if old_values[var] is sentinel:
+                        del glob[var]
+                    else:
+                        glob[var] = old_values[var]
+
+            return res
+        return wrapped
+    return decorator
+
+# pylint: disable=E0602
+def requires_permission(action, error_msg):
+    """
+    A decorator that requires a permission check for the function.
+    Assumptions:
+        - the function scope includes the variables 'username' and 'tournament'
+    """
+    def decorator(func):                # pylint: disable=missing-docstring
+        @wraps(func)
+        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
+
+            checker = PermissionsChecker()
+            if request.authorization is None or not checker.check_permission(
+                    action,
+                    request.authorization.username,
+                    username,
+                    tournament):
+                # TODO get tournament from the request
+                raise ValueError('Permission denied. {}'.format(error_msg))
+
+            return func(*args, **kwargs)
+        return wrapped
+    return decorator
 
 @APP.route("/")
 def main():
@@ -34,10 +120,15 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     tournament names
     """
-    from flask import jsonify
-    return jsonify({'tournaments' : TOURNAMENT_DB_CONN.list_tournaments()})
+    # pylint: disable=no-member
+    details = [
+        {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
+        for x in TournamentDAO.query.all()]
+
+    return jsonpickle.encode({'tournaments' : details}, unpicklable=False)
 
 @APP.route('/registerfortournament', methods=['POST'])
+@enforce_request_variables('inputTournamentName', 'inputUserName')
 def apply_for_tournament():
     """
     POST to apply for entry to a tournament.
@@ -45,22 +136,19 @@ def apply_for_tournament():
         - inputUserName - Username of player applying
         - inputTournamentName - Tournament as returned by GET /listtournaments
     """
-    username = request.form['inputUserName']
-    tournament_name = request.form['inputTournamentName']
-
-    if not username or not tournament_name:
-        return make_response("Enter the required fields", 400)
+    rego = TournamentRegistration(inputUserName, inputTournamentName)
+    rego.clashes()
 
     try:
-        return make_response(
-            REGISTRATION_DB_CONN.register_for_tournament(
-                tournament_name,
-                username),
-            200)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+        db.session.add(rego)
+        db.session.commit()
+    except IntegrityError:
+        raise ValueError("Check username and tournament")
+
+    return make_response('Application Submitted', 200)
 
 @APP.route('/addTournament', methods=['POST'])
+@enforce_request_variables('inputTournamentName', 'inputTournamentDate')
 def add_tournament():
     """
     POST to add a tournament
@@ -68,28 +156,17 @@ def add_tournament():
         - inputTournamentName - Tournament name. Must be unique.
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
-    import datetime
-    name = request.form['inputTournamentName']
-    date = request.form['inputTournamentDate']
-
-    if not name or not date:
-        return make_response("Please fill in the required fields", 400)
-
-    try:
-        date = datetime.datetime.strptime(
-                    request.form['inputTournamentDate'],
-                    "%Y-%m-%d")
-        assert date.date() >= datetime.date.today()
-    except ValueError:
-        return make_response("Enter a valid date", 400)
-
-    if TOURNAMENT_DB_CONN.tournament_exists(name):
-        return make_response("A tournament with name %s already exists! \
-        Please choose another name" % name, 400)
-    TOURNAMENT_DB_CONN.add_tournament({'name' : name, 'date' : date})
-    return make_response('<p>Tournament Created! You submitted the \
-        following fields:</p><ul><li>Name: {name}</li><li>Date: {date} \
-        </li></ul>'.format(**locals()), 200)
+    # pylint: disable=E0602
+    tourn = Tournament(
+        inputTournamentName,
+        creator=request.authorization.username)
+    # pylint: disable=E0602
+    tourn.add_to_db(inputTournamentDate)
+    # pylint: disable=E0602
+    return make_response(
+        '<p>Tournament Created! You submitted the following fields:</p> \
+        <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
+            inputTournamentName, inputTournamentDate), 200)
 
 def validate_user_email(email):
     """
@@ -104,111 +181,111 @@ def validate_user_email(email):
         return False
 
 @APP.route('/addPlayer', methods=['POST'])
-def add_account():
+@enforce_request_variables('username', 'email', 'password1', 'password2')
+def create_account():
     """
     POST to add an account
     Expects:
-        - inputUsername
-        - inputEmail
-        - inputPassword
-        - inputConfirmPassword
+        - username
+        - email
+        - password1
+        - password2
     """
-    username = request.form['inputUsername'].strip()
-    email = request.form['inputEmail'].strip()
-    password = request.form['inputPassword'].strip()
-    confirm = request.form['inputConfirmPassword'].strip()
-
-    if not username:
-        return make_response("Please fill in the required fields", 400)
-
+    # pylint: disable=E0602
     if not validate_user_email(email):
         return make_response("This email does not appear valid", 400)
 
-    if not password or not confirm or password != confirm:
+    # pylint: disable=E0602
+    if password1 != password2:
         return make_response("Please enter two matching passwords", 400)
 
-    if PLAYER_DB_CONN.username_exists(username):
-        return make_response("A user with the username %s already exists! \
-            Please choose another name" % username, 400)
+    if Account.username_exists(username):
+        return make_response("A user with the username {} already exists! \
+            Please choose another name".format(username), 400)
 
-    PLAYER_DB_CONN.add_account({'user_name': username,
-                               'email' : email,
-                               'password': password})
+    add_account(username, email, password1)
+
     return make_response('<p>Account created! You submitted the following \
-        fields:</p><ul><li>User Name: {username}</li><li>Email: {email}\
-        </li></ul>'.format(**locals()), 200)
-
-@APP.route('/entergamescore', methods=['POST'])
-def enter_game_score():
-    """
-    POST to enter the scores for a single game.
-
-    Expects:
-        - json blob named 'gamescore' e.g. gamescore={blah}.It should include:
-            {
-            'scores': { 'username':{}, 'username': {} },
-            'tournament_name': 'some_tournament_id',
-            'round': '1'
-            }
-    """
-    if not request.args.get('gamescore'):
-        return make_response('Enter the required fields', 400)
-
-    data = json.loads(request.args.get('gamescore'))
-
-    if not data \
-    or not 'tournament_name' in data \
-    or not 'round' in data \
-    or not 'scores' in data:
-        return make_response('Enter the required fields', 400)
-
-    unknown_players = [x for x in data['scores'].keys() \
-                        if not PLAYER_DB_CONN.username_exists(x)]
-    if len(unknown_players) > 0:
-        return make_response('Unknown player: ' + unknown_players[0], 400)
-
-    try:
-        return make_response(
-            TOURNAMENT_DB_CONN.enter_game_score(
-                data['tournament_name'],
-                data['round'],
-                data['scores']),
-            200)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+        fields:</p><ul><li>User Name: {}</li><li>Email: {}\
+        </li></ul>'.format(username, email), 200)
 
 @APP.route('/entertournamentscore', methods=['POST'])
+@enforce_request_variables('username', 'tournament', 'key', 'value')
+@requires_permission(
+    PERMISSIONS.get('ENTER_SCORE'),
+    'You cannot enter scores for this game. Contact the TO.')
 def enter_tournament_score():
     """
-    POST to enter a one-time score for a player in a tournament. An example
-    might be a painting score.
+    POST to enter a score for a player in a tournament.
 
     Expects:
-        - username
-        - tournament - the tournament name
-        - key - the category e.g. painting
-        - value - the score
+        - username - the player_id
+        - tournament - the tournament_id
+        - key - the category e.g. painting, round_6_battle
+        - value - the score. Integer
     """
+    # pylint: disable=E0602
+    tourn = Tournament(tournament)
+    if not tourn.exists_in_db:
+        raise ValueError('Unknown tournament: {}'.format(tournament))
 
-    user = request.args.get('username')
-    tournament = request.args.get('tournament')
-    category = request.args.get('key')
-    score = request.args.get('value')
+    if not Account.username_exists(username):
+        raise ValueError('Unknown player: {}'.format(username))
 
-    if not user or not tournament or not category or not score:
-        return make_response('Enter the required fields', 400)
+    # pylint: disable=E0602,no-member
+    entry_id = TournamentEntry.query.\
+            filter_by(tournament_id=tournament, player_id=username).first().id
 
-    if not PLAYER_DB_CONN.username_exists(user):
-        return make_response('Unknown user: ' + user, 400)
+    # pylint: disable=E0602
+    tourn.enter_score(entry_id, key, value)
+    return make_response(
+        'Score entered for {}: {}'.format(username, value),
+        200)
+
+def get_entry_id(tournament_id, username):
+    """Get entry info from tournament and username"""
+    if not Account.username_exists(username):
+        raise ValueError('Unknown player: {}'.format(username))
+
+    # pylint: disable=no-member
+    return TournamentEntry.query.\
+        filter_by(tournament_id=tournament_id, player_id=username).first().id
+
+
+@APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
+def get_entry_id_from_tournament(tournament_id, username):
+    """Get entry info from tournament and username"""
+    return jsonpickle.encode(get_entry_id(tournament_id, username),
+                             unpicklable=False)
+
+@APP.route('/entryInfo/<entry_id>', methods=['GET'])
+def entry_info_from_id(entry_id):
+    """ Given entry_id, get info about player and tournament"""
 
     try:
-        return make_response(
-            TOURNAMENT_DB_CONN.enter_score(tournament, user, category, score),
-            200)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
+        entry_id = int(entry_id)
+    except ValueError:
+        raise ValueError('Entry ID must be an integer')
+
+    try:
+        # pylint: disable=no-member
+        entry = TournamentEntry.query.filter_by(id=entry_id).first()
+
+        return jsonpickle.encode({
+            'entry_id': entry.id,
+            'username': entry.account.username,
+            'tournament_name': entry.tournament.name,
+        }, unpicklable=False)
+    except AttributeError:
+        raise ValueError('Entry ID not valid: {}'.format(entry_id))
+
+@APP.route('/entryInfo/<tournament_id>/<username>', methods=['GET'])
+def entry_info_from_tournament(tournament_id, username):
+    """ Given entry_id, get info about player and tournament"""
+    return entry_info_from_id(get_entry_id(tournament_id, username))
 
 @APP.route('/login', methods=['POST'])
+@enforce_request_variables('inputUsername', 'inputPassword')
 def login():
     """
     POST to login
@@ -216,17 +293,43 @@ def login():
         - inputUsername
         - inputPassword
     """
-    username = request.form['inputUsername'].strip()
-    password = request.form['inputPassword'].strip()
+    # pylint: disable=E0602
+    return make_response(
+        "Login successful" if check_auth(inputUsername, inputPassword) \
+        else "Login unsuccessful",
+        200)
 
-    try:
-        return make_response(PLAYER_DB_CONN.login(username, password), 200)
-    except RuntimeError as err:
-        return make_response(str(err), 400)
-    except Exception as err:
-        print err
-        return make_response(str(err), 500)
+@APP.route('/getMissions/<tournament_id>', methods=['GET'])
+def get_missions(tournament_id):
+    """GET list of missions for a tournament."""
+    return jsonpickle.encode(
+        [x.mission for x in Tournament(tournament_id).get_dao().rounds],
+        unpicklable=False)
 
+@APP.route('/setMissions', methods=['POST'])
+@enforce_request_variables('tournamentId', 'missions')
+def set_missions():
+    """POST to set the missions for a tournament.A list of strings expected"""
+    # pylint: disable=E0602
+    tourn = Tournament(tournamentId)
+    # pylint: disable=E0602
+    rounds = tourn.details()['rounds']
+    json_missions = json.loads(missions)
+
+    if len(json_missions) != int(rounds):
+        # pylint: disable=E0602
+        raise ValueError('Tournament {} has {} rounds. \
+            You submitted missions {}'.format(tournamentId, rounds, missions))
+
+    from models.tournament_round import TournamentRound as TR
+    for i, mission in enumerate(json_missions):
+        rnd = tourn.get_round(i + 1)
+        # pylint: disable=no-member
+        rnd.mission = mission if mission else TR.__table__.c.mission.default.arg
+        db.session.add(rnd)
+
+    db.session.commit()
+    return make_response('Missions set: {}'.format(missions), 200)
 
 @APP.route('/placefeedback', methods=['POST'])
 def place_feedback():
@@ -238,12 +341,139 @@ def place_feedback():
     _feedback = request.form['inputFeedback'].strip('\n\r\t+')
     if re.match(r'^[\+\s]*$', _feedback) is not None:
         return make_response("Please fill in the required fields", 400)
-    FEEDBACK_DB_CONN.submit_feedback(_feedback)
+    try:
+        db.session.add(Feedback(_feedback))
+        db.session.commit()
+    except IntegrityError:
+        pass
+
     return make_response("Thanks for you help improving the site", 200)
 
+@APP.route('/rankEntries/<tournament_id>', methods=['GET'])
+def rank_entries(tournament_id):
+    """
+    Rank all the entries in a tournament based on the scoring criteria for the
+    tournament.
+    The structure of the returned JSON blob will be as follows:
+    [
+        {
+            'username': 'homer',
+            'entry_id': 1,
+            'tournament_id': 'some_tournie',
+            'scores': {'round_1': 10, 'round_2': 4 },
+            'total_score': 23.50, # always 2dp
+            'ranking': 3
+        },
+    ]
+    """
+    tourn = Tournament(tournament_id)
+    if not tourn.exists_in_db:
+        return make_response(
+            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
 
-if __name__ == "__main__":
-    # Bind to PORT if defined, otherwise default to 5000.
-    PORT = int(os.environ.get('PORT', 5000))
-    APP.run(host='0.0.0.0', port=PORT)
+    return jsonpickle.encode(
+        [
+            {
+                'username' : x.player_id,
+                'entry_id' : x.id,
+                'tournament_id' : tourn.tournament_id,
+                'scores' : x.score_info,
+                'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
+                'ranking': x.ranking
+            } for x in \
+            tourn.ranking_strategy.overall_ranking(tourn.entries())
+        ],
+        unpicklable=False)
 
+@APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET'])
+@enforce_request_variables('score_keys', 'mission')
+# pylint: disable=E0602
+def get_round_info(tournament_id, round_id):
+    """
+    GET the information about a round
+    POST information including the mission, score_keys to be used.
+    POST Expects:
+        {
+            'mission': a text name,
+        }
+    """
+    tourn = Tournament(tournament_id)
+    rnd = tourn.get_round(round_id)
+    draw = tourn.make_draw(round_id)
+
+    draw_info = [
+        {'table_number': t.table_number,
+         'entrants': [x if isinstance(x, str) else x.player_id \
+                      for x in t.entrants]
+        } for t in draw]
+
+    # We will return all round info for all requests regardless of method
+    return jsonpickle.encode(
+        {
+            'draw': draw_info,
+            'mission': rnd.mission
+        },
+        unpicklable=False)
+
+@APP.route('/setRounds', methods=['POST'])
+@enforce_request_variables('numRounds', 'tournamentId')
+def set_rounds():
+    """Set the number of rounds for a tournament"""
+    # pylint: disable=E0602
+    rounds = int(numRounds)
+    if rounds < 1:
+        raise ValueError('Set at least 1 round')
+    # pylint: disable=E0602
+    Tournament(tournamentId).set_number_of_rounds(rounds)
+    return make_response('Rounds set: {}'.format(rounds), 200)
+
+@APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
+def get_score_categories(tournament_id):
+    """
+    GET the score categories set for the tournament.
+    e.g. [{ 'name': 'painting', 'percentage': 20, 'id': 2 }]
+    """
+    try:
+        tourn = Tournament(tournament_id)
+        return jsonpickle.encode(
+            tourn.list_score_categories(), unpicklable=False)
+    except ValueError as err:
+        return make_response(str(err), 404)
+
+@APP.route('/setScoreCategories', methods=['POST'])
+@enforce_request_variables('tournamentId', 'categories')
+def set_score_categories():
+    """
+    POST to set tournament categories en masse
+    """
+    tourn = Tournament(tournamentId)
+
+    new_categories = []
+    for json_cat in json.loads(categories):
+        cat = json.loads(request.values.get(json_cat, []))
+        new_categories.append(
+            ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
+
+    tourn.set_score_categories(new_categories)
+
+    return make_response('Score categories set: {}'.format(
+        ', '.join([str(cat.display_name) for cat in new_categories])), 200)
+
+@APP.route('/tournamentDetails/<t_name>', methods=['GET'])
+def tournament_details(t_name=None):
+    """
+    GET to get details about a tournament. This includes entrants and format
+    information
+    """
+    tourn = Tournament(t_name)
+    return jsonpickle.encode(tourn.details(), unpicklable=False)
+
+@APP.route('/userDetails/<u_name>', methods=['GET'])
+def user_details(u_name=None):
+    """
+    GET to get account details in url form
+    TODO security
+    """
+    # pylint: disable=no-member
+    return jsonify({u_name: Account.query.filter_by(
+        username=u_name).first().contact_email})

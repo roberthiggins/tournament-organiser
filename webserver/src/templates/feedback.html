@@ -1,21 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
- 
-    <head>
-        <title>Tournament Organiser {{title}}</title>
-    </head>
+{% extends "base.html" %}
 
-    <body>
-        <div class="red" style="background: red; display:none"><ul></ul></div>
-        <div class="green" style="background: green; display:none"><ul></ul></div>
-        <p>{{intro}}</p>
-        <form class="form-register-for-tournament">
-            <textarea name="inputFeedback" id="inputFeedback" class="form-control" placeholder="{{title}}"rows="10" cols="50" required autofocus></textarea>
-            <button id="submit" class="btn btn-lg btn-primary btn-block" type="button">Submit</button>
-        </form>
-    </body>
-    <script type="text/javascript"
-            src="../static/js/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript"
-            src="../static/js/feedback.js"></script>
-</html>
+{% block title %}{{title}}{% endblock %}
+
+{% block intro %}<p>{{intro}}</p>{% endblock %}
+
+{% block form %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

@@ -1,10 +1,7 @@
 # This is a an install script which will rebuild all the docker containers and
-# fire them all up. This is all you should have to run to get development set
-# up.
-
-# c.f. also the run script.
+# fire them all up.
+#
 # Use install script when:
-#     - You need to setup for the first time
 #     - You want to rebuild the containers from scratch
 #     - You have made changes to a Dockerfile and want to see them.
 
@@ -12,7 +9,8 @@
 #!/bin/sh
 
 #### OPTION HANDLING ####
-ENVS="db drawserver daoserver webserver"
+ENVS_NOT_USED="rails-webserver"
+ENVS="db daoserver webserver"
 if [ $# -ne 0 ]
     then
     ENVS="$@"
@@ -34,14 +32,6 @@ do
             sudo docker build -t db_image .
             popd
         ;;
-        drawserver)
-            pushd drawserver
-            pushd drawbuilder
-            mvn clean package
-            popd
-            sudo docker build -t drawserver_image .
-            popd
-        ;;
         daoserver)
             pushd daoserver
             sudo docker build -t daoserver_image .
@@ -50,6 +40,11 @@ do
         webserver)
             pushd webserver
             sudo docker build -t webserver_image .
+            popd
+        ;;
+        rails-webserver)
+            pushd rails_webserver/src/webapp
+            sudo docker build -t rails_webapp_image .
             popd
         ;;
         *)
@@ -64,17 +59,21 @@ for ENV in $ENVS
 do
     case $ENV in
         db)
-            sudo docker run -d -P --name db db_image
+            rm -f database/env_file
+            python -u scripts/make_db_env_file.py
+            sudo docker run --env-file=database/env_file -d -P --name db db_image
             sleep 10    # wait for db to finish startup
         ;;
-        drawserver)
-            sudo docker run --name=drawserver -d -p 8888:8080 --link=db drawserver_image
-        ;;
         daoserver)
-            sudo docker run --name=daoserver -d -p 5001:5000 --link=db --link=drawserver daoserver_image
+            sudo docker run --name=daoserver -d -p 5001:5000 --link=db daoserver_image
         ;;
         webserver)
-            sudo docker run --name=webserver -d -p 5000:5000 --link=db --link=drawserver --link=daoserver webserver_image
+            sudo docker run --name=webserver -d -p 5000:8000 --link=db --link=daoserver webserver_image
+        sleep 5
+        ;;
+        rails-webserver)
+            sudo docker run --name=rails-webserver -d -p 3000:3000 --link=daoserver rails_webapp_image
+        sleep 5
         ;;
         *)
         # unknown option

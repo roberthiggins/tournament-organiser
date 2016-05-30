@@ -7,6 +7,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class RestContext extends BehatContext
 {
+    private $_auth              = null;
     private $_restObject        = null;
     private $_restObjectType    = null;
     private $_restObjectMethod  = 'get';
@@ -98,8 +99,9 @@ class RestContext extends BehatContext
     public function theResponseIsJson()
     {
         $data = json_decode($this->_response->getBody(true));
-        if (empty($data)) {
-            throw new Exception("Response was not JSON\n" . $this->_response);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("Response was not JSON\n" .
+                $this->_response->getBody(true));
         }
     }
     /**
@@ -113,7 +115,8 @@ class RestContext extends BehatContext
                 throw new Exception("Property '".$propertyName."' is not set!\n");
             }
         } else {
-            throw new Exception("Response was not JSON\n" . $this->_response->getBody(true));
+            throw new Exception("Response was not JSON\n" .
+                $this->_response->getBody(true));
         }
     }
     /**
@@ -172,10 +175,25 @@ class RestContext extends BehatContext
     {
         $baseUrl = $this->getParameter('api_url');
         $this->_requestUrl = $baseUrl.$pageUrl;
-        $response = $this->_client
-            ->request('GET', $this->_requestUrl.'?'.http_build_query((array)$this->_restObject));
-        $this->_response = $response;
+        try {
+            $response = $this->_client
+                ->request('GET',
+                    $this->_requestUrl.'?'.http_build_query((array)$this->_restObject));
+            $this->_response = $response;
+        }
+        catch (GuzzleHttp\Exception\ClientException $e) {
+            $this->_response = $e->getResponse();
+        }
     }
+
+    /**
+     * @Given /^that I set auth to u:"([^"]*)" and p:"([^"]*)"$/
+     */
+    public function iSetAuth($username, $password)
+    {
+        $this->_auth = [$username,$password];
+    }
+
     /**
      * @When /^I POST "([^"]*)" to "([^"]*)" from the API$/
      */
@@ -185,22 +203,42 @@ class RestContext extends BehatContext
         $this->_requestUrl = $baseUrl.$pageUrl;
         try {
             $response = $this->_client->request(
-                            'POST',
-                            $this->_requestUrl.'?'.$value);
+                'POST',
+                $this->_requestUrl.'?'.$value,
+                [ 'auth' => $this->_auth ]);
+            $this->_response = $response;
         }
         catch (GuzzleHttp\Exception\ClientException $e) {
             $this->_response = $e->getResponse();
         }
     }
+
     /**
-     * @Then /^the API response should contain "([^"]*)"$/
+     * @Then /^the API response should( not)? contain "([^"]*)"$/
      */
-    public function theRequestShouldContain($value){
+    public function theRequestShouldContain($negate, $value){
         $data = $this->_response->getBody(true);
         if (!empty($data)) {
-            if (strpos($data,$value) === false) {
+            if (strpos($data,$value) === (false || $negate)) {
                 throw new Exception("Response doesn't include " .
                     $value . "\n".$this->_response->getBody(true));
+            }
+        } else {
+            throw new Exception("Response empty\n" .
+                $this->_response->getBody(true));
+        }
+    }
+
+    /**
+     * @Then /^the API response should be a list of length (\d+)$/
+     */
+    public function theApiResponseShouldContainAListOfLength($expected){
+        $data = $this->_response->getBody(true);
+        if (!empty($data)) {
+            $len = sizeof(json_decode($data));
+            if ($len != $expected) {
+                throw new Exception("Array length was " . $len .
+                    ". Expected " . $expected);
             }
         } else {
             throw new Exception("Response empty\n" .

@@ -1,0 +1,14 @@
+# This is an install script for development environments.
+#
+# This will make sure the development settings are configured propery.
+
+#! /bin/sh
+
+cp config/dev/config.ini webserver/env_config.ini
+cp config/dev/config.ini daoserver/env_config.ini
+cp config/dev/config.ini database/env_config.ini
+
+./scripts/install $@
+
+sleep 5
+./scripts/smoketest
