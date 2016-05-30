@@ -4,7 +4,7 @@
 FROM ubuntu:14.04
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
-RUN apt-get install -y curl postgresql
+RUN apt-get update && apt-get install -y curl postgresql
 
 ADD src/ tests/
 

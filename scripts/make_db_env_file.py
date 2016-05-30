@@ -7,7 +7,7 @@ file will be placed in the appropriate place in the db directory.
 import ConfigParser
 
 CONFIG = ConfigParser.ConfigParser()
-CONFIG.read('database/env_config.ini')
+CONFIG.read('config/dev/config.ini')
 
 DB_NAME = CONFIG.get('DATABASE', 'DB_NAME')
 DB_PASSWORD = CONFIG.get('DATABASE', 'DB_PASSWORD')
