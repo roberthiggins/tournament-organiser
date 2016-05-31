@@ -1,6 +1,6 @@
-# Travis CI build script. This gets run by github before any pushes to github
-# are accepted. Note you should always push to dev and then pull from master
-# once the tests pass.
+# Travis CI build script. This gets run by github when a push is performed.
+# Note you should always push to dev and then pull from master once the tests
+# pass.
 
 sudo: required
 
@@ -8,14 +8,14 @@ services:
     - docker
 
 before_install:
- - docker pull roberthiggins/tournament-organiser-db
- - rm -f database/env_file
- - python -u scripts/make_db_env_file.py
- - docker run --env-file=database/env_file -d -P --name db roberthiggins/tournament-organiser-db
- - rm -f database/env_file
- - docker pull roberthiggins/tournament-organiser-daoserver
- - rm -f daoserver/env_file
- - python -u scripts/make_daoserver_env_file.py
- - docker run --env-file=daoserver/env_file --name=dao_unit_test -d --link=db roberthiggins/tournament-organiser-daoserver
+    # DB for all tests
+    - docker pull roberthiggins/tournament-organiser-db
+    - ./scripts/install -i roberthiggins/tournament-organiser-db db
+    - docker pull roberthiggins/tournament-organiser-db
 
-script: docker exec dao_unit_test python -m unittest discover -s unit_tests --pattern=*.py
+    # DAO servers for system test and unit test
+    - docker pull roberthiggins/tournament-organiser-daoserver
+    - ./scripts/install -i roberthiggins/tournament-organiser-daoserver daoserver
+
+script:
+    - docker exec daoserver python -m unittest discover -s unit_tests --pattern=*.py
