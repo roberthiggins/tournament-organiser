@@ -8,13 +8,14 @@ services:
     - docker
 
 before_install:
+    - docker pull roberthiggins/tournament-organiser-db
+    - docker pull roberthiggins/tournament-organiser-daoserver
+
+install:
     # DB for all tests
-    - docker pull roberthiggins/tournament-organiser-db
     - ./scripts/install -i roberthiggins/tournament-organiser-db db
-    - docker pull roberthiggins/tournament-organiser-db
 
     # DAO servers for system test and unit test
-    - docker pull roberthiggins/tournament-organiser-daoserver
     - ./scripts/install -i roberthiggins/tournament-organiser-daoserver daoserver
 
 script:
