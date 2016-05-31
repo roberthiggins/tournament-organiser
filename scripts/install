@@ -74,13 +74,13 @@ do
         webserver)
             rm -f webserver/env_file
             python -u scripts/make_webserver_env_file.py
-            sudo docker run --env-file=webserver/env_file --name=webserver -d -p 5000:8000 --link=db --link=daoserver webserver_image
+            sudo docker run --env-file=webserver/env_file --name=webserver --env ROOT_PASSWORD=root -d -p 5000:8000 --link=db --link=daoserver webserver_image
             rm -f webserver/env_file
-        sleep 5
+            sleep 5
         ;;
         rails-webserver)
             sudo docker run --name=rails-webserver -d -p 3000:3000 --link=daoserver rails_webapp_image
-        sleep 5
+            sleep 5
         ;;
         *)
         # unknown option
