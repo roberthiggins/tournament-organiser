@@ -9,7 +9,6 @@
 #!/bin/sh
 
 #### OPTION HANDLING ####
-ENVS_NOT_USED="rails-webserver"
 ENVS="db daoserver webserver"
 if [ $# -ne 0 ]
     then
@@ -42,11 +41,6 @@ do
             sudo docker build -t webserver_image .
             popd
         ;;
-        rails-webserver)
-            pushd rails_webserver/src/webapp
-            sudo docker build -t rails_webapp_image .
-            popd
-        ;;
         *)
         # unknown option
         ;;
@@ -76,10 +70,6 @@ do
             python -u scripts/make_webserver_env_file.py
             sudo docker run --env-file=webserver/env_file --name=webserver --env ROOT_PASSWORD=root -d -p 5000:8000 --link=db --link=daoserver webserver_image
             rm -f webserver/env_file
-            sleep 5
-        ;;
-        rails-webserver)
-            sudo docker run --name=rails-webserver -d -p 3000:3000 --link=daoserver rails_webapp_image
             sleep 5
         ;;
         *)
