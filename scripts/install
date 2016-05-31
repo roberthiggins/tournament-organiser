@@ -60,7 +60,6 @@ done
 # Build replacements
 if [ -z "$DOCKER_IMAGE" ]
     then
-    echo 'dfsfdsfsdfsdf'
     for ENV in $ENVS
     do
         case $ENV in
