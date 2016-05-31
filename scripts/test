@@ -1,4 +1,4 @@
-./scripts/install_dev $@
+./scripts/install $@
 
 sleep 5
 ./scripts/smoketest
