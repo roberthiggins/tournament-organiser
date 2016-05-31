@@ -22,7 +22,6 @@ RUN pip install -r requirements.txt
 ADD src/ webapp/
 ADD ./init.sh webapp/
 ADD ./bash_aliases /root/.bash_aliases
-ADD ./env_config.ini /webapp/environment_config.ini
 
 # Config
 WORKDIR webapp/

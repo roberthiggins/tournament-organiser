@@ -4,8 +4,6 @@
 
 #! /bin/sh
 
-cp config/dev/config.ini webserver/env_config.ini
-
 ./scripts/install $@
 
 sleep 5
