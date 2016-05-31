@@ -1,6 +1,6 @@
 # We use behat and a selnium server to run behaviour tests
-sudo docker kill selenium behat
-sudo docker rm -v selenium behat
+sudo docker kill selenium behat         &> /dev/null
+sudo docker rm -v selenium behat        &> /dev/null
 
 pushd behat
 sudo docker build -t behat_image .

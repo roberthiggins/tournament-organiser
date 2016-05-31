@@ -1,5 +1,5 @@
-sudo docker kill dao_unit_test
-sudo docker rm -v dao_unit_test
+sudo docker kill dao_unit_test  &> /dev/null
+sudo docker rm -v dao_unit_test &> /dev/null
 
 # We assume the dao image exists
 

@@ -52,8 +52,8 @@ fi
 # Turn off existing
 for ENV in $ENVS
 do
-    sudo docker kill $ENV
-    sudo docker rm -v $ENV
+    sudo docker kill $ENV       &> /dev/null
+    sudo docker rm -v $ENV      &> /dev/null
 done
 
 
