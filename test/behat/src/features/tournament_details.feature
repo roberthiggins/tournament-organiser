@@ -32,13 +32,3 @@ Feature: Get information about a tournament
     Scenario: I try to visit a non-existent page
         Given I am on "/tournament/not_a_tournament"
         Then I should see "Tournament not_a_tournament not found in database"
-
-    Scenario: I check the API for information on northcon_2095
-        Given I GET "/tournamentDetails/northcon_2095" from the API
-        Then the response is JSON
-        Then the response has a "name" property
-
-    Scenario: I check the API for information on not_a_tournament
-        When I GET "/tournamentDetails/not_a_tournament" from the API
-        Then the API response status code should be 400
-

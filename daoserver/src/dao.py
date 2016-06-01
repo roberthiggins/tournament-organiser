@@ -11,7 +11,7 @@ import re
 from functools import wraps
 import jsonpickle
 
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request, make_response, jsonify, Response
 
 from sqlalchemy.exc import IntegrityError
 
@@ -466,7 +466,9 @@ def tournament_details(t_name=None):
     information
     """
     tourn = Tournament(t_name)
-    return jsonpickle.encode(tourn.details(), unpicklable=False)
+    return Response(
+        jsonpickle.encode(tourn.details(), unpicklable=False),
+        mimetype='application/json')
 
 @APP.route('/userDetails/<u_name>', methods=['GET'])
 def user_details(u_name=None):
