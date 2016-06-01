@@ -12,6 +12,7 @@ services:
 before_install:
     - docker pull roberthiggins/tournament-organiser-db
     - docker pull roberthiggins/tournament-organiser-daoserver
+    - docker pull roberthiggins/tournament-organiser-api-test
 
 install:
     - pip install pylint
@@ -19,9 +20,11 @@ install:
     # DB for all tests
     - ./scripts/install -i roberthiggins/tournament-organiser-db db
 
-    # DAO servers for system test and unit test
+    # DAO servers for system test, unit test, api test
     - ./scripts/install -i roberthiggins/tournament-organiser-daoserver daoserver
 
 script:
     - docker exec daoserver python -m unittest discover -s unit_tests --pattern=*.py
+    - docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB_NAME"'
+    - docker run -t --link=daoserver roberthiggins/tournament-organiser-api-test
     - pylint $(find . -iname "*.py")
