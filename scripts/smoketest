@@ -1,14 +1,14 @@
 # Go get the env_file used for the db
 rm -f database/env_file
 python -u scripts/make_db_env_file.py
-cp database/env_file smoketester/env_file
+cp database/env_file test/smoketester/env_file
 rm -f database/env_file
 
 # Build a container to run smoke tests on the other containers.
-pushd smoketester
+pushd test/smoketester
 sudo docker build -t smoketester .
 popd
 
-sudo docker run -it --rm --link=webserver --link=daoserver --link=db --env-file=smoketester/env_file smoketester
+sudo docker run -it --rm --link=webserver --link=daoserver --link=db --env-file=test/smoketester/env_file smoketester
 
 exit $?
