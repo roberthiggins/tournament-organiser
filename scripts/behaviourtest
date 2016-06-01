@@ -7,7 +7,7 @@ docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB
 sudo docker kill selenium behat         &> /dev/null
 sudo docker rm -v selenium behat        &> /dev/null
 
-pushd behat
+pushd test/behat
 sudo docker build -t behat_image .
 popd
 
