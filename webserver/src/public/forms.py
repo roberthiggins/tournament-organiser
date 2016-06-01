@@ -39,7 +39,7 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=no-ini
         model = User
         fields = ("username", "email", "password1", "password2")
 
-    def save(self, commit=True):                # pylint: disable=no-init,E1002
+    def save(self, commit=True):                # pylint: disable=no-init,missing-docstring,E1002
         user = super(CreateAccountForm, self).save(commit=False)
         user.email = self.cleaned_data["email"]         # pylint: disable=no-member
         if commit:
@@ -94,7 +94,7 @@ class CategoryWidget(forms.MultiWidget):
 
         super(CategoryWidget, self).__init__(widgets, *args, **kwargs)
 
-    def decompress(self, value):
+    def decompress(self, value):        # pylint: disable=missing-docstring
         return list(value) if value else []
 
     def format_output(self, widget):
@@ -115,7 +115,7 @@ class CategoriesField(forms.MultiValueField):
         super(CategoriesField, self).__init__(
             fields, widget=widget, *args, **kwargs)
 
-    def compress(self, data_list):
+    def compress(self, data_list):      # pylint: disable=missing-docstring
         return json.dumps(data_list)
 
 class SetCategoriesForm(ErrorStringForm):
@@ -149,7 +149,7 @@ class MissionWidget(forms.MultiWidget):
 
         super(MissionWidget, self).__init__(widgets, *args, **kwargs)
 
-    def decompress(self, value):
+    def decompress(self, value):        # pylint: disable=missing-docstring
         return value.split(',') if value else []
 
     def format_output(self, rendered_widgets):
@@ -170,7 +170,7 @@ class MissionFields(forms.MultiValueField):
         super(MissionFields, self).__init__(
             fields, widget=widget, *args, **kwargs)
 
-    def compress(self, data_list):
+    def compress(self, data_list): # pylint: disable=missing-docstring
         return json.dumps(data_list)
 
 class SetMissionsForm(ErrorStringForm):

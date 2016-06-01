@@ -4,6 +4,8 @@
 
 sudo: required
 
+language: python
+
 services:
     - docker
 
@@ -12,6 +14,8 @@ before_install:
     - docker pull roberthiggins/tournament-organiser-daoserver
 
 install:
+    - pip install pylint
+
     # DB for all tests
     - ./scripts/install -i roberthiggins/tournament-organiser-db db
 
@@ -20,3 +24,4 @@ install:
 
 script:
     - docker exec daoserver python -m unittest discover -s unit_tests --pattern=*.py
+    - pylint $(find . -iname "*.py")
