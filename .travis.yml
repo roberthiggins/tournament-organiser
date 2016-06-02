@@ -9,22 +9,20 @@ language: python
 services:
     - docker
 
-before_install:
-    - docker pull roberthiggins/tournament-organiser-db
-    - docker pull roberthiggins/tournament-organiser-daoserver
-    - docker pull roberthiggins/tournament-organiser-api-test
-
 install:
     - pip install pylint
 
     # DB for all tests
-    - ./scripts/install -i roberthiggins/tournament-organiser-db db
+    - ./scripts/install db
 
     # DAO servers for system test, unit test, api test
-    - ./scripts/install -i roberthiggins/tournament-organiser-daoserver daoserver
+    - ./scripts/install daoserver
+
+    # Frisby for API tests
+    - docker build -t frisby test/frisby/
 
 script:
     - docker exec daoserver python -m unittest discover -s unit_tests --pattern=*.py
     - docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB_NAME"'
-    - docker run -t --link=daoserver roberthiggins/tournament-organiser-api-test
+    - docker run -t --link=daoserver frisby
     - pylint $(find . -iname "*.py")
