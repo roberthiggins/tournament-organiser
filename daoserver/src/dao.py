@@ -371,19 +371,22 @@ def rank_entries(tournament_id):
         return make_response(
             'Tournament {} doesn\'t exist'.format(tournament_id), 404)
 
-    return jsonpickle.encode(
-        [
-            {
-                'username' : x.player_id,
-                'entry_id' : x.id,
-                'tournament_id' : tourn.tournament_id,
-                'scores' : x.score_info,
-                'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
-                'ranking': x.ranking
-            } for x in \
-            tourn.ranking_strategy.overall_ranking(tourn.entries())
-        ],
-        unpicklable=False)
+    # pylint: disable=line-too-long
+    return Response(
+        jsonpickle.encode(
+            [
+                {
+                    'username' : x.player_id,
+                    'entry_id' : x.id,
+                    'tournament_id' : tourn.tournament_id,
+                    'scores' : x.score_info,
+                    'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
+                    'ranking': x.ranking
+                } for x in \
+                tourn.ranking_strategy.overall_ranking(tourn.entries())
+            ],
+            unpicklable=False),
+        mimetype='application/json')
 
 @APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET'])
 @enforce_request_variables('score_keys', 'mission')
