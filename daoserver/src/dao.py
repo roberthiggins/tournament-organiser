@@ -273,11 +273,14 @@ def entry_info_from_id(entry_id):
         # pylint: disable=no-member
         entry = TournamentEntry.query.filter_by(id=entry_id).first()
 
-        return jsonpickle.encode({
-            'entry_id': entry.id,
-            'username': entry.account.username,
-            'tournament_name': entry.tournament.name,
-        }, unpicklable=False)
+        return Response(
+            jsonpickle.encode(
+                {
+                    'entry_id': entry.id,
+                    'username': entry.account.username,
+                    'tournament_name': entry.tournament.name,
+                }, unpicklable=False),
+            mimetype='application/json')
     except AttributeError:
         raise ValueError('Entry ID not valid: {}'.format(entry_id))
 
