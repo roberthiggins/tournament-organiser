@@ -11,7 +11,7 @@ import re
 from functools import wraps
 import jsonpickle
 
-from flask import Blueprint, request, make_response, jsonify, Response
+from flask import Blueprint, request, make_response, Response
 
 from sqlalchemy.exc import IntegrityError
 
@@ -482,5 +482,10 @@ def user_details(u_name=None):
     TODO security
     """
     # pylint: disable=no-member
-    return jsonify({u_name: Account.query.filter_by(
-        username=u_name).first().contact_email})
+    user = Account.query.filter_by(username=u_name).first()
+    if user is None:
+        raise ValueError('Cannot find user {}'.format(u_name))
+
+    return Response(
+        jsonpickle.encode({u_name: user.contact_email}, unpicklable=False),
+        mimetype='application/json')
