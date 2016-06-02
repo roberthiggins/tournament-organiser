@@ -4,13 +4,11 @@
 docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB_NAME"'
 
 # We use behat and a selnium server to run behaviour tests
-sudo docker kill selenium behat         &> /dev/null
-sudo docker rm -v selenium behat        &> /dev/null
+docker kill selenium behat         &> /dev/null
+docker rm -v selenium behat        &> /dev/null
 
-pushd test/behat
-sudo docker build -t behat_image .
-popd
+docker build -t behat_image test/behat
 
-sudo docker run --name=selenium -d -p 4444:4444 selenium/standalone-firefox
-sudo docker run --name=behat -t --link=selenium --link=webserver --link=daoserver behat_image
+docker run --name=selenium -d -p 4444:4444 selenium/standalone-firefox
+docker run --name=behat -t --link=selenium --link=webserver --link=daoserver behat_image
 

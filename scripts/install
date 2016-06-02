@@ -52,8 +52,8 @@ fi
 # Turn off existing
 for ENV in $ENVS
 do
-    sudo docker kill $ENV       &> /dev/null
-    sudo docker rm -v $ENV      &> /dev/null
+    docker kill $ENV       &> /dev/null
+    docker rm -v $ENV      &> /dev/null
 done
 
 
@@ -65,17 +65,17 @@ if [ -z "$DOCKER_IMAGE" ]
         case $ENV in
             db)
                 pushd database
-                sudo docker build -t db_image .
+                docker build -t db_image .
                 popd
             ;;
             daoserver)
                 pushd daoserver
-                sudo docker build -t dao_img .
+                docker build -t dao_img .
                 popd
             ;;
             webserver)
                 pushd webserver
-                sudo docker build -t web_img .
+                docker build -t web_img .
                 popd
             ;;
             *)
@@ -109,7 +109,7 @@ do
             [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="web_img"
             rm -f webserver/env_file
             python -u scripts/make_webserver_env_file.py
-            sudo docker run --env-file=webserver/env_file --name=webserver --env ROOT_PASSWORD=root -d -p 5000:8000 --link=db --link=daoserver $IMAGE
+            docker run --env-file=webserver/env_file --name=webserver --env ROOT_PASSWORD=root -d -p 5000:8000 --link=db --link=daoserver $IMAGE
             rm -f webserver/env_file
             sleep 5
         ;;

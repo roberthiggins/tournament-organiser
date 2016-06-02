@@ -16,16 +16,16 @@ h2. Setup
 h3. Manual Installation
 * Build the db servers:
 ** cd <to_dir>/player_database
-** sudo docker build -t player_db .
+** docker build -t player_db .
 ** cd <to_dir>/tournament_database
-** sudo docker build -t tournament_db .
+** docker build -t tournament_db .
 * Build the webserver:
 ** cd <to_dir>/webserver
-** sudo docker build -t webserver .
+** docker build -t webserver .
 * Run these images to start the containers:
-** sudo docker run --name=player_db -d -P player_db
-** sudo docker run --name=tournament_db -d -P tournament_db
-** sudo docker run --name=webserver -d -p 5000:5000 --link=player_db --link=tournament_db webserver
+** docker run --name=player_db -d -P player_db
+** docker run --name=tournament_db -d -P tournament_db
+** docker run --name=webserver -d -p 5000:5000 --link=player_db --link=tournament_db webserver
 
 h2. Testing
 Currently there is a smoketest and behat skeleton.
@@ -56,7 +56,7 @@ h2. Connecting to the Player DB
 The recommended way to connect to the db is to enter the webserver container
 and then connect to the player_db container from there. Attach to the
 webserver and run the command:
-* sudo docker exec -i -t webserver /bin/bash
+* docker exec -i -t webserver /bin/bash
 * psql-db # This has been aliased
 # Notes: When we run the webserver we tell it to link to the player_db
 # container and this will insert some ENV variables into the web container
@@ -67,7 +67,7 @@ webserver and run the command:
 h2. Handy Commands
 
 h3. From your machine
-$ sudo docker exec -it webserver bash # Attach to a running box (webserver in this case)
+$ docker exec -it webserver bash # Attach to a running box (webserver in this case)
 
 h3. From inside a container
 $ env # See the environment variables. This includes IPs, ports, passwords for linked containers.
