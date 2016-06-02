@@ -10,7 +10,7 @@ fi
 ./scripts/unittest
 
 # add some data to the database
-docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB_NAME"'
+docker exec -it database bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB_NAME"'
 
 ./scripts/apitest
 ./scripts/behaviourtest

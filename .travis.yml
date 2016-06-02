@@ -13,7 +13,7 @@ install:
     - pip install pylint
 
     # DB for all tests
-    - ./scripts/install db
+    - ./scripts/install database
 
     # DAO servers for system test, unit test, api test
     - ./scripts/install daoserver
@@ -23,6 +23,6 @@ install:
 
 script:
     - docker exec daoserver python -m unittest discover -s unit_tests --pattern=*.py
-    - docker exec -it db bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DB_NAME"'
+    - docker exec -it database bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DATABASE_NAME"'
     - docker run -t --link=daoserver frisby
     - pylint $(find . -iname "*.py")

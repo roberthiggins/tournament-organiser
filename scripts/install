@@ -11,7 +11,7 @@
 #### OPTION HANDLING ####
 # A POSIX variable
 OPTIND=1        # Reset in case getopts has been used previously in the shell.
-ENVS="db daoserver webserver"
+ENVS="database daoserver webserver"
 
 DOCKER_IMAGE="" # use Docker image instead of build. Only used if len(ENVS) = 1
 while getopts ":i:" opt; do
@@ -63,9 +63,9 @@ if [ -z "$DOCKER_IMAGE" ]
     for ENV in $ENVS
     do
         case $ENV in
-            db)
+            database)
                 pushd database
-                docker build -t db_image .
+                docker build -t database_image .
                 popd
             ;;
             daoserver)
@@ -90,26 +90,29 @@ fi
 for ENV in $ENVS
 do
     case $ENV in
-        db)
-            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="db_image"
+        database)
+            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="database_image"
             rm -f database/env_file
-            python -u scripts/make_db_env_file.py
-            docker run --env-file=database/env_file -d -P --name db $IMAGE
+            python -u scripts/make_database_env_file.py
+            docker run --env-file=database/env_file -d -P --name database $IMAGE
             rm -f database/env_file
-            sleep 10    # wait for db to finish startup
+            sleep 10    # wait for database to finish startup
         ;;
         daoserver)
             [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="dao_img"
             rm -f daoserver/env_file
             python -u scripts/make_daoserver_env_file.py
-            docker run --env-file=daoserver/env_file --name=daoserver -d -p 5001:5000 --link=db $IMAGE
+            docker run --env-file=daoserver/env_file --name=daoserver \
+                -d -p 5001:5000 --link=database $IMAGE
             rm -f daoserver/env_file
         ;;
         webserver)
             [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="web_img"
             rm -f webserver/env_file
             python -u scripts/make_webserver_env_file.py
-            docker run --env-file=webserver/env_file --name=webserver --env ROOT_PASSWORD=root -d -p 5000:8000 --link=db --link=daoserver $IMAGE
+            docker run --env-file=webserver/env_file --name=webserver \
+                --env ROOT_PASSWORD=root -d -p 5000:8000 \
+                --link=database --link=daoserver $IMAGE
             rm -f webserver/env_file
             sleep 5
         ;;

@@ -6,6 +6,6 @@ docker rm -v dao_unit_test &> /dev/null
 rm -f daoserver/env_file
 python -u scripts/make_daoserver_env_file.py
 docker run --env-file=daoserver/env_file --name=dao_unit_test -t \
-    --link=db \
+    --link=database \
     daoserver_image python -m unittest discover -s unit_tests --pattern=*.py
 rm -f daoserver/env_file

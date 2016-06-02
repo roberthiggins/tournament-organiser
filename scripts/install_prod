@@ -6,14 +6,14 @@
 
 FILE_PATH=/var/lib/postgresql/
 FILE=$(date +"%Y-%m-%d_%H-%M-%S")_backup.sql
-EXISTING_DB_CONTAINER=$(docker ps | grep "\ db$" | awk '{print $1}')
+EXISTING_DB_CONTAINER=$(docker ps | grep "\ database$" | awk '{print $1}')
 
 if [[ $EXISTING_DB_CONTAINER ]]
 then
-    # Dump the contents of the db to your local machine
+    # Dump the contents of the database to your local machine
     COMMAND='pg_dump --data-only "$DB_NAME" > '$FILE_PATH/$FILE
-    docker exec -it db bash -c "$COMMAND"
-    docker cp db:$FILE_PATH/$FILE /tmp/
+    docker exec -it database bash -c "$COMMAND"
+    docker cp database:$FILE_PATH/$FILE /tmp/
 fi
 
 # Install all the things
@@ -21,14 +21,14 @@ cp config/production/config.ini webserver/env_config.ini
 cp config/production/config.ini daoserver/env_config.ini
 cp config/production/config.ini database/env_config.ini
 
-./scripts/install db daoserver webserver
+./scripts/install database daoserver webserver
 
 if [[ $EXISTING_DB_CONTAINER ]]
 then
     # Re-load the contents from the dump file to the new container.
-    docker cp /tmp/$FILE db:$FILE_PATH/
+    docker cp /tmp/$FILE database:$FILE_PATH/
     COMMAND='psql -d "$DB_NAME" --file='$FILE_PATH/$FILE
-    docker exec -it db bash -c "$COMMAND"
+    docker exec -it database bash -c "$COMMAND"
 fi
 
 # Smoketest

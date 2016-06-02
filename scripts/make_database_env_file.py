@@ -1,7 +1,7 @@
 """
 This helper script will extract variables from your env_config file (that are
-required by the db) and use them to create an env-file for use by docker. The
-file will be placed in the appropriate place in the db directory.
+required by the database) and use them to create an env-file for use by docker.
+The file will be placed in the appropriate place in the database directory.
 """
 
 import ConfigParser
