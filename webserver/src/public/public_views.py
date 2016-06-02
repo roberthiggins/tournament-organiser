@@ -75,7 +75,7 @@ def create_or_update_user(login_creds):
 @ratelimit(key='ip', rate='100/m', block=True)
 def list_tournaments(request):
     """ Get a list of tournaments"""
-    t_list = json.loads(from_dao('/listtournaments').content)['tournaments']
+    t_list = json.loads(from_dao('/listTournaments').content)['tournaments']
     return render_to_response(
         'tournament-list.html',
         {'tournaments': t_list},

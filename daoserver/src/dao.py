@@ -113,7 +113,7 @@ def main():
     return make_response('daoserver', 200)
 
 # Page actions
-@APP.route('/listtournaments', methods=['GET'])
+@APP.route('/listTournaments', methods=['GET'])
 def list_tournaments():
     """
     GET a list of tournaments
@@ -125,7 +125,9 @@ def list_tournaments():
         {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
         for x in TournamentDAO.query.all()]
 
-    return jsonpickle.encode({'tournaments' : details}, unpicklable=False)
+    return Response(
+        jsonpickle.encode({'tournaments' : details}, unpicklable=False),
+        mimetype='application/json')
 
 @APP.route('/registerfortournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputUserName')
@@ -134,7 +136,7 @@ def apply_for_tournament():
     POST to apply for entry to a tournament.
     Expects:
         - inputUserName - Username of player applying
-        - inputTournamentName - Tournament as returned by GET /listtournaments
+        - inputTournamentName - Tournament as returned by GET /listTournaments
     """
     rego = TournamentRegistration(inputUserName, inputTournamentName)
     rego.clashes()
