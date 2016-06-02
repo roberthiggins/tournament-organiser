@@ -62,26 +62,7 @@ if [ -z "$DOCKER_IMAGE" ]
     then
     for ENV in $ENVS
     do
-        case $ENV in
-            database)
-                pushd database
-                docker build -t database_image .
-                popd
-            ;;
-            daoserver)
-                pushd daoserver
-                docker build -t dao_img .
-                popd
-            ;;
-            webserver)
-                pushd webserver
-                docker build -t web_img .
-                popd
-            ;;
-            *)
-            # unknown option
-            ;;
-        esac
+        docker build -t ${ENV}_image ${ENV}
     done
 fi
 
@@ -99,7 +80,7 @@ do
             sleep 10    # wait for database to finish startup
         ;;
         daoserver)
-            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="dao_img"
+            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="daoserver_image"
             rm -f daoserver/env_file
             python -u scripts/make_daoserver_env_file.py
             docker run --env-file=daoserver/env_file --name=daoserver \
@@ -107,7 +88,7 @@ do
             rm -f daoserver/env_file
         ;;
         webserver)
-            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="web_img"
+            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="webserver_image"
             rm -f webserver/env_file
             python -u scripts/make_webserver_env_file.py
             docker run --env-file=webserver/env_file --name=webserver \

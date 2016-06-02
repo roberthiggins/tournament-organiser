@@ -60,7 +60,7 @@ webserver and run the command:
 * psql-db # This has been aliased
 # Notes: When we run the webserver we tell it to link to the player_db
 # container and this will insert some ENV variables into the web container
-# ('$DB_PORT_5432_TCP_ADDR', etc.). You will be asked the docker user
+# ('$DATABASE_PORT_5432_TCP_ADDR', etc.). You will be asked the docker user
 # password to connect. You can find it in the Dockerfile of the player_database
 # directory.
 

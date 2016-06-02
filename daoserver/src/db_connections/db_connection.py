@@ -15,10 +15,10 @@ class DBConnection(object):
 
         self.con = None
         self.config = {
-            'db_host': os.environ['DB_PORT_5432_TCP_ADDR'],
-            'db_name': os.environ['DB_NAME'],
-            'db_port': os.environ['DB_PORT_5432_TCP_PORT'],
-            'db_pass': os.environ['DB_PASSWORD']
+            'db_host': os.environ['DATABASE_PORT_5432_TCP_ADDR'],
+            'db_name': os.environ['DATABASE_NAME'],
+            'db_port': os.environ['DATABASE_PORT_5432_TCP_PORT'],
+            'db_pass': os.environ['DATABASE_PASSWORD']
         }
         try:
             self.con = psycopg2.connect(

@@ -16,10 +16,10 @@ def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = \
         'postgresql://docker:{}@{}:{}/{}'.format(
-            os.environ['DB_PASSWORD'],
-            os.environ['DB_PORT_5432_TCP_ADDR'],
-            os.environ['DB_PORT_5432_TCP_PORT'],
-            os.environ['DB_NAME'])
+            os.environ['DATABASE_PASSWORD'],
+            os.environ['DATABASE_PORT_5432_TCP_ADDR'],
+            os.environ['DATABASE_PORT_5432_TCP_PORT'],
+            os.environ['DATABASE_NAME'])
 
     from models.db_connection import db as db_conn
     db_conn.init_app(app)

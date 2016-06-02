@@ -23,7 +23,7 @@ fi
 
 # DB Connection from the daoserver
 printf "Testing DB Connection from the daoserver\n"
-db_has_version=$(PGPASSWORD=$DB_PASSWORD psql -h $DB_PORT_5432_TCP_ADDR -p $DB_PORT_5432_TCP_PORT -d $DB_NAME -U docker -c "select version();")
+db_has_version=$(PGPASSWORD=$DATABASE_PASSWORD psql -h $DATABASE_PORT_5432_TCP_ADDR -p $DATABASE_PORT_5432_TCP_PORT -d $DATABASE_NAME -U docker -c "select version();")
 if [ -z "$db_has_version" ]; then
     echo "Smoke test failed - the connection to the db returned $db_has_version"
     HAS_ERROR="true"

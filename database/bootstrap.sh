@@ -9,10 +9,10 @@
 # ordered correctly. This can be done by prefixing a number to the filename.
 /etc/init.d/postgresql start
 
-COMMAND="CREATE USER docker WITH SUPERUSER PASSWORD '"$DB_PASSWORD"';"
+COMMAND="CREATE USER docker WITH SUPERUSER PASSWORD '"$DATABASE_PASSWORD"';"
 psql --command "$COMMAND"
 
-createdb -O docker $DB_NAME
+createdb -O docker $DATABASE_NAME
 for i in setup/*.sql; do psql --file=$i -d to-db ;done
 
 /etc/init.d/postgresql stop
