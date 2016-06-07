@@ -446,8 +446,9 @@ def get_score_categories(tournament_id):
     """
     try:
         tourn = Tournament(tournament_id)
-        return jsonpickle.encode(
-            tourn.list_score_categories(), unpicklable=False)
+        return Response(
+            jsonpickle.encode(tourn.list_score_categories(), unpicklable=False),
+            mimetype='application/json')
     except ValueError as err:
         return make_response(str(err), 404)
 
