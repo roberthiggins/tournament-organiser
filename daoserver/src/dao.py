@@ -64,10 +64,11 @@ def enforce_request_variables(*vars_to_enforce):
             for var in vars_to_enforce:
                 value = request.form[var] if var in request.form \
                     else request.values.get(var, None)
+
                 if value is None and request.get_json() is not None:
                     value = request.get_json().get(var, None)
 
-                if not value:
+                if value is None:
                     return make_response('Enter the required fields', 400)
 
                 old_values[var] = glob.get(var, sentinel)
@@ -461,8 +462,17 @@ def set_score_categories():
     tourn = Tournament(tournamentId)
 
     new_categories = []
-    for json_cat in json.loads(categories):
-        cat = json.loads(request.values.get(json_cat, []))
+    try:
+        cats = json.loads(categories)
+    except TypeError:
+        cats = categories
+
+    for json_cat in cats:
+        try:
+            cat = json.loads(request.values.get(json_cat, []))
+        except TypeError:
+            cat = request.get_json().get(json_cat)
+
         new_categories.append(
             ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
 
