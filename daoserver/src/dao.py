@@ -64,6 +64,9 @@ def enforce_request_variables(*vars_to_enforce):
             for var in vars_to_enforce:
                 value = request.form[var] if var in request.form \
                     else request.values.get(var, None)
+                if value is None and request.get_json() is not None:
+                    value = request.get_json().get(var, None)
+
                 if not value:
                     return make_response('Enter the required fields', 400)
 
