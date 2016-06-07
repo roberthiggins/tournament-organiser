@@ -18,11 +18,6 @@ Feature: Register for a Tournament
         Given I am on "/registerforatournament"
         Then I should see "Select a tournament to register for"
 
-    Scenario: I use the API to list tournaments
-        When I GET "/listtournaments" from the API
-        Then the response is JSON
-        Then the response has a "tournaments" property
-
     Scenario Outline: I miss some fields
         Given I am on "/registerforatournament"
         When I select "<tournament>" from "inputTournamentName"
@@ -39,13 +34,3 @@ Feature: Register for a Tournament
             | southcon_2095     | stevemcqueen  | Application submitted         |
             | conquest_2095     | stevemcqueen  | You've already applied to conquest_2095    |
             | northcon_2095     | stevemcqueen  | northcon_2095 clashes with southcon_2095   |
-
-#    Scenario: I sign up to a clashing tournament deliberately
-#        Given I am on "/registerforatournament"
-#        When I select "northcon_2095" from "inputTournamentName"
-#        When I fill in "inputUserName" with "Jerry"
-#        When I press "Apply"
-#        Then I should see "northcon_2095 clashes with southcon_2095"
-#        When I press "Apply Anyway!"
-#        Then I should see "Application Submitted"
-

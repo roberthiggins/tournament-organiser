@@ -90,40 +90,54 @@ class Tournament(object):
         if len(keys) != len(set(keys)):
             raise ValueError("You cannot set multiple keys with the same name")
 
-        to_delete = ScoreCategory.query.\
-            filter_by(tournament_id=self.tournament_id).all()
+        # pylint: disable=broad-except
+        try:
+            # Delete the ones no longer needed
+            to_delete = ScoreCategory.query.\
+                filter(and_(ScoreCategory.tournament_id == self.tournament_id,
+                            ~ScoreCategory.display_name.in_(keys)))
+            for cat in to_delete.all():
+                cat.score_keys.delete()
+            to_delete.delete(synchronize_session='fetch')
 
-        for cat in new_categories:
-            dao = ScoreCategory.query.\
-                filter_by(tournament_id=self.tournament_id,
-                          display_name=cat.display_name).first()
 
-            if dao is None:
-                dao = ScoreCategory(self.tournament_id,
-                                    cat.display_name,
-                                    cat.percentage,
-                                    cat.per_tournament,
-                                    cat.min_val,
-                                    cat.max_val,)
-            else:
-                to_delete = [x for x in to_delete \
-                if x.display_name != cat.display_name]
-            dao.percentage = int(cat.percentage)
-            dao.per_tournament = cat.per_tournament
-            dao.clashes()
-            db.session.add(dao)
-            db.session.flush()
+            for cat in new_categories:
+                dao = ScoreCategory.query.\
+                    filter_by(tournament_id=self.tournament_id,
+                              display_name=cat.display_name).first()
 
-            try:
-                if ScoreKey.query.filter_by(key=cat.display_name,
-                                            category=dao.id).first() is None:
-                    db.session.add(ScoreKey(cat.display_name, dao.id))
-                    db.session.commit()
-            except IntegrityError:
-                raise Exception('Score already set')
+                if dao is None:
+                    dao = ScoreCategory(self.tournament_id,
+                                        cat.display_name,
+                                        cat.percentage,
+                                        cat.per_tournament,
+                                        cat.min_val,
+                                        cat.max_val,)
+                dao.percentage = int(cat.percentage)
+                dao.per_tournament = cat.per_tournament
+                db.session.add(dao)
+                db.session.flush()
 
-        for cat in to_delete:
-            cat.delete()
+                try:
+                    if ScoreKey.query.\
+                    filter_by(key=cat.display_name, category=dao.id).first() \
+                    is None:
+                        db.session.add(ScoreKey(cat.display_name, dao.id))
+                except IntegrityError:
+                    raise Exception('Score already set')
+
+            # check for clashes before actually writing
+            for cat in new_categories:
+                ScoreCategory.query.\
+                    filter_by(tournament_id=self.tournament_id,
+                              display_name=cat.display_name).first().clashes()
+
+            db.session.commit()
+        except ValueError:
+            db.session.rollback()
+            raise
+        except Exception:
+            db.session.rollback()
 
     @must_exist_in_db
     def details(self):

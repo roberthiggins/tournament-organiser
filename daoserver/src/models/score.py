@@ -70,15 +70,6 @@ class ScoreCategory(db.Model):
             self.min_val,
             self.max_val)
 
-    def delete(self):
-        """From the DB"""
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
     def clashes(self):
         """
         Check that the ScoreCategory will work in the proposed tournament. This

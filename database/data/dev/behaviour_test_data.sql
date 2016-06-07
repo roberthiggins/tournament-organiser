@@ -28,7 +28,7 @@ BEGIN
     INSERT INTO account_security VALUES ('stevemcqueen', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
     INSERT INTO account VALUES ('rick_james', 'foo@bar.com');
     INSERT INTO account_security VALUES ('rick_james', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
-    INSERT INTO account VALUES ('charlie_murphy', 'chalie_murphy@darkness.com');
+    INSERT INTO account VALUES ('charlie_murphy', 'charlie_murphy@darkness.com');
     INSERT INTO account_security VALUES ('charlie_murphy', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
 
     -- Enter some players

@@ -52,7 +52,12 @@ class RankingStrategy(object):
         error_on_incomplete: when true this will raise a RuntimeError if any
             of the entrants have incopmlete scores.
         """
-        for i, entry in enumerate(entries):
+        for entry in entries:
             entry.total_score = self.total_score(entry)
+
+        entries.sort(key=lambda entry: entry.total_score, reverse=True)
+
+        for i, entry in enumerate(entries):
             entry.ranking = i + 1
+
         return entries

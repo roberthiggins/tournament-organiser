@@ -11,66 +11,6 @@ Feature: Modify the scoring categories for a tournament
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
 
-    Scenario Outline: I get a list of the tournament categories from the API
-        When I GET "/getScoreCategories/<tournament>" from the API
-        Then the API response status code should be 200
-        Then the response is JSON
-        Then the API response should be a list of length <cats>
-        Then the API response should contain "<cat_1>"
-        Then the API response should contain "<cat_2>"
-
-        Examples:
-            | tournament        | cats  | cat_1         | cat_2         |
-            | southcon_2095     | 1     | some_category | some_category |
-            | ranking_test      | 2     | Battle        | Fair Play     |
-            | category_test     | 2     | foo           | bar           |
-
-
-    Scenario Outline: I get a list of categories from a non-existent tournament
-        When I GET "/getScoreCategories/<tournament>" from the API
-        Then the API response status code should be <code>
-        Then the API response should contain "<response_text>"
-
-        Examples:
-            | tournament   | code  | response_text                      |
-            | not_a_thing  | 404   | Tournament not_a_thing not found   |
-            | southcon_209 | 404   | Tournament southcon_209 not found  |
-            |              | 404   | Not Found                          |
-
-
-    Scenario: I get a list of categories from a tournament with none
-        When I GET "/getScoreCategories/conquest_2095" from the API
-        Then the API response status code should be 200
-        Then the response is JSON
-        Then the API response should be a list of length 0
-
-    Scenario: I modify the tournament categories through the API
-        When I POST "tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fantasticgibberish%22,%2221%22,true,%2210%22,%2210%22]" to "/setScoreCategories" from the API
-        Then the API response status code should be 200
-        Then I GET "/getScoreCategories/category_test" from the API
-        Then the API response status code should be 200
-        Then the API response should be a list of length 1
-        Then the API response should contain "fantasticgibberish"
-        Then the API response should not contain "category_1"
-
-    Scenario Outline: I try to modify the tournament categories through the API incorrectly
-        When I POST "<post>" to "/setScoreCategories" from the API
-        Then the API response status code should be 400
-        Then I GET "/getScoreCategories/southcon_2095" from the API
-        Then the API response status code should be 200
-        Then the API response should be a list of length 1
-        Then the API response should not contain "<category>"
-
-        Examples:
-            | category  | post                                                                                           |
-            | fooey     | categories=[%22categories_0%22]&categories_0=[%22fooey%22,%2221%22,true,%2210%22,%2210%22]     |
-            | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fooey%22,%2221%22,true,%2210%22]     |
-            | fooey     | tournamentId=category_test&categories_0=[%22fooey%22,%2221%22,true,%2210%22,%2210%22]          |
-            | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%22fooey%22]          |
-            | fooey     | tournamentId=category_test&categories=[%22categories_0%22]&categories_0=[%2221%22]             |
-            | fooey     | tournamentId=category_test&categories=[%22categories_1%22]&categories_0=[%22fooey%22,%2221%22] |
-            | fooey     | tournamentId=category_test&categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22fooey%22,%2221%22]&categories_0=[%22barey%22,%2221%22] |
-
     Scenario: I modify the tournament categories through the webserver
         # Set
         Given I am on "/setcategories/category_test"

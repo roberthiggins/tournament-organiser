@@ -11,7 +11,7 @@ import re
 from functools import wraps
 import jsonpickle
 
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request, make_response, Response
 
 from sqlalchemy.exc import IntegrityError
 
@@ -64,7 +64,11 @@ def enforce_request_variables(*vars_to_enforce):
             for var in vars_to_enforce:
                 value = request.form[var] if var in request.form \
                     else request.values.get(var, None)
-                if not value:
+
+                if value is None and request.get_json() is not None:
+                    value = request.get_json().get(var, None)
+
+                if value is None:
                     return make_response('Enter the required fields', 400)
 
                 old_values[var] = glob.get(var, sentinel)
@@ -113,7 +117,7 @@ def main():
     return make_response('daoserver', 200)
 
 # Page actions
-@APP.route('/listtournaments', methods=['GET'])
+@APP.route('/listTournaments', methods=['GET'])
 def list_tournaments():
     """
     GET a list of tournaments
@@ -125,7 +129,9 @@ def list_tournaments():
         {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
         for x in TournamentDAO.query.all()]
 
-    return jsonpickle.encode({'tournaments' : details}, unpicklable=False)
+    return Response(
+        jsonpickle.encode({'tournaments' : details}, unpicklable=False),
+        mimetype='application/json')
 
 @APP.route('/registerfortournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputUserName')
@@ -134,7 +140,7 @@ def apply_for_tournament():
     POST to apply for entry to a tournament.
     Expects:
         - inputUserName - Username of player applying
-        - inputTournamentName - Tournament as returned by GET /listtournaments
+        - inputTournamentName - Tournament as returned by GET /listTournaments
     """
     rego = TournamentRegistration(inputUserName, inputTournamentName)
     rego.clashes()
@@ -271,11 +277,14 @@ def entry_info_from_id(entry_id):
         # pylint: disable=no-member
         entry = TournamentEntry.query.filter_by(id=entry_id).first()
 
-        return jsonpickle.encode({
-            'entry_id': entry.id,
-            'username': entry.account.username,
-            'tournament_name': entry.tournament.name,
-        }, unpicklable=False)
+        return Response(
+            jsonpickle.encode(
+                {
+                    'entry_id': entry.id,
+                    'username': entry.account.username,
+                    'tournament_name': entry.tournament.name,
+                }, unpicklable=False),
+            mimetype='application/json')
     except AttributeError:
         raise ValueError('Entry ID not valid: {}'.format(entry_id))
 
@@ -371,19 +380,22 @@ def rank_entries(tournament_id):
         return make_response(
             'Tournament {} doesn\'t exist'.format(tournament_id), 404)
 
-    return jsonpickle.encode(
-        [
-            {
-                'username' : x.player_id,
-                'entry_id' : x.id,
-                'tournament_id' : tourn.tournament_id,
-                'scores' : x.score_info,
-                'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
-                'ranking': x.ranking
-            } for x in \
-            tourn.ranking_strategy.overall_ranking(tourn.entries())
-        ],
-        unpicklable=False)
+    # pylint: disable=line-too-long
+    return Response(
+        jsonpickle.encode(
+            [
+                {
+                    'username' : x.player_id,
+                    'entry_id' : x.id,
+                    'tournament_id' : tourn.tournament_id,
+                    'scores' : x.score_info,
+                    'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
+                    'ranking': x.ranking
+                } for x in \
+                tourn.ranking_strategy.overall_ranking(tourn.entries())
+            ],
+            unpicklable=False),
+        mimetype='application/json')
 
 @APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET'])
 @enforce_request_variables('score_keys', 'mission')
@@ -435,8 +447,9 @@ def get_score_categories(tournament_id):
     """
     try:
         tourn = Tournament(tournament_id)
-        return jsonpickle.encode(
-            tourn.list_score_categories(), unpicklable=False)
+        return Response(
+            jsonpickle.encode(tourn.list_score_categories(), unpicklable=False),
+            mimetype='application/json')
     except ValueError as err:
         return make_response(str(err), 404)
 
@@ -449,8 +462,17 @@ def set_score_categories():
     tourn = Tournament(tournamentId)
 
     new_categories = []
-    for json_cat in json.loads(categories):
-        cat = json.loads(request.values.get(json_cat, []))
+    try:
+        cats = json.loads(categories)
+    except TypeError:
+        cats = categories
+
+    for json_cat in cats:
+        try:
+            cat = json.loads(request.values.get(json_cat, []))
+        except TypeError:
+            cat = request.get_json().get(json_cat)
+
         new_categories.append(
             ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
 
@@ -466,7 +488,9 @@ def tournament_details(t_name=None):
     information
     """
     tourn = Tournament(t_name)
-    return jsonpickle.encode(tourn.details(), unpicklable=False)
+    return Response(
+        jsonpickle.encode(tourn.details(), unpicklable=False),
+        mimetype='application/json')
 
 @APP.route('/userDetails/<u_name>', methods=['GET'])
 def user_details(u_name=None):
@@ -475,5 +499,10 @@ def user_details(u_name=None):
     TODO security
     """
     # pylint: disable=no-member
-    return jsonify({u_name: Account.query.filter_by(
-        username=u_name).first().contact_email})
+    user = Account.query.filter_by(username=u_name).first()
+    if user is None:
+        raise ValueError('Cannot find user {}'.format(u_name))
+
+    return Response(
+        jsonpickle.encode({u_name: user.contact_email}, unpicklable=False),
+        mimetype='application/json')
