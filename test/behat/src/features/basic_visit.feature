@@ -6,7 +6,3 @@ Feature: Front page of the website
   Scenario: I visit the front page
     Given I am on "/"
     Then I should see "Here you can play in or organise wargaming tournaments. Log in to see lists of tournaments you can enter or create your own."
-
-  Scenario: Hit the API
-    When I GET "/" from the API
-    Then the response status code should be 200
