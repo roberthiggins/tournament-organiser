@@ -10,7 +10,7 @@ fi
 ./scripts/unittest
 
 # add some data to the database
-docker exec -it database bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DATABASE_NAME"'
+docker exec -it database bash -c 'psql --file=/docker-entrypoint-initdb.d/data/dev/behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
 
 ./scripts/apitest
 ./scripts/behaviourtest

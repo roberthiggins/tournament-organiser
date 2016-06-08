@@ -23,6 +23,6 @@ install:
 
 script:
     - docker exec daoserver python -m unittest discover -s unit_tests --pattern=*.py
-    - docker exec -it database bash -c 'psql --file=data/dev/behaviour_test_data.sql -d "$DATABASE_NAME"'
+    - docker exec -it database bash -c 'psql --file=/docker-entrypoint-initdb.d/data/dev/behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
     - docker run -t --link=daoserver frisby
     - pylint $(find . -iname "*.py")

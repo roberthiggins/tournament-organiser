@@ -16,7 +16,7 @@ class DBConnection(object):
         self.con = None
         self.config = {
             'db_host': os.environ['DATABASE_PORT_5432_TCP_ADDR'],
-            'db_name': os.environ['DATABASE_NAME'],
+            'db_name': os.environ['POSTGRES_DB'],
             'db_port': os.environ['DATABASE_PORT_5432_TCP_PORT'],
             'db_pass': os.environ['DATABASE_PASSWORD']
         }
