@@ -323,7 +323,10 @@ def set_missions():
     tourn = Tournament(tournamentId)
     # pylint: disable=E0602
     rounds = tourn.details()['rounds']
-    json_missions = json.loads(missions)
+    try:
+        json_missions = json.loads(missions)
+    except TypeError:
+        json_missions = missions
 
     if len(json_missions) != int(rounds):
         # pylint: disable=E0602
