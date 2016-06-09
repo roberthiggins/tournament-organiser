@@ -31,11 +31,6 @@ CREATE TABLE score (
 );
 COMMENT ON TABLE score IS 'An entry will have lots of scores.';
 
-CREATE TABLE round_score(
-    score_key_id        INTEGER REFERENCES score_key(id),
-    round_id            INTEGER REFERENCES tournament_round(id)
-);
-
 CREATE TABLE game_score (
     entry_id    INTEGER REFERENCES entry(id),
     game_id     INTEGER REFERENCES game(id),
