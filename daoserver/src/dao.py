@@ -401,12 +401,10 @@ def rank_entries(tournament_id):
         mimetype='application/json')
 
 @APP.route('/roundInfo/<tournament_id>/<round_id>', methods=['GET'])
-@enforce_request_variables('score_keys', 'mission')
 # pylint: disable=E0602
 def get_round_info(tournament_id, round_id):
     """
     GET the information about a round
-    POST information including the mission, score_keys to be used.
     POST Expects:
         {
             'mission': a text name,
