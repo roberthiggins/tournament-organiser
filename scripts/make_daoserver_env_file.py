@@ -9,9 +9,9 @@ import ConfigParser
 CONFIG = ConfigParser.ConfigParser()
 CONFIG.read('config/dev/config.ini')
 
-DATABASE_NAME = CONFIG.get('DATABASE', 'DATABASE_NAME')
+POSTGRES_DB = CONFIG.get('DATABASE', 'POSTGRES_DB')
 DATABASE_PASSWORD = CONFIG.get('DATABASE', 'DATABASE_PASSWORD')
 
 with open('daoserver/env_file', 'a') as env_file:
-    env_file.write('DATABASE_NAME={}\n'.format(DATABASE_NAME))
+    env_file.write('POSTGRES_DB={}\n'.format(POSTGRES_DB))
     env_file.write('DATABASE_PASSWORD={}\n'.format(DATABASE_PASSWORD))

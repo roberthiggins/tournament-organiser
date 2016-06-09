@@ -11,7 +11,7 @@ EXISTING_DATABASE_CONTAINER=$(docker ps | grep "\ database$" | awk '{print $1}')
 if [[ $EXISTING_DATABASE_CONTAINER ]]
 then
     # Dump the contents of the database to your local machine
-    COMMAND='pg_dump --data-only "$DATABASE_NAME" > '$FILE_PATH/$FILE
+    COMMAND='pg_dump --data-only "$POSTGRES_DB" > '$FILE_PATH/$FILE
     docker exec -it database bash -c "$COMMAND"
     docker cp database:$FILE_PATH/$FILE /tmp/
 fi
@@ -27,7 +27,7 @@ if [[ $EXISTING_DATABASE_CONTAINER ]]
 then
     # Re-load the contents from the dump file to the new container.
     docker cp /tmp/$FILE database:$FILE_PATH/
-    COMMAND='psql -d "$DATABASE_NAME" --file='$FILE_PATH/$FILE
+    COMMAND='psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" --file='$FILE_PATH/$FILE
     docker exec -it database bash -c "$COMMAND"
 fi
 
