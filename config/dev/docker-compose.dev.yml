@@ -1,0 +1,19 @@
+database:
+    environment:
+        POSTGRES_USER: docker
+        DATABASE_PASSWORD: FuEm7l003bfd6zM
+        POSTGRES_DB: to-db
+
+daoserver:
+    environment:
+        POSTGRES_USER: docker
+        DATABASE_PASSWORD: FuEm7l003bfd6zM
+        POSTGRES_DB: to-db
+
+webserver:
+    environment:
+        DEBUG: "True"
+        HOST_IP: 127.0.0.1
+        SECRET_KEY: =a)f4_+^*7%0z#a*do-20dbg%a8=czyfqjndi65z%fqva-vqxm
+        TEMPLATE_DEBUG: "True"
+        ROOT_PASSWORD: root

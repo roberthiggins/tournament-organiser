@@ -1,8 +1,0 @@
-#! /bin/bash
-
-docker kill frisby      &> /dev/null
-docker rm -v frisby     &> /dev/null
-
-docker build -t frisby_image test/frisby
-
-docker run --name=frisby --link=daoserver -t frisby_image

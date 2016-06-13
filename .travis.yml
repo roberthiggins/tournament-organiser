@@ -12,17 +12,18 @@ services:
 install:
     - pip install pylint
 
-    # DB for all tests
-    - ./scripts/install database
-
-    # DAO servers for system test, unit test, api test
-    - ./scripts/install daoserver
-
-    # Frisby for API tests
-    - docker build -t frisby test/frisby/
+    - docker-compose build
+    - cp config/dev/docker-compose.dev.yml ./docker-compose.override.yml
+    - docker-compose up -d database daoserver webserver
 
 script:
-    - docker exec daoserver python -m unittest discover -s unit_tests --pattern=*.py
+
+    - docker-compose -f docker-compose.yml -f config/dev/docker-compose.dev.yml run daoserver python -m unittest discover -s unit_tests --pattern=*.py
+
+
     - docker exec -it database bash -c 'psql --file=/docker-entrypoint-initdb.d/data/dev/behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
-    - docker run -t --link=daoserver frisby
+    - docker-compose run apitest
+#    - docker-compose run systemtest
+
+
     - pylint $(find . -iname "*.py")

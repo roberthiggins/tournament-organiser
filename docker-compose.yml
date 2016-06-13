@@ -1,0 +1,40 @@
+database:
+    build: database
+    container_name: database
+
+daoserver:
+    build: daoserver
+    container_name: daoserver
+    links:
+        - database
+    ports:
+        - "5001:5000"
+    command: bash /webapp/wait-for-postgres.sh database python -u app.py
+
+apitest:
+    build: test/frisby
+    container_name: frisby
+    links:
+        - daoserver
+
+webserver:
+    build: webserver
+    container_name: webserver
+    links:
+        - daoserver
+    ports:
+        - "5000:8000"
+
+systemtest:
+    build: test/behat
+    container_name: behat
+    links:
+        - selenium
+        - daoserver
+        - webserver
+
+selenium:
+    image: selenium/standalone-firefox
+    container_name: selenium
+    ports:
+        - "4444:4444"

@@ -3,38 +3,33 @@
 # This will make sure the prod settings are configured properly
 #
 # To do a prod install you need to run this file on prod
+#
+# This will run all the tests that don't affect the db
+#
+# What you need:
+#       - CHECK there is a file at config/prod/docker-compose.prod.yml It should
+#       contain all the environment variables specific to prod (like passwords)
+#       THIS WILL NOT BE CHECKED IN!!! You should scp it from your home machine.
+#
+# Using the existing db:
+#       - If you would like to use the existing db info you just need to make
+#       sure the prod compose file includes a "volumes_from" pointing at dbstore
 
-FILE_PATH=/var/lib/postgresql/
-FILE=$(date +"%Y-%m-%d_%H-%M-%S")_backup.sql
-EXISTING_DATABASE_CONTAINER=$(docker ps | grep "\ database$" | awk '{print $1}')
 
-if [[ $EXISTING_DATABASE_CONTAINER ]]
+#! /bin/bash
+
+# Check if there is an available db store. If not then we make one for
+# persistent volumes.
+EXISTING_DB_STORE=$(docker ps -a | grep "dbstore$" | awk '{print $1}')
+if [[ -z "$EXISTING_DB_STORE" ]]
 then
-    # Dump the contents of the database to your local machine
-    COMMAND='pg_dump --data-only "$POSTGRES_DB" > '$FILE_PATH/$FILE
-    docker exec -it database bash -c "$COMMAND"
-    docker cp database:$FILE_PATH/$FILE /tmp/
+    docker create -v /dbdata --name dbstore postgres:9.3 bin/true
 fi
 
-# Install all the things
-cp config/production/config.ini webserver/env_config.ini
-cp config/production/config.ini daoserver/env_config.ini
-cp config/production/config.ini database/env_config.ini
 
-./scripts/install database daoserver webserver
+./scripts/install config/production/docker-compose.prod.yml
 
-if [[ $EXISTING_DATABASE_CONTAINER ]]
-then
-    # Re-load the contents from the dump file to the new container.
-    docker cp /tmp/$FILE database:$FILE_PATH/
-    COMMAND='psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" --file='$FILE_PATH/$FILE
-    docker exec -it database bash -c "$COMMAND"
-fi
 
-# Smoketest
-sleep 5
-./scripts/smoketest
-
-# TODO There needs to be a failsafe for stopping the install script from running in prod environments
-
-# TODO maybe make another backup
+# Non-destructive tests
+docker-compose run daoserver python -m unittest discover -s unit_tests \
+    --pattern=*.py

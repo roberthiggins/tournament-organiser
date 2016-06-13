@@ -8,12 +8,8 @@
 # Config file. I am unsure as to whether to include this or ignore it. It would
 # be fine to include so long as there are never any passwords, etc. in here.
 *config.yml
-
-# drawbuilder taget
-drawserver/drawbuilder/target/
+docker-compose.override.yml
 
 # Passwords for prod
 *env_config.ini
 config/production/*
-database/env_file
-smoketester/env_file
