@@ -17,7 +17,6 @@ from models.db_connection import db
 from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
-from models.tournament_round import TournamentRound
 
 class ScoreCategory(db.Model):
     """ A row from the score_category table"""
@@ -106,27 +105,6 @@ class ScoreKey(db.Model):
             self.id,
             self.key,
             self.category)
-
-class RoundScore(db.Model):
-    """A score for an entry in a round"""
-
-    __tablename__ = 'round_score'
-    score_key_id = db.Column(db.Integer,
-                             db.ForeignKey(ScoreKey.id),
-                             primary_key=True)
-    round_id = db.Column(db.Integer,
-                         db.ForeignKey(TournamentRound.id),
-                         primary_key=True)
-    score_key = db.relationship(ScoreKey)
-    round = db.relationship(TournamentRound,
-                            backref=db.backref('round_scores', lazy='dynamic'))
-
-    def __init__(self, score_key, round_id):
-        self.score_key_id = score_key
-        self.round_id = int(round_id)
-
-    def __repr__(self):
-        return '<RoundScore ({}, {})>'.format(self.score_key_id, self.round_id)
 
 class Score(db.Model):
     """An individual score tied to a ScoreKey"""

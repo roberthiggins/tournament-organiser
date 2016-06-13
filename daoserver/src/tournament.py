@@ -236,14 +236,14 @@ class Tournament(object):
         if game_dao is not None and game_dao.score_entered:
             return True
 
-        per_round_scores = len(game_dao.tournament_round.tournament.\
+        per_game_scores = len(game_dao.tournament_round.tournament.\
             score_categories.filter_by(per_tournament=False).all())
-        if per_round_scores <= 0:
+        if per_game_scores <= 0:
             raise AttributeError(
                 '{} does not have any scores associated with it'.\
                 format(game_dao))
 
-        scores_expected = per_round_scores * len(game_dao.entrants.all())
+        scores_expected = per_game_scores * len(game_dao.entrants.all())
 
         if len(game_dao.game_scores.all()) == scores_expected:
             game_dao.score_entered = True
@@ -357,7 +357,6 @@ class Tournament(object):
         db.session.add(tourn)
 
         for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
-            rnd.round_scores.delete()
             for game in rnd.games:
                 entrants = GameEntrant.query.filter_by(game_id=game.id)
                 for entrant in entrants.all():

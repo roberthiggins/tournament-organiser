@@ -142,9 +142,6 @@ class TournamentInjector(object):
             if tourn is None:
                 return
 
-            for rnd in tourn.rounds:
-                rnd.round_scores.delete()
-
             tourn.tournament_scores.delete()
 
             for cat in tourn.score_categories:
