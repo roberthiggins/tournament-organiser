@@ -1,5 +1,5 @@
 database:
-    build: database
+    image: postgres:9.3
     container_name: database
 
 daoserver:

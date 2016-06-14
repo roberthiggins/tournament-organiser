@@ -6,8 +6,10 @@
 docker-compose run daoserver python -m unittest discover -s unit_tests \
     --pattern=*.py
 
+# Copy some test data
+docker cp database/data/dev/behaviour_test_data.sql database:.
+docker exec -it database bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
 
-docker exec -it database bash -c 'psql --file=/docker-entrypoint-initdb.d/data/dev/behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
 docker-compose run apitest
 docker-compose run systemtest
 
