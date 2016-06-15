@@ -5,22 +5,61 @@ database:
         POSTGRES_USER: docker
         DATABASE_PASSWORD: FuEm7l003bfd6zM
         POSTGRES_DB: to-db
+    extends:
+        file: docker-compose.base.yml
+        service: database
 
 daoserver:
+    links:
+        - database
     environment:
         POSTGRES_USER: docker
         DATABASE_PASSWORD: FuEm7l003bfd6zM
         POSTGRES_DB: to-db
+    extends:
+        file: docker-compose.base.yml
+        service: daoserver
 
 unittest:
+    links:
+        - database
     environment:
         POSTGRES_USER: docker
         DATABASE_PASSWORD: FuEm7l003bfd6zM
         POSTGRES_DB: to-db
+    extends:
+        file: docker-compose.base.yml
+        service: unittest
+
+apitest:
+    build: test/frisby
+    container_name: frisby
+    links:
+        - daoserver
+
 webserver:
+    links:
+        - daoserver
     environment:
         DEBUG: "True"
         HOST_IP: 127.0.0.1
         SECRET_KEY: =a)f4_+^*7%0z#a*do-20dbg%a8=czyfqjndi65z%fqva-vqxm
         TEMPLATE_DEBUG: "True"
         ROOT_PASSWORD: root
+    extends:
+        file: docker-compose.base.yml
+        service: webserver
+
+systemtest:
+    build: test/behat
+    container_name: behat
+    links:
+        - selenium
+        - daoserver
+        - webserver
+
+selenium:
+    image: selenium/standalone-firefox
+    container_name: selenium
+    ports:
+        - "4444:4444"

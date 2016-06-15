@@ -4,10 +4,10 @@
 
 docker-compose kill     &> /dev/null
 docker-compose rm -f    &> /dev/null
+
+cp "$1" ./docker-compose.yml
+
 docker-compose pull     &> /dev/null
 docker-compose build    &> /dev/null
-
-
-cp "$1" ./docker-compose.override.yml
 
 docker-compose up -d database daoserver webserver  &> /dev/null

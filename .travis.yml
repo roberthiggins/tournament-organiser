@@ -12,10 +12,10 @@ services:
 install:
     - pip install pylint
 
+    - cp config/dev/docker-compose.dev.yml ./docker-compose.yml
     - docker-compose build
-    - cp config/dev/docker-compose.dev.yml ./docker-compose.override.yml
     - docker-compose up -d database daoserver webserver
-
+    - docker inspect daoserver
 script:
 
     - docker-compose run unittest

@@ -5,8 +5,6 @@ database:
 daoserver:
     build: daoserver
     container_name: daoserver
-    links:
-        - database
     ports:
         - "5001:5000"
     command: bash /webapp/wait-for-postgres.sh database python -u app.py
@@ -14,34 +12,10 @@ daoserver:
 unittest:
     build: daoserver
     container_name: unittest
-    links:
-        - database
     command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
-
-apitest:
-    build: test/frisby
-    container_name: frisby
-    links:
-        - daoserver
 
 webserver:
     build: webserver
     container_name: webserver
-    links:
-        - daoserver
     ports:
         - "5000:8000"
-
-systemtest:
-    build: test/behat
-    container_name: behat
-    links:
-        - selenium
-        - daoserver
-        - webserver
-
-selenium:
-    image: selenium/standalone-firefox
-    container_name: selenium
-    ports:
-        - "4444:4444"
