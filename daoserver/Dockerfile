@@ -21,4 +21,7 @@ ADD bash_aliases /root/.bash_aliases
 # Config
 WORKDIR webapp/
 
+# Add a script to allow waiting for the db
+ADD ./wait-for-postgres.sh ./wait-for-postgres.sh
+
 CMD python -u app.py

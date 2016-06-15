@@ -1,106 +1,13 @@
-# This is a an install script which will rebuild all the docker containers and
-# fire them all up.
-#
-# Use install script when:
-#     - You want to rebuild the containers from scratch
-#     - You have made changes to a Dockerfile and want to see them.
+#! /bin/bash
 
+# Remove all containers and get a basic install up
 
-#!/bin/sh
+docker-compose kill     &> /dev/null
+docker-compose rm -f    &> /dev/null
 
-#### OPTION HANDLING ####
-# A POSIX variable
-OPTIND=1        # Reset in case getopts has been used previously in the shell.
-ENVS="database daoserver webserver"
+cp "$1" ./docker-compose.yml
 
-DOCKER_IMAGE="" # use Docker image instead of build. Only used if len(ENVS) = 1
-while getopts ":i:" opt; do
-    case $opt in
-        i)
-            DOCKER_IMAGE=$OPTARG
-            ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
-            exit 1
-            ;;
-        :)
-            echo "Option -$OPTARG requires an argument." >&2
-            exit 1
-            ;;
-  esac
-done
+docker-compose pull     &> /dev/null
+docker-compose build    &> /dev/null
 
-shift $((OPTIND -1))
-
-if [[ $# -ne 0 ]]
-    then
-    ENVS="$@"
-fi
-if [[ -n "$DOCKER_IMAGE" && $# -ne 1 ]]
-    then
-    echo "Invalid option: Image file and multiple environments" >&2
-    exit 1
-fi
-
-# If the user 
-if [[ $# -ne 1 ]]
-    then
-    DOCKER_IMAGE=""
-fi
-
-
-# Turn off existing
-for ENV in $ENVS
-do
-    docker kill $ENV       &> /dev/null
-    docker rm -v $ENV      &> /dev/null
-done
-
-
-# Build replacements
-if [ -z "$DOCKER_IMAGE" ]
-    then
-    for ENV in $ENVS
-    do
-        docker build -t ${ENV}_image ${ENV}
-    done
-fi
-
-
-# Turn on replacements
-for ENV in $ENVS
-do
-    case $ENV in
-        database)
-            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="database_image"
-            rm -f database/env_file
-            python -u scripts/make_database_env_file.py
-            docker run --env-file=database/env_file -d -P --name database $IMAGE
-            rm -f database/env_file
-            sleep 10    # wait for database to finish startup
-        ;;
-        daoserver)
-            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="daoserver_image"
-            rm -f daoserver/env_file
-            python -u scripts/make_daoserver_env_file.py
-            docker run --env-file=daoserver/env_file --name=daoserver \
-                -d -p 5001:5000 --link=database $IMAGE
-            rm -f daoserver/env_file
-        ;;
-        webserver)
-            [[ -n "$DOCKER_IMAGE" ]] && IMAGE=$DOCKER_IMAGE || IMAGE="webserver_image"
-            rm -f webserver/env_file
-            python -u scripts/make_webserver_env_file.py
-            docker run --env-file=webserver/env_file --name=webserver \
-                --env ROOT_PASSWORD=root -d -p 5000:8000 \
-                --link=database --link=daoserver $IMAGE
-            rm -f webserver/env_file
-            sleep 5
-        ;;
-        *)
-        # unknown option
-        ;;
-    esac
-done
-
-exit
+docker-compose up -d database daoserver webserver  &> /dev/null

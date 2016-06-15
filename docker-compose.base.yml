@@ -1,0 +1,21 @@
+database:
+    image: postgres:9.3
+    container_name: database
+
+daoserver:
+    build: daoserver
+    container_name: daoserver
+    ports:
+        - "5001:5000"
+    command: bash /webapp/wait-for-postgres.sh database python -u app.py
+
+unittest:
+    build: daoserver
+    container_name: unittest
+    command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+
+webserver:
+    build: webserver
+    container_name: webserver
+    ports:
+        - "5000:8000"

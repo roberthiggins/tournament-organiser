@@ -1,17 +1,16 @@
-./scripts/install $@
+#! /bin/bash
 
-sleep 5
-./scripts/smoketest
-if [ $? -ne 0 ]
-then
-  exit 1
-fi
+# Build all containers and run all tests
+./scripts/install config/dev/docker-compose.dev.yml
 
-./scripts/unittest
+docker-compose run unittest
 
-# add some data to the database
-docker exec -it database bash -c 'psql --file=/docker-entrypoint-initdb.d/data/dev/behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
+# Copy some test data
+docker cp database/data/dev/behaviour_test_data.sql database:.
+docker exec -it database bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
 
-./scripts/apitest
-./scripts/behaviourtest
-./scripts/lint
+docker-compose run apitest
+docker-compose run systemtest
+
+
+pylint $(find . -iname "*.py")

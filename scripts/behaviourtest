@@ -1,9 +1,0 @@
-# We use behat and a selnium server to run behaviour tests
-docker kill selenium behat         &> /dev/null
-docker rm -v selenium behat        &> /dev/null
-
-docker build -t behat_image test/behat
-
-docker run --name=selenium -d -p 4444:4444 selenium/standalone-firefox
-docker run --name=behat -t --link=selenium --link=webserver --link=daoserver behat_image
-
