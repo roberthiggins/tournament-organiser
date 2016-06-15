@@ -31,5 +31,4 @@ fi
 
 
 # Non-destructive tests
-docker-compose run daoserver python -m unittest discover -s unit_tests \
-    --pattern=*.py
+docker-compose run unittest

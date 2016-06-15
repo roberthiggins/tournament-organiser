@@ -11,6 +11,13 @@ daoserver:
         - "5001:5000"
     command: bash /webapp/wait-for-postgres.sh database python -u app.py
 
+unittest:
+    build: daoserver
+    container_name: unittest
+    links:
+        - database
+    command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+
 apitest:
     build: test/frisby
     container_name: frisby

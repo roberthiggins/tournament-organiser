@@ -3,8 +3,7 @@
 # Build all containers and run all tests
 ./scripts/install config/dev/docker-compose.dev.yml
 
-docker-compose run daoserver python -m unittest discover -s unit_tests \
-    --pattern=*.py
+docker-compose run unittest
 
 # Copy some test data
 docker cp database/data/dev/behaviour_test_data.sql database:.
