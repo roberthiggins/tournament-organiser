@@ -1,8 +1,8 @@
 This is a guide to how to install everything, form the ground up, in a prod environment.
 
-1. Provision a VPS. It should be a KVM. This guide is made with Ubuntu 14.04+ in mind
+1. Provision a VPS. It should be a KVM. This guide is made with Ubuntu 16.04+ in mind
 
-2. Jump on your new machine.
+2. Jump on your new machine ssh ubuntu@to-prod (or something similar).
 
 3. Install some things
 
@@ -20,27 +20,35 @@ This is a guide to how to install everything, form the ground up, in a prod envi
 
     apt-get update
     apt-get install apt-transport-https ca-certificates 
-    apt-get install aufs-tools
-    apt-get install apparmor
-    apt-get upgrade
+#    apt-get install aufs-tools
+#    apt-get upgrade
 
     sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-    echo "deb https://apt.dockerproject.org/repo ubuntu-wily main" > /etc/apt/sources.list.d/docker.list
+    echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" > /etc/apt/sources.list.d/docker.list
     apt-get update
     apt-get purge lxc-docker
     apt-cache policy docker-engine
+
+    apt-get install linux-image-extra-$(uname -r)
 
     apt-get install docker-engine
     service docker start
     docker run hello-world
 
-7. Allow user to use docker without sudo
-    sudo groupadd docker
-    sudo gpasswd -a ${USER} docker
-    logout
-    log back in
-    sudo service docker restart
+7. Install docker-compose Check the official docs but it should be something like:
+    as sudo:
+        curl -L https://github.com/docker/compose/releases/download/1.8.0-rc1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+    as user:
+        docker-compose --version
 
-8. Install all the things
-    # TODO set a custom password for the db
+#8. Allow user to use docker without sudo
+#    sudo groupadd docker
+#    sudo gpasswd -a ${USER} docker
+#    logout
+#    log back in
+#    sudo service docker restart
+
+9. Install all the things
+    sudo su
     ./scripts/install_prod
