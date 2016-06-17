@@ -69,9 +69,11 @@ Feature: Enter a score for a player
             | 5    | Score entered for rick_james: 5            |
             | 6    | 6 not entered. Score is already set        |
 
+    @javascript
     Scenario Outline: The TO gives a painting score to a player
         Given that I set auth to u:"superman" and p:"password"
         When I POST "<value>" to "/entertournamentscore" from the API
+        When I wait for 1 second
         Then the API response should contain "<response_text>"
         Then the API response status code should be <response_code>
 
