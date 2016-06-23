@@ -9,7 +9,3 @@
 # be fine to include so long as there are never any passwords, etc. in here.
 *config.yml
 docker-compose.yml
-
-# Passwords for prod
-*env_config.ini
-config/production/*

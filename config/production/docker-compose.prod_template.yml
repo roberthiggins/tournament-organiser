@@ -1,0 +1,45 @@
+database:
+    volumes:
+        - "./database/setup/:/docker-entrypoint-initdb.d"
+    environment:
+        POSTGRES_USER: docker
+        DATABASE_PASSWORD: FuEm7l003bfd6zM
+        POSTGRES_DB: to-db
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+daoserver:
+    links:
+        - database
+    environment:
+        POSTGRES_USER: docker
+        DATABASE_PASSWORD: FuEm7l003bfd6zM
+        POSTGRES_DB: to-db
+    extends:
+        file: docker-compose.base.yml
+        service: daoserver
+
+unittest:
+    links:
+        - database
+    environment:
+        POSTGRES_USER: docker
+        DATABASE_PASSWORD: FuEm7l003bfd6zM
+        POSTGRES_DB: to-db
+    extends:
+        file: docker-compose.base.yml
+        service: unittest
+
+webserver:
+    links:
+        - daoserver
+    environment:
+        DEBUG: "False"
+        HOST_IP: 127.0.0.1
+        SECRET_KEY: =a)f4_+^*7%0z#a*do-20dbg%a8=czyfqjndi65z%fqva-vqxm
+        TEMPLATE_DEBUG: "False"
+        ROOT_PASSWORD: ANYTHING_BUT_ROOT
+    extends:
+        file: docker-compose.base.yml
+        service: webserver
