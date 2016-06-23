@@ -37,15 +37,16 @@ class FeatureContext extends MinkContext
     }
 
     /**
-     * Wait for AJAX responses
-     * This will wait for up to 5 seconds
+     * This will wait for up to n seconds
      *
-     * @When /^I wait for the response$/
+     * Note you'll need to add the @javascript decorator
+     *
+     * @When /^I wait for (\d+) second(s)?$/
      */
-    public function iWaitForTheResponse()
+    public function iWaitForTheResponse($delay)
     {
-        $time = 5000; // milliseconds
-        $this->getSession()->wait($time, "(0 === jQuery.active)");
+        $time = 1000 * $delay; // milliseconds
+        $this->getSession()->wait($time);
     }
 
 //

@@ -22,7 +22,7 @@ script:
     - docker cp database/data/dev/behaviour_test_data.sql database:.
     - docker exec -it database bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
     - docker-compose run apitest
-#    - docker-compose run systemtest
+    - docker-compose run systemtest
 
 
     - pylint $(find . -iname "*.py")
