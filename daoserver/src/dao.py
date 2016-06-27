@@ -253,10 +253,14 @@ def get_entry_id(tournament_id, username):
     if not Account.username_exists(username):
         raise ValueError('Unknown player: {}'.format(username))
 
-    # pylint: disable=no-member
-    return TournamentEntry.query.\
-        filter_by(tournament_id=tournament_id, player_id=username).first().id
-
+    try:
+        # pylint: disable=no-member
+        return TournamentEntry.query.\
+            filter_by(tournament_id=tournament_id, player_id=username).\
+            first().id
+    except AttributeError:
+        raise ValueError('Entry for {} in tournament {} not found'.\
+            format(username, tournament_id))
 
 @APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
 def get_entry_id_from_tournament(tournament_id, username):

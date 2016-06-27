@@ -33,6 +33,10 @@ Feature: Enter a score for a player
         Then the response status code should be 200
         Then I should see "Permission denied"
 
+    Scenario: A player not in the tournament
+        Given I am on "/enterscore/painting_test/lisa"
+        Then the response status code should be 404
+        Then I should see "Entry for lisa in tournament painting_test not found"
 
     Scenario Outline: I only know the tournament and username
         Given I am on "/enterscore/<tournament>/<username>"
