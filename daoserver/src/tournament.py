@@ -154,22 +154,22 @@ class Tournament(object):
         }
 
     @must_exist_in_db
-    def enter_score(self, entry_id, score_key, score, game_id=None):
+    def enter_score(self, entry_id, score_cat, score, game_id=None):
         """
         Enters a score for category into tournament for player.
 
         Expects: All fields required
             - entry_id - of the entry
-            - score_key - e.g. round_3_battle
+            - score_cat - e.g. round_3_battle
             - score - integer
 
         Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
             there is an issue inserting the score.
         """
-        # score_key should mean something in the context of the tournie
+        # score_cat should mean something in the context of the tournie
         key = db.session.query(ScoreKey).join(ScoreCategory).\
             filter(and_(ScoreCategory.tournament_id == self.get_dao().name,
-                        ScoreKey.key == score_key)
+                        ScoreCategory.display_name == score_cat)
                   ).first()
 
         # Validate the score
@@ -181,7 +181,7 @@ class Tournament(object):
         except ValueError:
             raise ValueError('Invalid score: {}'.format(score))
         except AttributeError:
-            raise TypeError('Unknown category: {}'.format(score_key))
+            raise TypeError('Unknown category: {}'.format(score_cat))
 
         # Has it already been entered?
         if game_id is None:

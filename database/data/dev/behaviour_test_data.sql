@@ -35,6 +35,7 @@ BEGIN
     INSERT INTO registration VALUES('stevemcqueen', tournie_id);
 
     INSERT INTO entry VALUES(default, 'rick_james', 'painting_test');
+    INSERT INTO entry VALUES(default, 'stevemcqueen', 'painting_test');
 
 END $$;
 

@@ -61,7 +61,7 @@ Feature: Enter a score for a player
 
     Scenario Outline: I enter some scores
         Given I am on "/enterscore/painting_test/rick_james"
-        Then I fill in "id_key" with "number_tassles"
+        Then I fill in "id_key" with "Fanciness"
         Then I fill in "id_value" with "<score>"
         Then I press "Enter Score"
         Then the response status code should be 200
@@ -84,45 +84,44 @@ Feature: Enter a score for a player
         Examples:
             |value                                                                                      |response_code  |response_text                          |
             |foo                                                                                        |400            |Enter the required fields              |
-            |tournament=painting_test&key=fanciest_wig&value=20                                         |400            |Enter the required fields              |
-            |username=stevemcqueen&key=fanciest_wig&value=20                                            |400            |Enter the required fields              |
-            |username=stevemcqueen&username=stevemcqueen&key=fanciest_wig&value=20                      |400            |Enter the required fields              |
+            |tournament=painting_test&key=Fanciness&value=20                                            |400            |Enter the required fields              |
+            |username=stevemcqueen&key=Fanciness&value=20                                               |400            |Enter the required fields              |
+            |username=stevemcqueen&username=stevemcqueen&key=Fanciness&value=20                         |400            |Enter the required fields              |
             |username=stevemcqueen&tournament=painting_test&value=20                                    |400            |Enter the required fields              |
-            |username=stevemcqueen&tournament=painting_test&key=fanciest_wig                            |400            |Enter the required fields              |
-            |username=stevemcqueen&tournament=painting_test&key=fanciest_wig&                           |400            |Enter the required fields              |
-            |username=jimmynoname&tournament=painting_test&key=fanciest_wig&value=20                    |400            |Unknown player: jimmynoname            |
-            |username=stevemcqueen&tournament=notatournament&key=fanciest_wig&value=20                  |400            |Unknown tournament: notatournament     |
-            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=ham                    |400            |Invalid score: ham                     |
+            |username=stevemcqueen&tournament=painting_test&key=Fanciness                               |400            |Enter the required fields              |
+            |username=stevemcqueen&tournament=painting_test&key=Fanciness&                              |400            |Enter the required fields              |
+            |username=jimmynoname&tournament=painting_test&key=Fanciness&value=20                       |400            |Unknown player: jimmynoname            |
+            |username=stevemcqueen&tournament=notatournament&key=Fanciness&value=20                     |400            |Unknown tournament: notatournament     |
+            |username=rick_james&tournament=painting_test&key=Fanciness&value=ham                       |400            |Invalid score: ham                     |
             |username=rick_james&tournament=painting_test&key=magic&value=20                            |400            |Unknown category: magic                |
-            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=1000                   |400            |Invalid score: 1000                    |
-            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=-3                     |400            |Invalid score: -3                      |
-            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=14                     |200            |Score entered for rick_james: 14       |
-            |username=rick_james&tournament=painting_test&key=fanciest_wig&value=12                     |400            |12 not entered. Score is already set   |
-            |username=rick_james&username=rick_james&tournament=painting_test&key=fanciest_wig&value=9  |400            |9 not entered. Score is already set    |
-            |username=rick_james&username=jerry&tournament=painting_test&key=fanciest_wig&value=8       |400            |8 not entered. Score is already set    |
+            |username=rick_james&tournament=painting_test&key=Fanciness&value=1000                      |400            |Invalid score: 1000                    |
+            |username=rick_james&tournament=painting_test&key=Fanciness&value=-3                        |400            |Invalid score: -3                      |
+            |username=rick_james&tournament=painting_test&key=Fanciness&value=12                        |400            |12 not entered. Score is already set   |
+            |username=rick_james&username=rick_james&tournament=painting_test&key=Fanciness&value=9     |400            |9 not entered. Score is already set    |
+            |username=rick_james&username=jerry&tournament=painting_test&key=Fanciness&value=8          |400            |8 not entered. Score is already set    |
 
     # TODO User controls
     Scenario: another player
         Given I am on "/logout"
-        Given I am on "/enterscore/ranking_test/lisa"
-        When I fill in "id_inputUsername" with "bart"
+        Given I am on "/enterscore/painting_test/stevemcqueen"
+        When I fill in "id_inputUsername" with "rick_james"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        When I fill in "id_key" with "round_2_battle"
-        When I fill in "id_value" with "1"
+        When I fill in "id_key" with "Fanciness"
+        When I fill in "id_value" with "5"
         Then I press "Enter Score"
         Then the response status code should be 200
         Then I should see "Permission denied"
 
     Scenario: A non super user
         Given I am on "/logout"
-        Given I am on "/enterscore/ranking_test/lisa"
-        When I fill in "id_inputUsername" with "lisa"
+        Given I am on "/enterscore/painting_test/stevemcqueen"
+        When I fill in "id_inputUsername" with "stevemcqueen"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        When I fill in "id_key" with "round_2_battle"
-        When I fill in "id_value" with "1"
+        When I fill in "id_key" with "Fanciness"
+        When I fill in "id_value" with "5"
         Then I press "Enter Score"
         Then the response status code should be 200
         Then I should not see "Permission denied"
-        Then I should see "Score entered for lisa: 1"
+        Then I should see "Score entered for stevemcqueen: 5"
