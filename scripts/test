@@ -1,7 +1,8 @@
 #! /bin/bash
 
 # Build all containers and run all tests
-./scripts/install config/dev/docker-compose.dev.yml
+cp config/dev/docker-compose.dev.yml docker-compose.yml
+./scripts/install
 
 docker-compose run unittest
 
