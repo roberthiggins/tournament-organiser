@@ -208,7 +208,7 @@ class Tournament(object):
                 '{} not entered. Score is already set'.format(score))
 
         try:
-            score_dao = Score(entry_id, key.id, score)
+            score_dao = Score(entry_id, key.id, key.score_category.id, score)
             db.session.add(score_dao)
             db.session.flush()
 

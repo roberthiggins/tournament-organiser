@@ -27,6 +27,7 @@ CREATE TABLE score (
     id                  SERIAL PRIMARY KEY,
     entry_id            INTEGER REFERENCES entry(id),
     score_key_id        INTEGER REFERENCES score_key(id),
+    score_category_id   INTEGER REFERENCES score_category(id),
     value               INTEGER
 );
 COMMENT ON TABLE score IS 'An entry will have lots of scores.';
