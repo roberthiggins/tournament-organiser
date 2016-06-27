@@ -171,13 +171,13 @@ class Tournament(object):
             filter(and_(ScoreCategory.tournament_id == self.get_dao().name,
                         ScoreCategory.display_name == score_cat)
                   ).first()
+        cat = db.session.query(ScoreCategory).filter_by(
+            tournament_id=self.get_dao().name, display_name=score_cat).\
+            first()
 
         # Validate the score
         try:
             score = int(score)
-            cat = db.session.query(ScoreCategory).filter_by(
-                tournament_id=self.get_dao().name, display_name=score_cat).\
-                first()
             if score < cat.min_val or score > cat.max_val:
                 raise ValueError()
         except ValueError:
@@ -187,16 +187,17 @@ class Tournament(object):
 
         # Has it already been entered?
         if game_id is None:
-            existing_score = TournamentScore.query.join(Score).join(ScoreKey).\
+            existing_score = TournamentScore.query.join(Score).\
+                join(ScoreCategory).\
                 filter(and_(TournamentScore.entry_id == entry_id,
                             TournamentScore.tournament_id == self.get_dao().id,
-                            ScoreKey.id == key.id)).first() is not None
+                            ScoreCategory.id == cat.id)).first() is not None
         else:
             try:
                 existing_score = GameScore.query.join(Score).\
                     filter(and_(GameScore.entry_id == entry_id, \
                                 GameScore.game_id == game_id,
-                                Score.score_key_id == key.id)).\
+                                Score.score_category_id == cat.id)).\
                     first() is not None
             except DataError:
                 db.session.rollback()
@@ -208,7 +209,7 @@ class Tournament(object):
                 '{} not entered. Score is already set'.format(score))
 
         try:
-            score_dao = Score(entry_id, key.id, key.score_category.id, score)
+            score_dao = Score(entry_id, key.id, cat.id, score)
             db.session.add(score_dao)
             db.session.flush()
 
