@@ -13,7 +13,7 @@
                 <td>Name</td>
                 <td>Total Score</td>
                 {% for s in placings.0.scores %}
-                    <td>{{s.key}}</td>
+                    <td>{{s.category}}</td>
                 {% endfor %}
             </tr>
             {% for entry in placings %}

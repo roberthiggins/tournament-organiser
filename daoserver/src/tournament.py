@@ -266,11 +266,10 @@ class Tournament(object):
                 TableAllocation.query.filter_by(entry_id=entry.id)]
             entry.score_info = [
                 {
-                    'key': x.score_key.key,
                     'score': x.value,
-                    'category': x.score_key.score_category.display_name,
-                    'min_val': x.score_key.score_category.min_val,
-                    'max_val': x.score_key.score_category.max_val,
+                    'category': x.score_category.display_name,
+                    'min_val': x.score_category.min_val,
+                    'max_val': x.score_category.max_val,
                 } for x in entry.scores
             ]
 
