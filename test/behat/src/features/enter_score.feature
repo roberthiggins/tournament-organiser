@@ -59,12 +59,13 @@ Feature: Enter a score for a player
             | 404  | a  |
             | 404  | 1a |
 
+    @javascript
     Scenario Outline: I enter some scores
         Given I am on "/enterscore/painting_test/rick_james"
+        When I wait for 1 second
         Then I fill in "id_key" with "Fanciness"
         Then I fill in "id_value" with "<score>"
         Then I press "Enter Score"
-        Then the response status code should be 200
         Then I should see "<content>"
         Examples:
             |score | content                                    |
