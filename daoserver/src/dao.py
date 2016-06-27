@@ -409,10 +409,6 @@ def rank_entries(tournament_id):
 def get_round_info(tournament_id, round_id):
     """
     GET the information about a round
-    POST Expects:
-        {
-            'mission': a text name,
-        }
     """
     tourn = Tournament(tournament_id)
     rnd = tourn.get_round(round_id)

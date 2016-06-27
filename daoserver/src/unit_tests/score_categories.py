@@ -3,13 +3,12 @@ Test entering scores for games in a tournament
 """
 
 from flask_testing import TestCase
-from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from app import create_app
 from db_connections.db_connection import db_conn
 from models.db_connection import db
-from models.score import ScoreCategory, ScoreKey
+from models.score import ScoreCategory
 
 from tournament import Tournament, ScoreCategoryPair
 from unit_tests.tournament_injector import TournamentInjector
@@ -77,28 +76,6 @@ class ScoreCategoryTests(TestCase):
         c_1 = ScoreCategory.query.\
             filter_by(display_name=self.cat_1.display_name).first()
         self.assertTrue(c_1 is None)
-
-    @db_conn()
-    def test_keys_created(self):
-        # Add two keys to the tournament
-        self.tournament.set_score_categories([self.cat_1, self.cat_2])
-
-        # Check they are both there
-        key_1 = ScoreKey.query.join(ScoreCategory).filter(and_(
-            ScoreCategory.tournament_id == self.tourn_1,
-            ScoreKey.key == self.cat_1.display_name
-            )).first()
-        self.assertTrue(key_1 is not None)
-        key_2 = ScoreKey.query.join(ScoreCategory).filter(and_(
-            ScoreCategory.tournament_id == self.tourn_1,
-            ScoreKey.key == self.cat_2.display_name
-            )).first()
-        self.assertTrue(key_2 is not None)
-
-        # Check that only they are both there
-        all_keys = ScoreKey.query.join(ScoreCategory).\
-            filter(ScoreCategory.tournament_id == self.tourn_1).all()
-        self.assertTrue(len(all_keys) == 2)
 
     # pylint: disable=unused-variable
     @db_conn()
