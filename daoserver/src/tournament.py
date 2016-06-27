@@ -175,8 +175,10 @@ class Tournament(object):
         # Validate the score
         try:
             score = int(score)
-            if score < key.score_category.min_val or \
-            score > key.score_category.max_val:
+            cat = db.session.query(ScoreCategory).filter_by(
+                tournament_id=self.get_dao().name, display_name=score_cat).\
+                first()
+            if score < cat.min_val or score > cat.max_val:
                 raise ValueError()
         except ValueError:
             raise ValueError('Invalid score: {}'.format(score))
