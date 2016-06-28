@@ -26,7 +26,6 @@ COMMENT ON TABLE score_key IS 'This table is all the score keys that might be en
 CREATE TABLE score (
     id                  SERIAL PRIMARY KEY,
     entry_id            INTEGER REFERENCES entry(id),
-    score_key_id        INTEGER REFERENCES score_key(id),
     score_category_id   INTEGER REFERENCES score_category(id),
     value               INTEGER
 );

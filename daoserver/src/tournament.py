@@ -167,10 +167,6 @@ class Tournament(object):
             there is an issue inserting the score.
         """
         # score_cat should mean something in the context of the tournie
-        key = db.session.query(ScoreKey).join(ScoreCategory).\
-            filter(and_(ScoreCategory.tournament_id == self.get_dao().name,
-                        ScoreCategory.display_name == score_cat)
-                  ).first()
         cat = db.session.query(ScoreCategory).filter_by(
             tournament_id=self.get_dao().name, display_name=score_cat).\
             first()
@@ -209,7 +205,7 @@ class Tournament(object):
                 '{} not entered. Score is already set'.format(score))
 
         try:
-            score_dao = Score(entry_id, key.id, cat.id, score)
+            score_dao = Score(entry_id, cat.id, score)
             db.session.add(score_dao)
             db.session.flush()
 

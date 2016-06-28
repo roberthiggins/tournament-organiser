@@ -112,27 +112,22 @@ class Score(db.Model):
     __tablenamene__ = 'score'
     id = db.Column(db.Integer, primary_key=True)
     entry_id = db.Column(db.Integer, db.ForeignKey(TournamentEntry.id))
-    score_key_id = db.Column(db.Integer, db.ForeignKey(ScoreKey.id))
     score_category_id = db.Column(db.Integer, db.ForeignKey(ScoreCategory.id))
     value = db.Column(db.Integer)
 
     entry = db.relationship(TournamentEntry, backref='scores')
-    score_key = db.relationship(ScoreKey,
-                                backref=db.backref('scores', lazy='dynamic'))
     score_category = db.relationship(ScoreCategory, \
         backref=db.backref('scores', lazy='dynamic'))
 
-    def __init__(self, entry_id, score_key_id, score_category_id, value=None):
+    def __init__(self, entry_id, score_category_id, value=None):
         self.entry_id = entry_id
-        self.score_key_id = score_key_id
         self.score_category_id = score_category_id
         self.value = value
 
     def __repr__(self):
-        return '<Score ({}, {}, {}, {}, {})>'.format(
+        return '<Score ({}, {}, {}, {})>'.format(
             self.id,
             self.entry_id,
-            self.score_key_id,
             self.score_category_id,
             self.value)
 
