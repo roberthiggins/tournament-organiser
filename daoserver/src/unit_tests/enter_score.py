@@ -10,8 +10,7 @@ from app import create_app
 from db_connections.db_connection import db_conn
 from models.db_connection import db
 from models.game_entry import GameEntrant
-from models.score import ScoreCategory, ScoreKey, TournamentScore, GameScore, \
-Score
+from models.score import ScoreCategory, TournamentScore, GameScore, Score
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 from models.tournament_round import TournamentRound
@@ -104,8 +103,6 @@ class TestScoreEntered(TestCase):
                                    0, 100)
         db.session.add(category_1)
         db.session.flush()
-        db.session.add(ScoreKey('test_enter_score_key_1', category_1.id))
-        db.session.flush()
 
         entry_2_id = TournamentEntry.query.filter_by(
             player_id='{}_player_{}'.format(self.tournament_1, 2),
@@ -192,17 +189,11 @@ class EnterScore(TestCase):
         self.category_1 = ScoreCategory(self.tournament_1, 'per_tourn', 50,
                                         True, 0, 100)
         db.session.add(self.category_1)
-        db.session.flush()
-        self.key_1 = ScoreKey('test_enter_score_key_1', self.category_1.id)
-        db.session.add(self.key_1)
 
         # per round category
         self.category_2 = ScoreCategory(self.tournament_1, 'per_round', 50,
                                         False, 0, 100)
         db.session.add(self.category_2)
-        db.session.flush()
-        self.key_2 = ScoreKey('test_enter_score_key_2', self.category_2.id)
-        db.session.add(self.key_2)
         db.session.commit()
 
     def tearDown(self):

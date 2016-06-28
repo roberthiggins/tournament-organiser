@@ -10,7 +10,7 @@ from app import create_app
 from db_connections.db_connection import db_conn
 from models.db_connection import db
 from models.game_entry import GameEntrant
-from models.score import ScoreCategory, ScoreKey
+from models.score import ScoreCategory
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 from models.tournament_round import TournamentRound
@@ -44,7 +44,7 @@ class TestScoreEntered(TestCase):
 
     def test_get_game_from_score(self):
         """
-        You should be able to determine game from entry_id and the score_key
+        You should be able to determine game from entry_id and the score_cat
         """
         entry_2_id = TournamentEntry.query.filter_by(
             player_id='{}_player_{}'.format(self.tournament_1, 2),
@@ -101,9 +101,6 @@ class TestScoreEntered(TestCase):
         category_1 = ScoreCategory(self.tournament_1, 'per_round', 50, False,
                                    0, 100)
         db.session.add(category_1)
-        db.session.flush()
-        key_1 = ScoreKey('test_score_entered_key_1', category_1.id)
-        db.session.add(key_1)
         db.session.flush()
 
         tourn = Tournament(self.tournament_1)

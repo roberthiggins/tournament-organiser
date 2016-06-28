@@ -12,8 +12,7 @@ from matching_strategy import RoundRobin
 from models.db_connection import db
 from models.game_entry import GameEntrant
 from models.permissions import ProtObjAction, ProtObjPerm
-from models.score import Score, ScoreCategory, ScoreKey, TournamentScore, \
-GameScore
+from models.score import Score, ScoreCategory, TournamentScore, GameScore
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
@@ -96,8 +95,6 @@ class Tournament(object):
             to_delete = ScoreCategory.query.\
                 filter(and_(ScoreCategory.tournament_id == self.tournament_id,
                             ~ScoreCategory.display_name.in_(keys)))
-            for cat in to_delete.all():
-                cat.score_keys.delete()
             to_delete.delete(synchronize_session='fetch')
 
 
@@ -117,14 +114,6 @@ class Tournament(object):
                 dao.per_tournament = cat.per_tournament
                 db.session.add(dao)
                 db.session.flush()
-
-                try:
-                    if ScoreKey.query.\
-                    filter_by(key=cat.display_name, category=dao.id).first() \
-                    is None:
-                        db.session.add(ScoreKey(cat.display_name, dao.id))
-                except IntegrityError:
-                    raise Exception('Score already set')
 
             # check for clashes before actually writing
             for cat in new_categories:

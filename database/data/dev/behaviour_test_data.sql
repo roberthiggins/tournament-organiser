@@ -21,8 +21,6 @@ BEGIN
     INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tournie_id;
 
     INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT, DEFAULT, 4, 15) RETURNING id INTO fanciness;
-    INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', fanciness);
-    INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', fanciness);
 
     INSERT INTO account VALUES ('stevemcqueen', 'foo@bar.com');
     INSERT INTO account_security VALUES ('stevemcqueen', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
@@ -42,10 +40,6 @@ END $$;
 -- Make a tournament for the purposes of testing rankings
 CREATE OR REPLACE FUNCTION ranking_test_setup() RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
-    rd1key int := 0;
-    rd2key int := 0;
-    rd1sportskey int := 0;
-    rd2sportskey int := 0;
     battlecategory int := 0;
     sportscategory int := 0;
     protect_object_id int := 0;
@@ -70,10 +64,6 @@ BEGIN
 
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90, DEFAULT, 0, 20) RETURNING id INTO battlecategory;
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10, DEFAULT, 1, 5) RETURNING id INTO sportscategory;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', battlecategory) RETURNING id INTO rd1key;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', battlecategory) RETURNING id INTO rd2key;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_1_sports', sportscategory) RETURNING id INTO rd1sportskey;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_2_sports', sportscategory) RETURNING id INTO rd2sportskey;
 
     INSERT INTO account VALUES ('homer', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('homer', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
