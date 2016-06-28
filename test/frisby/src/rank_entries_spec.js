@@ -22,7 +22,6 @@ describe('Check that players are ranked correctly', function() {
                 category: String,
                 max_val: Number,
                 score: Number,
-                key: String,
                 min_val: Number 
             }
         )
@@ -43,28 +42,24 @@ describe('Check that players are ranked correctly', function() {
                         category: 'Battle',
                         max_val: 20,
                         score: 20,
-                        key: 'round_1_battle',
                         min_val: 0
                     },
                     {
                         category: 'Fair Play',
                         max_val: 5,
                         score: 1,
-                        key: 'round_1_sports',
                         min_val: 1
                     },
                     {
                         category: 'Battle',
                         max_val: 20,
                         score: 15,
-                        key: 'round_2_battle',
                         min_val: 0
                     },
                     {
                         category: 'Fair Play',
                         max_val: 5,
                         score: 5,
-                        key: 'round_2_sports',
                         min_val: 1
                     }
                 ],
@@ -79,28 +74,24 @@ describe('Check that players are ranked correctly', function() {
                         category: 'Battle',
                         max_val: 20,
                         score: 20,
-                        key: 'round_1_battle',
                         min_val: 0
                     },
                     {
                         category: 'Fair Play',
                         max_val: 5,
                         score: 5,
-                        key: 'round_1_sports',
                         min_val: 1
                     },
                     {
                         category: 'Battle',
                         max_val: 20,
                         score: 5,
-                        key: 'round_2_battle',
                         min_val: 0
                     },
                     {
                         category: 'Fair Play',
                         max_val: 5,
                         score: 5,
-                        key: 'round_2_sports',
                         min_val: 1
                     }
                 ],
@@ -115,14 +106,12 @@ describe('Check that players are ranked correctly', function() {
                         category: 'Battle',
                         max_val: 20,
                         score: 5,
-                        key: 'round_2_battle',
                         min_val: 0
                     },
                     {
                         category: 'Fair Play',
                         max_val: 5,
                         score: 5,
-                        key: 'round_2_sports',
                         min_val: 1
                     }
                 ],
@@ -138,14 +127,12 @@ describe('Check that players are ranked correctly', function() {
                         category: 'Battle',
                         max_val: 20,
                         score: 0,
-                        key: 'round_1_battle',
                         min_val: 0
                     },
                     {
                         category: 'Fair Play',
                         max_val: 5,
                         score: 5,
-                        key: 'round_1_sports',
                         min_val: 1
                     }
                 ],
@@ -161,14 +148,12 @@ describe('Check that players are ranked correctly', function() {
                         category: 'Battle',
                         max_val: 20,
                         score: 0,
-                        key: 'round_1_battle',
                         min_val: 0
                     },
                     {
                         category: 'Fair Play',
                         max_val: 5,
                         score: 5,
-                        key: 'round_1_sports',
                         min_val: 1
                     }
                 ],

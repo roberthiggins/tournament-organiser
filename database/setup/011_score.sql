@@ -15,18 +15,10 @@ CREATE TABLE score_category(
 );
 COMMENT ON COLUMN score_category.percentage IS 'The raw score should be multiplied by this.';
 
-CREATE TABLE score_key (
-    id                  SERIAL UNIQUE,
-    key                 VARCHAR NOT NULL,
-    category            INTEGER NOT NULL REFERENCES score_category(id),
-    PRIMARY KEY (key, category)
-);
-COMMENT ON TABLE score_key IS 'This table is all the score keys that might be entered for a tournament. An example might be round_1_battle, round_1_sports, best_painted_votes';
-
 CREATE TABLE score (
     id                  SERIAL PRIMARY KEY,
     entry_id            INTEGER REFERENCES entry(id),
-    score_key_id        INTEGER REFERENCES score_key(id),
+    score_category_id   INTEGER REFERENCES score_category(id),
     value               INTEGER
 );
 COMMENT ON TABLE score IS 'An entry will have lots of scores.';

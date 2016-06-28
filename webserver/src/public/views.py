@@ -47,7 +47,7 @@ def enter_score(request, tournament_id, username):      # pylint: disable=W0613
         entry_id = json.loads(response.content)
         return HttpResponseRedirect('/enterscore/{}'.format(entry_id))
     except ValueError:
-        return HttpResponseNotFound()
+        return HttpResponseNotFound(response.content)
 
 @login_required
 def enter_score_by_entry(request, entry_id):

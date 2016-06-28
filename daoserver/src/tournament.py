@@ -12,8 +12,7 @@ from matching_strategy import RoundRobin
 from models.db_connection import db
 from models.game_entry import GameEntrant
 from models.permissions import ProtObjAction, ProtObjPerm
-from models.score import Score, ScoreCategory, ScoreKey, TournamentScore, \
-GameScore
+from models.score import Score, ScoreCategory, TournamentScore, GameScore
 from models.table_allocation import TableAllocation
 from models.tournament import Tournament as TournamentDB
 from models.tournament_entry import TournamentEntry
@@ -96,8 +95,6 @@ class Tournament(object):
             to_delete = ScoreCategory.query.\
                 filter(and_(ScoreCategory.tournament_id == self.tournament_id,
                             ~ScoreCategory.display_name.in_(keys)))
-            for cat in to_delete.all():
-                cat.score_keys.delete()
             to_delete.delete(synchronize_session='fetch')
 
 
@@ -117,14 +114,6 @@ class Tournament(object):
                 dao.per_tournament = cat.per_tournament
                 db.session.add(dao)
                 db.session.flush()
-
-                try:
-                    if ScoreKey.query.\
-                    filter_by(key=cat.display_name, category=dao.id).first() \
-                    is None:
-                        db.session.add(ScoreKey(cat.display_name, dao.id))
-                except IntegrityError:
-                    raise Exception('Score already set')
 
             # check for clashes before actually writing
             for cat in new_categories:
@@ -154,47 +143,46 @@ class Tournament(object):
         }
 
     @must_exist_in_db
-    def enter_score(self, entry_id, score_key, score, game_id=None):
+    def enter_score(self, entry_id, score_cat, score, game_id=None):
         """
         Enters a score for category into tournament for player.
 
         Expects: All fields required
             - entry_id - of the entry
-            - score_key - e.g. round_3_battle
+            - score_cat - e.g. round_3_battle
             - score - integer
 
         Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
             there is an issue inserting the score.
         """
-        # score_key should mean something in the context of the tournie
-        key = db.session.query(ScoreKey).join(ScoreCategory).\
-            filter(and_(ScoreCategory.tournament_id == self.get_dao().name,
-                        ScoreKey.key == score_key)
-                  ).first()
+        # score_cat should mean something in the context of the tournie
+        cat = db.session.query(ScoreCategory).filter_by(
+            tournament_id=self.get_dao().name, display_name=score_cat).\
+            first()
 
         # Validate the score
         try:
             score = int(score)
-            if score < key.score_category.min_val or \
-            score > key.score_category.max_val:
+            if score < cat.min_val or score > cat.max_val:
                 raise ValueError()
         except ValueError:
             raise ValueError('Invalid score: {}'.format(score))
         except AttributeError:
-            raise TypeError('Unknown category: {}'.format(score_key))
+            raise TypeError('Unknown category: {}'.format(score_cat))
 
         # Has it already been entered?
         if game_id is None:
-            existing_score = TournamentScore.query.join(Score).join(ScoreKey).\
+            existing_score = TournamentScore.query.join(Score).\
+                join(ScoreCategory).\
                 filter(and_(TournamentScore.entry_id == entry_id,
                             TournamentScore.tournament_id == self.get_dao().id,
-                            ScoreKey.id == key.id)).first() is not None
+                            ScoreCategory.id == cat.id)).first() is not None
         else:
             try:
                 existing_score = GameScore.query.join(Score).\
                     filter(and_(GameScore.entry_id == entry_id, \
                                 GameScore.game_id == game_id,
-                                Score.score_key_id == key.id)).\
+                                Score.score_category_id == cat.id)).\
                     first() is not None
             except DataError:
                 db.session.rollback()
@@ -206,7 +194,7 @@ class Tournament(object):
                 '{} not entered. Score is already set'.format(score))
 
         try:
-            score_dao = Score(entry_id, key.id, score)
+            score_dao = Score(entry_id, cat.id, score)
             db.session.add(score_dao)
             db.session.flush()
 
@@ -264,11 +252,10 @@ class Tournament(object):
                 TableAllocation.query.filter_by(entry_id=entry.id)]
             entry.score_info = [
                 {
-                    'key': x.score_key.key,
                     'score': x.value,
-                    'category': x.score_key.score_category.display_name,
-                    'min_val': x.score_key.score_category.min_val,
-                    'max_val': x.score_key.score_category.max_val,
+                    'category': x.score_category.display_name,
+                    'min_val': x.score_category.min_val,
+                    'max_val': x.score_category.max_val,
                 } for x in entry.scores
             ]
 

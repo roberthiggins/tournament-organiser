@@ -21,8 +21,6 @@ BEGIN
     INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tournie_id;
 
     INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT, DEFAULT, 4, 15) RETURNING id INTO fanciness;
-    INSERT INTO score_key VALUES (DEFAULT, 'fanciest_wig', fanciness);
-    INSERT INTO score_key VALUES (DEFAULT, 'number_tassles', fanciness);
 
     INSERT INTO account VALUES ('stevemcqueen', 'foo@bar.com');
     INSERT INTO account_security VALUES ('stevemcqueen', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
@@ -35,16 +33,13 @@ BEGIN
     INSERT INTO registration VALUES('stevemcqueen', tournie_id);
 
     INSERT INTO entry VALUES(default, 'rick_james', 'painting_test');
+    INSERT INTO entry VALUES(default, 'stevemcqueen', 'painting_test');
 
 END $$;
 
 -- Make a tournament for the purposes of testing rankings
 CREATE OR REPLACE FUNCTION ranking_test_setup() RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
-    rd1key int := 0;
-    rd2key int := 0;
-    rd1sportskey int := 0;
-    rd2sportskey int := 0;
     battlecategory int := 0;
     sportscategory int := 0;
     protect_object_id int := 0;
@@ -69,10 +64,6 @@ BEGIN
 
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Battle', 90, DEFAULT, 0, 20) RETURNING id INTO battlecategory;
     INSERT INTO score_category VALUES(DEFAULT, 'ranking_test', 'Fair Play', 10, DEFAULT, 1, 5) RETURNING id INTO sportscategory;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_1_battle', battlecategory) RETURNING id INTO rd1key;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_2_battle', battlecategory) RETURNING id INTO rd2key;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_1_sports', sportscategory) RETURNING id INTO rd1sportskey;
-    INSERT INTO score_key VALUES (DEFAULT, 'round_2_sports', sportscategory) RETURNING id INTO rd2sportskey;
 
     INSERT INTO account VALUES ('homer', 'foo@bar.com') ;
     INSERT INTO account_security VALUES ('homer', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
@@ -115,9 +106,9 @@ BEGIN
     INSERT INTO game_entrant VALUES(game_id, lisa_id);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('lisa', permission_id);
---    INSERT INTO score VALUES(DEFAULT, lisa_id, rd1key, DEFAULT) RETURNING id INTO score_id;
+--    INSERT INTO score VALUES(DEFAULT, lisa_id, battlecategory, DEFAULT) RETURNING id INTO score_id;
 --    INSERT INTO game_score VALUES(lisa_id, game_id, score_id);
---    INSERT INTO score VALUES(DEFAULT, lisa_id, rd1sportskey, 5) RETURNING id INTO score_id;
+--    INSERT INTO score VALUES(DEFAULT, lisa_id, sportscategory, 5) RETURNING id INTO score_id;
 --    INSERT INTO game_score VALUES(lisa_id, game_id, score_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
@@ -127,13 +118,13 @@ BEGIN
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('homer', permission_id);
     INSERT INTO account_protected_object_permission VALUES ('maggie', permission_id);
-    INSERT INTO score VALUES(DEFAULT, homer_id, rd1key, 20) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, homer_id, battlecategory, 20) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(homer_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, homer_id, rd1sportskey, 1) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, homer_id, sportscategory, 1) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(homer_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, maggie_id, rd1key, 0) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, maggie_id, battlecategory, 0) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(maggie_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, maggie_id, rd1sportskey, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, maggie_id, sportscategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(maggie_id, game_id, score_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
@@ -143,13 +134,13 @@ BEGIN
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('marge', permission_id);
     INSERT INTO account_protected_object_permission VALUES ('bart', permission_id);
-    INSERT INTO score VALUES(DEFAULT, marge_id, rd1key, 0) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, marge_id, battlecategory, 0) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(marge_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, marge_id, rd1sportskey, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, marge_id, sportscategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(marge_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, bart_id, rd1key, 20) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, bart_id, battlecategory, 20) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(bart_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, bart_id, rd1sportskey, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, bart_id, sportscategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(bart_id, game_id, score_id);
 
     -- The draw for round 2 has already been completed.
@@ -160,9 +151,9 @@ BEGIN
     INSERT INTO game_entrant VALUES(game_id, marge_id);
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('marge', permission_id);
---    INSERT INTO score VALUES(DEFAULT, marge_id, rd2key, DEFAULT) RETURNING id INTO score_id;
+--    INSERT INTO score VALUES(DEFAULT, marge_id, battlecategory, DEFAULT) RETURNING id INTO score_id;
 --    INSERT INTO game_score VALUES(marge_id, game_id, score_id);
---    INSERT INTO score VALUES(DEFAULT, marge_id, rd2sportskey, 5) RETURNING id INTO score_id;
+--    INSERT INTO score VALUES(DEFAULT, marge_id, sportscategory, 5) RETURNING id INTO score_id;
 --    INSERT INTO game_score VALUES(marge_id, game_id, score_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
@@ -172,13 +163,13 @@ BEGIN
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('maggie', permission_id);
     INSERT INTO account_protected_object_permission VALUES ('bart', permission_id);
-     --INSERT INTO score VALUES(DEFAULT, maggie_id, rd2key, 15) RETURNING id INTO score_id;
+     --INSERT INTO score VALUES(DEFAULT, maggie_id, battlecategory, 15) RETURNING id INTO score_id;
      --INSERT INTO game_score VALUES(maggie_id, game_id, score_id);
-     --INSERT INTO score VALUES(DEFAULT, maggie_id, rd2sportskey, 5) RETURNING id INTO score_id;
+     --INSERT INTO score VALUES(DEFAULT, maggie_id, sportscategory, 5) RETURNING id INTO score_id;
      --INSERT INTO game_score VALUES(maggie_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, bart_id, rd2key, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, bart_id, battlecategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(bart_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, bart_id, rd2sportskey, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, bart_id, sportscategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(bart_id, game_id, score_id);
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
@@ -188,13 +179,13 @@ BEGIN
     INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, protected_action_id) RETURNING id INTO permission_id;
     INSERT INTO account_protected_object_permission VALUES ('homer', permission_id);
     INSERT INTO account_protected_object_permission VALUES ('lisa', permission_id);
-    INSERT INTO score VALUES(DEFAULT, homer_id, rd2key, 15) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, homer_id, battlecategory, 15) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(homer_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, homer_id, rd2sportskey, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, homer_id, sportscategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(homer_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, lisa_id, rd2key, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, lisa_id, battlecategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(lisa_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, lisa_id, rd2sportskey, 5) RETURNING id INTO score_id;
+    INSERT INTO score VALUES(DEFAULT, lisa_id, sportscategory, 5) RETURNING id INTO score_id;
     INSERT INTO game_score VALUES(lisa_id, game_id, score_id);
 
 

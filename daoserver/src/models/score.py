@@ -84,51 +84,29 @@ class ScoreCategory(db.Model):
 
         return False
 
-class ScoreKey(db.Model):
-    """A row in the score_key table"""
-
-    __tablename__ = 'score_key'
-    id = db.Column(db.Integer, db.Sequence('score_key_id_seq'), unique=True)
-    key = db.Column(db.String(50), primary_key=True)
-    category = db.Column(db.Integer,
-                         db.ForeignKey(ScoreCategory.id),
-                         primary_key=True)
-    score_category = db.relationship(ScoreCategory, backref=db.backref(
-        'score_keys', lazy='dynamic', cascade='all, delete-orphan'))
-
-    def __init__(self, key, category):
-        self.key = key
-        self.category = category
-
-    def __repr__(self):
-        return '<ScoreKey ({}, {}, {})>'.format(
-            self.id,
-            self.key,
-            self.category)
-
 class Score(db.Model):
-    """An individual score tied to a ScoreKey"""
+    """An individual score tied to a ScoreCategory"""
 
     __tablenamene__ = 'score'
     id = db.Column(db.Integer, primary_key=True)
     entry_id = db.Column(db.Integer, db.ForeignKey(TournamentEntry.id))
-    score_key_id = db.Column(db.Integer, db.ForeignKey(ScoreKey.id))
+    score_category_id = db.Column(db.Integer, db.ForeignKey(ScoreCategory.id))
     value = db.Column(db.Integer)
 
     entry = db.relationship(TournamentEntry, backref='scores')
-    score_key = db.relationship(ScoreKey,
-                                backref=db.backref('scores', lazy='dynamic'))
+    score_category = db.relationship(ScoreCategory, \
+        backref=db.backref('scores', lazy='dynamic'))
 
-    def __init__(self, entry_id, score_key_id, value=None):
+    def __init__(self, entry_id, score_category_id, value=None):
         self.entry_id = entry_id
-        self.score_key_id = score_key_id
+        self.score_category_id = score_category_id
         self.value = value
 
     def __repr__(self):
         return '<Score ({}, {}, {}, {})>'.format(
             self.id,
             self.entry_id,
-            self.score_key_id,
+            self.score_category_id,
             self.value)
 
 class GameScore(db.Model):

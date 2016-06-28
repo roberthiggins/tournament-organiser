@@ -10,7 +10,7 @@ from app import create_app
 from db_connections.db_connection import db_conn
 from models.db_connection import db
 from models.game_entry import GameEntrant
-from models.score import ScoreCategory, ScoreKey
+from models.score import ScoreCategory
 from models.tournament_entry import TournamentEntry
 from models.tournament_game import TournamentGame
 from models.tournament_round import TournamentRound
@@ -44,7 +44,7 @@ class TestScoreEntered(TestCase):
 
     def test_get_game_from_score(self):
         """
-        You should be able to determine game from entry_id and the score_key
+        You should be able to determine game from entry_id and the score_cat
         """
         entry_2_id = TournamentEntry.query.filter_by(
             player_id='{}_player_{}'.format(self.tournament_1, 2),
@@ -102,9 +102,6 @@ class TestScoreEntered(TestCase):
                                    0, 100)
         db.session.add(category_1)
         db.session.flush()
-        key_1 = ScoreKey('test_score_entered_key_1', category_1.id)
-        db.session.add(key_1)
-        db.session.flush()
 
         tourn = Tournament(self.tournament_1)
 
@@ -123,8 +120,8 @@ class TestScoreEntered(TestCase):
 
         # A completed game
         game = self.get_game_by_round(entry_4_id, 1)
-        tourn.enter_score(entry_2_id, key_1.key, 2, game.id)
-        tourn.enter_score(entry_4_id, key_1.key, 4, game.id)
+        tourn.enter_score(entry_2_id, category_1.display_name, 2, game.id)
+        tourn.enter_score(entry_4_id, category_1.display_name, 4, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
         self.assertTrue(entry_4_id in entrants)
@@ -132,7 +129,7 @@ class TestScoreEntered(TestCase):
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
-        tourn.enter_score(entry_3_id, key_1.key, 3, game.id)
+        tourn.enter_score(entry_3_id, category_1.display_name, 3, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
         self.assertTrue(entry_3_id in entrants)
@@ -144,14 +141,14 @@ class TestScoreEntered(TestCase):
             format(entry_4_id))
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
-        tourn.enter_score(entry_4_id, key_1.key, 4, game.id)
+        tourn.enter_score(entry_4_id, category_1.display_name, 4, game.id)
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
         self.assertFalse(Tournament.is_score_entered(game))
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tournament_1)
-        tourn.enter_score(entry_5_id, key_1.key, 5, game.id)
+        tourn.enter_score(entry_5_id, category_1.display_name, 5, game.id)
         self.assertTrue(Tournament.is_score_entered(game))
 
     @staticmethod

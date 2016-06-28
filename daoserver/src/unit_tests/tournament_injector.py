@@ -145,11 +145,9 @@ class TournamentInjector(object):
             tourn.tournament_scores.delete()
 
             for cat in tourn.score_categories:
-                for key in cat.score_keys:
-                    for score in key.scores:
-                        score.game_scores.delete()
-                    key.scores.delete()
-                cat.score_keys.delete()
+                for score in cat.scores:
+                    score.game_scores.delete()
+                cat.scores.delete()
             tourn.score_categories.delete()
         db.session.commit()
 
