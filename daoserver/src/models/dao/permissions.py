@@ -3,8 +3,8 @@ ORM module for permissions
 """
 # pylint: disable=invalid-name
 
-from models.account import Account
-from models.db_connection import db
+from models.dao.account import Account
+from models.dao.db_connection import db
 
 class ProtectedObject(db.Model):
     """

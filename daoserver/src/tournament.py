@@ -9,15 +9,15 @@ from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from matching_strategy import RoundRobin
-from models.db_connection import db
-from models.game_entry import GameEntrant
-from models.permissions import ProtObjAction, ProtObjPerm
-from models.score import Score, ScoreCategory, TournamentScore, GameScore
-from models.table_allocation import TableAllocation
-from models.tournament import Tournament as TournamentDB
-from models.tournament_entry import TournamentEntry
-from models.tournament_game import TournamentGame
-from models.tournament_round import TournamentRound as TR
+from models.dao.db_connection import db
+from models.dao.game_entry import GameEntrant
+from models.dao.permissions import ProtObjAction, ProtObjPerm
+from models.dao.score import Score, ScoreCategory, TournamentScore, GameScore
+from models.dao.table_allocation import TableAllocation
+from models.dao.tournament import Tournament as TournamentDB
+from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_game import TournamentGame
+from models.dao.tournament_round import TournamentRound as TR
 from permissions import PermissionsChecker, PERMISSIONS
 from ranking_strategies import RankingStrategy
 from table_strategy import ProtestAvoidanceStrategy

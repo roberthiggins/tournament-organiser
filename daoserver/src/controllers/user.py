@@ -7,7 +7,7 @@ import jsonpickle
 from flask import Blueprint, make_response, Response
 
 from authentication import check_auth
-from models.account import Account
+from models.dao.account import Account
 from request_variables import enforce_request_variables
 
 USER = Blueprint('USER', __name__)

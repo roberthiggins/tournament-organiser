@@ -13,10 +13,10 @@ TODO:
 
 from sqlalchemy.sql.expression import and_
 
-from models.db_connection import db
-from models.tournament import Tournament
-from models.tournament_entry import TournamentEntry
-from models.tournament_game import TournamentGame
+from models.dao.db_connection import db
+from models.dao.tournament import Tournament
+from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_game import TournamentGame
 
 class ScoreCategory(db.Model):
     """ A row from the score_category table"""

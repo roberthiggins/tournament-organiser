@@ -5,9 +5,9 @@ ORM module for a registration of a user into a tournament
 
 from sqlalchemy.sql.expression import and_
 
-from models.account import Account
-from models.db_connection import db
-from models.tournament import Tournament
+from models.dao.account import Account
+from models.dao.db_connection import db
+from models.dao.tournament import Tournament
 
 class TournamentRegistration(db.Model):
     """A row in the registration table"""

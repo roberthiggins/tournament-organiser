@@ -24,7 +24,7 @@ def create_app():
             os.environ['DATABASE_PORT_5432_TCP_PORT'],
             os.environ['POSTGRES_DB'])
 
-    from models.db_connection import db as db_conn
+    from models.dao.db_connection import db as db_conn
     db_conn.init_app(app)
 
     app.register_blueprint(APP)

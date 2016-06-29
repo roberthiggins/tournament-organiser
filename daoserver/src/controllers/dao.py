@@ -14,11 +14,11 @@ from flask import Blueprint, request, make_response, Response
 
 from sqlalchemy.exc import IntegrityError
 
-from models.account import Account, add_account
-from models.db_connection import db
-from models.registration import TournamentRegistration
-from models.tournament import Tournament as TournamentDAO
-from models.tournament_entry import TournamentEntry
+from models.dao.account import Account, add_account
+from models.dao.db_connection import db
+from models.dao.registration import TournamentRegistration
+from models.dao.tournament import Tournament as TournamentDAO
+from models.dao.tournament_entry import TournamentEntry
 from permissions import PERMISSIONS, PermissionsChecker
 from request_variables import enforce_request_variables
 from tournament import Tournament, ScoreCategoryPair
@@ -296,7 +296,7 @@ def set_missions():
         raise ValueError('Tournament {} has {} rounds. \
             You submitted missions {}'.format(tournamentId, rounds, missions))
 
-    from models.tournament_round import TournamentRound as TR
+    from models.dao.tournament_round import TournamentRound as TR
     for i, mission in enumerate(json_missions):
         rnd = tourn.get_round(i + 1)
         # pylint: disable=no-member

@@ -6,9 +6,9 @@ ORM moduel for an entry in a tournament
 
 from flask import json
 
-from models.account import Account
-from models.db_connection import db
-from models.tournament import Tournament
+from models.dao.account import Account
+from models.dao.db_connection import db
+from models.dao.tournament import Tournament
 
 class TournamentEntry(db.Model):
     """

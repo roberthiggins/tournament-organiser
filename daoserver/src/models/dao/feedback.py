@@ -5,7 +5,7 @@ ORM module for feedback from the user
 
 import datetime
 
-from models.db_connection import db
+from models.dao.db_connection import db
 
 class Feedback(db.Model):
     """

@@ -6,11 +6,11 @@ Module to handle permissions for accounts trying to modify a tournament.
 from sqlalchemy.sql.expression import and_
 
 from db_connections.db_connection import db_conn
-from models.db_connection import db
-from models.account import Account
-from models.permissions import AccountProtectedObjectPermission, \
+from models.dao.db_connection import db
+from models.dao.account import Account
+from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtObjAction, ProtObjPerm
-from models.tournament_entry import TournamentEntry
+from models.dao.tournament_entry import TournamentEntry
 
 PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',

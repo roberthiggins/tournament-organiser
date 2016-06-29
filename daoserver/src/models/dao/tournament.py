@@ -3,8 +3,8 @@ ORM module for a tournament
 """
 # pylint: disable=invalid-name
 
-from models.db_connection import db
-from models.permissions import ProtectedObject
+from models.dao.db_connection import db
+from models.dao.permissions import ProtectedObject
 
 class Tournament(db.Model):
     """Represents a row in the tournament table"""

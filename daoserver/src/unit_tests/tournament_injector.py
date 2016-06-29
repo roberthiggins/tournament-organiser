@@ -13,14 +13,14 @@ or something similar to:
 
 from datetime import datetime, timedelta
 
-from models.account import Account
-from models.db_connection import db
-from models.permissions import AccountProtectedObjectPermission, \
+from models.dao.account import Account
+from models.dao.db_connection import db
+from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtectedObject, ProtObjAction, ProtObjPerm
-from models.registration import TournamentRegistration as TRegistration
-from models.tournament import Tournament
-from models.tournament_entry import TournamentEntry
-from models.tournament_round import TournamentRound
+from models.dao.registration import TournamentRegistration as TRegistration
+from models.dao.tournament import Tournament
+from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_round import TournamentRound
 
 from permissions import PermissionsChecker, PERMISSIONS, set_up_permissions
 

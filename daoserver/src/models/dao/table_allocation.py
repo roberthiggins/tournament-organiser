@@ -4,8 +4,8 @@ ORM module for a table, allocated to some players
 
 # pylint: disable=invalid-name
 
-from models.db_connection import db
-from models.tournament_entry import TournamentEntry
+from models.dao.db_connection import db
+from models.dao.tournament_entry import TournamentEntry
 
 class TableAllocation(db.Model):
     """ Entries need a place to play their games."""

@@ -6,9 +6,9 @@ from flask_testing import TestCase
 from testfixtures import compare
 
 from app import create_app
-from models.account import db, Account, AccountSecurity, add_account
-from models.permissions import ProtectedObject, ProtObjAction, ProtObjPerm, \
-AccountProtectedObjectPermission as AccountProtectedObjectPerm
+from models.dao.account import db, Account, AccountSecurity, add_account
+from models.dao.permissions import ProtectedObject, ProtObjAction, \
+ProtObjPerm, AccountProtectedObjectPermission as AccountProtectedObjectPerm
 from permissions import PermissionsChecker
 from tournament import Tournament
 

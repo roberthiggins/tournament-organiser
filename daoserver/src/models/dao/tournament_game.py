@@ -4,9 +4,9 @@ ORM module for a game in a tournament
 
 # pylint: disable=invalid-name,no-member
 
-from models.db_connection import db
-from models.permissions import ProtectedObject
-from models.tournament_round import TournamentRound
+from models.dao.db_connection import db
+from models.dao.permissions import ProtectedObject
+from models.dao.tournament_round import TournamentRound
 
 class TournamentGame(db.Model):
     """

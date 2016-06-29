@@ -6,9 +6,9 @@ from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
 
 from app import create_app
-from models.account import Account
-from models.db_connection import db
-from models.registration import TournamentRegistration as TReg
+from models.dao.account import Account
+from models.dao.db_connection import db
+from models.dao.registration import TournamentRegistration as TReg
 
 from unit_tests.tournament_injector import TournamentInjector
 
