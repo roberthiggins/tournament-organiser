@@ -241,8 +241,9 @@ def register_for_tournament(request):
 
     if request.method == 'POST':
         form = ApplyForTournamentForm(request.POST, tournament_list=t_list)
-        if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/registerfortournament', form)
+        if form.is_valid():                     # pylint: disable=no-member
+            t_name = form.cleaned_data['inputTournamentName']
+            response = from_dao('/tournament/{}/register'.format(t_name), form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)

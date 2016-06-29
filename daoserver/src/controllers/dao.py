@@ -12,12 +12,9 @@ import jsonpickle
 
 from flask import Blueprint, request, make_response, Response
 
-from sqlalchemy.exc import IntegrityError
-
 from controllers.request_variables import enforce_request_variables
 from models.dao.account import Account, add_account
 from models.dao.db_connection import db
-from models.dao.registration import TournamentRegistration
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
 from models.tournament import Tournament, ScoreCategoryPair
@@ -75,26 +72,6 @@ def main():
     return make_response('daoserver', 200)
 
 # Page actions
-
-@APP.route('/registerfortournament', methods=['POST'])
-@enforce_request_variables('inputTournamentName', 'inputUserName')
-def apply_for_tournament():
-    """
-    POST to apply for entry to a tournament.
-    Expects:
-        - inputUserName - Username of player applying
-        - inputTournamentName - Tournament as returned by GET /tournament
-    """
-    rego = TournamentRegistration(inputUserName, inputTournamentName)
-    rego.clashes()
-
-    try:
-        db.session.add(rego)
-        db.session.commit()
-    except IntegrityError:
-        raise ValueError("Check username and tournament")
-
-    return make_response('Application Submitted', 200)
 
 @APP.route('/addTournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')

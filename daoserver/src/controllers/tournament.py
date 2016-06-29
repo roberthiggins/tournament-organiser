@@ -2,9 +2,12 @@
 All tournament interactions.
 """
 import jsonpickle
-
 from flask import Blueprint, make_response, Response
+from sqlalchemy.exc import IntegrityError
 
+from controllers.request_variables import enforce_request_variables
+from models.dao.db_connection import db
+from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.tournament import Tournament
@@ -50,6 +53,26 @@ def list_tournaments():
     return Response(
         jsonpickle.encode({'tournaments' : details}, unpicklable=False),
         mimetype='application/json')
+
+# pylint: disable=undefined-variable
+@TOURNAMENT.route('/<tournament_id>/register', methods=['POST'])
+@enforce_request_variables('inputUserName')
+def register(tournament_id):
+    """
+    POST to apply for entry to a tournament.
+    Expects:
+        - inputUserName - Username of player applying
+    """
+    rego = TournamentRegistration(inputUserName, tournament_id)
+    rego.clashes()
+
+    try:
+        db.session.add(rego)
+        db.session.commit()
+    except IntegrityError:
+        raise ValueError("Check username and tournament")
+
+    return make_response('Application Submitted', 200)
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 def tournament_details(tournament_id=None):
