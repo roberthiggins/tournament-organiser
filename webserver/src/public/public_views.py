@@ -135,7 +135,7 @@ def tournament(request, tournament_id):
         return HttpResponseRedirect('/registerforatournament')
 
     try:
-        response = from_dao('/tournamentDetails/%s' % tournament_id).content
+        response = from_dao('/tournament/%s' % tournament_id).content
         t_info = json.loads(response)
         return render_to_response(
             'tournament-info.html',

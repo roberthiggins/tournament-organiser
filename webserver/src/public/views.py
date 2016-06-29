@@ -194,7 +194,7 @@ def set_categories(request, tournament_id):
 @login_required
 def set_missions(request, tournament_id):
     """Set the number of rounds for a competition"""
-    t_details = from_dao('/tournamentDetails/{}'.format(tournament_id))
+    t_details = from_dao('/tournament/{}'.format(tournament_id))
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
@@ -258,7 +258,7 @@ def register_for_tournament(request):
 @login_required
 def set_rounds(request, tournament_id):
     """Set the number of rounds for a competition"""
-    t_details = from_dao('/tournamentDetails/{}'.format(tournament_id))
+    t_details = from_dao('/tournament/{}'.format(tournament_id))
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))

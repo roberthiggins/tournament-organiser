@@ -391,14 +391,3 @@ def set_score_categories():
 
     return make_response('Score categories set: {}'.format(
         ', '.join([str(cat.display_name) for cat in new_categories])), 200)
-
-@APP.route('/tournamentDetails/<t_name>', methods=['GET'])
-def tournament_details(t_name=None):
-    """
-    GET to get details about a tournament. This includes entrants and format
-    information
-    """
-    tourn = Tournament(t_name)
-    return Response(
-        jsonpickle.encode(tourn.details(), unpicklable=False),
-        mimetype='application/json')

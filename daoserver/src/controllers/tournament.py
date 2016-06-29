@@ -11,6 +11,26 @@ from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__, url_prefix='')
 
+@TOURNAMENT.errorhandler(ValueError)
+def input_error(err):
+    """Input errors"""
+    print type(err).__name__
+    print err
+    import traceback
+    traceback.print_exc()
+    return make_response(str(err), 400)
+
+@TOURNAMENT.route('/<tournament_id>', methods=['GET'])
+def tournament_details(tournament_id=None):
+    """
+    GET to get details about a tournament. This includes entrants and format
+    information
+    """
+    tourn = Tournament(tournament_id)
+    return Response(
+        jsonpickle.encode(tourn.details(), unpicklable=False),
+        mimetype='application/json')
+
 @TOURNAMENT.route('/<tournament_id>/entries', methods=['GET'])
 def entry_list(tournament_id):
     """
