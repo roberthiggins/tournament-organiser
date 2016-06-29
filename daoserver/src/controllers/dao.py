@@ -20,8 +20,8 @@ from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
-from permissions import PERMISSIONS, PermissionsChecker
-from tournament import Tournament, ScoreCategoryPair
+from models.permissions import PERMISSIONS, PermissionsChecker
+from models.tournament import Tournament, ScoreCategoryPair
 
 APP = Blueprint('APP', __name__, url_prefix='')
 

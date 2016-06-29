@@ -8,7 +8,6 @@ import datetime
 from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
 
-from matching_strategy import RoundRobin
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.permissions import ProtObjAction, ProtObjPerm
@@ -18,9 +17,10 @@ from models.dao.tournament import Tournament as TournamentDB
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as TR
-from permissions import PermissionsChecker, PERMISSIONS
-from ranking_strategies import RankingStrategy
-from table_strategy import ProtestAvoidanceStrategy
+from models.matching_strategy import RoundRobin
+from models.permissions import PermissionsChecker, PERMISSIONS
+from models.ranking_strategies import RankingStrategy
+from models.table_strategy import ProtestAvoidanceStrategy
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""

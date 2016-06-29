@@ -6,7 +6,7 @@ import unittest
 from testfixtures import compare
 
 from models.dao.tournament_entry import TournamentEntry
-from table_strategy import ProtestAvoidanceStrategy, Table
+from models.table_strategy import ProtestAvoidanceStrategy, Table
 
 class TableStrategyTests(unittest.TestCase):             # pylint: disable=R0904
     """Tests for `table_strategy_strategy.py`."""

@@ -11,7 +11,8 @@ from flask import Flask
 from controllers.dao import APP
 from controllers.feedback import FEEDBACK
 from controllers.user import USER
-from permissions import set_up_permissions
+from models.dao.db_connection import db as db_conn
+from models.permissions import set_up_permissions
 
 # pylint: disable=W0621
 def create_app():
@@ -24,7 +25,6 @@ def create_app():
             os.environ['DATABASE_PORT_5432_TCP_PORT'],
             os.environ['POSTGRES_DB'])
 
-    from models.dao.db_connection import db as db_conn
     db_conn.init_app(app)
 
     app.register_blueprint(APP)

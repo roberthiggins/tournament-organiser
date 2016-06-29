@@ -7,7 +7,7 @@ from testfixtures import compare
 from app import create_app
 from models.dao.tournament import db
 from models.dao.tournament_round import TournamentRound
-from tournament import Tournament
+from models.tournament import Tournament
 
 from unit_tests.tournament_injector import TournamentInjector
 

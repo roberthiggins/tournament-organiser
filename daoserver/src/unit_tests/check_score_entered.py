@@ -15,7 +15,7 @@ from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound
 
-from tournament import Tournament
+from models.tournament import Tournament
 from unit_tests.tournament_injector import TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
