@@ -4,8 +4,7 @@ describe('HTTP Method Test Suite', function() {
         + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
 
     frisby.create('POST 2 rounds to setup')
-        .post(URL + '/setRounds', {
-            tournamentId: 'ranking_test',
+        .post(URL + '/tournament/ranking_test/rounds', {
             numRounds: 2
         }, {json: true})
         .expectStatus(200)

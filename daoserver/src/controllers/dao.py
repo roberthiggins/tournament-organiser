@@ -216,18 +216,6 @@ def get_round_info(tournament_id, round_id):
         },
         unpicklable=False)
 
-@APP.route('/setRounds', methods=['POST'])
-@enforce_request_variables('numRounds', 'tournamentId')
-def set_rounds():
-    """Set the number of rounds for a tournament"""
-    # pylint: disable=E0602
-    rounds = int(numRounds)
-    if rounds < 1:
-        raise ValueError('Set at least 1 round')
-    # pylint: disable=E0602
-    Tournament(tournamentId).set_number_of_rounds(rounds)
-    return make_response('Rounds set: {}'.format(rounds), 200)
-
 @APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
 def get_score_categories(tournament_id):
     """

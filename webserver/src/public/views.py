@@ -260,7 +260,8 @@ def register_for_tournament(request):
 @login_required
 def set_rounds(request, tournament_id):
     """Set the number of rounds for a competition"""
-    t_details = from_dao('/tournament/{}'.format(tournament_id))
+    tourn_path = '/tournament/{}'.format(tournament_id)
+    t_details = from_dao(tourn_path)
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
@@ -273,7 +274,7 @@ def set_rounds(request, tournament_id):
     if request.method == 'POST':
         form = SetRoundsForm(request.POST, tournament_id=tournament_id)
         if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/setRounds', form)
+            response = from_dao('{}/rounds'.format(tourn_path), form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)

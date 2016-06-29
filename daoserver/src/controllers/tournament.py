@@ -133,6 +133,18 @@ def set_missions(tournament_id):
     db.session.commit()
     return make_response('Missions set: {}'.format(missions), 200)
 
+@TOURNAMENT.route('/<tournament_id>/rounds', methods=['POST'])
+@enforce_request_variables('numRounds')
+def set_rounds(tournament_id):
+    """Set the number of rounds for a tournament"""
+
+    # pylint: disable=undefined-variable
+    rounds = int(numRounds)
+    if rounds < 1:
+        raise ValueError('Set at least 1 round')
+    Tournament(tournament_id).set_number_of_rounds(rounds)
+    return make_response('Rounds set: {}'.format(rounds), 200)
+
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 def tournament_details(tournament_id=None):
     """

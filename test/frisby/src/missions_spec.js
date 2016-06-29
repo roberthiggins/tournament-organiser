@@ -5,8 +5,7 @@ describe('Check Missions', function() {
 
     // Normal behaviour
     frisby.create('POST 3 rounds to setup')
-        .post(URL + '/setRounds', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/rounds', {
             numRounds: 3
         }, {json: true})
         .expectStatus(200)
@@ -26,8 +25,7 @@ describe('Check Missions', function() {
 
     // set missions and then change numbe of rounds
     frisby.create('POST 3 rounds to setup')
-        .post(URL + '/setRounds', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/rounds', {
             numRounds: 3
         }, {json: true})
         .expectStatus(200)
@@ -45,8 +43,7 @@ describe('Check Missions', function() {
         .expectJSON(['mission_4', 'mission_5', 'mission_6'])
         .toss();
     frisby.create('Add a 4th round')
-        .post(URL + '/setRounds', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/rounds', {
             numRounds: 4
         }, {json: true})
         .expectStatus(200)
@@ -58,15 +55,13 @@ describe('Check Missions', function() {
         .expectJSON(['mission_4', 'mission_5', 'mission_6', 'TBA'])
         .toss();
     frisby.create('POST 2 rounds')
-        .post(URL + '/setRounds', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/rounds', {
             numRounds: 2
         }, {json: true})
         .expectStatus(200)
         .toss();
     frisby.create('POST 3 rounds')
-        .post(URL + '/setRounds', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/rounds', {
             numRounds: 3
         }, {json: true})
         .expectStatus(200)
