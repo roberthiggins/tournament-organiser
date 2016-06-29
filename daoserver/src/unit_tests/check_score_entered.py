@@ -7,15 +7,15 @@ from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from app import create_app
-from db_connections.db_connection import db_conn
-from models.db_connection import db
-from models.game_entry import GameEntrant
-from models.score import ScoreCategory
-from models.tournament_entry import TournamentEntry
-from models.tournament_game import TournamentGame
-from models.tournament_round import TournamentRound
+from controllers.db_connection import db_conn
+from models.dao.db_connection import db
+from models.dao.game_entry import GameEntrant
+from models.dao.score import ScoreCategory
+from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_game import TournamentGame
+from models.dao.tournament_round import TournamentRound
 
-from tournament import Tournament
+from models.tournament import Tournament
 from unit_tests.tournament_injector import TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable

@@ -25,7 +25,7 @@ def create_tournament(request):
     if request.method == 'POST':
         form = AddTournamentForm(request.POST)
         if form.is_valid():                     # pylint: disable=no-member
-            response = from_dao('/addTournament', form, request)
+            response = from_dao('/tournament', form, request)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -106,7 +106,7 @@ def enter_score_for_game(tournament_id, username, round_id):
 @login_required
 def entry_list(request, tournament_id):
     """List entrants for a tournament"""
-    response = from_dao('/{}/entries'.format(tournament_id))
+    response = from_dao('/tournament/{}/entry/'.format(tournament_id))
     if response.status_code != 200:
         return HttpResponse(response, status=response.status_code)
 
@@ -154,7 +154,8 @@ def logout(request):
 @login_required
 def set_categories(request, tournament_id):
     """Set the scoring categories for a tournament"""
-    cats_request = from_dao('/getScoreCategories/{}'.format(tournament_id))
+    dao_url = '/tournament/{}/score_categories'.format(tournament_id)
+    cats_request = from_dao(dao_url)
     if cats_request.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
@@ -175,7 +176,7 @@ def set_categories(request, tournament_id):
                 k for k, v in form.cleaned_data.iteritems() \
                 if k.startswith('categories_') and v != form.empty_field()])
 
-            response = from_dao('/setScoreCategories', form)
+            response = from_dao(dao_url, form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -194,14 +195,15 @@ def set_categories(request, tournament_id):
 @login_required
 def set_missions(request, tournament_id):
     """Set the number of rounds for a competition"""
-    t_details = from_dao('/tournamentDetails/{}'.format(tournament_id))
+    tourn_path = '/tournament/{}'.format(tournament_id)
+    t_details = from_dao(tourn_path)
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
     rounds = int(json.loads(t_details.content)['rounds'])
 
     existing_missions = json.loads(
-        from_dao('/getMissions/{}'.format(tournament_id)).content)
+        from_dao('{}/missions'.format(tourn_path)).content)
 
     form = SetMissionsForm(
         tournament_id=tournament_id,
@@ -214,8 +216,8 @@ def set_missions(request, tournament_id):
             tournament_id=tournament_id,
             rounds=rounds)
 
-        if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/setMissions', form)
+        if form.is_valid():                     # pylint: disable=no-member
+            response = from_dao('{}/missions'.format(tourn_path), form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -235,14 +237,15 @@ def set_missions(request, tournament_id):
 def register_for_tournament(request):
     """Page to register for tournament"""
 
-    t_list = json.loads(from_dao('/listTournaments').content)['tournaments']
+    t_list = json.loads(from_dao('/tournament/').content)['tournaments']
     t_list = [(x['name'], x['name']) for x in t_list]
     form = ApplyForTournamentForm(tournament_list=t_list)
 
     if request.method == 'POST':
         form = ApplyForTournamentForm(request.POST, tournament_list=t_list)
-        if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/registerfortournament', form)
+        if form.is_valid():                     # pylint: disable=no-member
+            t_name = form.cleaned_data['inputTournamentName']
+            response = from_dao('/tournament/{}/register'.format(t_name), form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -258,7 +261,8 @@ def register_for_tournament(request):
 @login_required
 def set_rounds(request, tournament_id):
     """Set the number of rounds for a competition"""
-    t_details = from_dao('/tournamentDetails/{}'.format(tournament_id))
+    tourn_path = '/tournament/{}'.format(tournament_id)
+    t_details = from_dao(tourn_path)
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
@@ -271,7 +275,7 @@ def set_rounds(request, tournament_id):
     if request.method == 'POST':
         form = SetRoundsForm(request.POST, tournament_id=tournament_id)
         if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/setRounds', form)
+            response = from_dao('{}/rounds'.format(tourn_path), form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -320,7 +324,8 @@ def score_categories(tournament_id):
     insertion into a select.
     """
     try:
-        response = from_dao('/getScoreCategories/{}'.format(tournament_id))
+        response = from_dao(
+            '/tournament/{}/score_categories'.format(tournament_id))
         return [
             (x['id'], '{} ({}%)'.format(x['name'], int(x['percentage'])))
             for x in json.loads(response.content)

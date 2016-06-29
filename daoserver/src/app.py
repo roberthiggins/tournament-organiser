@@ -8,7 +8,14 @@ import jsonpickle
 
 from flask import Flask
 
-from permissions import set_up_permissions
+from controllers.dao import APP
+from controllers.feedback import FEEDBACK
+from controllers.tournament import TOURNAMENT
+from controllers.tournament_entry import ENTRY
+from controllers.tournament_round import TOURNAMENT_ROUND
+from controllers.user import USER
+from models.dao.db_connection import db as db_conn
+from models.permissions import set_up_permissions
 
 # pylint: disable=W0621
 def create_app():
@@ -21,14 +28,15 @@ def create_app():
             os.environ['DATABASE_PORT_5432_TCP_PORT'],
             os.environ['POSTGRES_DB'])
 
-    from models.db_connection import db as db_conn
     db_conn.init_app(app)
 
-    from dao import APP
-    from feedback import FEEDBACK
-    from user import USER
     app.register_blueprint(APP)
     app.register_blueprint(FEEDBACK, url_prefix='/feedback')
+    app.register_blueprint(TOURNAMENT, url_prefix='/tournament')
+    app.register_blueprint(TOURNAMENT_ROUND,
+                           url_prefix='/tournament/<tournament_id>/rounds')
+    app.register_blueprint(ENTRY,
+                           url_prefix='/tournament/<tournament_id>/entry')
     app.register_blueprint(USER, url_prefix='/user')
 
     return app

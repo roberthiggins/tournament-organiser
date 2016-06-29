@@ -7,8 +7,8 @@ import re
 from flask import Blueprint, request, make_response
 from sqlalchemy.exc import IntegrityError
 
-from models.db_connection import db
-from models.feedback import Feedback
+from models.dao.db_connection import db
+from models.dao.feedback import Feedback
 
 FEEDBACK = Blueprint('FEEDBACK', __name__)
 

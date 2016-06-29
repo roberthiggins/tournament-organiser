@@ -3,9 +3,9 @@ ORM module for an entrant in a game
 """
 # pylint: disable=invalid-name
 
-from models.db_connection import db
-from models.tournament_entry import TournamentEntry
-from models.tournament_game import TournamentGame
+from models.dao.db_connection import db
+from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_game import TournamentGame
 
 class GameEntrant(db.Model):
     """A TournamentGame typically has 2+ GameEntrant"""

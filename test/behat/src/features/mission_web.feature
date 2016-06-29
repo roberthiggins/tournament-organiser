@@ -10,7 +10,7 @@ Feature: Set the missions through the web front end.
         When I press "Login"
 
     Scenario: I view the missions for a tournament
-        Given I POST "tournamentId=mission_test&missions=[%22missionzz%22,%22boo%22,%22random%22]" to "/setMissions" from the API
+        Given I POST "missions=[%22missionzz%22,%22boo%22,%22random%22]" to "/tournament/mission_test/missions" from the API
         Given I am on "/setmissions/mission_test"
         Then the "id_missions_0" field should contain "missionzz"
         Then the "id_missions_1" field should contain "boo"

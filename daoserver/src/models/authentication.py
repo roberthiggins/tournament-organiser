@@ -4,7 +4,7 @@ from functools import wraps
 from flask import request, Response
 from passlib.hash import sha256_crypt
 
-from models.account import AccountSecurity
+from models.dao.account import AccountSecurity
 
 def check_auth(username, password):
     """This function is called to check if a username /

@@ -34,7 +34,7 @@ def create_account(request):
         if form.is_valid():                             # pylint: disable=no-member
             form.save()
 
-            response = from_dao('/addPlayer', form)
+            response = from_dao('/user', form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -75,7 +75,7 @@ def create_or_update_user(login_creds):
 @ratelimit(key='ip', rate='100/m', block=True)
 def list_tournaments(request):
     """ Get a list of tournaments"""
-    t_list = json.loads(from_dao('/listTournaments').content)['tournaments']
+    t_list = json.loads(from_dao('/tournament/').content)['tournaments']
     return render_to_response(
         'tournament-list.html',
         {'tournaments': t_list},
@@ -135,7 +135,7 @@ def tournament(request, tournament_id):
         return HttpResponseRedirect('/registerforatournament')
 
     try:
-        response = from_dao('/tournamentDetails/%s' % tournament_id).content
+        response = from_dao('/tournament/%s' % tournament_id).content
         t_info = json.loads(response)
         return render_to_response(
             'tournament-info.html',
@@ -155,7 +155,7 @@ def tournament_draw(request, tournament_id, round_id):
 
     try:
         response = from_dao(
-            '/roundInfo/{}/{}'.format(tournament_id, round_id)
+            '/tournament/{}/rounds/{}'.format(tournament_id, round_id)
         ).content
         json_data = json.loads(response)
     except ValueError:

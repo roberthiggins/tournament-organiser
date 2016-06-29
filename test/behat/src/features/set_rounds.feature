@@ -22,7 +22,7 @@ Feature: Set the number of rounds
         Then I should be on "/setrounds/ranking_test"
         Then I should see "8"
         Then I should not see "5"
-        Given I GET "/tournamentDetails/ranking_test" from the API
+        Given I GET "/tournament/ranking_test" from the API
         Then the API response status code should be 200
         Then the response is JSON
         Then the API response should contain "8"

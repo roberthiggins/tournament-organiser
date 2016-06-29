@@ -3,8 +3,8 @@ ORM module for a round in a tournament
 """
 # pylint: disable=invalid-name
 
-from models.db_connection import db
-from models.tournament import Tournament
+from models.dao.db_connection import db
+from models.dao.tournament import Tournament
 
 class TournamentRound(db.Model):
     """A row in the tournament_round table"""

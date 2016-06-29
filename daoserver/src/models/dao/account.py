@@ -5,7 +5,7 @@ ORM module for accounts
 
 from passlib.hash import sha256_crypt
 
-from models.db_connection import db
+from models.dao.db_connection import db
 
 class Account(db.Model):
     """Basic user account"""

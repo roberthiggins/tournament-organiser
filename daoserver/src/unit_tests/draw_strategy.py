@@ -7,9 +7,9 @@ from flask_testing import TestCase
 from testfixtures import compare
 
 from app import create_app
-from matching_strategy import RoundRobin
-from models.db_connection import db
-from tournament import Tournament
+from models.matching_strategy import RoundRobin
+from models.dao.db_connection import db
+from models.tournament import Tournament
 
 from unit_tests.tournament_injector import TournamentInjector
 
