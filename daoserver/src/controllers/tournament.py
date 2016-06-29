@@ -14,7 +14,7 @@ from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
 
-TOURNAMENT = Blueprint('TOURNAMENT', __name__, url_prefix='')
+TOURNAMENT = Blueprint('TOURNAMENT', __name__)
 
 
 @TOURNAMENT.errorhandler(RuntimeError)
@@ -46,29 +46,6 @@ def add_tournament():
         '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
             inputTournamentName, inputTournamentDate), 200)
-
-@TOURNAMENT.route('/<tournament_id>/rounds/<round_id>', methods=['GET'])
-def get_round_info(tournament_id, round_id):
-    """
-    GET the information about a round
-    """
-    tourn = Tournament(tournament_id)
-    rnd = tourn.get_round(round_id)
-    draw = tourn.make_draw(round_id)
-
-    draw_info = [
-        {'table_number': t.table_number,
-         'entrants': [x if isinstance(x, str) else x.player_id \
-                      for x in t.entrants]
-        } for t in draw]
-
-    # We will return all round info for all requests regardless of method
-    return jsonpickle.encode(
-        {
-            'draw': draw_info,
-            'mission': rnd.mission
-        },
-        unpicklable=False)
 
 @TOURNAMENT.route('/<tournament_id>/entries', methods=['GET'])
 def list_entries(tournament_id):
@@ -155,18 +132,6 @@ def set_missions(tournament_id):
 
     db.session.commit()
     return make_response('Missions set: {}'.format(missions), 200)
-
-@TOURNAMENT.route('/<tournament_id>/rounds', methods=['POST'])
-@enforce_request_variables('numRounds')
-def set_rounds(tournament_id):
-    """Set the number of rounds for a tournament"""
-
-    # pylint: disable=undefined-variable
-    rounds = int(numRounds)
-    if rounds < 1:
-        raise ValueError('Set at least 1 round')
-    Tournament(tournament_id).set_number_of_rounds(rounds)
-    return make_response('Rounds set: {}'.format(rounds), 200)
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 def tournament_details(tournament_id=None):
