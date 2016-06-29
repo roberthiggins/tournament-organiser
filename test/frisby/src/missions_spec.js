@@ -19,7 +19,7 @@ describe('Check Missions', function() {
         .expectStatus(200)
         .toss();
     frisby.create('Check those missions exist')
-        .get(URL + '/getMissions/mission_test')
+        .get(URL + '/tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
         .expectJSON(['mission_1', 'mission_2', 'mission_3'])
@@ -41,7 +41,7 @@ describe('Check Missions', function() {
         .expectStatus(200)
         .toss();
     frisby.create('Check those missions exist')
-        .get(URL + '/getMissions/mission_test')
+        .get(URL + '/tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
         .expectJSON(['mission_4', 'mission_5', 'mission_6'])
@@ -54,7 +54,7 @@ describe('Check Missions', function() {
         .expectStatus(200)
         .toss();
     frisby.create('Check 4th round is TBA')
-        .get(URL + '/getMissions/mission_test')
+        .get(URL + '/tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
         .expectJSON(['mission_4', 'mission_5', 'mission_6', 'TBA'])
@@ -74,7 +74,7 @@ describe('Check Missions', function() {
         .expectStatus(200)
         .toss();
     frisby.create('Check 3rd round is TBA and 4th is gone')
-        .get(URL + '/getMissions/mission_test')
+        .get(URL + '/tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
         .expectJSON(['mission_4', 'mission_5', 'TBA'])

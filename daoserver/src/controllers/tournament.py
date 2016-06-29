@@ -45,7 +45,7 @@ def add_tournament():
             inputTournamentName, inputTournamentDate), 200)
 
 @TOURNAMENT.route('/<tournament_id>/entries', methods=['GET'])
-def entry_list(tournament_id):
+def list_entries(tournament_id):
     """
     Return a list of the entrants for the tournament
     """
@@ -58,6 +58,13 @@ def entry_list(tournament_id):
         TournamentEntry.query.filter_by(tournament_id=tournament_id).all()]
     return Response(jsonpickle.encode(entries, unpicklable=False),
                     mimetype='application/json')
+
+@TOURNAMENT.route('/<tournament_id>/missions', methods=['GET'])
+def list_missions(tournament_id):
+    """GET list of missions for a tournament."""
+    return jsonpickle.encode(
+        [x.mission for x in Tournament(tournament_id).get_dao().rounds],
+        unpicklable=False)
 
 @TOURNAMENT.route('/', methods=['GET'])
 def list_tournaments():

@@ -154,13 +154,6 @@ def entry_info_from_tournament(tournament_id, username):
     """ Given entry_id, get info about player and tournament"""
     return entry_info_from_id(get_entry_id(tournament_id, username))
 
-@APP.route('/getMissions/<tournament_id>', methods=['GET'])
-def get_missions(tournament_id):
-    """GET list of missions for a tournament."""
-    return jsonpickle.encode(
-        [x.mission for x in Tournament(tournament_id).get_dao().rounds],
-        unpicklable=False)
-
 @APP.route('/setMissions', methods=['POST'])
 @enforce_request_variables('tournamentId', 'missions')
 def set_missions():

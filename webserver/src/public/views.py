@@ -201,7 +201,7 @@ def set_missions(request, tournament_id):
     rounds = int(json.loads(t_details.content)['rounds'])
 
     existing_missions = json.loads(
-        from_dao('/getMissions/{}'.format(tournament_id)).content)
+        from_dao('/tournament/{}/missions'.format(tournament_id)).content)
 
     form = SetMissionsForm(
         tournament_id=tournament_id,
