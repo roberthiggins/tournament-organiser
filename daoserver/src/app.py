@@ -8,6 +8,9 @@ import jsonpickle
 
 from flask import Flask
 
+from controllers.dao import APP
+from controllers.feedback import FEEDBACK
+from controllers.user import USER
 from permissions import set_up_permissions
 
 # pylint: disable=W0621
@@ -24,9 +27,6 @@ def create_app():
     from models.db_connection import db as db_conn
     db_conn.init_app(app)
 
-    from dao import APP
-    from feedback import FEEDBACK
-    from user import USER
     app.register_blueprint(APP)
     app.register_blueprint(FEEDBACK, url_prefix='/feedback')
     app.register_blueprint(USER, url_prefix='/user')
