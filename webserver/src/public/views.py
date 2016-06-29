@@ -128,7 +128,7 @@ def feedback(request):
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
         if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/placefeedback', form)
+            response = from_dao('/feedback', form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -296,7 +296,7 @@ def suggest_improvement(request):
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
         if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/placefeedback', form)
+            response = from_dao('/feedback', form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)

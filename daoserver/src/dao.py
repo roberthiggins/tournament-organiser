@@ -7,7 +7,6 @@ should talk to this for functionality wherever possible.
 
 from decimal import Decimal as Dec
 import json
-import re
 from functools import wraps
 import jsonpickle
 
@@ -18,7 +17,6 @@ from sqlalchemy.exc import IntegrityError
 from authentication import check_auth
 from models.account import Account, add_account
 from models.db_connection import db
-from models.feedback import Feedback
 from models.registration import TournamentRegistration
 from models.tournament import Tournament as TournamentDAO
 from models.tournament_entry import TournamentEntry
@@ -361,24 +359,6 @@ def set_missions():
 
     db.session.commit()
     return make_response('Missions set: {}'.format(missions), 200)
-
-@APP.route('/placefeedback', methods=['POST'])
-def place_feedback():
-    """
-    POST to add feedback or submit suggestion.
-    Expects:
-        - inputFeedback - A string
-    """
-    _feedback = request.form['inputFeedback'].strip('\n\r\t+')
-    if re.match(r'^[\+\s]*$', _feedback) is not None:
-        return make_response("Please fill in the required fields", 400)
-    try:
-        db.session.add(Feedback(_feedback))
-        db.session.commit()
-    except IntegrityError:
-        pass
-
-    return make_response("Thanks for you help improving the site", 200)
 
 @APP.route('/rankEntries/<tournament_id>', methods=['GET'])
 def rank_entries(tournament_id):
