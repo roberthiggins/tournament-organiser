@@ -49,16 +49,6 @@ Feature: Enter a score for a player
             |foobar             |rick_james     |/enterscore/foobar/rick_james  |404    |
             |painting_test      |jimmy          |/enterscore/painting_test/jimmy|404    |
 
-    Scenario Outline: URL malformed
-        Given I am on "/enterscore/<id>"
-        Then the response status code should be <code>
-        Examples:
-            | code | id |
-            | 404  |    |
-            | 400  | 0  |
-            | 404  | a  |
-            | 404  | 1a |
-
     @javascript
     Scenario Outline: I enter some scores
         Given I am on "/enterscore/painting_test/rick_james"

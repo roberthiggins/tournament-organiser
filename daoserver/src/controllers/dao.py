@@ -6,9 +6,8 @@ should talk to this for functionality wherever possible.
 """
 
 from functools import wraps
-import jsonpickle
 
-from flask import Blueprint, request, make_response, Response
+from flask import Blueprint, request, make_response
 
 from controllers.request_variables import enforce_request_variables
 from models.dao.account import Account
@@ -18,9 +17,7 @@ from models.tournament import Tournament
 
 APP = Blueprint('APP', __name__, url_prefix='')
 
-@APP.errorhandler(IndexError)
 @APP.errorhandler(TypeError)
-@APP.errorhandler(RuntimeError)
 @APP.errorhandler(ValueError)
 def input_error(err):
     """Input errors"""
@@ -101,47 +98,3 @@ def enter_tournament_score():
     return make_response(
         'Score entered for {}: {}'.format(username, value),
         200)
-
-def get_entry_id(tournament_id, username):
-    """Get entry info from tournament and username"""
-    if not Account.username_exists(username):
-        raise ValueError('Unknown player: {}'.format(username))
-
-    try:
-        # pylint: disable=no-member
-        return TournamentEntry.query.\
-            filter_by(tournament_id=tournament_id, player_id=username).\
-            first().id
-    except AttributeError:
-        raise ValueError('Entry for {} in tournament {} not found'.\
-            format(username, tournament_id))
-
-@APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
-def get_entry_id_from_tournament(tournament_id, username):
-    """Get entry info from tournament and username"""
-    return jsonpickle.encode(get_entry_id(tournament_id, username),
-                             unpicklable=False)
-
-@APP.route('/entryInfo/<entry_id>', methods=['GET'])
-def entry_info_from_id(entry_id):
-    """ Given entry_id, get info about player and tournament"""
-
-    try:
-        entry_id = int(entry_id)
-    except ValueError:
-        raise ValueError('Entry ID must be an integer')
-
-    try:
-        # pylint: disable=no-member
-        entry = TournamentEntry.query.filter_by(id=entry_id).first()
-
-        return Response(
-            jsonpickle.encode(
-                {
-                    'entry_id': entry.id,
-                    'username': entry.account.username,
-                    'tournament_name': entry.tournament.name,
-                }, unpicklable=False),
-            mimetype='application/json')
-    except AttributeError:
-        raise ValueError('Entry ID not valid: {}'.format(entry_id))
