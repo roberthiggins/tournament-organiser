@@ -11,8 +11,7 @@ describe('HTTP Method Test Suite', function() {
         .expectStatus(200)
         .toss();
     frisby.create('POST 2 missions to setup')
-        .post(URL + '/setMissions', {
-            tournamentId: 'ranking_test',
+        .post(URL + '/tournament/ranking_test/missions', {
             missions: ['mission_1', 'mission_2']
         }, {json: true})
         .expectStatus(200)

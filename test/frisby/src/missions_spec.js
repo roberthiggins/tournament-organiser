@@ -12,8 +12,7 @@ describe('Check Missions', function() {
         .expectStatus(200)
         .toss();
     frisby.create('POST 3 missions to setup')
-        .post(URL + '/setMissions', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/missions', {
             missions: ['mission_1', 'mission_2', 'mission_3']
         }, {json: true})
         .expectStatus(200)
@@ -34,8 +33,7 @@ describe('Check Missions', function() {
         .expectStatus(200)
         .toss();
     frisby.create('POST 3 missions to setup')
-        .post(URL + '/setMissions', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/missions', {
             missions: ['mission_4', 'mission_5', 'mission_6']
         }, {json: true})
         .expectStatus(200)
@@ -82,34 +80,29 @@ describe('Check Missions', function() {
 
 
     frisby.create('POST malformed missions')
-        .post(URL + '/setMissions', {
+        .post(URL + '/tournament/not_real/missions', {
             missions: ['mission_1', 'mission_2', 'mission_3']
         }, {json: true})
         .expectStatus(400)
         .toss();
     frisby.create('POST malformed missions')
-        .post(URL + '/setMissions', {
-            tournamentId: 'mission_test'
-        }, {json: true})
+        .post(URL + '/tournament/mission_test/missions', {}, {json: true})
         .expectStatus(400)
         .toss();
     frisby.create('Too few')
-        .post(URL + '/setMissions', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/missions', {
             missions: ['mission_1', 'mission_2']
         }, {json: true})
         .expectStatus(400)
         .toss();
     frisby.create('Too many')
-        .post(URL + '/setMissions', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/missions', {
             missions: ['mission_1', 'mission_2', 'mission_3', 'mission_4']
         }, {json: true})
         .expectStatus(400)
         .toss();
     frisby.create('None')
-        .post(URL + '/setMissions', {
-            tournamentId: 'mission_test',
+        .post(URL + '/tournament/mission_test/missions', {
             missions: []
         }, {json: true})
         .expectStatus(400)

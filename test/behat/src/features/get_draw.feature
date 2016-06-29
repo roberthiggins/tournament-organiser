@@ -6,7 +6,7 @@ Feature: Check the draw
     Background: Set the missions for a round robin tournament
         Given I POST "tournamentId=ranking_test&numRounds=4" to "/setRounds" from the API
         Then the API response status code should be 200
-        Then I POST "tournamentId=ranking_test&missions=[%22mission_1%22,%22mission_2%22,%22mission_3%22,%22%22]" to "/setMissions" from the API
+        Then I POST "missions=[%22mission_1%22,%22mission_2%22,%22mission_3%22,%22%22]" to "/tournament/ranking_test/missions" from the API
         Then the API response status code should be 200
 
     Scenario Outline: Check the draw

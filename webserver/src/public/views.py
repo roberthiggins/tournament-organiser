@@ -194,14 +194,15 @@ def set_categories(request, tournament_id):
 @login_required
 def set_missions(request, tournament_id):
     """Set the number of rounds for a competition"""
-    t_details = from_dao('/tournament/{}'.format(tournament_id))
+    tourn_path = '/tournament/{}'.format(tournament_id)
+    t_details = from_dao(tourn_path)
     if t_details.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
     rounds = int(json.loads(t_details.content)['rounds'])
 
     existing_missions = json.loads(
-        from_dao('/tournament/{}/missions'.format(tournament_id)).content)
+        from_dao('{}/missions'.format(tourn_path)).content)
 
     form = SetMissionsForm(
         tournament_id=tournament_id,
@@ -214,8 +215,8 @@ def set_missions(request, tournament_id):
             tournament_id=tournament_id,
             rounds=rounds)
 
-        if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/setMissions', form)
+        if form.is_valid():                     # pylint: disable=no-member
+            response = from_dao('{}/missions'.format(tourn_path), form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)

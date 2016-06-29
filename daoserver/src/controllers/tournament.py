@@ -1,6 +1,7 @@
 """
 All tournament interactions.
 """
+import json
 import jsonpickle
 from flask import Blueprint, request, make_response, Response
 from sqlalchemy.exc import IntegrityError
@@ -10,6 +11,7 @@ from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__, url_prefix='')
@@ -25,10 +27,11 @@ def input_error(err):
     traceback.print_exc()
     return make_response(str(err), 400)
 
-# pylint: disable=undefined-variable
 @TOURNAMENT.route('', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')
 def add_tournament():
+    # pylint: disable=undefined-variable
+
     """
     POST to add a tournament
     Expects:
@@ -82,10 +85,11 @@ def list_tournaments():
         jsonpickle.encode({'tournaments' : details}, unpicklable=False),
         mimetype='application/json')
 
-# pylint: disable=undefined-variable
 @TOURNAMENT.route('/<tournament_id>/register', methods=['POST'])
 @enforce_request_variables('inputUserName')
 def register(tournament_id):
+    # pylint: disable=undefined-variable
+
     """
     POST to apply for entry to a tournament.
     Expects:
@@ -101,6 +105,33 @@ def register(tournament_id):
         raise ValueError("Check username and tournament")
 
     return make_response('Application Submitted', 200)
+
+@TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])
+@enforce_request_variables('missions')
+def set_missions(tournament_id):
+    # pylint: disable=undefined-variable
+
+    """POST to set the missions for a tournament.A list of strings expected"""
+    tourn = Tournament(tournament_id)
+    rounds = tourn.details()['rounds']
+    try:
+        json_missions = json.loads(missions)
+    except TypeError:
+        json_missions = missions
+
+    if len(json_missions) != int(rounds):
+        raise ValueError('Tournament {} has {} rounds. \
+            You submitted missions {}'.format(tournament_id, rounds, missions))
+
+    for i, mission in enumerate(json_missions):
+        rnd = tourn.get_round(i + 1)
+        # pylint: disable=no-member
+        rnd.mission = mission if mission else \
+            TournamentRound.__table__.c.mission.default.arg
+        db.session.add(rnd)
+
+    db.session.commit()
+    return make_response('Missions set: {}'.format(missions), 200)
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 def tournament_details(tournament_id=None):

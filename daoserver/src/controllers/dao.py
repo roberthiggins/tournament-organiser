@@ -14,7 +14,6 @@ from flask import Blueprint, request, make_response, Response
 
 from controllers.request_variables import enforce_request_variables
 from models.dao.account import Account
-from models.dao.db_connection import db
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
 from models.tournament import Tournament, ScoreCategoryPair
@@ -153,34 +152,6 @@ def entry_info_from_id(entry_id):
 def entry_info_from_tournament(tournament_id, username):
     """ Given entry_id, get info about player and tournament"""
     return entry_info_from_id(get_entry_id(tournament_id, username))
-
-@APP.route('/setMissions', methods=['POST'])
-@enforce_request_variables('tournamentId', 'missions')
-def set_missions():
-    """POST to set the missions for a tournament.A list of strings expected"""
-    # pylint: disable=E0602
-    tourn = Tournament(tournamentId)
-    # pylint: disable=E0602
-    rounds = tourn.details()['rounds']
-    try:
-        json_missions = json.loads(missions)
-    except TypeError:
-        json_missions = missions
-
-    if len(json_missions) != int(rounds):
-        # pylint: disable=E0602
-        raise ValueError('Tournament {} has {} rounds. \
-            You submitted missions {}'.format(tournamentId, rounds, missions))
-
-    from models.dao.tournament_round import TournamentRound as TR
-    for i, mission in enumerate(json_missions):
-        rnd = tourn.get_round(i + 1)
-        # pylint: disable=no-member
-        rnd.mission = mission if mission else TR.__table__.c.mission.default.arg
-        db.session.add(rnd)
-
-    db.session.commit()
-    return make_response('Missions set: {}'.format(missions), 200)
 
 @APP.route('/rankEntries/<tournament_id>', methods=['GET'])
 def rank_entries(tournament_id):
