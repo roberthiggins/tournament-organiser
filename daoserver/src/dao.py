@@ -21,6 +21,7 @@ from models.registration import TournamentRegistration
 from models.tournament import Tournament as TournamentDAO
 from models.tournament_entry import TournamentEntry
 from permissions import PERMISSIONS, PermissionsChecker
+from request_variables import enforce_request_variables
 from tournament import Tournament, ScoreCategoryPair
 
 APP = Blueprint('APP', __name__, url_prefix='')
@@ -45,45 +46,6 @@ def unknown_error(err):
     import traceback
     traceback.print_exc()
     return make_response(str(err), 500)
-
-def enforce_request_variables(*vars_to_enforce):
-    """ A decorator that requires var exists in the request"""
-    def decorator(func):                # pylint: disable=missing-docstring
-        @wraps(func)
-        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
-
-            if request.method == 'GET':
-                return func(*args, **kwargs)
-
-            glob = func.func_globals
-            sentinel = object()
-            old_values = {}
-
-            for var in vars_to_enforce:
-                value = request.form[var] if var in request.form \
-                    else request.values.get(var, None)
-
-                if value is None and request.get_json() is not None:
-                    value = request.get_json().get(var, None)
-
-                if value is None:
-                    return make_response('Enter the required fields', 400)
-
-                old_values[var] = glob.get(var, sentinel)
-                glob[var] = value
-
-            try:
-                res = func(*args, **kwargs)
-            finally:
-                for var in vars_to_enforce:
-                    if old_values[var] is sentinel:
-                        del glob[var]
-                    else:
-                        glob[var] = old_values[var]
-
-            return res
-        return wrapped
-    return decorator
 
 # pylint: disable=E0602
 def requires_permission(action, error_msg):
