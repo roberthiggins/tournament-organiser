@@ -2,7 +2,7 @@
 All tournament interactions.
 """
 import jsonpickle
-from flask import Blueprint, make_response, Response
+from flask import Blueprint, request, make_response, Response
 from sqlalchemy.exc import IntegrityError
 
 from controllers.request_variables import enforce_request_variables
@@ -14,6 +14,8 @@ from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__, url_prefix='')
 
+
+@TOURNAMENT.errorhandler(RuntimeError)
 @TOURNAMENT.errorhandler(ValueError)
 def input_error(err):
     """Input errors"""
@@ -22,6 +24,25 @@ def input_error(err):
     import traceback
     traceback.print_exc()
     return make_response(str(err), 400)
+
+# pylint: disable=undefined-variable
+@TOURNAMENT.route('', methods=['POST'])
+@enforce_request_variables('inputTournamentName', 'inputTournamentDate')
+def add_tournament():
+    """
+    POST to add a tournament
+    Expects:
+        - inputTournamentName - Tournament name. Must be unique.
+        - inputTournamentDate - Tournament Date. YYYY-MM-DD
+    """
+    tourn = Tournament(
+        inputTournamentName,
+        creator=request.authorization.username)
+    tourn.add_to_db(inputTournamentDate)
+    return make_response(
+        '<p>Tournament Created! You submitted the following fields:</p> \
+        <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
+            inputTournamentName, inputTournamentDate), 200)
 
 @TOURNAMENT.route('/<tournament_id>/entries', methods=['GET'])
 def entry_list(tournament_id):

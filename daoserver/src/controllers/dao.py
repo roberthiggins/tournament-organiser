@@ -72,28 +72,6 @@ def main():
     return make_response('daoserver', 200)
 
 # Page actions
-
-@APP.route('/addTournament', methods=['POST'])
-@enforce_request_variables('inputTournamentName', 'inputTournamentDate')
-def add_tournament():
-    """
-    POST to add a tournament
-    Expects:
-        - inputTournamentName - Tournament name. Must be unique.
-        - inputTournamentDate - Tournament Date. YYYY-MM-DD
-    """
-    # pylint: disable=E0602
-    tourn = Tournament(
-        inputTournamentName,
-        creator=request.authorization.username)
-    # pylint: disable=E0602
-    tourn.add_to_db(inputTournamentDate)
-    # pylint: disable=E0602
-    return make_response(
-        '<p>Tournament Created! You submitted the following fields:</p> \
-        <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
-            inputTournamentName, inputTournamentDate), 200)
-
 def validate_user_email(email):
     """
     Validates email based on django validator

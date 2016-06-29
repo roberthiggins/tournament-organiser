@@ -25,7 +25,7 @@ def create_tournament(request):
     if request.method == 'POST':
         form = AddTournamentForm(request.POST)
         if form.is_valid():                     # pylint: disable=no-member
-            response = from_dao('/addTournament', form, request)
+            response = from_dao('/tournament', form, request)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
