@@ -154,7 +154,8 @@ def logout(request):
 @login_required
 def set_categories(request, tournament_id):
     """Set the scoring categories for a tournament"""
-    cats_request = from_dao('/getScoreCategories/{}'.format(tournament_id))
+    dao_url = '/tournament/{}/score_categories'.format(tournament_id)
+    cats_request = from_dao(dao_url)
     if cats_request.status_code != 200:
         return HttpResponseNotFound(
             'Tournament {} not found'.format(tournament_id))
@@ -175,7 +176,7 @@ def set_categories(request, tournament_id):
                 k for k, v in form.cleaned_data.iteritems() \
                 if k.startswith('categories_') and v != form.empty_field()])
 
-            response = from_dao('/setScoreCategories', form)
+            response = from_dao(dao_url, form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -323,7 +324,8 @@ def score_categories(tournament_id):
     insertion into a select.
     """
     try:
-        response = from_dao('/getScoreCategories/{}'.format(tournament_id))
+        response = from_dao(
+            '/tournament/{}/score_categories'.format(tournament_id))
         return [
             (x['id'], '{} ({}%)'.format(x['name'], int(x['percentage'])))
             for x in json.loads(response.content)

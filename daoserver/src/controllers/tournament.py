@@ -12,12 +12,13 @@ from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_round import TournamentRound
-from models.tournament import Tournament
+from models.tournament import Tournament, ScoreCategoryPair
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__)
 
 
 @TOURNAMENT.errorhandler(RuntimeError)
+@TOURNAMENT.errorhandler(TypeError)
 @TOURNAMENT.errorhandler(ValueError)
 def input_error(err):
     """Input errors"""
@@ -68,6 +69,20 @@ def list_missions(tournament_id):
     return jsonpickle.encode(
         [x.mission for x in Tournament(tournament_id).get_dao().rounds],
         unpicklable=False)
+
+@TOURNAMENT.route('/<tournament_id>/score_categories', methods=['GET'])
+def list_score_categories(tournament_id):
+    """
+    GET the score categories set for the tournament.
+    e.g. [{ 'name': 'painting', 'percentage': 20, 'id': 2 }]
+    """
+    try:
+        tourn = Tournament(tournament_id)
+        return Response(
+            jsonpickle.encode(tourn.list_score_categories(), unpicklable=False),
+            mimetype='application/json')
+    except ValueError as err:
+        return make_response(str(err), 404)
 
 @TOURNAMENT.route('/', methods=['GET'])
 def list_tournaments():
@@ -132,6 +147,36 @@ def set_missions(tournament_id):
 
     db.session.commit()
     return make_response('Missions set: {}'.format(missions), 200)
+
+@TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
+@enforce_request_variables('categories')
+def set_score_categories(tournament_id):
+    # pylint: disable=undefined-variable
+
+    """
+    POST to set tournament categories en masse
+    """
+    tourn = Tournament(tournament_id)
+
+    new_categories = []
+    try:
+        cats = json.loads(categories)
+    except TypeError:
+        cats = categories
+
+    for json_cat in cats:
+        try:
+            cat = json.loads(request.values.get(json_cat, []))
+        except TypeError:
+            cat = request.get_json().get(json_cat)
+
+        new_categories.append(
+            ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
+
+    tourn.set_score_categories(new_categories)
+
+    return make_response('Score categories set: {}'.format(
+        ', '.join([str(cat.display_name) for cat in new_categories])), 200)
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 def tournament_details(tournament_id=None):

@@ -4,7 +4,7 @@ Feature: Modify the scoring categories for a tournament
     I need to be able to view and set the scoreing categories for a tournament (battle, sports, etc)
 
     Background: I set the categories for category_test
-        When I POST "tournamentId=category_test&categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22foo%22,%2210%22,false,%2210%22,%2210%22]&categories_1=[%22bar%22,%2210%22,false,%2210%22,%2210%22]" to "/setScoreCategories" from the API
+        When I POST "categories=[%22categories_0%22,%22categories_1%22]&categories_0=[%22foo%22,%2210%22,false,%2210%22,%2210%22]&categories_1=[%22bar%22,%2210%22,false,%2210%22,%2210%22]" to "/tournament/category_test/score_categories" from the API
         Then the API response status code should be 200
         Given I am on "/login"
         When I fill in "id_inputUsername" with "charlie_murphy"
@@ -23,7 +23,7 @@ Feature: Modify the scoring categories for a tournament
         Then I should not see "too high"
         Then I should not see "violates"
         # Confirm
-        Then I GET "/getScoreCategories/category_test" from the API
+        Then I GET "/tournament/category_test/score_categories" from the API
         Then the API response should be a list of length 2
         Then the API response should contain "foo"
         Then the API response should contain "another_category"
@@ -32,7 +32,7 @@ Feature: Modify the scoring categories for a tournament
         Then I press "Set"
         Then the response status code should be 200
         Then I should not see "too high"
-        Then I GET "/getScoreCategories/category_test" from the API
+        Then I GET "/tournament/category_test/score_categories" from the API
         Then the API response should be a list of length 2
         Then the API response should contain "foo"
         Then the API response should contain "another_category"
@@ -43,7 +43,7 @@ Feature: Modify the scoring categories for a tournament
         Then I fill in "id_categories_0_0" with "something_something_darkside"
         Then I fill in "id_categories_0_1" with "1"
         Then I press "Set"
-        Then I GET "/getScoreCategories/category_test" from the API
+        Then I GET "/tournament/category_test/score_categories" from the API
         Then the API response should be a list of length 2
         Then the API response should contain "something_something_darkside"
         Then the API response should contain "1"
@@ -62,7 +62,7 @@ Feature: Modify the scoring categories for a tournament
         Then I fill in "id_categories_1_3" with "1"
         Then I fill in "id_categories_1_4" with "1"
         Then I press "Set"
-        Then I GET "/getScoreCategories/category_test" from the API
+        Then I GET "/tournament/category_test/score_categories" from the API
         Then the API response status code should be 200
         Then the API response should be a list of length 2
         Then the API response should contain "foo"
@@ -107,7 +107,7 @@ Feature: Modify the scoring categories for a tournament
         Then I fill in "id_categories_1_3" with "1"
         Then I fill in "id_categories_1_4" with "1"
         Then I press "Set"
-        Then I GET "/getScoreCategories/category_test" from the API
+        Then I GET "/tournament/category_test/score_categories" from the API
         Then the API response should be a list of length 2
         Then the API response should contain "foo"
         Then the API response should contain "10"

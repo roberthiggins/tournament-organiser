@@ -6,7 +6,6 @@ should talk to this for functionality wherever possible.
 """
 
 from decimal import Decimal as Dec
-import json
 from functools import wraps
 import jsonpickle
 
@@ -16,7 +15,7 @@ from controllers.request_variables import enforce_request_variables
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
-from models.tournament import Tournament, ScoreCategoryPair
+from models.tournament import Tournament
 
 APP = Blueprint('APP', __name__, url_prefix='')
 
@@ -191,45 +190,3 @@ def rank_entries(tournament_id):
             ],
             unpicklable=False),
         mimetype='application/json')
-
-@APP.route('/getScoreCategories/<tournament_id>', methods=['GET'])
-def get_score_categories(tournament_id):
-    """
-    GET the score categories set for the tournament.
-    e.g. [{ 'name': 'painting', 'percentage': 20, 'id': 2 }]
-    """
-    try:
-        tourn = Tournament(tournament_id)
-        return Response(
-            jsonpickle.encode(tourn.list_score_categories(), unpicklable=False),
-            mimetype='application/json')
-    except ValueError as err:
-        return make_response(str(err), 404)
-
-@APP.route('/setScoreCategories', methods=['POST'])
-@enforce_request_variables('tournamentId', 'categories')
-def set_score_categories():
-    """
-    POST to set tournament categories en masse
-    """
-    tourn = Tournament(tournamentId)
-
-    new_categories = []
-    try:
-        cats = json.loads(categories)
-    except TypeError:
-        cats = categories
-
-    for json_cat in cats:
-        try:
-            cat = json.loads(request.values.get(json_cat, []))
-        except TypeError:
-            cat = request.get_json().get(json_cat)
-
-        new_categories.append(
-            ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
-
-    tourn.set_score_categories(new_categories)
-
-    return make_response('Score categories set: {}'.format(
-        ', '.join([str(cat.display_name) for cat in new_categories])), 200)
