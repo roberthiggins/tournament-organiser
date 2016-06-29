@@ -6,7 +6,9 @@ import jsonpickle
 
 from flask import Blueprint, make_response, Response
 
+from authentication import check_auth
 from models.account import Account
+from request_variables import enforce_request_variables
 
 USER = Blueprint('USER', __name__)
 
@@ -18,6 +20,21 @@ def input_error(err):
     import traceback
     traceback.print_exc()
     return make_response(str(err), 400)
+
+@USER.route('/login', methods=['POST'])
+@enforce_request_variables('inputUsername', 'inputPassword')
+def login():
+    """
+    POST to login
+    Expects:
+        - inputUsername
+        - inputPassword
+    """
+    # pylint: disable=E0602
+    return make_response(
+        "Login successful" if check_auth(inputUsername, inputPassword) \
+        else "Login unsuccessful",
+        200)
 
 @USER.route('/<u_name>', methods=['GET'])
 def user_details(u_name=None):

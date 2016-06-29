@@ -14,7 +14,6 @@ from flask import Blueprint, request, make_response, Response
 
 from sqlalchemy.exc import IntegrityError
 
-from authentication import check_auth
 from models.account import Account, add_account
 from models.db_connection import db
 from models.registration import TournamentRegistration
@@ -271,21 +270,6 @@ def entry_info_from_id(entry_id):
 def entry_info_from_tournament(tournament_id, username):
     """ Given entry_id, get info about player and tournament"""
     return entry_info_from_id(get_entry_id(tournament_id, username))
-
-@APP.route('/login', methods=['POST'])
-@enforce_request_variables('inputUsername', 'inputPassword')
-def login():
-    """
-    POST to login
-    Expects:
-        - inputUsername
-        - inputPassword
-    """
-    # pylint: disable=E0602
-    return make_response(
-        "Login successful" if check_auth(inputUsername, inputPassword) \
-        else "Login unsuccessful",
-        200)
 
 @APP.route('/getMissions/<tournament_id>', methods=['GET'])
 def get_missions(tournament_id):
