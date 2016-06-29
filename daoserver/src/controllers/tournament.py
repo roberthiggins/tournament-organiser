@@ -47,6 +47,29 @@ def add_tournament():
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
             inputTournamentName, inputTournamentDate), 200)
 
+@TOURNAMENT.route('/<tournament_id>/rounds/<round_id>', methods=['GET'])
+def get_round_info(tournament_id, round_id):
+    """
+    GET the information about a round
+    """
+    tourn = Tournament(tournament_id)
+    rnd = tourn.get_round(round_id)
+    draw = tourn.make_draw(round_id)
+
+    draw_info = [
+        {'table_number': t.table_number,
+         'entrants': [x if isinstance(x, str) else x.player_id \
+                      for x in t.entrants]
+        } for t in draw]
+
+    # We will return all round info for all requests regardless of method
+    return jsonpickle.encode(
+        {
+            'draw': draw_info,
+            'mission': rnd.mission
+        },
+        unpicklable=False)
+
 @TOURNAMENT.route('/<tournament_id>/entries', methods=['GET'])
 def list_entries(tournament_id):
     """

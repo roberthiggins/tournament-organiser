@@ -155,7 +155,7 @@ def tournament_draw(request, tournament_id, round_id):
 
     try:
         response = from_dao(
-            '/roundInfo/{}/{}'.format(tournament_id, round_id)
+            '/tournament/{}/rounds/{}'.format(tournament_id, round_id)
         ).content
         json_data = json.loads(response)
     except ValueError:

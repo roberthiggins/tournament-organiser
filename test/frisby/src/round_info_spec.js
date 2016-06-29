@@ -16,7 +16,7 @@ describe('HTTP Method Test Suite', function() {
         .expectStatus(200)
         .toss();
     frisby.create('Check those missions exist')
-        .get(URL + '/roundInfo/ranking_test/1')
+        .get(URL + '/tournament/ranking_test/rounds/1')
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,
@@ -28,7 +28,7 @@ describe('HTTP Method Test Suite', function() {
         })
         .toss();
     frisby.create('Check those missions exist')
-        .get(URL + '/roundInfo/ranking_test/2')
+        .get(URL + '/tournament/ranking_test/rounds/2')
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,
@@ -41,31 +41,31 @@ describe('HTTP Method Test Suite', function() {
         .toss();
 
     frisby.create('malformations')
-        .get(URL + '/roundInfo/foo/1')
+        .get(URL + '/tournament/foo/rounds/1')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(URL + '/roundInfo/ranking_test/4')
+        .get(URL + '/tournament/ranking_test/rounds/4')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(URL + '/roundInfo/ranking_test/-1')
+        .get(URL + '/tournament/ranking_test/rounds/-1')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(URL + '/roundInfo/ranking_test/ranking_test')
+        .get(URL + '/tournament/ranking_test/rounds/ranking_test')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(URL + '/roundInfo/1/ranking_test')
+        .get(URL + '/tournament/1/rounds/ranking_test')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(URL + '/roundInfo/ranking_test/1/1')
+        .get(URL + '/tournament/ranking_test/rounds/1/1')
         .expectStatus(404)
         .toss();
     frisby.create('malformations')
-        .get(URL + '/roundInfo/1/1')
+        .get(URL + '/tournament/1/rounds/1')
         .expectStatus(400)
         .toss();
 });
