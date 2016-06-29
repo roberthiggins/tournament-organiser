@@ -10,6 +10,7 @@ from flask import Flask
 
 from controllers.dao import APP
 from controllers.feedback import FEEDBACK
+from controllers.tournament import TOURNAMENT
 from controllers.user import USER
 from models.dao.db_connection import db as db_conn
 from models.permissions import set_up_permissions
@@ -29,6 +30,7 @@ def create_app():
 
     app.register_blueprint(APP)
     app.register_blueprint(FEEDBACK, url_prefix='/feedback')
+    app.register_blueprint(TOURNAMENT, url_prefix='/tournament')
     app.register_blueprint(USER, url_prefix='/user')
 
     return app
