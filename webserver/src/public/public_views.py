@@ -179,7 +179,7 @@ def tournament_rankings(request, tournament_id):
         return HttpResponseNotFound()
     try:
         json_data = json.loads(
-            from_dao('/rankEntries/%s' % tournament_id).content)
+            from_dao('/tournament/{}/entry/rank'.format(tournament_id)).content)
 
         return render_to_response(
             'tournament-rankings.html',

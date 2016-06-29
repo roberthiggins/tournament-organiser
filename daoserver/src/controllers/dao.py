@@ -5,7 +5,6 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
-from decimal import Decimal as Dec
 from functools import wraps
 import jsonpickle
 
@@ -151,42 +150,3 @@ def entry_info_from_id(entry_id):
 def entry_info_from_tournament(tournament_id, username):
     """ Given entry_id, get info about player and tournament"""
     return entry_info_from_id(get_entry_id(tournament_id, username))
-
-@APP.route('/rankEntries/<tournament_id>', methods=['GET'])
-def rank_entries(tournament_id):
-    """
-    Rank all the entries in a tournament based on the scoring criteria for the
-    tournament.
-    The structure of the returned JSON blob will be as follows:
-    [
-        {
-            'username': 'homer',
-            'entry_id': 1,
-            'tournament_id': 'some_tournie',
-            'scores': {'round_1': 10, 'round_2': 4 },
-            'total_score': 23.50, # always 2dp
-            'ranking': 3
-        },
-    ]
-    """
-    tourn = Tournament(tournament_id)
-    if not tourn.exists_in_db:
-        return make_response(
-            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
-
-    # pylint: disable=line-too-long
-    return Response(
-        jsonpickle.encode(
-            [
-                {
-                    'username' : x.player_id,
-                    'entry_id' : x.id,
-                    'tournament_id' : tourn.tournament_id,
-                    'scores' : x.score_info,
-                    'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
-                    'ranking': x.ranking
-                } for x in \
-                tourn.ranking_strategy.overall_ranking(tourn.entries())
-            ],
-            unpicklable=False),
-        mimetype='application/json')
