@@ -106,7 +106,7 @@ def enter_score_for_game(tournament_id, username, round_id):
 @login_required
 def entry_list(request, tournament_id):
     """List entrants for a tournament"""
-    response = from_dao('/tournament/{}/entries'.format(tournament_id))
+    response = from_dao('/tournament/{}/entry/'.format(tournament_id))
     if response.status_code != 200:
         return HttpResponse(response, status=response.status_code)
 

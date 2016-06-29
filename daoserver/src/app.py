@@ -11,6 +11,7 @@ from flask import Flask
 from controllers.dao import APP
 from controllers.feedback import FEEDBACK
 from controllers.tournament import TOURNAMENT
+from controllers.tournament_entry import ENTRY
 from controllers.tournament_round import TOURNAMENT_ROUND
 from controllers.user import USER
 from models.dao.db_connection import db as db_conn
@@ -34,6 +35,8 @@ def create_app():
     app.register_blueprint(TOURNAMENT, url_prefix='/tournament')
     app.register_blueprint(TOURNAMENT_ROUND,
                            url_prefix='/tournament/<tournament_id>/rounds')
+    app.register_blueprint(ENTRY,
+                           url_prefix='/tournament/<tournament_id>/entry')
     app.register_blueprint(USER, url_prefix='/user')
 
     return app

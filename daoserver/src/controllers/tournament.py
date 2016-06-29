@@ -10,7 +10,6 @@ from controllers.request_variables import enforce_request_variables
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
-from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament, ScoreCategoryPair
 
@@ -47,21 +46,6 @@ def add_tournament():
         '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
             inputTournamentName, inputTournamentDate), 200)
-
-@TOURNAMENT.route('/<tournament_id>/entries', methods=['GET'])
-def list_entries(tournament_id):
-    """
-    Return a list of the entrants for the tournament
-    """
-    # pylint: disable=no-member
-    if not Tournament(tournament_id).exists_in_db:
-        return make_response(
-            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
-
-    entries = [ent.player_id for ent in \
-        TournamentEntry.query.filter_by(tournament_id=tournament_id).all()]
-    return Response(jsonpickle.encode(entries, unpicklable=False),
-                    mimetype='application/json')
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['GET'])
 def list_missions(tournament_id):
