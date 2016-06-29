@@ -5,6 +5,7 @@ import jsonpickle
 
 from flask import Blueprint, make_response, Response
 
+from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.tournament import Tournament
 
@@ -24,3 +25,19 @@ def entry_list(tournament_id):
         TournamentEntry.query.filter_by(tournament_id=tournament_id).all()]
     return Response(jsonpickle.encode(entries, unpicklable=False),
                     mimetype='application/json')
+
+@TOURNAMENT.route('/', methods=['GET'])
+def list_tournaments():
+    """
+    GET a list of tournaments
+    Returns json. The only key is 'tournaments' and the value is a list of
+    tournament names
+    """
+    # pylint: disable=no-member
+    details = [
+        {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
+        for x in TournamentDAO.query.all()]
+
+    return Response(
+        jsonpickle.encode({'tournaments' : details}, unpicklable=False),
+        mimetype='application/json')

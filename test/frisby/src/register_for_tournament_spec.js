@@ -4,7 +4,7 @@ describe('Test seeing and registering for a tournament', function() {
         + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
 
     frisby.create('See a list of tournaments')
-        .get(URL + '/listTournaments')
+        .get(URL + '/tournament/')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes({tournaments: Array})

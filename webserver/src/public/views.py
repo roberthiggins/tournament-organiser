@@ -235,7 +235,7 @@ def set_missions(request, tournament_id):
 def register_for_tournament(request):
     """Page to register for tournament"""
 
-    t_list = json.loads(from_dao('/listTournaments').content)['tournaments']
+    t_list = json.loads(from_dao('/tournament/').content)['tournaments']
     t_list = [(x['name'], x['name']) for x in t_list]
     form = ApplyForTournamentForm(tournament_list=t_list)
 

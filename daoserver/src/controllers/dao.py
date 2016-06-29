@@ -18,7 +18,6 @@ from controllers.request_variables import enforce_request_variables
 from models.dao.account import Account, add_account
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
-from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
 from models.tournament import Tournament, ScoreCategoryPair
@@ -77,22 +76,6 @@ def main():
 
 # Page actions
 
-@APP.route('/listTournaments', methods=['GET'])
-def list_tournaments():
-    """
-    GET a list of tournaments
-    Returns json. The only key is 'tournaments' and the value is a list of
-    tournament names
-    """
-    # pylint: disable=no-member
-    details = [
-        {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
-        for x in TournamentDAO.query.all()]
-
-    return Response(
-        jsonpickle.encode({'tournaments' : details}, unpicklable=False),
-        mimetype='application/json')
-
 @APP.route('/registerfortournament', methods=['POST'])
 @enforce_request_variables('inputTournamentName', 'inputUserName')
 def apply_for_tournament():
@@ -100,7 +83,7 @@ def apply_for_tournament():
     POST to apply for entry to a tournament.
     Expects:
         - inputUserName - Username of player applying
-        - inputTournamentName - Tournament as returned by GET /listTournaments
+        - inputTournamentName - Tournament as returned by GET /tournament
     """
     rego = TournamentRegistration(inputUserName, inputTournamentName)
     rego.clashes()
