@@ -145,8 +145,3 @@ def entry_info_from_id(entry_id):
             mimetype='application/json')
     except AttributeError:
         raise ValueError('Entry ID not valid: {}'.format(entry_id))
-
-@APP.route('/entryInfo/<tournament_id>/<username>', methods=['GET'])
-def entry_info_from_tournament(tournament_id, username):
-    """ Given entry_id, get info about player and tournament"""
-    return entry_info_from_id(get_entry_id(tournament_id, username))
