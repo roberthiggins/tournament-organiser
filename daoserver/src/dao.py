@@ -487,18 +487,3 @@ def tournament_details(t_name=None):
     return Response(
         jsonpickle.encode(tourn.details(), unpicklable=False),
         mimetype='application/json')
-
-@APP.route('/userDetails/<u_name>', methods=['GET'])
-def user_details(u_name=None):
-    """
-    GET to get account details in url form
-    TODO security
-    """
-    # pylint: disable=no-member
-    user = Account.query.filter_by(username=u_name).first()
-    if user is None:
-        raise ValueError('Cannot find user {}'.format(u_name))
-
-    return Response(
-        jsonpickle.encode({u_name: user.contact_email}, unpicklable=False),
-        mimetype='application/json')

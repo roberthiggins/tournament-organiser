@@ -4,7 +4,7 @@ describe('Signing up and seeing user details', function() {
         + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
 
     frisby.create('See user details')
-        .get(URL + '/userDetails/charlie_murphy')
+        .get(URL + '/user/charlie_murphy')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes({charlie_murphy: String})
@@ -12,12 +12,12 @@ describe('Signing up and seeing user details', function() {
         .toss();
 
     frisby.create('Look for a user who doesn\'t exist')
-        .get(URL + '/userDetails/')
+        .get(URL + '/user/')
         .expectStatus(404)
         .toss();
 
     frisby.create('Look for a user who doesn\'t exist')
-        .get(URL + '/userDetails/jim_bob_noname')
+        .get(URL + '/user/jim_bob_noname')
         .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('Cannot find user jim_bob_noname')

@@ -58,7 +58,7 @@ def create_or_update_user(login_creds):
     """
     u_name = login_creds.cleaned_data['inputUsername']
     p_word = login_creds.cleaned_data['inputPassword']
-    user = json.loads(from_dao('/userDetails/%s' % u_name).content).get(u_name)
+    user = json.loads(from_dao('/user/%s' % u_name).content).get(u_name)
 
     try:
         # pylint: disable=no-member
