@@ -34,7 +34,7 @@ def create_account(request):
         if form.is_valid():                             # pylint: disable=no-member
             form.save()
 
-            response = from_dao('/addPlayer', form)
+            response = from_dao('/user', form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)

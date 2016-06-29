@@ -8,7 +8,7 @@ from flask import Blueprint, make_response, Response
 
 from controllers.request_variables import enforce_request_variables
 from models.authentication import check_auth
-from models.dao.account import Account
+from models.dao.account import Account, add_account
 
 USER = Blueprint('USER', __name__)
 
@@ -35,6 +35,46 @@ def login():
         "Login successful" if check_auth(inputUsername, inputPassword) \
         else "Login unsuccessful",
         200)
+
+def validate_user_email(email):
+    """
+    Validates email based on django validator
+    """
+    from django.core.exceptions import ValidationError
+    from django.core.validators import validate_email
+    try:
+        validate_email(email)
+        return True
+    except ValidationError:
+        return False
+
+# pylint: disable=undefined-variable
+@USER.route('', methods=['POST'])
+@enforce_request_variables('username', 'email', 'password1', 'password2')
+def create():
+    """
+    POST to add an account
+    Expects:
+        - username
+        - email
+        - password1
+        - password2
+    """
+    if not validate_user_email(email):
+        return make_response("This email does not appear valid", 400)
+
+    if password1 != password2:
+        return make_response("Please enter two matching passwords", 400)
+
+    if Account.username_exists(username):
+        return make_response("A user with the username {} already exists! \
+            Please choose another name".format(username), 400)
+
+    add_account(username, email, password1)
+
+    return make_response('<p>Account created! You submitted the following \
+        fields:</p><ul><li>User Name: {}</li><li>Email: {}\
+        </li></ul>'.format(username, email), 200)
 
 @USER.route('/<u_name>', methods=['GET'])
 def user_details(u_name=None):

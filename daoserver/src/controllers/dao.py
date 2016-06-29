@@ -13,7 +13,7 @@ import jsonpickle
 from flask import Blueprint, request, make_response, Response
 
 from controllers.request_variables import enforce_request_variables
-from models.dao.account import Account, add_account
+from models.dao.account import Account
 from models.dao.db_connection import db
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
@@ -72,47 +72,6 @@ def main():
     return make_response('daoserver', 200)
 
 # Page actions
-def validate_user_email(email):
-    """
-    Validates email based on django validator
-    """
-    from django.core.exceptions import ValidationError
-    from django.core.validators import validate_email
-    try:
-        validate_email(email)
-        return True
-    except ValidationError:
-        return False
-
-@APP.route('/addPlayer', methods=['POST'])
-@enforce_request_variables('username', 'email', 'password1', 'password2')
-def create_account():
-    """
-    POST to add an account
-    Expects:
-        - username
-        - email
-        - password1
-        - password2
-    """
-    # pylint: disable=E0602
-    if not validate_user_email(email):
-        return make_response("This email does not appear valid", 400)
-
-    # pylint: disable=E0602
-    if password1 != password2:
-        return make_response("Please enter two matching passwords", 400)
-
-    if Account.username_exists(username):
-        return make_response("A user with the username {} already exists! \
-            Please choose another name".format(username), 400)
-
-    add_account(username, email, password1)
-
-    return make_response('<p>Account created! You submitted the following \
-        fields:</p><ul><li>User Name: {}</li><li>Email: {}\
-        </li></ul>'.format(username, email), 200)
-
 @APP.route('/entertournamentscore', methods=['POST'])
 @enforce_request_variables('username', 'tournament', 'key', 'value')
 @requires_permission(
