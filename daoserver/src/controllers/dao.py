@@ -14,13 +14,13 @@ from flask import Blueprint, request, make_response, Response
 
 from sqlalchemy.exc import IntegrityError
 
+from controllers.request_variables import enforce_request_variables
 from models.dao.account import Account, add_account
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from permissions import PERMISSIONS, PermissionsChecker
-from request_variables import enforce_request_variables
 from tournament import Tournament, ScoreCategoryPair
 
 APP = Blueprint('APP', __name__, url_prefix='')
