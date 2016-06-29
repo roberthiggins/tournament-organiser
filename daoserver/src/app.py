@@ -25,7 +25,11 @@ def create_app():
     db_conn.init_app(app)
 
     from dao import APP
+    from feedback import FEEDBACK
+    from user import USER
     app.register_blueprint(APP)
+    app.register_blueprint(FEEDBACK, url_prefix='/feedback')
+    app.register_blueprint(USER, url_prefix='/user')
 
     return app
 

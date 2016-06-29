@@ -31,6 +31,8 @@ urlpatterns = [
         views.enter_score_by_entry, name='enter_score_by_entry'),
     url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)/(?P<round_id>.+)$',
         views.enter_score_for_game, name='enter_score_for_game'),
+    url(r'^(?P<tournament_id>.+)/entries$',
+        views.entry_list, name='tournament_entry_list'),
     url(r'^feedback$', views.feedback, name='feedback'),
     url(r'^logout$', views.logout, name='logout'),
     url(r'^setcategories/(?P<tournament_id>.+)$',

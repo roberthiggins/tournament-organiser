@@ -7,7 +7,6 @@ should talk to this for functionality wherever possible.
 
 from decimal import Decimal as Dec
 import json
-import re
 from functools import wraps
 import jsonpickle
 
@@ -15,14 +14,13 @@ from flask import Blueprint, request, make_response, Response
 
 from sqlalchemy.exc import IntegrityError
 
-from authentication import check_auth
 from models.account import Account, add_account
 from models.db_connection import db
-from models.feedback import Feedback
 from models.registration import TournamentRegistration
 from models.tournament import Tournament as TournamentDAO
 from models.tournament_entry import TournamentEntry
 from permissions import PERMISSIONS, PermissionsChecker
+from request_variables import enforce_request_variables
 from tournament import Tournament, ScoreCategoryPair
 
 APP = Blueprint('APP', __name__, url_prefix='')
@@ -47,45 +45,6 @@ def unknown_error(err):
     import traceback
     traceback.print_exc()
     return make_response(str(err), 500)
-
-def enforce_request_variables(*vars_to_enforce):
-    """ A decorator that requires var exists in the request"""
-    def decorator(func):                # pylint: disable=missing-docstring
-        @wraps(func)
-        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
-
-            if request.method == 'GET':
-                return func(*args, **kwargs)
-
-            glob = func.func_globals
-            sentinel = object()
-            old_values = {}
-
-            for var in vars_to_enforce:
-                value = request.form[var] if var in request.form \
-                    else request.values.get(var, None)
-
-                if value is None and request.get_json() is not None:
-                    value = request.get_json().get(var, None)
-
-                if value is None:
-                    return make_response('Enter the required fields', 400)
-
-                old_values[var] = glob.get(var, sentinel)
-                glob[var] = value
-
-            try:
-                res = func(*args, **kwargs)
-            finally:
-                for var in vars_to_enforce:
-                    if old_values[var] is sentinel:
-                        del glob[var]
-                    else:
-                        glob[var] = old_values[var]
-
-            return res
-        return wrapped
-    return decorator
 
 # pylint: disable=E0602
 def requires_permission(action, error_msg):
@@ -117,6 +76,21 @@ def main():
     return make_response('daoserver', 200)
 
 # Page actions
+@APP.route('/<tournament_id>/entries', methods=['GET'])
+def tournament_entries(tournament_id):
+    """
+    Return a list of the entrants for the tournament
+    """
+    # pylint: disable=no-member
+    if not Tournament(tournament_id).exists_in_db:
+        return make_response(
+            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
+
+    entries = [ent.player_id for ent in \
+        TournamentEntry.query.filter_by(tournament_id=tournament_id).all()]
+    return Response(jsonpickle.encode(entries, unpicklable=False),
+                    mimetype='application/json')
+
 @APP.route('/listTournaments', methods=['GET'])
 def list_tournaments():
     """
@@ -297,21 +271,6 @@ def entry_info_from_tournament(tournament_id, username):
     """ Given entry_id, get info about player and tournament"""
     return entry_info_from_id(get_entry_id(tournament_id, username))
 
-@APP.route('/login', methods=['POST'])
-@enforce_request_variables('inputUsername', 'inputPassword')
-def login():
-    """
-    POST to login
-    Expects:
-        - inputUsername
-        - inputPassword
-    """
-    # pylint: disable=E0602
-    return make_response(
-        "Login successful" if check_auth(inputUsername, inputPassword) \
-        else "Login unsuccessful",
-        200)
-
 @APP.route('/getMissions/<tournament_id>', methods=['GET'])
 def get_missions(tournament_id):
     """GET list of missions for a tournament."""
@@ -346,24 +305,6 @@ def set_missions():
 
     db.session.commit()
     return make_response('Missions set: {}'.format(missions), 200)
-
-@APP.route('/placefeedback', methods=['POST'])
-def place_feedback():
-    """
-    POST to add feedback or submit suggestion.
-    Expects:
-        - inputFeedback - A string
-    """
-    _feedback = request.form['inputFeedback'].strip('\n\r\t+')
-    if re.match(r'^[\+\s]*$', _feedback) is not None:
-        return make_response("Please fill in the required fields", 400)
-    try:
-        db.session.add(Feedback(_feedback))
-        db.session.commit()
-    except IntegrityError:
-        pass
-
-    return make_response("Thanks for you help improving the site", 200)
 
 @APP.route('/rankEntries/<tournament_id>', methods=['GET'])
 def rank_entries(tournament_id):
@@ -491,19 +432,4 @@ def tournament_details(t_name=None):
     tourn = Tournament(t_name)
     return Response(
         jsonpickle.encode(tourn.details(), unpicklable=False),
-        mimetype='application/json')
-
-@APP.route('/userDetails/<u_name>', methods=['GET'])
-def user_details(u_name=None):
-    """
-    GET to get account details in url form
-    TODO security
-    """
-    # pylint: disable=no-member
-    user = Account.query.filter_by(username=u_name).first()
-    if user is None:
-        raise ValueError('Cannot find user {}'.format(u_name))
-
-    return Response(
-        jsonpickle.encode({u_name: user.contact_email}, unpicklable=False),
         mimetype='application/json')
