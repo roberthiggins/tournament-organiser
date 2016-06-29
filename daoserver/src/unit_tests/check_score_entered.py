@@ -7,7 +7,7 @@ from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from app import create_app
-from db_connections.db_connection import db_conn
+from controllers.db_connection import db_conn
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.score import ScoreCategory

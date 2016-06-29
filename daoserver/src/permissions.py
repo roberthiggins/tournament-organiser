@@ -5,7 +5,7 @@ Module to handle permissions for accounts trying to modify a tournament.
 
 from sqlalchemy.sql.expression import and_
 
-from db_connections.db_connection import db_conn
+from controllers.db_connection import db_conn
 from models.dao.db_connection import db
 from models.dao.account import Account
 from models.dao.permissions import AccountProtectedObjectPermission, \

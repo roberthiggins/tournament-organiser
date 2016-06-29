@@ -6,7 +6,7 @@ from flask_testing import TestCase
 from testfixtures import compare
 
 from app import create_app
-from db_connections.db_connection import db_conn
+from controllers.db_connection import db_conn
 from models.dao.db_connection import db
 from models.dao.score import ScoreCategory
 
