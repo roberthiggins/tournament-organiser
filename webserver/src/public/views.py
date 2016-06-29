@@ -104,6 +104,22 @@ def enter_score_for_game(tournament_id, username, round_id):
     # render the form and pass back to the browser
 
 @login_required
+def entry_list(request, tournament_id):
+    """List entrants for a tournament"""
+    response = from_dao('/{}/entries'.format(tournament_id))
+    if response.status_code != 200:
+        return HttpResponse(response, status=response.status_code)
+
+    return render_to_response(
+        'entry-list.html',
+        {
+            'tournament': tournament_id,
+            'entries': json.loads(response.content)
+        },
+        RequestContext(request)
+    )
+
+@login_required
 def feedback(request):
     """ Page for user to place feedback"""
 

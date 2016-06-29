@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Entries for {{ tournament_name }}{% endblock %}
+
+{% block intro %}
+    {% if entries %}
+        <p>Entries:</p>
+        <ol>
+            {% for name in entries %}
+                <li>{{ name }}</li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p>There are no entries yet. <a href="/registerforatournament">Be the first!</a></p>
+    {% endif %}
+{% endblock %}
