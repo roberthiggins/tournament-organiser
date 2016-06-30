@@ -74,6 +74,29 @@ def entry_info_from_tournament(username):
     except AttributeError:
         raise ValueError('Entry ID not valid: {}'.format(entry_id))
 
+@ENTRY.route('/<username>/schedule', methods=['GET'])
+def get_schedule(username):
+    """Get the scheule of games for username's entry"""
+    entry_id = get_entry_id(g.tournament_id, username)
+    # pylint: disable=no-member
+    entry = TournamentEntry.query.filter_by(id=entry_id).first()
+    games = [gent.game for gent in entry.game_entries]
+
+    def get_opponent(game, username):
+        """Work out the opponent of username in the game"""
+        entrants = [x.entrant.player_id for x in game.entrants \
+                    if x.entrant.player_id != username]
+        return entrants[0] if len(entrants) else "BYE"
+
+    return Response(
+        jsonpickle.encode([{
+            'game_id': game.id,
+            'round': game.tournament_round.ordering,
+            'opponent': get_opponent(game, username),
+            'table': game.table_num,
+        } for game in games], unpicklable=False),
+        mimetype='application/json')
+
 @ENTRY.route('/rank', methods=['GET'])
 def rank_entries():
     """
