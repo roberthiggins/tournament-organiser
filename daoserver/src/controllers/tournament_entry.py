@@ -29,6 +29,13 @@ def get_tournament(endpoint, values):
     if not g.tournament.exists_in_db:
         raise ValueError('Tournament {} doesn\'t exist'.format(g.tournament_id))
 
+    g.username = values.pop('username', None)
+    if g.username:
+        entry_id = get_entry_id(g.tournament_id, g.username)
+        # pylint: disable=no-member
+        g.entry = TournamentEntry.query.filter_by(id=entry_id).first()
+
+
 @ENTRY.route('/', methods=['GET'])
 def list_entries():
     """
@@ -55,44 +62,37 @@ def get_entry_id(tournament_id, username):
             format(username, tournament_id))
 
 @ENTRY.route('/<username>', methods=['GET'])
-def entry_info_from_tournament(username):
+def entry_info_from_tournament():
     """ Given entry_id, get info about player and tournament"""
-    entry_id = get_entry_id(g.tournament_id, username)
 
     try:
-        # pylint: disable=no-member
-        entry = TournamentEntry.query.filter_by(id=entry_id).first()
-
         return Response(
             jsonpickle.encode(
                 {
-                    'entry_id': entry.id,
-                    'username': entry.account.username,
-                    'tournament_name': entry.tournament.name,
+                    'entry_id': g.entry.id,
+                    'username': g.entry.account.username,
+                    'tournament_name': g.entry.tournament.name,
                 }, unpicklable=False),
             mimetype='application/json')
     except AttributeError:
-        raise ValueError('Entry ID not valid: {}'.format(entry_id))
+        raise ValueError('Entry not valid: {}'.format(g.username))
 
 @ENTRY.route('/<username>/schedule', methods=['GET'])
-def get_schedule(username):
+def get_schedule():
     """Get the scheule of games for username's entry"""
-    entry_id = get_entry_id(g.tournament_id, username)
-    # pylint: disable=no-member
-    entry = TournamentEntry.query.filter_by(id=entry_id).first()
-    games = [gent.game for gent in entry.game_entries]
+    games = [gent.game for gent in g.entry.game_entries]
 
-    def get_opponent(game, username):
+    def get_opponent(game, entry):
         """Work out the opponent of username in the game"""
         entrants = [x.entrant.player_id for x in game.entrants \
-                    if x.entrant.player_id != username]
+                    if x.entrant.player_id != entry.player_id]
         return entrants[0] if len(entrants) else "BYE"
 
     return Response(
         jsonpickle.encode([{
             'game_id': game.id,
             'round': game.tournament_round.ordering,
-            'opponent': get_opponent(game, username),
+            'opponent': get_opponent(game, g.entry),
             'table': game.table_num,
         } for game in games], unpicklable=False),
         mimetype='application/json')
