@@ -2,7 +2,7 @@
 Controller for entries in tournaments
 """
 from decimal import Decimal as Dec
-from flask import Blueprint, make_response, Response
+from flask import Blueprint, make_response, Response, g
 import jsonpickle
 
 from models.dao.account import Account
@@ -20,18 +20,23 @@ def input_error(err):
     traceback.print_exc()
     return make_response(str(err), 400)
 
+@ENTRY.url_value_preprocessor
+# pylint: disable=unused-argument
+def get_tournament(endpoint, values):
+    """Retrieve tournament_id from URL and ensure the tournament exists"""
+    g.tournament_id = values.pop('tournament_id', None)
+    g.tournament = Tournament(g.tournament_id)
+    if not g.tournament.exists_in_db:
+        raise ValueError('Tournament {} doesn\'t exist'.format(g.tournament_id))
+
 @ENTRY.route('/', methods=['GET'])
-def list_entries(tournament_id):
+def list_entries():
     """
     Return a list of the entrants for the tournament
     """
     # pylint: disable=no-member
-    if not Tournament(tournament_id).exists_in_db:
-        return make_response(
-            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
-
     entries = [ent.player_id for ent in \
-        TournamentEntry.query.filter_by(tournament_id=tournament_id).all()]
+        TournamentEntry.query.filter_by(tournament_id=g.tournament_id).all()]
     return Response(jsonpickle.encode(entries, unpicklable=False),
                     mimetype='application/json')
 
@@ -50,9 +55,9 @@ def get_entry_id(tournament_id, username):
             format(username, tournament_id))
 
 @ENTRY.route('/<username>', methods=['GET'])
-def entry_info_from_tournament(tournament_id, username):
+def entry_info_from_tournament(username):
     """ Given entry_id, get info about player and tournament"""
-    entry_id = get_entry_id(tournament_id, username)
+    entry_id = get_entry_id(g.tournament_id, username)
 
     try:
         # pylint: disable=no-member
@@ -70,7 +75,7 @@ def entry_info_from_tournament(tournament_id, username):
         raise ValueError('Entry ID not valid: {}'.format(entry_id))
 
 @ENTRY.route('/rank', methods=['GET'])
-def rank_entries(tournament_id):
+def rank_entries():
     """
     Rank all the entries in a tournament based on the scoring criteria for the
     tournament.
@@ -86,10 +91,6 @@ def rank_entries(tournament_id):
         },
     ]
     """
-    tourn = Tournament(tournament_id)
-    if not tourn.exists_in_db:
-        return make_response(
-            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
 
     # pylint: disable=line-too-long
     return Response(
@@ -98,12 +99,13 @@ def rank_entries(tournament_id):
                 {
                     'username' : x.player_id,
                     'entry_id' : x.id,
-                    'tournament_id' : tourn.tournament_id,
+                    'tournament_id' : g.tournament_id,
                     'scores' : x.score_info,
                     'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
                     'ranking': x.ranking
                 } for x in \
-                tourn.ranking_strategy.overall_ranking(tourn.entries())
+                g.tournament.ranking_strategy.overall_ranking(
+                    g.tournament.entries())
             ],
             unpicklable=False),
         mimetype='application/json')

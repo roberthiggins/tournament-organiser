@@ -164,7 +164,7 @@ describe('Check that players are ranked correctly', function() {
 
     frisby.create('Non-existent tournament')
         .get(URL + '/tournament/not_a_tournament/entry/rank')
-        .expectStatus(404)
+        .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('Tournament not_a_tournament doesn\'t exist')
         .toss();

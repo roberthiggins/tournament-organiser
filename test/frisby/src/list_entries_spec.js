@@ -26,6 +26,6 @@ describe('Get a list of entries from a tournament', function() {
 
     frisby.create('Tournament that does not exist')
         .get(URL + '/tournament/kdjflskdjflkdjflkdjf/entry/')
-        .expectStatus(404)
+        .expectStatus(400)
         .toss();
 });

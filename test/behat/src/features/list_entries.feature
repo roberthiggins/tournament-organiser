@@ -46,4 +46,4 @@ Feature: List Entries for a tournament
 
     Scenario: A non-existent tournament
         Given I am on "/not_a_thing/entries"
-        Then the response status code should be 404
+        Then the response status code should be 400
