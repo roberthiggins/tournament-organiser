@@ -5,7 +5,7 @@ describe('HTTP Method Test Suite', function() {
 
     frisby.create('GET from non-existent tournament')
         .get(URL + '/tournament/not_a_thing/score_categories')
-        .expectStatus(404)
+        .expectStatus(400)
         .toss();
 
     frisby.create('GET from non-existent tournament')

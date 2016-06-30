@@ -2,9 +2,9 @@
 Controller for entries in tournaments
 """
 from decimal import Decimal as Dec
-from flask import Blueprint, make_response, Response, g
-import jsonpickle
+from flask import Blueprint, make_response, g
 
+from controllers.request_helpers import json_response
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.tournament import Tournament
@@ -37,15 +37,14 @@ def get_tournament(endpoint, values):
 
 
 @ENTRY.route('/', methods=['GET'])
+@json_response
 def list_entries():
     """
     Return a list of the entrants for the tournament
     """
     # pylint: disable=no-member
-    entries = [ent.player_id for ent in \
+    return [ent.player_id for ent in \
         TournamentEntry.query.filter_by(tournament_id=g.tournament_id).all()]
-    return Response(jsonpickle.encode(entries, unpicklable=False),
-                    mimetype='application/json')
 
 def get_entry_id(tournament_id, username):
     """Get entry info from tournament and username"""
@@ -62,22 +61,21 @@ def get_entry_id(tournament_id, username):
             format(username, tournament_id))
 
 @ENTRY.route('/<username>', methods=['GET'])
+@json_response
 def entry_info_from_tournament():
     """ Given entry_id, get info about player and tournament"""
 
     try:
-        return Response(
-            jsonpickle.encode(
-                {
-                    'entry_id': g.entry.id,
-                    'username': g.entry.account.username,
-                    'tournament_name': g.entry.tournament.name,
-                }, unpicklable=False),
-            mimetype='application/json')
+        return {
+            'entry_id': g.entry.id,
+            'username': g.entry.account.username,
+            'tournament_name': g.entry.tournament.name,
+        }
     except AttributeError:
         raise ValueError('Entry not valid: {}'.format(g.username))
 
 @ENTRY.route('/<username>/schedule', methods=['GET'])
+@json_response
 def get_schedule():
     """Get the scheule of games for username's entry"""
     games = [gent.game for gent in g.entry.game_entries]
@@ -88,16 +86,16 @@ def get_schedule():
                     if x.entrant.player_id != entry.player_id]
         return entrants[0] if len(entrants) else "BYE"
 
-    return Response(
-        jsonpickle.encode([{
+    return [
+        {
             'game_id': game.id,
             'round': game.tournament_round.ordering,
             'opponent': get_opponent(game, g.entry),
             'table': game.table_num,
-        } for game in games], unpicklable=False),
-        mimetype='application/json')
+        } for game in games]
 
 @ENTRY.route('/rank', methods=['GET'])
+@json_response
 def rank_entries():
     """
     Rank all the entries in a tournament based on the scoring criteria for the
@@ -116,19 +114,14 @@ def rank_entries():
     """
 
     # pylint: disable=line-too-long
-    return Response(
-        jsonpickle.encode(
-            [
-                {
-                    'username' : x.player_id,
-                    'entry_id' : x.id,
-                    'tournament_id' : g.tournament_id,
-                    'scores' : x.score_info,
-                    'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
-                    'ranking': x.ranking
-                } for x in \
-                g.tournament.ranking_strategy.overall_ranking(
-                    g.tournament.entries())
-            ],
-            unpicklable=False),
-        mimetype='application/json')
+    return [
+        {
+            'username' : x.player_id,
+            'entry_id' : x.id,
+            'tournament_id' : g.tournament_id,
+            'scores' : x.score_info,
+            'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
+            'ranking': x.ranking
+        } for x in \
+        g.tournament.ranking_strategy.overall_ranking(g.tournament.entries())
+    ]

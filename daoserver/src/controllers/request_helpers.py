@@ -2,8 +2,9 @@
 Basic decorator for enforcing request elements
 """
 
-from flask import request, make_response
+from flask import Response, request, make_response
 from functools import wraps
+import jsonpickle
 
 def enforce_request_variables(*vars_to_enforce):
     """ A decorator that requires var exists in the request"""
@@ -43,3 +44,14 @@ def enforce_request_variables(*vars_to_enforce):
             return res
         return wrapped
     return decorator
+
+def json_response(func):
+    """Wrap the return value of func with jsonpickle and return as Response"""
+    @wraps(func)
+    def wrapped(*args, **kwargs):       # pylint: disable=missing-docstring
+
+        return Response(
+            jsonpickle.encode(func(*args, **kwargs), unpicklable=False),
+            mimetype='application/json')
+
+    return wrapped

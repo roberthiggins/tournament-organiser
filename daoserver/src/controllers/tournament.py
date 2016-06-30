@@ -3,10 +3,10 @@ All tournament interactions.
 """
 import json
 import jsonpickle
-from flask import Blueprint, request, make_response, Response
+from flask import Blueprint, request, make_response
 from sqlalchemy.exc import IntegrityError
 
-from controllers.request_helpers import enforce_request_variables
+from controllers.request_helpers import enforce_request_variables, json_response
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
@@ -55,20 +55,16 @@ def list_missions(tournament_id):
         unpicklable=False)
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['GET'])
+@json_response
 def list_score_categories(tournament_id):
     """
     GET the score categories set for the tournament.
     e.g. [{ 'name': 'painting', 'percentage': 20, 'id': 2 }]
     """
-    try:
-        tourn = Tournament(tournament_id)
-        return Response(
-            jsonpickle.encode(tourn.list_score_categories(), unpicklable=False),
-            mimetype='application/json')
-    except ValueError as err:
-        return make_response(str(err), 404)
+    return Tournament(tournament_id).list_score_categories()
 
 @TOURNAMENT.route('/', methods=['GET'])
+@json_response
 def list_tournaments():
     """
     GET a list of tournaments
@@ -80,9 +76,7 @@ def list_tournaments():
         {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
         for x in TournamentDAO.query.all()]
 
-    return Response(
-        jsonpickle.encode({'tournaments' : details}, unpicklable=False),
-        mimetype='application/json')
+    return {'tournaments' : details}
 
 @TOURNAMENT.route('/<tournament_id>/register', methods=['POST'])
 @enforce_request_variables('inputUserName')
@@ -163,12 +157,10 @@ def set_score_categories(tournament_id):
         ', '.join([str(cat.display_name) for cat in new_categories])), 200)
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
+@json_response
 def tournament_details(tournament_id=None):
     """
     GET to get details about a tournament. This includes entrants and format
     information
     """
-    tourn = Tournament(tournament_id)
-    return Response(
-        jsonpickle.encode(tourn.details(), unpicklable=False),
-        mimetype='application/json')
+    return Tournament(tournament_id).details()
