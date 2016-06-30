@@ -2,9 +2,8 @@
 Basic decorator for enforcing request elements
 """
 
-from functools import wraps
-
 from flask import request, make_response
+from functools import wraps
 
 def enforce_request_variables(*vars_to_enforce):
     """ A decorator that requires var exists in the request"""

@@ -9,7 +9,7 @@ from functools import wraps
 
 from flask import Blueprint, request, make_response
 
-from controllers.request_variables import enforce_request_variables
+from controllers.request_helpers import enforce_request_variables
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker

@@ -6,7 +6,7 @@ import jsonpickle
 from flask import Blueprint, request, make_response, Response
 from sqlalchemy.exc import IntegrityError
 
-from controllers.request_variables import enforce_request_variables
+from controllers.request_helpers import enforce_request_variables
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO

@@ -4,7 +4,7 @@ Individual rounds in a tournament
 from flask import Blueprint, make_response
 import jsonpickle
 
-from controllers.request_variables import enforce_request_variables
+from controllers.request_helpers import enforce_request_variables
 from models.tournament import Tournament
 
 TOURNAMENT_ROUND = Blueprint('TOURNAMENT_ROUND', __name__)
