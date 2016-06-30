@@ -19,13 +19,20 @@ describe('See the schedule for an entry in a tournament', function() {
         ])
         .toss();
 
+    frisby.create('Set homer schedule to 8 rounds')
+        .post(URL + '/tournament/ranking_test/rounds', {numRounds: 4})
+        .expectBodyContains('Rounds set: 4')
+        .expectStatus(200)
+        .toss()
     frisby.create('See homer schedule')
         .get(URL + '/tournament/ranking_test/entry/homer/schedule')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([
-            {'table': 2, 'game_id': Number, 'round': 1, 'opponent': 'maggie'},
-            {'table': 3, 'game_id': Number, 'round': 2, 'opponent': 'lisa'}
+            {"game_id": Number, "table": 2, "round": 1, "opponent": "maggie"},
+            {"game_id": Number, "table": 3, "round": 2, "opponent": "lisa"},
+            {"game_id": Number, "table": 3, "round": 3, "opponent": "BYE"},
+            {"game_id": Number, "table": 3, "round": 4, "opponent": "bart"}
         ])
         .toss();
 

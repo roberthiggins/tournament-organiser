@@ -47,7 +47,7 @@ describe('Test seeing and registering for a tournament', function() {
             {
                 date: '2095-08-12',
                 name: 'ranking_test',
-                rounds: 0
+                rounds: Number
             }
         )
         .expectJSON('tournaments.?',
