@@ -2,7 +2,7 @@
 Users for the site. Note this is separate from an entry in a tournament.
 """
 
-from flask import Blueprint, make_response
+from flask import Blueprint
 
 from controllers.request_helpers import enforce_request_variables, \
 json_response, text_response
@@ -51,14 +51,14 @@ def create():
         - password2
     """
     if not validate_user_email(email):
-        return make_response("This email does not appear valid", 400)
+        raise ValueError('This email does not appear valid')
 
     if password1 != password2:
-        return make_response("Please enter two matching passwords", 400)
+        raise ValueError('Please enter two matching passwords')
 
     if Account.username_exists(username):
-        return make_response("A user with the username {} already exists! \
-            Please choose another name".format(username), 400)
+        raise ValueError('A user with the username {} already exists! \
+            Please choose another name'.format(username))
 
     add_account(username, email, password1)
 

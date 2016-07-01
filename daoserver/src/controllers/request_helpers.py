@@ -2,7 +2,7 @@
 Basic decorator for enforcing request elements
 """
 
-from flask import Response, request, make_response
+from flask import Response, request
 from functools import wraps
 import jsonpickle
 
@@ -27,7 +27,7 @@ def enforce_request_variables(*vars_to_enforce):
                     value = request.get_json().get(var, None)
 
                 if value is None:
-                    return make_response('Enter the required fields', 400)
+                    raise ValueError('Enter the required fields')
 
                 old_values[var] = glob.get(var, sentinel)
                 glob[var] = value

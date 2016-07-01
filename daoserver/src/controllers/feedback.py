@@ -4,7 +4,7 @@ Feedback from users
 
 import re
 
-from flask import Blueprint, request, make_response
+from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
 
 from controllers.request_helpers import text_response
@@ -23,7 +23,7 @@ def place_feedback():
     """
     _feedback = request.form['inputFeedback'].strip('\n\r\t+')
     if re.match(r'^[\+\s]*$', _feedback) is not None:
-        return make_response("Please fill in the required fields", 400)
+        raise ValueError('Please fill in the required fields')
     try:
         db.session.add(Feedback(_feedback))
         db.session.commit()
