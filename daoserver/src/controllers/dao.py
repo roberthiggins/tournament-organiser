@@ -9,7 +9,7 @@ from functools import wraps
 
 from flask import Blueprint, request, make_response
 
-from controllers.request_helpers import enforce_request_variables
+from controllers.request_helpers import enforce_request_variables, text_response
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
@@ -61,12 +61,14 @@ def requires_permission(action, error_msg):
     return decorator
 
 @APP.route("/")
+@text_response
 def main():
     """Index page. Used to verify the server is running."""
-    return make_response('daoserver', 200)
+    return 'daoserver'
 
 # Page actions
 @APP.route('/entertournamentscore', methods=['POST'])
+@text_response
 @enforce_request_variables('username', 'tournament', 'key', 'value')
 @requires_permission(
     PERMISSIONS.get('ENTER_SCORE'),
@@ -95,6 +97,4 @@ def enter_tournament_score():
 
     # pylint: disable=E0602
     tourn.enter_score(entry_id, key, value)
-    return make_response(
-        'Score entered for {}: {}'.format(username, value),
-        200)
+    return 'Score entered for {}: {}'.format(username, value)

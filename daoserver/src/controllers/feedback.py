@@ -7,12 +7,14 @@ import re
 from flask import Blueprint, request, make_response
 from sqlalchemy.exc import IntegrityError
 
+from controllers.request_helpers import text_response
 from models.dao.db_connection import db
 from models.dao.feedback import Feedback
 
 FEEDBACK = Blueprint('FEEDBACK', __name__)
 
 @FEEDBACK.route('', methods=['POST'])
+@text_response
 def place_feedback():
     """
     POST to add feedback or submit suggestion.
@@ -28,4 +30,4 @@ def place_feedback():
     except IntegrityError:
         pass
 
-    return make_response("Thanks for you help improving the site", 200)
+    return 'Thanks for you help improving the site'
