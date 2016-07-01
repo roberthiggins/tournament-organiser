@@ -55,3 +55,16 @@ def json_response(func):
             mimetype='application/json')
 
     return wrapped
+
+def text_response(func):
+    """Wrap the return value of func in a Response"""
+    @wraps(func)
+    def wrapped(*args, **kwargs):       # pylint: disable=missing-docstring
+
+        text = func(*args, **kwargs)
+        if isinstance(text, basestring):
+            return Response(text, mimetype='text/html')
+        else:
+            return text # Probably an error response
+
+    return wrapped
