@@ -7,7 +7,7 @@ should talk to this for functionality wherever possible.
 
 from functools import wraps
 
-from flask import Blueprint, request, make_response
+from flask import Blueprint, request
 
 from controllers.request_helpers import enforce_request_variables, text_response
 from models.dao.account import Account
@@ -16,25 +16,6 @@ from models.permissions import PERMISSIONS, PermissionsChecker
 from models.tournament import Tournament
 
 APP = Blueprint('APP', __name__, url_prefix='')
-
-@APP.errorhandler(TypeError)
-@APP.errorhandler(ValueError)
-def input_error(err):
-    """Input errors"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 400)
-
-@APP.errorhandler(Exception)
-def unknown_error(err):
-    """All other exceptions are essentially just raised with logging"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 500)
 
 # pylint: disable=E0602
 def requires_permission(action, error_msg):

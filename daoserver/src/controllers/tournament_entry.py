@@ -2,7 +2,7 @@
 Controller for entries in tournaments
 """
 from decimal import Decimal as Dec
-from flask import Blueprint, make_response, g
+from flask import Blueprint, g
 
 from controllers.request_helpers import json_response
 from models.dao.account import Account
@@ -10,15 +10,6 @@ from models.dao.tournament_entry import TournamentEntry
 from models.tournament import Tournament
 
 ENTRY = Blueprint('ENTRY', __name__)
-
-@ENTRY.errorhandler(ValueError)
-def input_error(err):
-    """Input errors"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 400)
 
 @ENTRY.url_value_preprocessor
 # pylint: disable=unused-argument

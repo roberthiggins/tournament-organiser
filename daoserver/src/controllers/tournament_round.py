@@ -1,22 +1,13 @@
 """
 Individual rounds in a tournament
 """
-from flask import Blueprint, make_response
+from flask import Blueprint
 import jsonpickle
 
 from controllers.request_helpers import enforce_request_variables, text_response
 from models.tournament import Tournament
 
 TOURNAMENT_ROUND = Blueprint('TOURNAMENT_ROUND', __name__)
-
-@TOURNAMENT_ROUND.errorhandler(ValueError)
-def input_error(err):
-    """Input errors"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 400)
 
 @TOURNAMENT_ROUND.route('/<round_id>', methods=['GET'])
 def get_round_info(tournament_id, round_id):

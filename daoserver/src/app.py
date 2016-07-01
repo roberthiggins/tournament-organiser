@@ -6,7 +6,7 @@ import datetime
 import os
 import jsonpickle
 
-from flask import Flask
+from flask import Flask, make_response
 
 from controllers.dao import APP
 from controllers.feedback import FEEDBACK
@@ -38,6 +38,28 @@ def create_app():
     app.register_blueprint(ENTRY,
                            url_prefix='/tournament/<tournament_id>/entry')
     app.register_blueprint(USER, url_prefix='/user')
+
+    @app.errorhandler(RuntimeError)
+    @app.errorhandler(ValueError)
+    @app.errorhandler(TypeError)
+    # pylint: disable=unused-variable
+    def input_error(err):
+        """Input errors"""
+        print type(err).__name__
+        print err
+        import traceback
+        traceback.print_exc()
+        return make_response(str(err), 400)
+
+    @app.errorhandler(Exception)
+    # pylint: disable=unused-variable
+    def unknown_error(err):
+        """All other exceptions are essentially just raised with logging"""
+        print type(err).__name__
+        print err
+        import traceback
+        traceback.print_exc()
+        return make_response(str(err), 500)
 
     return app
 

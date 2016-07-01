@@ -11,15 +11,6 @@ from models.dao.account import Account, add_account
 
 USER = Blueprint('USER', __name__)
 
-@USER.errorhandler(ValueError)
-def input_error(err):
-    """Input errors"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 400)
-
 @USER.route('/login', methods=['POST'])
 @text_response
 @enforce_request_variables('inputUsername', 'inputPassword')

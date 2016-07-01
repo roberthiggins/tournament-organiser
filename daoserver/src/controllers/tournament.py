@@ -3,7 +3,7 @@ All tournament interactions.
 """
 import json
 import jsonpickle
-from flask import Blueprint, request, make_response
+from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
 
 from controllers.request_helpers import enforce_request_variables, \
@@ -15,18 +15,6 @@ from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament, ScoreCategoryPair
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__)
-
-
-@TOURNAMENT.errorhandler(RuntimeError)
-@TOURNAMENT.errorhandler(TypeError)
-@TOURNAMENT.errorhandler(ValueError)
-def input_error(err):
-    """Input errors"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 400)
 
 @TOURNAMENT.route('', methods=['POST'])
 @text_response
