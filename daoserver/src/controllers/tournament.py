@@ -6,7 +6,8 @@ import jsonpickle
 from flask import Blueprint, request, make_response
 from sqlalchemy.exc import IntegrityError
 
-from controllers.request_helpers import enforce_request_variables, json_response
+from controllers.request_helpers import enforce_request_variables, \
+json_response, text_response
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
@@ -28,6 +29,7 @@ def input_error(err):
     return make_response(str(err), 400)
 
 @TOURNAMENT.route('', methods=['POST'])
+@text_response
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')
 def add_tournament():
     # pylint: disable=undefined-variable
@@ -42,10 +44,9 @@ def add_tournament():
         inputTournamentName,
         creator=request.authorization.username)
     tourn.add_to_db(inputTournamentDate)
-    return make_response(
-        '<p>Tournament Created! You submitted the following fields:</p> \
-        <ul><li>Name: {}</li><li>Date: {}</li></ul>'.format(
-            inputTournamentName, inputTournamentDate), 200)
+    return '<p>Tournament Created! You submitted the following fields:</p> \
+        <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\
+        format(inputTournamentName, inputTournamentDate)
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['GET'])
 def list_missions(tournament_id):
@@ -79,6 +80,7 @@ def list_tournaments():
     return {'tournaments' : details}
 
 @TOURNAMENT.route('/<tournament_id>/register', methods=['POST'])
+@text_response
 @enforce_request_variables('inputUserName')
 def register(tournament_id):
     # pylint: disable=undefined-variable
@@ -97,9 +99,10 @@ def register(tournament_id):
     except IntegrityError:
         raise ValueError("Check username and tournament")
 
-    return make_response('Application Submitted', 200)
+    return 'Application Submitted'
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])
+@text_response
 @enforce_request_variables('missions')
 def set_missions(tournament_id):
     # pylint: disable=undefined-variable
@@ -124,9 +127,10 @@ def set_missions(tournament_id):
         db.session.add(rnd)
 
     db.session.commit()
-    return make_response('Missions set: {}'.format(missions), 200)
+    return 'Missions set: {}'.format(missions)
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
+@text_response
 @enforce_request_variables('categories')
 def set_score_categories(tournament_id):
     # pylint: disable=undefined-variable
@@ -153,8 +157,8 @@ def set_score_categories(tournament_id):
 
     tourn.set_score_categories(new_categories)
 
-    return make_response('Score categories set: {}'.format(
-        ', '.join([str(cat.display_name) for cat in new_categories])), 200)
+    return 'Score categories set: {}'.\
+        format(', '.join([str(cat.display_name) for cat in new_categories]))
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response
