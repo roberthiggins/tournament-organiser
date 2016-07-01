@@ -65,17 +65,35 @@ def entry_info_from_tournament():
     except AttributeError:
         raise ValueError('Entry not valid: {}'.format(g.username))
 
+def get_opponent(game, entry):
+    """Work out the opponent of username in the game"""
+    entrants = [x.entrant.player_id for x in game.entrants \
+                if x.entrant.player_id != entry.player_id]
+    return entrants[0] if len(entrants) else "BYE"
+
+@ENTRY.route('/<username>/nextgame', methods=['GET'])
+@json_response
+def get_next_game():
+    """Get the next game for given entry"""
+
+    games = [gent.game for gent in g.entry.game_entries]
+    games = sorted(games, key=lambda game: game.tournament_round.ordering)
+
+    for game in games:
+        if not Tournament.is_score_entered(game):
+            return {
+                'game_id': game.id,
+                'round': game.tournament_round.ordering,
+                'opponent': get_opponent(game, g.entry),
+                'table': game.table_num,
+            }
+    return {}
+
 @ENTRY.route('/<username>/schedule', methods=['GET'])
 @json_response
 def get_schedule():
     """Get the scheule of games for username's entry"""
     games = [gent.game for gent in g.entry.game_entries]
-
-    def get_opponent(game, entry):
-        """Work out the opponent of username in the game"""
-        entrants = [x.entrant.player_id for x in game.entrants \
-                    if x.entrant.player_id != entry.player_id]
-        return entrants[0] if len(entrants) else "BYE"
 
     return [
         {
