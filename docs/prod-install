@@ -52,13 +52,12 @@ This is a guide to how to install everything, form the ground up, in a prod envi
 
 #### Install all the things ####
 
-    # MAKE/GET THE PROD CONFIG FILE
+    # MAKE/GET THE PROD CONFIG FILES
     # You should do this on your own machine and then scp the file across
-    #   You can find a starting point in config/production/
-    #   Change pws, etc.
-    #   scp config/production/docker-compose.prod_template.yml ubuntu@to-prod:~/docker-compose.yml
+    #   - You need to create a passwords file (You can find a starting point in config/dev/docker-passwords.yml )
+    #   - scp config/production/docker-passwords.yml ubuntu@to-prod:~/docker-passwords.yml
     #   ssh ubuntu@to-prod
-    #   sudo cp docker-compose.yml /var/www/tournament-organiser/
+    #   sudo cp docker-passwords.yml /var/www/tournament-organiser/
 
     ssh ubuntu@to-prod
     cd /var/www/tournament-organiser

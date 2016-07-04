@@ -1,6 +1,9 @@
 database:
     image: postgres:9.3
     container_name: database
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
 
 daoserver:
     build: daoserver
@@ -10,6 +13,9 @@ daoserver:
     ports:
         - "5001:5000"
     command: bash /webapp/wait-for-postgres.sh database python -u app.py
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
 
 unittest:
     build: daoserver
@@ -17,9 +23,17 @@ unittest:
     environment:
         DB_CONTAINER: "DATABASE"
     command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
 
 webserver:
     build: webserver
     container_name: webserver
     ports:
         - "5000:8000"
+    environment:
+        HOST_IP: 127.0.0.1
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords

@@ -13,6 +13,7 @@ install:
     - pip install pylint
 
     - cp config/dev/docker-compose.dev.yml ./docker-compose.yml
+    - cp config/dev/docker-passwords.dev.yml ./docker-passwords.yml
     - docker-compose build
     - docker-compose up -d database daoserver webserver
     - docker inspect daoserver
