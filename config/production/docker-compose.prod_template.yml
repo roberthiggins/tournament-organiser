@@ -1,6 +1,4 @@
 database:
-    volumes:
-        - "./database/setup/:/docker-entrypoint-initdb.d"
     extends:
         file: docker-compose.base.yml
         service: database

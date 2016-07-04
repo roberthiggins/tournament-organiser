@@ -1,6 +1,8 @@
 database:
     image: postgres:9.3
     container_name: database
+    volumes:
+        - "./database/setup/:/docker-entrypoint-initdb.d"
     extends:
         file: docker-passwords.yml
         service: dbpasswords
