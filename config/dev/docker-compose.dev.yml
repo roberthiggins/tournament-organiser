@@ -10,19 +10,6 @@ daoserver:
         file: docker-compose.base.yml
         service: daoserver
 
-unittest:
-    links:
-        - database
-    extends:
-        file: docker-compose.base.yml
-        service: unittest
-
-apitest:
-    build: test/frisby
-    container_name: frisby
-    links:
-        - daoserver
-
 webserver:
     links:
         - daoserver
@@ -33,6 +20,22 @@ webserver:
         file: docker-compose.base.yml
         service: webserver
 
+# Unit Test Specific
+unittest:
+    links:
+        - database
+    extends:
+        file: docker-compose.base.yml
+        service: unittest
+
+# API Test Specific
+apitest:
+    build: test/frisby
+    container_name: frisby
+    links:
+        - daoserver
+
+# System Test Specific
 systemtest:
     build: test/behat
     container_name: behat
