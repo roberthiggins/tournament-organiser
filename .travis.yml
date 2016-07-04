@@ -16,13 +16,21 @@ install:
     - cp config/dev/docker-passwords.dev.yml ./docker-passwords.yml
     - docker-compose build
     - docker-compose up -d database daoserver webserver
+    - docker-compose up -d apitestdb apitestdaoserver
     - docker inspect daoserver
+    - docker inspect apitestdaoserver
 script:
 
     - docker-compose run unittest
+
+
+    - docker cp database/data/dev/behaviour_test_data.sql apitestdb:.
+    - docker exec -it apitestdb bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
+    - docker-compose run apitest
+
+
     - docker cp database/data/dev/behaviour_test_data.sql database:.
     - docker exec -it database bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
-    - docker-compose run apitest
     - docker-compose run systemtest
 
 

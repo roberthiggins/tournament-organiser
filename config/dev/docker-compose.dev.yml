@@ -29,11 +29,24 @@ unittest:
         service: unittest
 
 # API Test Specific
-apitest:
-    build: test/frisby
-    container_name: frisby
+apitestdb:
+    extends:
+        file: docker-compose.base.yml
+        service: apitestdb
+
+apitestdaoserver:
     links:
-        - daoserver
+        - apitestdb
+    extends:
+        file: docker-compose.base.yml
+        service: apitestdaoserver
+
+apitest:
+    links:
+        - apitestdaoserver
+    extends:
+        file: docker-compose.base.yml
+        service: apitest
 
 # System Test Specific
 systemtest:

@@ -39,3 +39,26 @@ webserver:
     extends:
         file: docker-passwords.yml
         service: webpasswords
+
+# API Test Specific
+apitestdb:
+    container_name: apitestdb
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+apitestdaoserver:
+    build: daoserver
+    container_name: apitestdaoserver
+    environment:
+        DB_CONTAINER: "APITESTDB"
+    command: bash /webapp/wait-for-postgres.sh apitestdb python -u app.py
+    ports:
+        - "5002:5000"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+apitest:
+    build: test/frisby
+    container_name: frisby
