@@ -5,6 +5,8 @@ database:
 daoserver:
     build: daoserver
     container_name: daoserver
+    environment:
+        DB_CONTAINER: "DATABASE"
     ports:
         - "5001:5000"
     command: bash /webapp/wait-for-postgres.sh database python -u app.py
@@ -12,6 +14,8 @@ daoserver:
 unittest:
     build: daoserver
     container_name: unittest
+    environment:
+        DB_CONTAINER: "DATABASE"
     command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
 
 webserver:
