@@ -10,9 +10,11 @@ from django.http import HttpResponse
 
 ### Some helper methods
 
-DAO_URL = "http://%s:%s" % (
-    os.environ['DAOSERVER_PORT_5000_TCP_ADDR'],
-    os.environ['DAOSERVER_PORT_5000_TCP_PORT'])
+DAO_NAME = os.environ['DAO_CONTAINER']
+DAO_URL = 'http://{}:{}'.format(
+    os.environ['{}_PORT_5000_TCP_ADDR'.format(DAO_NAME)],
+    os.environ['{}_PORT_5000_TCP_PORT'.format(DAO_NAME)]
+)
 
 def from_dao(url, form=None, request=None):
     """

@@ -49,16 +49,38 @@ apitest:
         service: apitest
 
 # System Test Specific
+systemtestdb:
+    extends:
+        file: docker-compose.base.yml
+        service: systemtestdb
+
+systemtestdaoserver:
+    links:
+        - systemtestdb
+    extends:
+        file: docker-compose.base.yml
+        service: systemtestdaoserver
+
+systemtestwebserver:
+    extends:
+        file: docker-compose.base.yml
+        service: systemtestwebserver
+    environment:
+        DEBUG: "True"
+        TEMPLATE_DEBUG: "True"
+    links:
+        - systemtestdaoserver
+
 systemtest:
-    build: test/behat
-    container_name: behat
+    extends:
+        file: docker-compose.base.yml
+        service: systemtest
     links:
         - selenium
-        - daoserver
-        - webserver
+        - systemtestdaoserver
+        - systemtestwebserver
 
 selenium:
-    image: selenium/standalone-firefox
-    container_name: selenium
-    ports:
-        - "4444:4444"
+    extends:
+        file: docker-compose.base.yml
+        service: selenium

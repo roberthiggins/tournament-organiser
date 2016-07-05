@@ -64,3 +64,44 @@ apitestdaoserver:
 apitest:
     build: test/frisby
     container_name: frisby
+
+# System Test Specific
+systemtestdb:
+    container_name: systemtestdb
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+systemtestdaoserver:
+    build: daoserver
+    container_name: systemtestdaoserver
+    environment:
+        DB_CONTAINER: "SYSTEMTESTDB"
+    command: bash /webapp/wait-for-postgres.sh systemtestdb python -u app.py
+    ports:
+        - "5003:5000"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+systemtestwebserver:
+    build: webserver
+    container_name: systemtestwebserver
+    ports:
+        - "5004:8000"
+    environment:
+        HOST_IP: 127.0.0.1
+        DAO_CONTAINER: "SYSTEMTESTDAOSERVER"
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords
+
+systemtest:
+    build: test/behat
+    container_name: behat
+
+selenium:
+    image: selenium/standalone-firefox
+    container_name: selenium
+    ports:
+        - "4444:4444"
