@@ -19,16 +19,6 @@ daoserver:
         file: docker-passwords.yml
         service: dbpasswords
 
-unittest:
-    build: daoserver
-    container_name: unittest
-    environment:
-        DB_CONTAINER: "DATABASE"
-    command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
-    extends:
-        file: docker-passwords.yml
-        service: dbpasswords
-
 webserver:
     build: webserver
     container_name: webserver
@@ -39,6 +29,18 @@ webserver:
     extends:
         file: docker-passwords.yml
         service: webpasswords
+
+# Unit Test Specific
+
+unittest:
+    build: daoserver
+    container_name: unittest
+    environment:
+        DB_CONTAINER: "DATABASE"
+    command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
 
 # API Test Specific
 apitestdb:
