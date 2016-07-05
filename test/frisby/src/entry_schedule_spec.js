@@ -1,9 +1,9 @@
 describe('See the schedule for an entry in a tournament', function() {
     var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+    var API = process.env['API_ADDR'] + 'tournament/schedule_test/'
 
     frisby.create('See lisa schedule')
-        .get(API + 'tournament/ranking_test/entry/lisa/schedule')
+        .get(API + 'entry/schedule_test_player_3/schedule')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes('*', {
@@ -14,41 +14,61 @@ describe('See the schedule for an entry in a tournament', function() {
         })
         .expectJSON([
             {'table': 1, 'game_id': Number, 'round': 1, 'opponent': 'BYE'},
-            {'table': 3, 'game_id': Number, 'round': 2, 'opponent': 'homer'}
+            {'table': 3, 'game_id': Number, 'round': 2, 'opponent': 'schedule_test_player_1'}
         ])
         .toss();
 
     frisby.create('Set homer schedule to 8 rounds')
-        .post(API + 'tournament/ranking_test/rounds', {numRounds: 4})
+        .post(API + 'rounds', {numRounds: 4})
         .expectBodyContains('Rounds set: 4')
         .expectStatus(200)
         .toss()
     frisby.create('See homer schedule')
-        .get(API + 'tournament/ranking_test/entry/homer/schedule')
+        .get(API + 'entry/schedule_test_player_1/schedule')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([
-            {"game_id": Number, "table": 2, "round": 1, "opponent": "maggie"},
-            {"game_id": Number, "table": 3, "round": 2, "opponent": "lisa"},
-            {"game_id": Number, "table": 3, "round": 3, "opponent": "BYE"},
-            {"game_id": Number, "table": 3, "round": 4, "opponent": "bart"}
+            {
+                'game_id': Number,
+                'table': 2,
+                'round': 1,
+                'opponent': 'schedule_test_player_5'
+            },
+            {
+                'game_id': Number,
+                'table': 3,
+                'round': 2,
+                'opponent': 'schedule_test_player_3'
+            },
+            {
+                'game_id': Number,
+                'table': 3,
+                'round': 3,
+                'opponent': 'BYE'
+            },
+            {
+                'game_id': Number,
+                'table': 3,
+                'round': 4,
+                'opponent': 'schedule_test_player_4'
+            }
         ])
         .toss();
 
     frisby.create('Entry has not played a game')
-        .get(API + 'tournament/permission_test/entry/permission_test_player/schedule')
+        .get(process.env['API_ADDR'] + 'tournament/permission_test/entry/permission_test_player/schedule')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([])
         .toss();
 
     frisby.create('No entry with that username')
-        .get(API + 'tournament/permission_test/entry/homer')
+        .get(API + 'entry/persona_non_grata')
         .expectStatus(400)
         .toss();
 
     frisby.create('Tournament that does not exist')
-        .get(API + 'tournament/ranking_testdfsdfsdf/entry/lisa/schedule')
+        .get(process.env['API_ADDR'] + 'tournament/sdf/entry/p_1/schedule')
         .expectStatus(400)
         .toss();
 });

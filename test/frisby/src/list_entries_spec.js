@@ -3,21 +3,18 @@ describe('Get a list of entries from a tournament', function() {
     var API = process.env['API_ADDR']
 
     frisby.create('Details for existing tournament')
-        .get(API + 'tournament/ranking_test/entry/')
+        .get(API + 'tournament/entry_list_test/entry/')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes('*', String)
         .expectJSON([
-            'homer',
-            'marge',
-            'lisa',
-            'bart',
-            'maggie'
+            'entry_list_player',
+            'entry_list_player_2'
         ])
         .toss();
 
     frisby.create('Tournament with no entries')
-        .get(API + 'tournament/permission_test/entry/')
+        .get(API + 'tournament/entry_list_test_no_entries/entry/')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([])

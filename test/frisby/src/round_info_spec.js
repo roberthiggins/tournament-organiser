@@ -3,19 +3,19 @@ describe('HTTP Method Test Suite', function() {
     var API = process.env['API_ADDR']
 
     frisby.create('POST 2 rounds to setup')
-        .post(API + 'tournament/ranking_test/rounds', {
+        .post(API + 'tournament/round_test/rounds', {
             numRounds: 2
         }, {json: true})
         .expectStatus(200)
         .toss();
     frisby.create('POST 2 missions to setup')
-        .post(API + 'tournament/ranking_test/missions', {
+        .post(API + 'tournament/round_test/missions', {
             missions: ['mission_1', 'mission_2']
         }, {json: true})
         .expectStatus(200)
         .toss();
     frisby.create('Check those missions exist')
-        .get(API + 'tournament/ranking_test/rounds/1')
+        .get(API + 'tournament/round_test/rounds/1')
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,
@@ -27,7 +27,7 @@ describe('HTTP Method Test Suite', function() {
         })
         .toss();
     frisby.create('Check those missions exist')
-        .get(API + 'tournament/ranking_test/rounds/2')
+        .get(API + 'tournament/round_test/rounds/2')
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,
@@ -44,15 +44,15 @@ describe('HTTP Method Test Suite', function() {
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(API + 'tournament/ranking_test/rounds/4')
+        .get(API + 'tournament/round_test/rounds/4')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(API + 'tournament/ranking_test/rounds/-1')
+        .get(API + 'tournament/round_test/rounds/-1')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(API + 'tournament/ranking_test/rounds/ranking_test')
+        .get(API + 'tournament/round_test/rounds/ranking_test')
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
@@ -60,7 +60,7 @@ describe('HTTP Method Test Suite', function() {
         .expectStatus(400)
         .toss();
     frisby.create('malformations')
-        .get(API + 'tournament/ranking_test/rounds/1/1')
+        .get(API + 'tournament/round_test/rounds/1/1')
         .expectStatus(404)
         .toss();
     frisby.create('malformations')

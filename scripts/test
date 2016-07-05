@@ -10,8 +10,8 @@ docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver &> /de
 docker-compose run unittest
 
 # API Tests
-docker cp database/data/dev/behaviour_test_data.sql apitestdb:.
-docker exec -it apitestdb bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
+docker cp database/data/dev/api_test_data.sql apitestdb:.
+docker exec -it apitestdb bash -c 'psql --file=api_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
 docker-compose run apitest
 
 # System Tests

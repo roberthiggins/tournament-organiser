@@ -1,9 +1,9 @@
 describe('Check that players are ranked correctly', function() {
     var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+    var API = process.env['API_ADDR'] + 'tournament/';
 
     frisby.create('Check that the rank_entries format is correct')
-        .get(API + 'tournament/ranking_test/entry/rank')
+        .get(API + 'rank_test/entry/rank')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes( '0',
@@ -28,12 +28,12 @@ describe('Check that players are ranked correctly', function() {
 
 
     frisby.create('Get rankings for a tournament')
-        .get(API + 'tournament/ranking_test/entry/rank')
+        .get(API + 'rank_test/entry/rank')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([
             {
-                username: 'homer',
+                username: 'rank_test_player_1',
                 ranking: 1,
                 total_score: '84.75',
                 scores: [
@@ -62,10 +62,10 @@ describe('Check that players are ranked correctly', function() {
                         min_val: 1
                     }
                 ],
-                tournament_id: 'ranking_test'
+                tournament_id: 'rank_test'
             },
             {
-                username: 'bart',
+                username: 'rank_test_player_4',
                 ranking: 2,
                 total_score: '66.25',
                 scores: [
@@ -94,10 +94,10 @@ describe('Check that players are ranked correctly', function() {
                         min_val: 1
                     }
                 ],
-                tournament_id: 'ranking_test'
+                tournament_id: 'rank_test'
             },
             {
-                username: 'lisa',
+                username: 'rank_test_player_3',
                 ranking: 3,
                 total_score: '32.50',
                 scores: [
@@ -114,12 +114,12 @@ describe('Check that players are ranked correctly', function() {
                         min_val: 1
                     }
                 ],
-                tournament_id: 'ranking_test'
+                tournament_id: 'rank_test'
             }
         ])
         .expectJSON('?',
             {
-                username: 'maggie',
+                username: 'rank_test_player_5',
                 total_score: '10.00',
                 scores: [
                     {
@@ -135,12 +135,12 @@ describe('Check that players are ranked correctly', function() {
                         min_val: 1
                     }
                 ],
-                tournament_id: 'ranking_test'
+                tournament_id: 'rank_test'
             }
         )
         .expectJSON('?',
             {
-                username: 'marge',
+                username: 'rank_test_player_2',
                 total_score: '10.00',
                 scores: [
                     {
@@ -156,13 +156,13 @@ describe('Check that players are ranked correctly', function() {
                         min_val: 1
                     }
                 ],
-                tournament_id: 'ranking_test'
+                tournament_id: 'rank_test'
             }
         )
         .toss();
 
     frisby.create('Non-existent tournament')
-        .get(API + 'tournament/not_a_tournament/entry/rank')
+        .get(API + 'not_a_tournament/entry/rank')
         .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('Tournament not_a_tournament doesn\'t exist')
