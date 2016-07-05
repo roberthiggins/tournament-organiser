@@ -1,10 +1,9 @@
 describe('Test seeing and registering for a tournament', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('See a list of tournaments')
-        .get(URL + '/tournament/')
+        .get(API + 'tournament/')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes({tournaments: Array})

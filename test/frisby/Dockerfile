@@ -13,6 +13,5 @@ ENV NODE_PATH /usr/local/lib/node_modules/
 ADD src/ /opt/frisby/dao_tests
 
 CMD jasmine-node \
-    --config DAOSERVER_PORT_5000_TCP_ADDR $DAOSERVER_PORT_5000_TCP_ADDR \
-    --config DAOSERVER_PORT_5000_TCP_PORT $DAOSERVER_PORT_5000_TCP_PORT \
+    --config API_ADDR "http://${DAOSERVER_PORT_5000_TCP_ADDR}:${DAOSERVER_PORT_5000_TCP_PORT}/" \
     dao_tests

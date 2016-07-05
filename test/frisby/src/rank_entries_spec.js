@@ -1,10 +1,9 @@
 describe('Check that players are ranked correctly', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('Check that the rank_entries format is correct')
-        .get(URL + '/tournament/ranking_test/entry/rank')
+        .get(API + 'tournament/ranking_test/entry/rank')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes( '0',
@@ -29,7 +28,7 @@ describe('Check that players are ranked correctly', function() {
 
 
     frisby.create('Get rankings for a tournament')
-        .get(URL + '/tournament/ranking_test/entry/rank')
+        .get(API + 'tournament/ranking_test/entry/rank')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([
@@ -163,7 +162,7 @@ describe('Check that players are ranked correctly', function() {
         .toss();
 
     frisby.create('Non-existent tournament')
-        .get(URL + '/tournament/not_a_tournament/entry/rank')
+        .get(API + 'tournament/not_a_tournament/entry/rank')
         .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('Tournament not_a_tournament doesn\'t exist')

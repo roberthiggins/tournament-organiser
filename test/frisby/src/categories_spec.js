@@ -1,22 +1,21 @@
 describe('HTTP Method Test Suite', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('GET from non-existent tournament')
-        .get(URL + '/tournament/not_a_thing/score_categories')
+        .get(API + 'tournament/not_a_thing/score_categories')
         .expectStatus(400)
         .toss();
 
     frisby.create('GET from non-existent tournament')
-        .get(URL + '/tournament//score_categories')
+        .get(API + 'tournament//score_categories')
         .expectStatus(404)
         .toss();
 
 
     // Normal function of getting categories
     frisby.create('set the score categories for category_test')
-        .post(URL + '/tournament/category_test/score_categories', {
+        .post(API + 'tournament/category_test/score_categories', {
             categories: ['categories_0', 'categories_1'],
             categories_0: ['categories_test_one', 8, true, 4, 12],
             categories_1: ['categories_test_two', 13, false, 3, 11]
@@ -24,7 +23,7 @@ describe('HTTP Method Test Suite', function() {
         .expectStatus(200)
         .toss();
     frisby.create('GET a list of tournament categories')
-        .get(URL + '/tournament/category_test/score_categories')
+        .get(API + 'tournament/category_test/score_categories')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes('0', {
@@ -58,14 +57,14 @@ describe('HTTP Method Test Suite', function() {
 
     // Modify the categories
     frisby.create('set the score categories for category_test')
-        .post(URL + '/tournament/category_test/score_categories', {
+        .post(API + 'tournament/category_test/score_categories', {
             categories: ['categories_3'],
             categories_3: ['categories_test_three', 99, true, 1, 2]
         }, {json: true, inspectOnFailure: true})
         .expectStatus(200)
         .toss();
     frisby.create('GET a list of tournament categories')
-        .get(URL + '/tournament/category_test/score_categories')
+        .get(API + 'tournament/category_test/score_categories')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([
@@ -83,13 +82,13 @@ describe('HTTP Method Test Suite', function() {
 
     // Empty the categories
     frisby.create('set the score categories for category_test to none')
-        .post(URL + '/tournament/category_test/score_categories', {
+        .post(API + 'tournament/category_test/score_categories', {
             categories: []
         }, {json: true, inspectOnFailure: true})
         .expectStatus(200)
         .toss();
     frisby.create('GET categories from now empty tournament')
-        .get(URL + '/tournament/category_test/score_categories')
+        .get(API + 'tournament/category_test/score_categories')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([])
@@ -98,20 +97,20 @@ describe('HTTP Method Test Suite', function() {
 
     // Modify the categories incorrectly
     frisby.create('Incorrect: categories don\'t match')
-        .post(URL + '/tournament/category_test/score_categories', {
+        .post(API + 'tournament/category_test/score_categories', {
             categories: ['categories_3'],
             categories_1: ['categories_test_no_match', 5, true, 1, 2]
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create('Incorrect: No names')
-        .post(URL + '/tournament/category_test/score_categories', {
+        .post(API + 'tournament/category_test/score_categories', {
             categories_1: ['categories_test_no_names', 5, true, 1, 2]
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create('Incorrect: No category info')
-        .post(URL + '/tournament/category_test/score_categories', {
+        .post(API + 'tournament/category_test/score_categories', {
             categories: ['categories_3']
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)

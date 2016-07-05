@@ -1,10 +1,9 @@
 describe('HTTP Method Test Suite', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('GET Method')
-        .get(URL + '/')
+        .get(API)
         .expectStatus(200)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('daoserver')

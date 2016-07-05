@@ -1,15 +1,14 @@
 describe('Get the next game for an entry', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('Set ranking_test to 2 rounds')
-        .post(URL + '/tournament/ranking_test/rounds', {numRounds: 2})
+        .post(API + 'tournament/ranking_test/rounds', {numRounds: 2})
         .expectBodyContains('Rounds set: 2')
         .expectStatus(200)
         .toss()
     frisby.create('See lisa next game (none)')
-        .get(URL + '/tournament/ranking_test/entry/lisa/nextgame')
+        .get(API + 'tournament/ranking_test/entry/lisa/nextgame')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON({})
@@ -17,12 +16,12 @@ describe('Get the next game for an entry', function() {
 
 
     frisby.create('Set ranking_test to 4 rounds')
-        .post(URL + '/tournament/ranking_test/rounds', {numRounds: 4})
+        .post(API + 'tournament/ranking_test/rounds', {numRounds: 4})
         .expectBodyContains('Rounds set: 4')
         .expectStatus(200)
         .toss()
     frisby.create('See lisa next game (none)')
-        .get(URL + '/tournament/ranking_test/entry/lisa/nextgame')
+        .get(API + 'tournament/ranking_test/entry/lisa/nextgame')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes({

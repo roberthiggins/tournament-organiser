@@ -1,10 +1,9 @@
 describe('Get a list of entries from a tournament', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('Details for existing tournament')
-        .get(URL + '/tournament/ranking_test/entry/')
+        .get(API + 'tournament/ranking_test/entry/')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes('*', String)
@@ -18,14 +17,14 @@ describe('Get a list of entries from a tournament', function() {
         .toss();
 
     frisby.create('Tournament with no entries')
-        .get(URL + '/tournament/permission_test/entry/')
+        .get(API + 'tournament/permission_test/entry/')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([])
         .toss();
 
     frisby.create('Tournament that does not exist')
-        .get(URL + '/tournament/kdjflskdjflkdjflkdjf/entry/')
+        .get(API + 'tournament/kdjflskdjflkdjflkdjf/entry/')
         .expectStatus(400)
         .toss();
 });

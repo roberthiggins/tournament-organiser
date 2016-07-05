@@ -1,10 +1,9 @@
 describe('Get info about tournament entries', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('Info about an entry')
-        .get(URL + '/tournament/ranking_test/entry/lisa')
+        .get(API + 'tournament/ranking_test/entry/lisa')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes(
@@ -23,13 +22,13 @@ describe('Get info about tournament entries', function() {
         .toss();
 
     frisby.create('A non-existent user')
-        .get(URL + '/tournament/ranking_test/entry/flubber')
+        .get(API + 'tournament/ranking_test/entry/flubber')
         .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('Unknown player: flubber')
         .toss();
     frisby.create('malformed')
-        .get(URL + '/tournament/ranking_test/entry/lisa/a')
+        .get(API + 'tournament/ranking_test/entry/lisa/a')
         .expectStatus(404)
         .toss();
 });
