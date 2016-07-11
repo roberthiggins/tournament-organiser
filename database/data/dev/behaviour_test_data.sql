@@ -1,13 +1,12 @@
 -- Set up a user to be logged in
-CREATE OR REPLACE FUNCTION login_setup() RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION create_user(username varchar, superuser boolean DEFAULT FALSE) RETURNS int LANGUAGE plpgsql AS $$
 BEGIN
 
-    INSERT INTO account VALUES ('charlie_murphy', 'charlie_murphy@darkness.com');
-    INSERT INTO account_security VALUES ('charlie_murphy', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
+    INSERT INTO account VALUES (username, username || '@bar.com', superuser);
+    INSERT INTO account_security VALUES (username, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
 
     RETURN 0;
 END $$;
-SELECT login_setup();
 
 -- Create player and enter them in to a tournament
 CREATE OR REPLACE FUNCTION add_player(tourn_name varchar, tourn_id int, player_name varchar) RETURNS int LANGUAGE plpgsql AS $$
@@ -15,8 +14,7 @@ DECLARE
     entry_id int := 0;
 BEGIN
 
-    INSERT INTO account VALUES (player_name, 'foo@bar.com') ;
-    INSERT INTO account_security VALUES (player_name, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
+    PERFORM create_user(player_name);
     INSERT INTO registration VALUES(player_name, tourn_id);
     INSERT INTO entry VALUES(default, player_name, tourn_name) RETURNING id INTO entry_id;
 
@@ -70,6 +68,8 @@ INSERT INTO tournament VALUES (DEFAULT, 'empty_tournament', '2021-06-04');
 
 INSERT INTO score_category VALUES(DEFAULT, 'southcon_2095', 'some_category', DEFAULT, DEFAULT, 1, 10);
 INSERT INTO score_category VALUES(100, 'northcon_2095', 'leastnortherly', DEFAULT, DEFAULT, 1, 10);
+
+SELECT create_user('charlie_murphy');
 
 -- Set up some users
 DO $$
@@ -221,19 +221,14 @@ DECLARE
 BEGIN
 
     -- Create a superuser
-    username = 'superman';
-    INSERT INTO account VALUES (username, 'manofsteel@fortressofsolitude.com', TRUE);
-    INSERT INTO account_security VALUES (username, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
-
+    PERFORM create_user('superman', TRUE);
 
     -- Create a tournament that will be restricted
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
 
     -- Create a user with access to modify
-    username = 'lex_luthor';
-    INSERT INTO account VALUES (username, 'lex_luthor@evil_hideout.com');
-    INSERT INTO account_security VALUES (username, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
+    PERFORM create_user('lex_luthor');
 
     -- Give them permission to enter a score for it
     SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'enter_score' LIMIT 1;
@@ -241,13 +236,10 @@ BEGIN
         (SELECT id FROM protected_object_action
             WHERE description = 'enter_score' LIMIT 1)
         ) RETURNING id INTO protected_object_permission_id;
-    INSERT INTO account_protected_object_permission VALUES (username, protected_object_permission_id);
+    INSERT INTO account_protected_object_permission VALUES ('lex_luthor', protected_object_permission_id);
 
     -- Create a basic player
-    INSERT INTO account VALUES ('permission_test_player', 'permission_test_player@darkness.com');
-    INSERT INTO account_security VALUES ('permission_test_player', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
-    INSERT INTO registration VALUES('permission_test_player', tourn_id);
-    INSERT INTO entry VALUES(default, 'permission_test_player', 'permission_test');
+    PERFORM add_player(tourn_name, tourn_id, 'permission_test_player');
 
     RETURN 0;
 END $$;
