@@ -26,6 +26,7 @@ webserver:
         - "5000:8000"
     environment:
         HOST_IP: 127.0.0.1
+        DAO_CONTAINER: "DAOSERVER"
     extends:
         file: docker-passwords.yml
         service: webpasswords
