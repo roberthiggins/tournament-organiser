@@ -1,3 +1,30 @@
+-- Set up a user to be logged in
+CREATE OR REPLACE FUNCTION login_setup() RETURNS int LANGUAGE plpgsql AS $$
+BEGIN
+
+    INSERT INTO account VALUES ('charlie_murphy', 'charlie_murphy@darkness.com');
+    INSERT INTO account_security VALUES ('charlie_murphy', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
+
+    RETURN 0;
+END $$;
+SELECT login_setup();
+
+-- Create player and enter them in to a tournament
+CREATE OR REPLACE FUNCTION add_player(tourn_name varchar, tourn_id int, player_name varchar) RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    entry_id int := 0;
+BEGIN
+
+    INSERT INTO account VALUES (player_name, 'foo@bar.com') ;
+    INSERT INTO account_security VALUES (player_name, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
+    INSERT INTO registration VALUES(player_name, tourn_id);
+    INSERT INTO entry VALUES(default, player_name, tourn_name) RETURNING id INTO entry_id;
+
+    RETURN entry_id;
+END $$;
+
+
+
 INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_score');
 
 -- Set up some tournaments
@@ -14,27 +41,16 @@ DO $$
 DECLARE
     fanciness int := 0;
     protect_object_id int := 0;
-    tournie_id int := 0;
+    tourn_id int := 0;
+    tourn_name varchar := 'painting_test';
 BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'Fanciness', DEFAULT, DEFAULT, 4, 15) RETURNING id INTO fanciness;
 
-    INSERT INTO tournament VALUES (DEFAULT, 'painting_test', '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tournie_id;
-
-    INSERT INTO score_category VALUES(DEFAULT, 'painting_test', 'Fanciness', DEFAULT, DEFAULT, 4, 15) RETURNING id INTO fanciness;
-
-    INSERT INTO account VALUES ('stevemcqueen', 'foo@bar.com');
-    INSERT INTO account_security VALUES ('stevemcqueen', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
-    INSERT INTO account VALUES ('rick_james', 'foo@bar.com');
-    INSERT INTO account_security VALUES ('rick_james', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
-    INSERT INTO account VALUES ('charlie_murphy', 'charlie_murphy@darkness.com');
-    INSERT INTO account_security VALUES ('charlie_murphy', '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
-
-    -- Enter some players
-    INSERT INTO registration VALUES('stevemcqueen', tournie_id);
-
-    INSERT INTO entry VALUES(default, 'rick_james', 'painting_test');
-    INSERT INTO entry VALUES(default, 'stevemcqueen', 'painting_test');
+    PERFORM add_player(tourn_name, tourn_id, 'stevemcqueen');
+    PERFORM add_player(tourn_name, tourn_id, 'rick_james');
 
 END $$;
 
