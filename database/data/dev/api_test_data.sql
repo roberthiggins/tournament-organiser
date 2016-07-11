@@ -135,13 +135,17 @@ DECLARE
 BEGIN
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO prot_obj_id;
     INSERT INTO game VALUES(DEFAULT, round_id, table_num, prot_obj_id, True) RETURNING id INTO game_id;
-
-    INSERT INTO game_entrant VALUES(game_id, ent_1_id);
-    INSERT INTO game_entrant VALUES(game_id, ent_2_id);
-
     INSERT INTO protected_object_permission VALUES (DEFAULT, prot_obj_id, prot_act_id) RETURNING id INTO perm_id;
-    INSERT INTO account_protected_object_permission VALUES (ent_1_uname, perm_id);
-    INSERT INTO account_protected_object_permission VALUES (ent_2_uname, perm_id);
+
+    IF ent_1_id IS NOT NULL AND ent_1_uname IS NOT NULL THEN
+        INSERT INTO game_entrant VALUES(game_id, ent_1_id);
+        INSERT INTO account_protected_object_permission VALUES (ent_1_uname, perm_id);
+    END IF;
+
+    IF ent_2_id IS NOT NULL AND ent_2_uname IS NOT NULL THEN
+        INSERT INTO game_entrant VALUES(game_id, ent_2_id);
+        INSERT INTO account_protected_object_permission VALUES (ent_2_uname, perm_id);
+    END IF;
 
     RETURN game_id;
 END $$;
@@ -192,20 +196,10 @@ BEGIN
     INSERT INTO table_allocation VALUES(ent_5_id, 1, 1);
     INSERT INTO table_allocation VALUES(ent_5_id, 1, 2);
 
-
-
     -- The draw for round 1 has already been completed.
     SELECT id INTO prot_act_id FROM protected_object_action WHERE description = 'enter_score';
 
-    INSERT INTO protected_object VALUES(DEFAULT) RETURNING id INTO prot_obj_id;
-    INSERT INTO game VALUES(DEFAULT, round_1_id, 1, prot_obj_id) RETURNING id INTO game_id;
-    INSERT INTO game_entrant VALUES(game_id, ent_3_id);
-    INSERT INTO protected_object_permission VALUES (DEFAULT, prot_obj_id, prot_act_id) RETURNING id INTO perm_id;
-    INSERT INTO account_protected_object_permission VALUES (tourn_name || '_player_3', perm_id);
---    INSERT INTO score VALUES(DEFAULT, ent_3_id, cat_1, DEFAULT) RETURNING id INTO score_id;
---    INSERT INTO game_score VALUES(ent_3_id, game_id, score_id);
---    INSERT INTO score VALUES(DEFAULT, ent_3_id, cat_2, 5) RETURNING id INTO score_id;
---    INSERT INTO game_score VALUES(ent_3_id, game_id, score_id);
+    game_id := make_game(round_1_id, 1, ent_3_id, tourn_name || '_player_3', NULL, NULL,  prot_act_id);
 
     game_id := make_game(round_1_id, 2, ent_1_id, tourn_name || '_player_1', ent_5_id, tourn_name || '_player_5',  prot_act_id);
     INSERT INTO score VALUES(DEFAULT, ent_1_id, cat_1, 20) RETURNING id INTO score_id;
@@ -230,15 +224,7 @@ BEGIN
     -- The draw for round 2 has already been completed.
     SELECT id INTO prot_act_id FROM protected_object_action WHERE description = 'enter_score';
 
-    INSERT INTO protected_object VALUES(DEFAULT) RETURNING id INTO prot_obj_id;
-    INSERT INTO game VALUES(DEFAULT, round_2_id, 1, prot_obj_id, True) RETURNING id INTO game_id;
-    INSERT INTO game_entrant VALUES(game_id, ent_2_id);
-    INSERT INTO protected_object_permission VALUES(DEFAULT, prot_obj_id, prot_act_id) RETURNING id INTO perm_id;
-    INSERT INTO account_protected_object_permission VALUES(tourn_name || '_player_2', perm_id);
---    INSERT INTO score VALUES(DEFAULT, ent_2_id, cat_1, DEFAULT) RETURNING id INTO score_id;
---    INSERT INTO game_score VALUES(ent_2_id, game_id, score_id);
---    INSERT INTO score VALUES(DEFAULT, ent_2_id, cat_2, 5) RETURNING id INTO score_id;
---    INSERT INTO game_score VALUES(ent_2_id, game_id, score_id);
+    game_id := make_game(round_2_id, 1, ent_2_id, tourn_name || '_player_2', NULL, NULL,  prot_act_id);
 
     game_id := make_game(round_2_id, 2, ent_5_id, tourn_name || '_player_5', ent_4_id, tourn_name || '_player_4',  prot_act_id);
      --INSERT INTO score VALUES(DEFAULT, ent_5_id, cat_1, 15) RETURNING id INTO score_id;
