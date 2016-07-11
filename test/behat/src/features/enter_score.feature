@@ -13,11 +13,11 @@ Feature: Enter a score for a player
         When I press "Login"
 
     Scenario: Logged in
-        Given I am on "/enterscore/ranking_test/bart"
+        Given I am on "/enterscore/ranking_test/ranking_test_player_4"
 
     Scenario: Logged out
         Given I am on "/logout"
-        Given I am on "/enterscore/ranking_test/bart"
+        Given I am on "/enterscore/ranking_test/ranking_test_player_4"
         Then I should be on "/login"
 
     Scenario: No permissions
@@ -34,9 +34,9 @@ Feature: Enter a score for a player
         Then I should see "Permission denied"
 
     Scenario: A player not in the tournament
-        Given I am on "/enterscore/painting_test/lisa"
+        Given I am on "/enterscore/painting_test/ranking_test_player_3"
         Then the response status code should be 404
-        Then I should see "Entry for lisa in tournament painting_test not found"
+        Then I should see "Entry for ranking_test_player_3 in tournament painting_test not found"
 
     Scenario Outline: I only know the tournament and username
         Given I am on "/enterscore/<tournament>/<username>"

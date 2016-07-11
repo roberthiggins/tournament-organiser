@@ -15,11 +15,11 @@ Feature: List Entries for a tournament
         Then I am on "/ranking_test/entries"
         Then the response status code should be 200
         Then I should see "Entries:"
-        Then I should see "homer"
-        Then I should see "marge"
-        Then I should see "lisa"
-        Then I should see "bart"
-        Then I should see "maggie"
+        Then I should see "ranking_test_player_1"
+        Then I should see "ranking_test_player_2"
+        Then I should see "ranking_test_player_3"
+        Then I should see "ranking_test_player_4"
+        Then I should see "ranking_test_player_5"
 
     Scenario: A tournament with no entries
         Given I am on "/empty_tournament/entries"
@@ -33,11 +33,11 @@ Feature: List Entries for a tournament
         Then I am on "/ranking_test/entries"
         Then the response status code should be 200
         Then I should see "Entries:"
-        Then I should see "homer"
-        Then I should see "marge"
-        Then I should see "lisa"
-        Then I should see "bart"
-        Then I should see "maggie"
+        Then I should see "ranking_test_player_1"
+        Then I should see "ranking_test_player_2"
+        Then I should see "ranking_test_player_3"
+        Then I should see "ranking_test_player_4"
+        Then I should see "ranking_test_player_5"
 
     Scenario: A logged-out user
         Given I am on "/logout"
