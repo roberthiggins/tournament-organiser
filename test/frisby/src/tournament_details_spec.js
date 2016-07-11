@@ -1,10 +1,9 @@
 describe('Getting tournament information', function() {
     var frisby = require('frisby');
-    var URL = 'http://' + process.env['DAOSERVER_PORT_5000_TCP_ADDR'] + ':'
-        + process.env['DAOSERVER_PORT_5000_TCP_PORT'];
+    var API = process.env['API_ADDR']
 
     frisby.create('Details for existing tournament')
-        .get(URL + '/tournament/northcon_2095')
+        .get(API + 'tournament/northcon_2095')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON({
@@ -15,7 +14,7 @@ describe('Getting tournament information', function() {
         .toss();
 
     frisby.create('Non-existent tournament')
-        .get(URL + '/tournament/not_a_tournament')
+        .get(API + 'tournament/not_a_tournament')
         .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('Tournament not_a_tournament not found in database')

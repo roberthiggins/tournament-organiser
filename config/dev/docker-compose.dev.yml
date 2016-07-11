@@ -1,10 +1,4 @@
 database:
-    volumes:
-        - "./database/setup/:/docker-entrypoint-initdb.d"
-    environment:
-        POSTGRES_USER: docker
-        DATABASE_PASSWORD: FuEm7l003bfd6zM
-        POSTGRES_DB: to-db
     extends:
         file: docker-compose.base.yml
         service: database
@@ -12,54 +6,81 @@ database:
 daoserver:
     links:
         - database
-    environment:
-        POSTGRES_USER: docker
-        DATABASE_PASSWORD: FuEm7l003bfd6zM
-        POSTGRES_DB: to-db
     extends:
         file: docker-compose.base.yml
         service: daoserver
-
-unittest:
-    links:
-        - database
-    environment:
-        POSTGRES_USER: docker
-        DATABASE_PASSWORD: FuEm7l003bfd6zM
-        POSTGRES_DB: to-db
-    extends:
-        file: docker-compose.base.yml
-        service: unittest
-
-apitest:
-    build: test/frisby
-    container_name: frisby
-    links:
-        - daoserver
 
 webserver:
     links:
         - daoserver
     environment:
         DEBUG: "True"
-        HOST_IP: 127.0.0.1
-        SECRET_KEY: =a)f4_+^*7%0z#a*do-20dbg%a8=czyfqjndi65z%fqva-vqxm
         TEMPLATE_DEBUG: "True"
-        ROOT_PASSWORD: root
     extends:
         file: docker-compose.base.yml
         service: webserver
 
+# Unit Test Specific
+unittest:
+    links:
+        - database
+    extends:
+        file: docker-compose.base.yml
+        service: unittest
+
+# API Test Specific
+apitestdb:
+    extends:
+        file: docker-compose.base.yml
+        service: apitestdb
+
+apitestdaoserver:
+    links:
+        - apitestdb
+    extends:
+        file: docker-compose.base.yml
+        service: apitestdaoserver
+
+apitest:
+    links:
+        - apitestdaoserver
+    extends:
+        file: docker-compose.base.yml
+        service: apitest
+
+# System Test Specific
+systemtestdb:
+    extends:
+        file: docker-compose.base.yml
+        service: systemtestdb
+
+systemtestdaoserver:
+    links:
+        - systemtestdb
+    extends:
+        file: docker-compose.base.yml
+        service: systemtestdaoserver
+
+systemtestwebserver:
+    extends:
+        file: docker-compose.base.yml
+        service: systemtestwebserver
+    environment:
+        DEBUG: "True"
+        TEMPLATE_DEBUG: "True"
+    links:
+        - systemtestdaoserver
+
 systemtest:
-    build: test/behat
-    container_name: behat
+    extends:
+        file: docker-compose.base.yml
+        service: systemtest
     links:
         - selenium
-        - daoserver
-        - webserver
+        - systemtestdaoserver
+        - systemtestwebserver
 
 selenium:
-    image: selenium/standalone-firefox
-    container_name: selenium
-    ports:
-        - "4444:4444"
+    extends:
+        file: docker-compose.base.yml
+        service: selenium

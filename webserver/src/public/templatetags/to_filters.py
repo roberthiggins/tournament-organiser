@@ -12,4 +12,3 @@ def get_item(dictionary, key):
             {{ mydict|get_item:item.NAME }}
     """
     return dictionary.get(key)
-

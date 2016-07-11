@@ -2,26 +2,17 @@
 Users for the site. Note this is separate from an entry in a tournament.
 """
 
-import jsonpickle
+from flask import Blueprint
 
-from flask import Blueprint, make_response, Response
-
-from controllers.request_variables import enforce_request_variables
+from controllers.request_helpers import enforce_request_variables, \
+json_response, text_response
 from models.authentication import check_auth
 from models.dao.account import Account, add_account
 
 USER = Blueprint('USER', __name__)
 
-@USER.errorhandler(ValueError)
-def input_error(err):
-    """Input errors"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 400)
-
 @USER.route('/login', methods=['POST'])
+@text_response
 @enforce_request_variables('inputUsername', 'inputPassword')
 def login():
     """
@@ -31,10 +22,8 @@ def login():
         - inputPassword
     """
     # pylint: disable=E0602
-    return make_response(
-        "Login successful" if check_auth(inputUsername, inputPassword) \
-        else "Login unsuccessful",
-        200)
+    return "Login successful" if check_auth(inputUsername, inputPassword) \
+        else "Login unsuccessful"
 
 def validate_user_email(email):
     """
@@ -50,6 +39,7 @@ def validate_user_email(email):
 
 # pylint: disable=undefined-variable
 @USER.route('', methods=['POST'])
+@text_response
 @enforce_request_variables('username', 'email', 'password1', 'password2')
 def create():
     """
@@ -61,22 +51,23 @@ def create():
         - password2
     """
     if not validate_user_email(email):
-        return make_response("This email does not appear valid", 400)
+        raise ValueError('This email does not appear valid')
 
     if password1 != password2:
-        return make_response("Please enter two matching passwords", 400)
+        raise ValueError('Please enter two matching passwords')
 
     if Account.username_exists(username):
-        return make_response("A user with the username {} already exists! \
-            Please choose another name".format(username), 400)
+        raise ValueError('A user with the username {} already exists! \
+            Please choose another name'.format(username))
 
     add_account(username, email, password1)
 
-    return make_response('<p>Account created! You submitted the following \
+    return '<p>Account created! You submitted the following \
         fields:</p><ul><li>User Name: {}</li><li>Email: {}\
-        </li></ul>'.format(username, email), 200)
+        </li></ul>'.format(username, email)
 
 @USER.route('/<u_name>', methods=['GET'])
+@json_response
 def user_details(u_name=None):
     """
     GET to get account details in url form
@@ -87,6 +78,4 @@ def user_details(u_name=None):
     if user is None:
         raise ValueError('Cannot find user {}'.format(u_name))
 
-    return Response(
-        jsonpickle.encode({u_name: user.contact_email}, unpicklable=False),
-        mimetype='application/json')
+    return {u_name: user.contact_email}

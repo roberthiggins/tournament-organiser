@@ -5,40 +5,17 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
-from decimal import Decimal as Dec
 from functools import wraps
-import jsonpickle
 
-from flask import Blueprint, request, make_response, Response
+from flask import Blueprint, request
 
-from controllers.request_variables import enforce_request_variables
+from controllers.request_helpers import enforce_request_variables, text_response
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
 from models.tournament import Tournament
 
 APP = Blueprint('APP', __name__, url_prefix='')
-
-@APP.errorhandler(IndexError)
-@APP.errorhandler(TypeError)
-@APP.errorhandler(RuntimeError)
-@APP.errorhandler(ValueError)
-def input_error(err):
-    """Input errors"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 400)
-
-@APP.errorhandler(Exception)
-def unknown_error(err):
-    """All other exceptions are essentially just raised with logging"""
-    print type(err).__name__
-    print err
-    import traceback
-    traceback.print_exc()
-    return make_response(str(err), 500)
 
 # pylint: disable=E0602
 def requires_permission(action, error_msg):
@@ -65,12 +42,14 @@ def requires_permission(action, error_msg):
     return decorator
 
 @APP.route("/")
+@text_response
 def main():
     """Index page. Used to verify the server is running."""
-    return make_response('daoserver', 200)
+    return 'daoserver'
 
 # Page actions
 @APP.route('/entertournamentscore', methods=['POST'])
+@text_response
 @enforce_request_variables('username', 'tournament', 'key', 'value')
 @requires_permission(
     PERMISSIONS.get('ENTER_SCORE'),
@@ -99,94 +78,4 @@ def enter_tournament_score():
 
     # pylint: disable=E0602
     tourn.enter_score(entry_id, key, value)
-    return make_response(
-        'Score entered for {}: {}'.format(username, value),
-        200)
-
-def get_entry_id(tournament_id, username):
-    """Get entry info from tournament and username"""
-    if not Account.username_exists(username):
-        raise ValueError('Unknown player: {}'.format(username))
-
-    try:
-        # pylint: disable=no-member
-        return TournamentEntry.query.\
-            filter_by(tournament_id=tournament_id, player_id=username).\
-            first().id
-    except AttributeError:
-        raise ValueError('Entry for {} in tournament {} not found'.\
-            format(username, tournament_id))
-
-@APP.route('/entryId/<tournament_id>/<username>', methods=['GET'])
-def get_entry_id_from_tournament(tournament_id, username):
-    """Get entry info from tournament and username"""
-    return jsonpickle.encode(get_entry_id(tournament_id, username),
-                             unpicklable=False)
-
-@APP.route('/entryInfo/<entry_id>', methods=['GET'])
-def entry_info_from_id(entry_id):
-    """ Given entry_id, get info about player and tournament"""
-
-    try:
-        entry_id = int(entry_id)
-    except ValueError:
-        raise ValueError('Entry ID must be an integer')
-
-    try:
-        # pylint: disable=no-member
-        entry = TournamentEntry.query.filter_by(id=entry_id).first()
-
-        return Response(
-            jsonpickle.encode(
-                {
-                    'entry_id': entry.id,
-                    'username': entry.account.username,
-                    'tournament_name': entry.tournament.name,
-                }, unpicklable=False),
-            mimetype='application/json')
-    except AttributeError:
-        raise ValueError('Entry ID not valid: {}'.format(entry_id))
-
-@APP.route('/entryInfo/<tournament_id>/<username>', methods=['GET'])
-def entry_info_from_tournament(tournament_id, username):
-    """ Given entry_id, get info about player and tournament"""
-    return entry_info_from_id(get_entry_id(tournament_id, username))
-
-@APP.route('/rankEntries/<tournament_id>', methods=['GET'])
-def rank_entries(tournament_id):
-    """
-    Rank all the entries in a tournament based on the scoring criteria for the
-    tournament.
-    The structure of the returned JSON blob will be as follows:
-    [
-        {
-            'username': 'homer',
-            'entry_id': 1,
-            'tournament_id': 'some_tournie',
-            'scores': {'round_1': 10, 'round_2': 4 },
-            'total_score': 23.50, # always 2dp
-            'ranking': 3
-        },
-    ]
-    """
-    tourn = Tournament(tournament_id)
-    if not tourn.exists_in_db:
-        return make_response(
-            'Tournament {} doesn\'t exist'.format(tournament_id), 404)
-
-    # pylint: disable=line-too-long
-    return Response(
-        jsonpickle.encode(
-            [
-                {
-                    'username' : x.player_id,
-                    'entry_id' : x.id,
-                    'tournament_id' : tourn.tournament_id,
-                    'scores' : x.score_info,
-                    'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
-                    'ranking': x.ranking
-                } for x in \
-                tourn.ranking_strategy.overall_ranking(tourn.entries())
-            ],
-            unpicklable=False),
-        mimetype='application/json')
+    return 'Score entered for {}: {}'.format(username, value)

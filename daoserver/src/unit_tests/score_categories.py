@@ -6,7 +6,6 @@ from flask_testing import TestCase
 from testfixtures import compare
 
 from app import create_app
-from controllers.db_connection import db_conn
 from models.dao.db_connection import db
 from models.dao.score import ScoreCategory
 
@@ -40,7 +39,6 @@ class ScoreCategoryTests(TestCase):
         self.injector.delete()
         db.session.remove()
 
-    @db_conn()
     def test_categories_created(self):
         # Enter a cat
         self.tournament.set_score_categories([self.cat_1])
@@ -67,7 +65,6 @@ class ScoreCategoryTests(TestCase):
         compare(c_3.min_val, self.cat_3.min_val)
         compare(c_3.max_val, self.cat_3.max_val)
 
-    @db_conn()
     def test_old_categories_deleted(self):
         self.tournament.set_score_categories([self.cat_1])
         self.tournament.set_score_categories([self.cat_2, self.cat_3])
@@ -78,7 +75,6 @@ class ScoreCategoryTests(TestCase):
         self.assertTrue(c_1 is None)
 
     # pylint: disable=unused-variable
-    @db_conn()
     def test_broken_categories(self):
         # ScoreCategoryPair should perform input validation only
         neg_min = ScoreCategoryPair('categories_painting', 10, False, -1, 20)

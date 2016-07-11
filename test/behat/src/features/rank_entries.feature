@@ -20,8 +20,11 @@ Feature: Rank Entries Based on Scores
     Scenario: I get rankings when scores have been entered
         Given I am on "/rankings/ranking_test"
         Then the response status code should be 200
-        Then I should see "homer"
-        Then I should see "marge"
+        Then I should see "ranking_test_player_1"
+        Then I should see "ranking_test_player_2"
+        Then I should see "ranking_test_player_3"
+        Then I should see "ranking_test_player_4"
+        Then I should see "ranking_test_player_5"
         Then I should see "84.75"
         Then I should see "10.00"
 

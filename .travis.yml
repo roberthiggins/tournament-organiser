@@ -13,15 +13,29 @@ install:
     - pip install pylint
 
     - cp config/dev/docker-compose.dev.yml ./docker-compose.yml
+    - cp config/dev/docker-passwords.dev.yml ./docker-passwords.yml
     - docker-compose build
     - docker-compose up -d database daoserver webserver
+    - docker-compose up -d apitestdb apitestdaoserver
+    - docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver
     - docker inspect daoserver
+    - docker inspect apitestdaoserver
+    - docker inspect systemtestdaoserver
 script:
 
     - docker-compose run unittest
-    - docker cp database/data/dev/behaviour_test_data.sql database:.
-    - docker exec -it database bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
+
+
+    - docker cp database/data/dev/basic_functions.sql apitestdb:.
+    - docker exec -it apitestdb bash -c 'psql --file=basic_functions.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
+    - docker cp database/data/dev/api_test_data.sql apitestdb:.
+    - docker exec -it apitestdb bash -c 'psql --file=api_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
     - docker-compose run apitest
+
+    - docker cp database/data/dev/basic_functions.sql systemtestdb:.
+    - docker exec -it systemtestdb bash -c 'psql --file=basic_functions.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
+    - docker cp database/data/dev/behaviour_test_data.sql systemtestdb:.
+    - docker exec -it systemtestdb bash -c 'psql --file=behaviour_test_data.sql -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
     - docker-compose run systemtest
 
 

@@ -41,38 +41,24 @@ def create_tournament(request):
 
 @login_required
 def enter_score(request, tournament_id, username):      # pylint: disable=W0613
-    """Enter score page when the entry_id isn't known"""
-    try:
-        response = from_dao('/entryId/{}/{}'.format(tournament_id, username))
-        entry_id = json.loads(response.content)
-        return HttpResponseRedirect('/enterscore/{}'.format(entry_id))
-    except ValueError:
+    """Enter score for entry"""
+
+    # Score can only be entered for entries that exist
+    response = from_dao('/tournament/{}/entry/{}'.\
+        format(tournament_id, username))
+    if response.status_code != 200:
         return HttpResponseNotFound(response.content)
 
-@login_required
-def enter_score_by_entry(request, entry_id):
-    """Enter score page"""
-    try:
-        entry_id = int(entry_id)
-    except ValueError:
-        return HttpResponseNotFound()
 
-    response = from_dao('/entryInfo/{}'.format(entry_id))
-    if response.status_code != 200:
-        return HttpResponse(response, status=response.status_code)
-
-    user_info = json.loads(response.content)
-    form = EnterScoreForm(
-        username=user_info['username'],
-        tournament=user_info['tournament_name'])
+    form = EnterScoreForm(username=username, tournament=tournament_id)
 
     if request.method == 'POST':
         form = EnterScoreForm(
             data=request.POST,
-            username=user_info['username'],
-            tournament=user_info['tournament_name'])
+            username=username,
+            tournament=tournament_id)
 
-        if form.is_valid():                             # pylint: disable=no-member
+        if form.is_valid():                     # pylint: disable=no-member
             response = from_dao('/entertournamentscore', form, request)
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -81,7 +67,7 @@ def enter_score_by_entry(request, entry_id):
 
     return render_to_response(
         'enter-score.html',
-        {'form': form, 'username': user_info['username']},
+        {'form': form, 'username': username},
         RequestContext(request)
     )
 

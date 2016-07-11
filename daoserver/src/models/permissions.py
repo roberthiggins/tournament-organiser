@@ -5,12 +5,12 @@ Module to handle permissions for accounts trying to modify a tournament.
 
 from sqlalchemy.sql.expression import and_
 
-from controllers.db_connection import db_conn
 from models.dao.db_connection import db
 from models.dao.account import Account
 from models.dao.permissions import AccountProtectedObjectPermission, \
-ProtObjAction, ProtObjPerm
+ProtObjAction, ProtObjPerm, ProtectedObject
 from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament import Tournament
 
 PERMISSIONS = {
     'ENTER_SCORE': 'enter_score',
@@ -120,11 +120,11 @@ class PermissionsChecker(object):
 
         db.session.commit()
 
-    @db_conn()
     def is_organiser(self, user, tournament):
         """user is an organiser of tournament"""
-        cur.execute(
-            "SELECT count(*) > 0 FROM tournament_organiser_permissions \
-            WHERE tournament_name = %s AND username = %s",
-            [tournament, user])
-        return cur.fetchone()[0]
+        return Tournament.query.join(ProtectedObject).join(ProtObjPerm).\
+            join(AccountProtectedObjectPermission).\
+            filter(and_(
+                Tournament.name == tournament,
+                AccountProtectedObjectPermission.account_username == user
+            )).count() > 0

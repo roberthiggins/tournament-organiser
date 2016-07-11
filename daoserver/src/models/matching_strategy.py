@@ -13,6 +13,8 @@ class RoundRobin(object):
     following entry, etc.
     """
 
+    DRAW_FOR_ALL_ROUNDS = True
+
     def match(self, round_to_draw, entry_list):
         """
         Match the entrants into pairs.

@@ -292,6 +292,7 @@ class Tournament(object):
     @must_exist_in_db
     def make_draw(self, round_id=1):
         """Determines the draw for round. This draw is written to the db"""
+
         rnd = self.get_round(round_id)
         match_ups = self.matching_strategy.match(rnd.ordering, self.entries())
         draw = self.table_strategy.determine_tables(match_ups)
@@ -368,6 +369,11 @@ class Tournament(object):
         for rnd in range(existing_rnds + 1, tourn.num_rounds + 1):
             db.session.add(TR(self.tournament_id, rnd))
         db.session.commit()
+
+        # If we can we determine all rounds
+        if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
+            for rnd in self.get_dao().rounds:
+                self.make_draw(rnd.ordering)
 
 # pylint: disable=too-many-arguments
 class ScoreCategoryPair(object):

@@ -1,21 +1,107 @@
 database:
     image: postgres:9.3
     container_name: database
+    volumes:
+        - "./database/setup/:/docker-entrypoint-initdb.d"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
 
 daoserver:
     build: daoserver
     container_name: daoserver
+    environment:
+        DB_CONTAINER: "DATABASE"
     ports:
         - "5001:5000"
     command: bash /webapp/wait-for-postgres.sh database python -u app.py
-
-unittest:
-    build: daoserver
-    container_name: unittest
-    command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
 
 webserver:
     build: webserver
     container_name: webserver
     ports:
         - "5000:8000"
+    environment:
+        HOST_IP: 127.0.0.1
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords
+
+# Unit Test Specific
+
+unittest:
+    build: daoserver
+    container_name: unittest
+    environment:
+        DB_CONTAINER: "DATABASE"
+    command: bash /webapp/wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+# API Test Specific
+apitestdb:
+    container_name: apitestdb
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+apitestdaoserver:
+    build: daoserver
+    container_name: apitestdaoserver
+    environment:
+        DB_CONTAINER: "APITESTDB"
+    command: bash /webapp/wait-for-postgres.sh apitestdb python -u app.py
+    ports:
+        - "5002:5000"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+apitest:
+    build: test/frisby
+    container_name: frisby
+
+# System Test Specific
+systemtestdb:
+    container_name: systemtestdb
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+systemtestdaoserver:
+    build: daoserver
+    container_name: systemtestdaoserver
+    environment:
+        DB_CONTAINER: "SYSTEMTESTDB"
+    command: bash /webapp/wait-for-postgres.sh systemtestdb python -u app.py
+    ports:
+        - "5003:5000"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+systemtestwebserver:
+    build: webserver
+    container_name: systemtestwebserver
+    ports:
+        - "5004:8000"
+    environment:
+        HOST_IP: 127.0.0.1
+        DAO_CONTAINER: "SYSTEMTESTDAOSERVER"
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords
+
+systemtest:
+    build: test/behat
+    container_name: behat
+
+selenium:
+    image: selenium/standalone-firefox
+    container_name: selenium
+    ports:
+        - "4444:4444"

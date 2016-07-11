@@ -82,4 +82,3 @@ class DrawStrategyTests(TestCase):
         compare(draw[1][1].player_id, 'dst_player_4')
         compare(draw[2][0].player_id, 'dst_player_3')
         compare(draw[2][1], 'BYE')
-

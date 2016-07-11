@@ -7,7 +7,6 @@ from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from app import create_app
-from controllers.db_connection import db_conn
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.score import ScoreCategory, TournamentScore, GameScore, Score
@@ -79,7 +78,6 @@ class TestScoreEntered(TestCase):
         self.assertTrue(game is None)
 
 
-    @db_conn()
     def test_no_scores(self):
         """
         There should be an error when you check a game before score categories \
@@ -95,7 +93,6 @@ class TestScoreEntered(TestCase):
             game)
 
 
-    @db_conn()
     def test_score_entered(self):
         tourn = Tournament(self.tournament_1)
 
@@ -136,8 +133,11 @@ class TestScoreEntered(TestCase):
 
         # Ensure the rd2 game entry_4 vs. entry_5 is listed as not scored. This
         # will force a full check. entry_5's score hasn't been entered.
-        cur.execute("UPDATE game SET score_entered = False WHERE id = {}".\
-            format(entry_4_id))
+        game = self.get_game_by_round(entry_4_id, 2)
+        game.score_entered = False
+        db.session.add(game)
+        db.session.flush()
+
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
         tourn.enter_score(entry_4_id, category_1.display_name, 4, game.id)
