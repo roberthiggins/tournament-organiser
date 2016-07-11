@@ -2,8 +2,8 @@
 Basic decorator for enforcing request elements
 """
 
-from flask import Response, request
 from functools import wraps
+from flask import Response, request
 import jsonpickle
 
 def enforce_request_variables(*vars_to_enforce):
