@@ -191,4 +191,3 @@ def tournament_rankings(request, tournament_id):
             )
     except ValueError:
         return HttpResponseNotFound()
-
