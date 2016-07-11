@@ -150,6 +150,17 @@ BEGIN
     RETURN game_id;
 END $$;
 
+-- Enter score for player
+CREATE OR REPLACE FUNCTION enter_score(game_id int, ent_id int, category int, score int) RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    score_id int := 0;
+BEGIN
+    INSERT INTO score VALUES(DEFAULT, ent_id, category, score) RETURNING id INTO score_id;
+    INSERT INTO game_score VALUES(ent_id, game_id, score_id);
+
+    RETURN 0;
+END $$;
+
 
 -- Make a partially complete tournament
 CREATE OR REPLACE FUNCTION half_tournament_test_setup(tourn_name varchar, tourn_date date) RETURNS int LANGUAGE plpgsql AS $$
@@ -168,7 +179,6 @@ DECLARE
     ent_3_id int := 0;
     ent_4_id int := 0;
     ent_5_id int := 0;
-    score_id int := 0;
 BEGIN
 
     INSERT INTO protected_object VALUES(DEFAULT)                                               RETURNING id INTO prot_obj_id;
@@ -202,24 +212,16 @@ BEGIN
     game_id := make_game(round_1_id, 1, ent_3_id, tourn_name || '_player_3', NULL, NULL,  prot_act_id);
 
     game_id := make_game(round_1_id, 2, ent_1_id, tourn_name || '_player_1', ent_5_id, tourn_name || '_player_5',  prot_act_id);
-    INSERT INTO score VALUES(DEFAULT, ent_1_id, cat_1, 20) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_1_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_1_id, cat_2, 1) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_1_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_5_id, cat_1, 0) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_5_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_5_id, cat_2, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_5_id, game_id, score_id);
+    PERFORM enter_score(game_id, ent_1_id, cat_1, 20);
+    PERFORM enter_score(game_id, ent_1_id, cat_2, 1);
+    PERFORM enter_score(game_id, ent_5_id, cat_1, 0);
+    PERFORM enter_score(game_id, ent_5_id, cat_2, 5);
 
     game_id := make_game(round_1_id, 3, ent_2_id, tourn_name || '_player_2', ent_4_id, tourn_name || '_player_4',  prot_act_id);
-    INSERT INTO score VALUES(DEFAULT, ent_2_id, cat_1, 0) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_2_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_2_id, cat_2, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_2_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_4_id, cat_1, 20) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_4_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_4_id, cat_2, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_4_id, game_id, score_id);
+    PERFORM enter_score(game_id, ent_2_id, cat_1, 0);
+    PERFORM enter_score(game_id, ent_2_id, cat_2, 5);
+    PERFORM enter_score(game_id, ent_4_id, cat_1, 20);
+    PERFORM enter_score(game_id, ent_4_id, cat_2, 5);
 
     -- The draw for round 2 has already been completed.
     SELECT id INTO prot_act_id FROM protected_object_action WHERE description = 'enter_score';
@@ -227,25 +229,16 @@ BEGIN
     game_id := make_game(round_2_id, 1, ent_2_id, tourn_name || '_player_2', NULL, NULL,  prot_act_id);
 
     game_id := make_game(round_2_id, 2, ent_5_id, tourn_name || '_player_5', ent_4_id, tourn_name || '_player_4',  prot_act_id);
-     --INSERT INTO score VALUES(DEFAULT, ent_5_id, cat_1, 15) RETURNING id INTO score_id;
-     --INSERT INTO game_score VALUES(ent_5_id, game_id, score_id);
-     --INSERT INTO score VALUES(DEFAULT, ent_5_id, cat_2, 5) RETURNING id INTO score_id;
-     --INSERT INTO game_score VALUES(ent_5_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_4_id, cat_1, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_4_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_4_id, cat_2, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_4_id, game_id, score_id);
+    PERFORM enter_score(game_id, ent_4_id, cat_1, 5);
+    PERFORM enter_score(game_id, ent_4_id, cat_2, 5);
+--    PERFORM enter_score(game_id, ent_5_id, cat_1, 15);
+--    PERFORM enter_score(game_id, ent_5_id, cat_2, 5);
 
     game_id := make_game(round_2_id, 3, ent_1_id, tourn_name || '_player_1', ent_3_id, tourn_name || '_player_3',  prot_act_id);
-    INSERT INTO score VALUES(DEFAULT, ent_1_id, cat_1, 15) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_1_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_1_id, cat_2, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_1_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_3_id, cat_1, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_3_id, game_id, score_id);
-    INSERT INTO score VALUES(DEFAULT, ent_3_id, cat_2, 5) RETURNING id INTO score_id;
-    INSERT INTO game_score VALUES(ent_3_id, game_id, score_id);
-
+    PERFORM enter_score(game_id, ent_1_id, cat_1, 15);
+    PERFORM enter_score(game_id, ent_1_id, cat_2, 5);
+    PERFORM enter_score(game_id, ent_3_id, cat_1, 5);
+    PERFORM enter_score(game_id, ent_3_id, cat_2, 5);
 
     RETURN 0;
 END $$;
