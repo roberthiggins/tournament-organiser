@@ -175,10 +175,15 @@ DECLARE
     round_2_id int := 0;
     tourn_id int := 0;
     ent_1_id int := 0;
+    ent_1_name varchar := tourn_name || '_player_1';
     ent_2_id int := 0;
+    ent_2_name varchar := tourn_name || '_player_2';
     ent_3_id int := 0;
+    ent_3_name varchar := tourn_name || '_player_3';
     ent_4_id int := 0;
+    ent_4_name varchar := tourn_name || '_player_4';
     ent_5_id int := 0;
+    ent_5_name varchar := tourn_name || '_player_5';
 BEGIN
 
     INSERT INTO protected_object VALUES(DEFAULT)                                               RETURNING id INTO prot_obj_id;
@@ -188,36 +193,36 @@ BEGIN
     INSERT INTO score_category   VALUES(DEFAULT, tourn_name, 'Battle', 90, DEFAULT, 0, 20)     RETURNING id INTO cat_1;
     INSERT INTO score_category   VALUES(DEFAULT, tourn_name, 'Fair Play', 10, DEFAULT, 1, 5)   RETURNING id INTO cat_2;
 
-    ent_1_id := add_player(tourn_name, tourn_id, tourn_name || '_player_1');
+    ent_1_id := add_player(tourn_name, tourn_id, ent_1_name);
     INSERT INTO table_allocation VALUES(ent_1_id, 1, 1);
     INSERT INTO table_allocation VALUES(ent_1_id, 2, 2);
 
-    ent_2_id := add_player(tourn_name, tourn_id, tourn_name || '_player_2');
+    ent_2_id := add_player(tourn_name, tourn_id, ent_2_name);
     INSERT INTO table_allocation VALUES(ent_2_id, 2, 1);
 
-    ent_3_id := add_player(tourn_name, tourn_id, tourn_name || '_player_3');
+    ent_3_id := add_player(tourn_name, tourn_id, ent_3_name);
     INSERT INTO table_allocation VALUES(ent_3_id, 2, 2);
 
-    ent_4_id := add_player(tourn_name, tourn_id, tourn_name || '_player_4');
+    ent_4_id := add_player(tourn_name, tourn_id, ent_4_name);
     INSERT INTO table_allocation VALUES(ent_4_id, 2, 1);
     INSERT INTO table_allocation VALUES(ent_4_id, 1, 2);
 
-    ent_5_id := add_player(tourn_name, tourn_id, tourn_name || '_player_5');
+    ent_5_id := add_player(tourn_name, tourn_id, ent_5_name);
     INSERT INTO table_allocation VALUES(ent_5_id, 1, 1);
     INSERT INTO table_allocation VALUES(ent_5_id, 1, 2);
 
     -- The draw for round 1 has already been completed.
     SELECT id INTO prot_act_id FROM protected_object_action WHERE description = 'enter_score';
 
-    game_id := make_game(round_1_id, 1, ent_3_id, tourn_name || '_player_3', NULL, NULL,  prot_act_id);
+    game_id := make_game(round_1_id, 1, ent_3_id, ent_3_name, NULL, NULL,  prot_act_id);
 
-    game_id := make_game(round_1_id, 2, ent_1_id, tourn_name || '_player_1', ent_5_id, tourn_name || '_player_5',  prot_act_id);
+    game_id := make_game(round_1_id, 2, ent_1_id, ent_1_name, ent_5_id, ent_5_name,  prot_act_id);
     PERFORM enter_score(game_id, ent_1_id, cat_1, 20);
     PERFORM enter_score(game_id, ent_1_id, cat_2, 1);
     PERFORM enter_score(game_id, ent_5_id, cat_1, 0);
     PERFORM enter_score(game_id, ent_5_id, cat_2, 5);
 
-    game_id := make_game(round_1_id, 3, ent_2_id, tourn_name || '_player_2', ent_4_id, tourn_name || '_player_4',  prot_act_id);
+    game_id := make_game(round_1_id, 3, ent_2_id, ent_2_name, ent_4_id, ent_4_name,  prot_act_id);
     PERFORM enter_score(game_id, ent_2_id, cat_1, 0);
     PERFORM enter_score(game_id, ent_2_id, cat_2, 5);
     PERFORM enter_score(game_id, ent_4_id, cat_1, 20);
@@ -226,15 +231,15 @@ BEGIN
     -- The draw for round 2 has already been completed.
     SELECT id INTO prot_act_id FROM protected_object_action WHERE description = 'enter_score';
 
-    game_id := make_game(round_2_id, 1, ent_2_id, tourn_name || '_player_2', NULL, NULL,  prot_act_id);
+    game_id := make_game(round_2_id, 1, ent_2_id, ent_2_name, NULL, NULL,  prot_act_id);
 
-    game_id := make_game(round_2_id, 2, ent_5_id, tourn_name || '_player_5', ent_4_id, tourn_name || '_player_4',  prot_act_id);
+    game_id := make_game(round_2_id, 2, ent_5_id, ent_5_name, ent_4_id, ent_4_name,  prot_act_id);
     PERFORM enter_score(game_id, ent_4_id, cat_1, 5);
     PERFORM enter_score(game_id, ent_4_id, cat_2, 5);
 --    PERFORM enter_score(game_id, ent_5_id, cat_1, 15);
 --    PERFORM enter_score(game_id, ent_5_id, cat_2, 5);
 
-    game_id := make_game(round_2_id, 3, ent_1_id, tourn_name || '_player_1', ent_3_id, tourn_name || '_player_3',  prot_act_id);
+    game_id := make_game(round_2_id, 3, ent_1_id, ent_1_name, ent_3_id, ent_3_name,  prot_act_id);
     PERFORM enter_score(game_id, ent_1_id, cat_1, 15);
     PERFORM enter_score(game_id, ent_1_id, cat_2, 5);
     PERFORM enter_score(game_id, ent_3_id, cat_1, 5);
