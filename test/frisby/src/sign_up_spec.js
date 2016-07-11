@@ -7,7 +7,7 @@ describe('Signing up and seeing user details', function() {
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes({charlie_murphy: String})
-        .expectJSON({charlie_murphy: 'charlie_murphy@darkness.com'})
+        .expectJSON({charlie_murphy: 'charlie_murphy@bar.com'})
         .toss();
 
     frisby.create('Look for a user who doesn\'t exist')
