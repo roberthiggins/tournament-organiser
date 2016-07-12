@@ -5,7 +5,7 @@ This is the public API for the Tournament Organiser. The website, and apps
 should talk to this for functionality wherever possible.
 """
 
-from flask import Blueprint, request
+from flask import Blueprint
 
 from controllers.request_helpers import enforce_request_variables, text_response
 from models.dao.account import Account
@@ -24,7 +24,7 @@ def main():
 # Page actions
 @APP.route('/entertournamentscore', methods=['POST'])
 @text_response
-@enforce_request_variables('username', 'tournament', 'key', 'value')
+@enforce_request_variables('scorer', 'username', 'tournament', 'key', 'value')
 def enter_tournament_score():
     """
     POST to enter a score for a player in a tournament.
@@ -37,9 +37,9 @@ def enter_tournament_score():
     """
     checker = PermissionsChecker()
     # pylint: disable=undefined-variable
-    if request.authorization is None or not checker.check_permission(
+    if not checker.check_permission(
             PERMISSIONS.get('ENTER_SCORE'),
-            request.authorization.username,
+            scorer,
             username,
             tournament):
         raise ValueError('Permission denied. {}'.\

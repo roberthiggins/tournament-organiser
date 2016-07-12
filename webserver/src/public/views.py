@@ -50,13 +50,15 @@ def enter_score(request, tournament_id, username):      # pylint: disable=W0613
         return HttpResponseNotFound(response.content)
 
 
-    form = EnterScoreForm(username=username, tournament=tournament_id)
+    form = EnterScoreForm(username=username, tournament=tournament_id,
+                          poster=request.user.username)
 
     if request.method == 'POST':
         form = EnterScoreForm(
             data=request.POST,
             username=username,
-            tournament=tournament_id)
+            tournament=tournament_id,
+            poster=request.user.username)
 
         if form.is_valid():                     # pylint: disable=no-member
             response = from_dao('/entertournamentscore', form, request)

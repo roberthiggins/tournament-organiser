@@ -60,10 +60,14 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=no-ini
 class EnterScoreForm(ErrorStringForm):                  # pylint: disable=no-init
     """Enter a score for a tournament"""
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002
+        poster = kwargs.pop('poster')
         username = kwargs.pop('username')
         tournament = kwargs.pop('tournament')
         super(EnterScoreForm, self).__init__(*args, **kwargs)
         # pylint: disable=no-member
+        self.fields['scorer'] = forms.CharField(
+            initial=poster,
+            widget=forms.widgets.HiddenInput())
         self.fields['username'] = forms.CharField(
             initial=username,
             widget=forms.widgets.HiddenInput())
