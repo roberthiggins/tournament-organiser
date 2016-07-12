@@ -1,4 +1,5 @@
 #! /bin/bash
+pylint $(find . -iname "*.py")
 
 # Build all containers and run all tests
 cp config/dev/docker-compose.dev.yml docker-compose.yml
@@ -22,6 +23,3 @@ docker-compose run apitest
 bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
 docker-compose run systemtest
-
-
-pylint $(find . -iname "*.py")
