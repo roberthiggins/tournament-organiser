@@ -61,7 +61,9 @@ def enter_score(request, tournament_id, username):      # pylint: disable=W0613
             poster=request.user.username)
 
         if form.is_valid():                     # pylint: disable=no-member
-            response = from_dao('/entertournamentscore', form, request)
+            url = '/tournament/{}/entry/{}/entertournamentscore'.\
+                format(tournament_id, username)
+            response = from_dao(url, form, request)
             if  response.status_code == 200:
                 return HttpResponse(response)
             else:

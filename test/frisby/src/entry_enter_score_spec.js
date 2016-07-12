@@ -1,13 +1,12 @@
 describe('Get the next game for an entry', function() {
     var frisby = require('frisby');
-    var API = process.env['API_ADDR'] + 'entertournamentscore';
+    var API = process.env['API_ADDR'] +
+        'tournament/enter_tournament_score_test/entry/';
 
     frisby.create('No auth enters a score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: '',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_1',
                 value: 5
             },
@@ -18,10 +17,8 @@ describe('Get the next game for an entry', function() {
         .toss()
 
     frisby.create('No auth enters a score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_1',
                 value: 5
             },
@@ -32,11 +29,9 @@ describe('Get the next game for an entry', function() {
         .toss()
 
     frisby.create('Non-playing user enters a score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'charlie_murphy',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_1',
                 value: 5
             },
@@ -47,11 +42,9 @@ describe('Get the next game for an entry', function() {
         .toss()
 
     frisby.create('Different entry enters a score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'enter_tournament_score_test_p_2',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_1',
                 value: 5
             },
@@ -62,11 +55,9 @@ describe('Get the next game for an entry', function() {
         .toss()
 
     frisby.create('superuser enters a score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'superuser',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_su',
                 value: 5
             },
@@ -79,11 +70,9 @@ describe('Get the next game for an entry', function() {
 
 
     frisby.create('to enters a score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'to',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_to',
                 value: 5
             },
@@ -95,11 +84,9 @@ describe('Get the next game for an entry', function() {
         .toss()
 
     frisby.create('player enters a score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'enter_tournament_score_test_p_1',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_1',
                 value: 5
             },
@@ -112,11 +99,9 @@ describe('Get the next game for an entry', function() {
 
 
     frisby.create('player enters a score twice: first score')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'enter_tournament_score_test_p_1',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_2',
                 value: 5
             },
@@ -127,11 +112,9 @@ describe('Get the next game for an entry', function() {
             'Score entered for enter_tournament_score_test_p_1: 5')
         .toss()
     frisby.create('player enters a score twice: again')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'enter_tournament_score_test_p_1',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_2',
                 value: 4
             },
@@ -143,11 +126,9 @@ describe('Get the next game for an entry', function() {
 
 
     frisby.create('score too low')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'enter_tournament_score_test_p_1',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_3',
                 value: 0
             },
@@ -159,11 +140,9 @@ describe('Get the next game for an entry', function() {
 
 
     frisby.create('score too high')
-        .post(API,
+        .post(API + 'enter_tournament_score_test_p_1/entertournamentscore',
             {
                 scorer: 'enter_tournament_score_test_p_1',
-                username: 'enter_tournament_score_test_p_1',
-                tournament: 'enter_tournament_score_test',
                 key: 'enter_tournament_score_test_category_4',
                 value: 6
             },
