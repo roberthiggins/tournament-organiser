@@ -12,7 +12,7 @@ describe('Get the next game for an entry', function() {
             },
             {json: true}
         )
-        .expectStatus(400) // TODO: 403
+        .expectStatus(403)
         .expectBodyContains('Permission denied')
         .toss()
 
@@ -37,7 +37,7 @@ describe('Get the next game for an entry', function() {
             },
             {json: true}
         )
-        .expectStatus(400) // TODO: 403
+        .expectStatus(403)
         .expectBodyContains('Permission denied')
         .toss()
 
@@ -50,7 +50,7 @@ describe('Get the next game for an entry', function() {
             },
             {json: true}
         )
-        .expectStatus(400) // TODO: 403
+        .expectStatus(403)
         .expectBodyContains('Permission denied')
         .toss()
 

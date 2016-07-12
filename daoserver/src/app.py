@@ -14,6 +14,7 @@ from controllers.tournament import TOURNAMENT
 from controllers.tournament_entry import ENTRY
 from controllers.tournament_round import TOURNAMENT_ROUND
 from controllers.user import USER
+from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.permissions import set_up_permissions
 
@@ -39,6 +40,16 @@ def create_app():
     app.register_blueprint(ENTRY,
                            url_prefix='/tournament/<tournament_id>/entry')
     app.register_blueprint(USER, url_prefix='/user')
+
+    @app.errorhandler(PermissionDeniedException)
+    # pylint: disable=unused-variable
+    def permission_denied(err):
+        """Permission denied (as opposed to auth failed)"""
+        print type(err).__name__
+        print err
+        import traceback
+        traceback.print_exc()
+        return make_response(str(err), 403)
 
     @app.errorhandler(RuntimeError)
     @app.errorhandler(ValueError)

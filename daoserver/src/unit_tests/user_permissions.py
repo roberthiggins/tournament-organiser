@@ -6,6 +6,7 @@ from flask_testing import TestCase
 from testfixtures import compare
 
 from app import create_app
+from models.authentication import PermissionDeniedException
 from models.dao.account import db, Account, AccountSecurity, add_account
 from models.dao.permissions import ProtectedObject, ProtObjAction, \
 ProtObjPerm, AccountProtectedObjectPermission as AccountProtectedObjectPerm
@@ -90,11 +91,12 @@ class UserPermissions(TestCase):
         self.assertRaises(ValueError, checker.check_permission, 'ENTER_SCORE',
                           None, None, None)
 
-        self.assertFalse(checker.check_permission(
-            'enter_score',
-            None,
-            None,
-            None))
+        self.assertRaises(PermissionDeniedException,
+                          checker.check_permission,
+                          'enter_score',
+                          None,
+                          None,
+                          None)
 
     def test_check_permissions(self):
         """Test the entrypoint method"""
@@ -111,25 +113,28 @@ class UserPermissions(TestCase):
             self.tourn_1))
 
         # player for random user
-        self.assertFalse(checker.check_permission(
-            'enter_score',
-            t_player_1,
-            self.acc_1,
-            self.tourn_1))
+        self.assertRaises(PermissionDeniedException,
+                          checker.check_permission,
+                          'enter_score',
+                          t_player_1,
+                          self.acc_1,
+                          self.tourn_1)
 
         # player who is not superuser
-        self.assertFalse(checker.check_permission(
-            'enter_score',
-            t_player_1,
-            None,
-            self.tourn_1))
+        self.assertRaises(PermissionDeniedException,
+                          checker.check_permission,
+                          'enter_score',
+                          t_player_1,
+                          None,
+                          self.tourn_1)
 
         # random user
-        self.assertFalse(checker.check_permission(
-            'enter_score',
-            self.acc_1,
-            None,
-            self.tourn_1))
+        self.assertRaises(PermissionDeniedException,
+                          checker.check_permission,
+                          'enter_score',
+                          self.acc_1,
+                          None,
+                          self.tourn_1)
 
     def test_remove_permissions(self):
         """Test that users can have their permissions removed"""
