@@ -5,5 +5,4 @@ Flask-SQLAlchemy
 Flask-Migrate
 Flask-Testing
 jsonpickle
-django
 testfixtures

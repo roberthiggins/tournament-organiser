@@ -2,6 +2,7 @@
 Users for the site. Note this is separate from an entry in a tournament.
 """
 
+import re
 from flask import Blueprint
 
 from controllers.request_helpers import enforce_request_variables, \
@@ -25,18 +26,6 @@ def login():
     return "Login successful" if check_auth(inputUsername, inputPassword) \
         else "Login unsuccessful"
 
-def validate_user_email(email):
-    """
-    Validates email based on django validator
-    """
-    from django.core.exceptions import ValidationError
-    from django.core.validators import validate_email
-    try:
-        validate_email(email)
-        return True
-    except ValidationError:
-        return False
-
 # pylint: disable=undefined-variable
 @USER.route('', methods=['POST'])
 @text_response
@@ -50,7 +39,7 @@ def create():
         - password1
         - password2
     """
-    if not validate_user_email(email):
+    if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
         raise ValueError('This email does not appear valid')
 
     if password1 != password2:
