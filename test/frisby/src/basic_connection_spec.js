@@ -1,5 +1,5 @@
-'use strict';
 describe('HTTP Method Test Suite', function () {
+    'use strict';
     var frisby = require('frisby'),
         API = process.env.API_ADDR;
 

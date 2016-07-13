@@ -1,5 +1,5 @@
-'use strict';
 describe('Get the next game for an entry', function () {
+    'use strict';
     var frisby = require('frisby'),
         API = process.env.API_ADDR + 'tournament/next_game_test/';
 

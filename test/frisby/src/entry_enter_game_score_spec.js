@@ -1,5 +1,5 @@
-'use strict';
 describe('Enter score for single game for an entry', function () {
+    'use strict';
     var frisby = require('frisby'),
         API = process.env.API_ADDR + 'tournament/enter_score_test/entry/';
 
@@ -78,8 +78,8 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 '
-                        + 'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1 '+
+                    'for game ' + gameId + ': 5')
                 .toss();
 
 
@@ -93,8 +93,8 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 '
-                    + 'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1 ' +
+                    'for game ' + gameId + ': 5')
                 .toss();
 
             frisby.create('player enters a score')
@@ -107,8 +107,8 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 '
-                    + 'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1 ' +
+                    'for game ' + gameId + ': 5')
                 .toss();
 
 
@@ -122,8 +122,8 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 '
-                    + 'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1 ' +
+                    'for game ' + gameId + ': 5')
                 .toss();
             frisby.create('player enters a score twice: again')
                 .post(API + 'enter_score_test_p_1/entergamescore',
@@ -176,8 +176,8 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(400)
-                .expectBodyContains('Unknown category: '
-                    + 'enter_score_test_category_non_existent')
+                .expectBodyContains('Unknown category: ' +
+                    'enter_score_test_category_non_existent')
                 .toss();
 
             frisby.create('Per tournament category')
@@ -190,9 +190,9 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(400)
-                .expectBodyContains('Cannot enter a per-tournament score '
-                    + '(enter_score_test_category_1) for a game (game_id: '
-                    + gameId + ')')
+                .expectBodyContains('Cannot enter a per-tournament score ' +
+                    '(enter_score_test_category_1) for a game (game_id: ' +
+                    gameId + ')')
                 .toss();
 
         })

@@ -1,5 +1,5 @@
-'use strict';
 describe('Check that players are ranked correctly', function () {
+    'use strict';
     var frisby = require('frisby'),
         API = process.env.API_ADDR + 'tournament/';
 

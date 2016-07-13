@@ -1,5 +1,5 @@
-'use strict';
 describe('See the schedule for an entry in a tournament', function () {
+    'use strict';
     var frisby = require('frisby'),
         API = process.env.API_ADDR + 'tournament/schedule_test/';
 

@@ -1,6 +1,5 @@
-'use strict';
-
 describe('Signing up and seeing user details', function () {
+    'use strict';
     var frisby = require('frisby'),
         API = process.env.API_ADDR;
 
