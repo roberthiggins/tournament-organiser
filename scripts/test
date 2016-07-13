@@ -1,5 +1,6 @@
 #! /bin/bash
 pylint $(find . -iname "*.py")
+jshint $(find . -iname "*.js")
 
 # Build all containers and run all tests
 cp config/dev/docker-compose.dev.yml docker-compose.yml
