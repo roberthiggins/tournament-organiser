@@ -86,7 +86,11 @@ BEGIN
     INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_3', DEFAULT, TRUE, 1, 5);
     INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_su', DEFAULT, TRUE, 1, 5);
     INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_to', DEFAULT, TRUE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_1', DEFAULT, FALSE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_1', DEFAULT, FALSE, 4, 15);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_2', DEFAULT, FALSE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_3', DEFAULT, FALSE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_su', DEFAULT, FALSE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_to', DEFAULT, FALSE, 1, 5);
 
     -- Create a tournament organiser
     PERFORM create_user('to');

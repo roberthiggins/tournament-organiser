@@ -54,6 +54,37 @@ def get_entry_id(tournament_id, username):
             format(username, tournament_id))
 
 
+@ENTRY.route('/<username>/entergamescore', methods=['POST'])
+@text_response
+@enforce_request_variables('scorer', 'key', 'value', 'game_id')
+def enter_game_score():
+    """
+    POST to enter a score for a player in a game.
+
+    Expects:
+        - game_id - The id of the game that the score is for
+        - scorer - username of the user entering the escore
+        - key - the category e.g. painting, round_6_battle
+        - value - the score. Integer
+    """
+    checker = PermissionsChecker()
+    # pylint: disable=undefined-variable
+    if not checker.check_permission(
+            PERMISSIONS.get('ENTER_SCORE'),
+            scorer,
+            g.username,
+            g.tournament_id):
+        raise ValueError('Permission denied. {}'.\
+            format('You cannot enter scores for this game. Contact the TO.'))
+
+    if not g.entry:
+        raise ValueError('Unknown player: {}'.format(g.username))
+
+    # pylint: disable=undefined-variable
+    g.tournament.enter_score(g.entry.id, key, value, game_id)
+    return 'Score entered for {} for game {}: {}'.\
+        format(g.username, game_id, value)
+
 @ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
 @text_response
 @enforce_request_variables('scorer', 'key', 'value')
