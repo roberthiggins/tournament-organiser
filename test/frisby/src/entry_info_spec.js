@@ -1,6 +1,7 @@
-describe('Get info about tournament entries', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+'use strict';
+describe('Get info about tournament entries', function () {
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR;
 
     frisby.create('Info about an entry')
         .get(API + 'tournament/entry_info_test/entry/entry_info_player')

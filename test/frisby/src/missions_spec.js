@@ -1,6 +1,7 @@
-describe('Check Missions', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+'use strict';
+describe('Check Missions', function () {
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR;
 
     // Normal behaviour
     frisby.create('POST 3 rounds to setup')

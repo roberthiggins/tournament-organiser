@@ -1,12 +1,13 @@
-describe('Check that players are ranked correctly', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR'] + 'tournament/';
+'use strict';
+describe('Check that players are ranked correctly', function () {
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR + 'tournament/';
 
     frisby.create('Check that the rank_entries format is correct')
         .get(API + 'rank_test/entry/rank')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
-        .expectJSONTypes( '0',
+        .expectJSONTypes('0',
             {
                 username: String,
                 ranking: Number,
@@ -14,17 +15,15 @@ describe('Check that players are ranked correctly', function() {
                 entry_id: Number,
                 scores: Array,
                 tournament_id: String
-            }
-        )
+            })
         .expectJSONTypes('*.0.scores.*',
             {
                 category: String,
                 max_val: Number,
                 score: Number,
-                min_val: Number 
-            }
-        )
-        .toss()
+                min_val: Number
+            })
+        .toss();
 
 
     frisby.create('Get rankings for a tournament')
@@ -136,8 +135,7 @@ describe('Check that players are ranked correctly', function() {
                     }
                 ],
                 tournament_id: 'rank_test'
-            }
-        )
+            })
         .expectJSON('?',
             {
                 username: 'rank_test_player_2',
@@ -157,8 +155,7 @@ describe('Check that players are ranked correctly', function() {
                     }
                 ],
                 tournament_id: 'rank_test'
-            }
-        )
+            })
         .toss();
 
     frisby.create('Non-existent tournament')

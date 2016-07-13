@@ -1,6 +1,7 @@
-describe('HTTP Method Test Suite', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+'use strict';
+describe('HTTP Method Test Suite', function () {
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR;
 
     frisby.create('GET Method')
         .get(API)

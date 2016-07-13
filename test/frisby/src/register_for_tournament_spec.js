@@ -1,7 +1,7 @@
-describe('Test seeing and registering for a tournament', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR'];
-    var entry = 'tournaments.?';
+'use strict';
+describe('Test seeing and registering for a tournament', function () {
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR;
 
     frisby.create('See a list of tournaments')
         .get(API + 'tournament/')
@@ -13,8 +13,7 @@ describe('Test seeing and registering for a tournament', function() {
                 date: String,
                 name: String,
                 rounds: Number
-            }
-        )
+            })
         .expectJSON('tournaments', [
             {date: '2095-06-01', name: 'northcon_2095',              rounds: 0},
             {date: '2095-07-02', name: 'entry_info_test',            rounds: 0},

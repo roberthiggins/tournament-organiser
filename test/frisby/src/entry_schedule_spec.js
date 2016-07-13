@@ -1,6 +1,7 @@
-describe('See the schedule for an entry in a tournament', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR'] + 'tournament/schedule_test/'
+'use strict';
+describe('See the schedule for an entry in a tournament', function () {
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR + 'tournament/schedule_test/';
 
     frisby.create('See lisa schedule')
         .get(API + 'entry/schedule_test_player_3/schedule')
@@ -10,7 +11,7 @@ describe('See the schedule for an entry in a tournament', function() {
             'table' : Number,
             'game_id': Number,
             'round': Number,
-            'opponent': String 
+            'opponent': String
         })
         .expectJSON([
             {'table': 1, 'game_id': Number, 'round': 1, 'opponent': 'BYE'},
@@ -22,7 +23,7 @@ describe('See the schedule for an entry in a tournament', function() {
         .post(API + 'rounds', {numRounds: 4})
         .expectBodyContains('Rounds set: 4')
         .expectStatus(200)
-        .toss()
+        .toss();
     frisby.create('See homer schedule')
         .get(API + 'entry/schedule_test_player_1/schedule')
         .expectStatus(200)
@@ -56,7 +57,7 @@ describe('See the schedule for an entry in a tournament', function() {
         .toss();
 
     frisby.create('Entry has not played a game')
-        .get(process.env['API_ADDR'] + 'tournament/permission_test/entry/permission_test_player/schedule')
+        .get(process.env.API_ADDR + 'tournament/permission_test/entry/permission_test_player/schedule')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([])
@@ -68,7 +69,7 @@ describe('See the schedule for an entry in a tournament', function() {
         .toss();
 
     frisby.create('Tournament that does not exist')
-        .get(process.env['API_ADDR'] + 'tournament/sdf/entry/p_1/schedule')
+        .get(process.env.API_ADDR + 'tournament/sdf/entry/p_1/schedule')
         .expectStatus(400)
         .toss();
 });
