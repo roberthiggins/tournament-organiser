@@ -9,10 +9,12 @@ Feature: Get information about a tournament
         Then I should see "Date: 2095-06-01"
         Then I should see "Apply to play in northcon_2095"
 
+    @javascript
     Scenario: I try to enter a tournament from the page
         Given I am on "/tournament/northcon_2095"
         Then I press "Apply to play in northcon_2095"
         Then I should be on "/login?next=/registerforatournament"
+        When I wait for 1 second
         When I fill in "id_inputUsername" with "charlie_murphy"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
