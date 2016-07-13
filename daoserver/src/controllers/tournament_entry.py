@@ -62,8 +62,7 @@ def enter_tournament_score():
     POST to enter a score for a player in a tournament.
 
     Expects:
-        - username - the player_id
-        - tournament - the tournament_id
+        - scorer - username of the user entering the escore
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """

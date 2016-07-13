@@ -71,7 +71,7 @@ DO $$
 DECLARE
     protect_object_id int := 0;
     tourn_id int := 0;
-    tourn_name varchar := 'enter_tournament_score_test';
+    tourn_name varchar := 'enter_score_test';
     protected_object_action_id int := 0;
     protected_object_permission_id int := 0;
 BEGIN
@@ -81,12 +81,12 @@ BEGIN
     -- Create a tournament that will be restricted
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_tournament_score_test_category_1', DEFAULT, DEFAULT, 4, 15);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_tournament_score_test_category_2', DEFAULT, DEFAULT, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_tournament_score_test_category_3', DEFAULT, DEFAULT, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_tournament_score_test_category_4', DEFAULT, DEFAULT, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_tournament_score_test_category_su', DEFAULT, DEFAULT, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_tournament_score_test_category_to', DEFAULT, DEFAULT, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_1', DEFAULT, TRUE, 4, 15);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_2', DEFAULT, TRUE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_3', DEFAULT, TRUE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_su', DEFAULT, TRUE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_to', DEFAULT, TRUE, 1, 5);
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_1', DEFAULT, FALSE, 1, 5);
 
     -- Create a tournament organiser
     PERFORM create_user('to');
@@ -99,8 +99,8 @@ BEGIN
         ) RETURNING id INTO protected_object_permission_id;
     INSERT INTO account_protected_object_permission VALUES ('to', protected_object_permission_id);
 
-    PERFORM add_player(tourn_name, tourn_id, 'enter_tournament_score_test_p_1');
-    PERFORM add_player(tourn_name, tourn_id, 'enter_tournament_score_test_p_2');
+    PERFORM add_player(tourn_name, tourn_id, 'enter_score_test_p_1');
+    PERFORM add_player(tourn_name, tourn_id, 'enter_score_test_p_2');
 END $$;
 
 
