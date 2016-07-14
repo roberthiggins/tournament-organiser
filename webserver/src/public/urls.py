@@ -27,7 +27,7 @@ urlpatterns = [
         views.create_tournament, name='create_tournament'),
     url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)$',
         views.enter_score, name='enter_score'),
-    url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)/(?P<round_id>.+)$',
+    url(r'^entergamescore/(?P<t_id>.+)/(?P<user>.+)$',
         views.enter_score_for_game, name='enter_score_for_game'),
     url(r'^(?P<tournament_id>.+)/entries$',
         views.entry_list, name='tournament_entry_list'),

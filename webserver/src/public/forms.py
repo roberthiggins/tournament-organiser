@@ -57,6 +57,26 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=no-ini
         else:
             return 'Enter the required fields'
 
+class EnterGameScoreForm(ErrorStringForm):
+    """Enter a score for a single user, for a game"""
+    def __init__(self, *args, **kwargs):
+        categories = kwargs.pop('categories', [])
+        game_id = kwargs.pop('game_id')
+        poster = kwargs.pop('poster')
+        super(EnterGameScoreForm, self).__init__(*args, **kwargs)
+        # pylint: disable=no-member
+        self.fields['scorer'] = forms.CharField(
+            initial=poster,
+            widget=forms.widgets.HiddenInput())
+        self.fields['game_id'] = forms.CharField(
+            initial=game_id,
+            widget=forms.widgets.HiddenInput())
+        self.fields['key'] = forms.ChoiceField(
+            label='Select a score category',
+            choices=categories
+        )
+    value = forms.CharField(label='Score', )
+
 class EnterScoreForm(ErrorStringForm):                  # pylint: disable=no-init
     """Enter a score for a tournament"""
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002

@@ -12,6 +12,7 @@ INSERT INTO score_category VALUES(100, 'northcon_2095', 'leastnortherly', DEFAUL
 SELECT create_user('charlie_murphy');
 
 SELECT half_tournament_test_setup('ranking_test', '2095-08-12');
+SELECT half_tournament_test_setup('enter_score_test', '2295-11-11');
 
 
 -- Set up some users
