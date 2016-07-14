@@ -44,21 +44,28 @@ def enter_score(request, tournament_id, username):      # pylint: disable=W0613
     """Enter score for entry"""
 
     # Score can only be entered for entries that exist
-    response = from_dao('/tournament/{}/entry/{}'.\
+    entry_response = from_dao('/tournament/{}/entry/{}'.\
         format(tournament_id, username))
-    if response.status_code != 200:
-        return HttpResponseNotFound(response.content)
+    if entry_response.status_code != 200:
+        return HttpResponseNotFound(entry_response.content)
 
+    categories_response = from_dao('/tournament/{}/score_categories'.\
+        format(tournament_id))
+    categories = json.loads(categories_response.content)
+    categories = [(x['name'], x['name']) for x in categories \
+                 if x['per_tournament']]
 
-    form = EnterScoreForm(username=username, tournament=tournament_id,
-                          poster=request.user.username)
+    form = EnterScoreForm(username=username,
+                          tournament=tournament_id,
+                          poster=request.user.username,
+                          categories=categories)
 
     if request.method == 'POST':
-        form = EnterScoreForm(
-            data=request.POST,
-            username=username,
-            tournament=tournament_id,
-            poster=request.user.username)
+        form = EnterScoreForm(data=request.POST,
+                              username=username,
+                              tournament=tournament_id,
+                              poster=request.user.username,
+                              categories=categories)
 
         if form.is_valid():                     # pylint: disable=no-member
             url = '/tournament/{}/entry/{}/entertournamentscore'.\

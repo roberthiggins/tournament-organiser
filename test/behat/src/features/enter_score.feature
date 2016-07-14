@@ -27,7 +27,7 @@ Feature: Enter a score for a player
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Given I am on "/enterscore/painting_test/rick_james"
-        When I fill in "id_key" with "number_tassles"
+        When I select "Fanciness" from "id_key"
         When I fill in "id_value" with "1"
         Then I press "Enter Score"
         Then the response status code should be 200
@@ -53,7 +53,7 @@ Feature: Enter a score for a player
     Scenario Outline: I enter some scores
         Given I am on "/enterscore/painting_test/rick_james"
         When I wait for 1 second
-        Then I fill in "id_key" with "Fanciness"
+        When I select "Fanciness" from "id_key"
         Then I fill in "id_value" with "<score>"
         Then I press "Enter Score"
         Then I should see "<content>"
@@ -71,7 +71,7 @@ Feature: Enter a score for a player
         When I fill in "id_inputUsername" with "rick_james"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        When I fill in "id_key" with "Fanciness"
+        When I select "Fanciness" from "id_key"
         When I fill in "id_value" with "5"
         Then I press "Enter Score"
         Then the response status code should be 200
@@ -83,7 +83,7 @@ Feature: Enter a score for a player
         When I fill in "id_inputUsername" with "stevemcqueen"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        When I fill in "id_key" with "Fanciness"
+        When I select "Fanciness" from "id_key"
         When I fill in "id_value" with "5"
         Then I press "Enter Score"
         Then the response status code should be 200
