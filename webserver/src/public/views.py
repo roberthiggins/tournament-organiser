@@ -39,6 +39,13 @@ def create_tournament(request):
         RequestContext(request)
     )
 
+def categories_info(tournament_id):
+    """Get the score_categories info for a tournament"""
+    resp = from_dao('/tournament/{}/score_categories'.format(tournament_id))
+    if resp.status_code != 200:
+        raise ValueError('Tournament {} not found'.format(tournament_id))
+    return json.loads(resp.content)
+
 @login_required
 def enter_score(request, tournament_id, username):      # pylint: disable=W0613
     """Enter score for entry"""
@@ -49,23 +56,20 @@ def enter_score(request, tournament_id, username):      # pylint: disable=W0613
     if entry_response.status_code != 200:
         return HttpResponseNotFound(entry_response.content)
 
-    categories_response = from_dao('/tournament/{}/score_categories'.\
-        format(tournament_id))
-    categories = json.loads(categories_response.content)
-    categories = [(x['name'], x['name']) for x in categories \
-                 if x['per_tournament']]
+    cats = [(x['name'], x['name']) for x in categories_info(tournament_id) \
+            if x['per_tournament']]
 
     form = EnterScoreForm(username=username,
                           tournament=tournament_id,
                           poster=request.user.username,
-                          categories=categories)
+                          categories=cats)
 
     if request.method == 'POST':
         form = EnterScoreForm(data=request.POST,
                               username=username,
                               tournament=tournament_id,
                               poster=request.user.username,
-                              categories=categories)
+                              categories=cats)
 
         if form.is_valid():                     # pylint: disable=no-member
             url = '/tournament/{}/entry/{}/entertournamentscore'.\
@@ -151,13 +155,8 @@ def logout(request):
 @login_required
 def set_categories(request, tournament_id):
     """Set the scoring categories for a tournament"""
-    dao_url = '/tournament/{}/score_categories'.format(tournament_id)
-    cats_request = from_dao(dao_url)
-    if cats_request.status_code != 200:
-        return HttpResponseNotFound(
-            'Tournament {} not found'.format(tournament_id))
     cats = [[x['name'], x['percentage'], x['per_tournament'], x['min_val'], \
-        x['max_val']] for x in json.loads(cats_request.content)]
+        x['max_val']] for x in categories_info(tournament_id)]
     form = SetCategoriesForm(tournament_id=tournament_id, categories=cats)
 
     if request.method == 'POST':
@@ -173,6 +172,7 @@ def set_categories(request, tournament_id):
                 k for k, v in form.cleaned_data.iteritems() \
                 if k.startswith('categories_') and v != form.empty_field()])
 
+            dao_url = '/tournament/{}/score_categories'.format(tournament_id)
             response = from_dao(dao_url, form)
 
             if  response.status_code == 200:
