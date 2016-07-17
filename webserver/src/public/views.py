@@ -39,6 +39,13 @@ def create_tournament(request):
         RequestContext(request)
     )
 
+def entry_info(tournament_id, username):
+    """Get information about an entry"""
+    resp = from_dao('/tournament/{}/entry/{}'.format(tournament_id, username))
+    if resp.status_code != 200:
+        raise ValueError(resp.content)
+    return json.loads(resp.content)
+
 def categories_info(tournament_id):
     """Get the score_categories info for a tournament"""
     resp = from_dao('/tournament/{}/score_categories'.format(tournament_id))
@@ -50,14 +57,12 @@ def categories_info(tournament_id):
 def enter_score(request, tournament_id, username):      # pylint: disable=W0613
     """Enter score for entry"""
 
-    # Score can only be entered for entries that exist
-    entry_response = from_dao('/tournament/{}/entry/{}'.\
-        format(tournament_id, username))
-    if entry_response.status_code != 200:
-        return HttpResponseNotFound(entry_response.content)
-
-    cats = [(x['name'], x['name']) for x in categories_info(tournament_id) \
-            if x['per_tournament']]
+    try:
+        entry_info(tournament_id, username)
+        cats = [(x['name'], x['name']) for x in categories_info(tournament_id) \
+                if x['per_tournament']]
+    except ValueError as err:
+        return HttpResponseNotFound(err)
 
     form = EnterScoreForm(username=username,
                           tournament=tournament_id,

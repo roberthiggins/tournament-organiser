@@ -82,8 +82,7 @@ def enter_game_score():
 
     # pylint: disable=undefined-variable
     g.tournament.enter_score(g.entry.id, key, value, game_id)
-    return 'Score entered for {} for game {}: {}'.\
-        format(g.username, game_id, value)
+    return 'Score entered for {}: {}'.format(g.username, value)
 
 @ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
 @text_response

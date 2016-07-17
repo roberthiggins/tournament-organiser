@@ -78,8 +78,7 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 '+
-                    'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1: 5')
                 .toss();
 
 
@@ -93,8 +92,7 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 ' +
-                    'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1: 5')
                 .toss();
 
             frisby.create('player enters a score')
@@ -107,8 +105,8 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 ' +
-                    'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1' +
+                    ': 5')
                 .toss();
 
 
@@ -122,8 +120,7 @@ describe('Enter score for single game for an entry', function () {
                     },
                     {json: true})
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1 ' +
-                    'for game ' + gameId + ': 5')
+                .expectBodyContains('Score entered for enter_score_test_p_1: 5')
                 .toss();
             frisby.create('player enters a score twice: again')
                 .post(API + 'enter_score_test_p_1/entergamescore',
