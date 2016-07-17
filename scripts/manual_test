@@ -1,0 +1,14 @@
+#! /bin/bash
+pylint $(find . -iname "*.py")
+jshint $(find . -iname "*.js")
+
+# Build all containers and run all tests
+cp config/dev/docker-compose.dev.yml docker-compose.yml
+cp config/dev/docker-passwords.dev.yml docker-passwords.yml
+./scripts/install
+
+sleep 10
+
+# Add some data to database for use in browser
+bash scripts/insert_into_db database database/data/dev/basic_functions.sql
+bash scripts/insert_into_db database database/data/dev/behaviour_test_data.sql
