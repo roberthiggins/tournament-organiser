@@ -1,4 +1,6 @@
 #! /bin/bash
+pylint $(find . -iname "*.py")
+jshint $(find . -iname "*.js")
 
 # Build all containers and run all tests
 cp config/dev/docker-compose.dev.yml docker-compose.yml
@@ -9,6 +11,10 @@ docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver &> /de
 
 docker-compose run unittest
 
+# Add some data to database for use in browser
+bash scripts/insert_into_db database database/data/dev/basic_functions.sql
+bash scripts/insert_into_db database database/data/dev/behaviour_test_data.sql
+
 # API Tests
 bash scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql
@@ -18,6 +24,3 @@ docker-compose run apitest
 bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
 docker-compose run systemtest
-
-
-pylint $(find . -iname "*.py")

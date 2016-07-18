@@ -209,28 +209,28 @@ class EnterScore(TestCase):
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_2.display_name,
             5,
             game_id='foo')
         self.assertRaises(
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_2.display_name,
             5,
             game_id=1000000)
         self.assertRaises(
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_2.display_name,
             5,
             game_id=-1)
         self.assertRaises(
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_2.display_name,
             5,
             game_id=0)
 

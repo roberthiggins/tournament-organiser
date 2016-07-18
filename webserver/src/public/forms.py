@@ -57,20 +57,48 @@ class CreateAccountForm(UserCreationForm):              # pylint: disable=no-ini
         else:
             return 'Enter the required fields'
 
+class EnterGameScoreForm(ErrorStringForm):
+    """Enter a score for a single user, for a game"""
+    def __init__(self, *args, **kwargs):
+        categories = kwargs.pop('categories', [])
+        game_id = kwargs.pop('game_id')
+        poster = kwargs.pop('poster')
+        super(EnterGameScoreForm, self).__init__(*args, **kwargs)
+        # pylint: disable=no-member
+        self.fields['scorer'] = forms.CharField(
+            initial=poster,
+            widget=forms.widgets.HiddenInput())
+        self.fields['game_id'] = forms.CharField(
+            initial=game_id,
+            widget=forms.widgets.HiddenInput())
+        self.fields['key'] = forms.ChoiceField(
+            label='Select a score category',
+            choices=categories
+        )
+    value = forms.CharField(label='Score', )
+
 class EnterScoreForm(ErrorStringForm):                  # pylint: disable=no-init
     """Enter a score for a tournament"""
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002
+        categories = kwargs.pop('categories', None)
+        poster = kwargs.pop('poster')
         username = kwargs.pop('username')
         tournament = kwargs.pop('tournament')
         super(EnterScoreForm, self).__init__(*args, **kwargs)
         # pylint: disable=no-member
+        self.fields['scorer'] = forms.CharField(
+            initial=poster,
+            widget=forms.widgets.HiddenInput())
         self.fields['username'] = forms.CharField(
             initial=username,
             widget=forms.widgets.HiddenInput())
         self.fields['tournament'] = forms.CharField(
             initial=tournament,
             widget=forms.widgets.HiddenInput())
-    key = forms.CharField(label='Category (e.g. round_1_battle)', )
+        self.fields['key'] = forms.ChoiceField(
+            label='Select a score category',
+            choices=categories
+        )
     value = forms.CharField(label='Score', )
 
 class FeedbackForm(ErrorStringForm):                    # pylint: disable=no-init

@@ -4,9 +4,11 @@ Controller for entries in tournaments
 from decimal import Decimal as Dec
 from flask import Blueprint, g
 
-from controllers.request_helpers import json_response
+from controllers.request_helpers import json_response, \
+enforce_request_variables, text_response
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
+from models.permissions import PERMISSIONS, PermissionsChecker
 from models.tournament import Tournament
 
 ENTRY = Blueprint('ENTRY', __name__)
@@ -50,6 +52,67 @@ def get_entry_id(tournament_id, username):
     except AttributeError:
         raise ValueError('Entry for {} in tournament {} not found'.\
             format(username, tournament_id))
+
+
+@ENTRY.route('/<username>/entergamescore', methods=['POST'])
+@text_response
+@enforce_request_variables('scorer', 'key', 'value', 'game_id')
+def enter_game_score():
+    """
+    POST to enter a score for a player in a game.
+
+    Expects:
+        - game_id - The id of the game that the score is for
+        - scorer - username of the user entering the escore
+        - key - the category e.g. painting, round_6_battle
+        - value - the score. Integer
+    """
+    checker = PermissionsChecker()
+    # pylint: disable=undefined-variable
+    if not checker.check_permission(
+            PERMISSIONS.get('ENTER_SCORE'),
+            scorer,
+            g.username,
+            g.tournament_id):
+        raise ValueError('Permission denied. {}'.\
+            format('You cannot enter scores for this game. Contact the TO.'))
+
+    if not g.entry:
+        raise ValueError('Unknown player: {}'.format(g.username))
+
+    # pylint: disable=undefined-variable
+    g.tournament.enter_score(g.entry.id, key, value, game_id)
+    return 'Score entered for {}: {}'.format(g.username, value)
+
+@ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
+@text_response
+@enforce_request_variables('scorer', 'key', 'value')
+def enter_tournament_score():
+    """
+    POST to enter a score for a player in a tournament.
+
+    Expects:
+        - scorer - username of the user entering the escore
+        - key - the category e.g. painting, round_6_battle
+        - value - the score. Integer
+    """
+    checker = PermissionsChecker()
+    # pylint: disable=undefined-variable
+    if not checker.check_permission(
+            PERMISSIONS.get('ENTER_SCORE'),
+            scorer,
+            g.username,
+            g.tournament_id):
+        raise ValueError('Permission denied. {}'.\
+            format('You cannot enter scores for this game. Contact the TO.'))
+
+    if not g.entry:
+        raise ValueError('Unknown player: {}'.format(g.username))
+
+    # pylint: disable=undefined-variable
+    g.tournament.enter_score(g.entry.id, key, value)
+    return 'Score entered for {}: {}'.format(g.username, value)
+
 
 @ENTRY.route('/<username>', methods=['GET'])
 @json_response

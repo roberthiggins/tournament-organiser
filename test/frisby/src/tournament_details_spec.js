@@ -1,6 +1,7 @@
-describe('Getting tournament information', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+describe('Getting tournament information', function () {
+    'use strict';
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR;
 
     frisby.create('Details for existing tournament')
         .get(API + 'tournament/northcon_2095')

@@ -27,7 +27,7 @@ Feature: Enter a score for a player
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
         Given I am on "/enterscore/painting_test/rick_james"
-        When I fill in "id_key" with "number_tassles"
+        When I select "Fanciness" from "id_key"
         When I fill in "id_value" with "1"
         Then I press "Enter Score"
         Then the response status code should be 200
@@ -53,7 +53,7 @@ Feature: Enter a score for a player
     Scenario Outline: I enter some scores
         Given I am on "/enterscore/painting_test/rick_james"
         When I wait for 1 second
-        Then I fill in "id_key" with "Fanciness"
+        When I select "Fanciness" from "id_key"
         Then I fill in "id_value" with "<score>"
         Then I press "Enter Score"
         Then I should see "<content>"
@@ -64,33 +64,6 @@ Feature: Enter a score for a player
             | 5    | Score entered for rick_james: 5            |
             | 6    | 6 not entered. Score is already set        |
 
-    @javascript
-    Scenario Outline: The TO gives a painting score to a player
-        Given that I set auth to u:"superman" and p:"password"
-        When I POST "<value>" to "/entertournamentscore" from the API
-        When I wait for 1 second
-        Then the API response should contain "<response_text>"
-        Then the API response status code should be <response_code>
-
-        Examples:
-            |value                                                                                      |response_code  |response_text                          |
-            |foo                                                                                        |400            |Enter the required fields              |
-            |tournament=painting_test&key=Fanciness&value=20                                            |400            |Enter the required fields              |
-            |username=stevemcqueen&key=Fanciness&value=20                                               |400            |Enter the required fields              |
-            |username=stevemcqueen&username=stevemcqueen&key=Fanciness&value=20                         |400            |Enter the required fields              |
-            |username=stevemcqueen&tournament=painting_test&value=20                                    |400            |Enter the required fields              |
-            |username=stevemcqueen&tournament=painting_test&key=Fanciness                               |400            |Enter the required fields              |
-            |username=stevemcqueen&tournament=painting_test&key=Fanciness&                              |400            |Enter the required fields              |
-            |username=jimmynoname&tournament=painting_test&key=Fanciness&value=20                       |400            |Unknown player: jimmynoname            |
-            |username=stevemcqueen&tournament=notatournament&key=Fanciness&value=20                     |400            |Unknown tournament: notatournament     |
-            |username=rick_james&tournament=painting_test&key=Fanciness&value=ham                       |400            |Invalid score: ham                     |
-            |username=rick_james&tournament=painting_test&key=magic&value=20                            |400            |Unknown category: magic                |
-            |username=rick_james&tournament=painting_test&key=Fanciness&value=1000                      |400            |Invalid score: 1000                    |
-            |username=rick_james&tournament=painting_test&key=Fanciness&value=-3                        |400            |Invalid score: -3                      |
-            |username=rick_james&tournament=painting_test&key=Fanciness&value=12                        |400            |12 not entered. Score is already set   |
-            |username=rick_james&username=rick_james&tournament=painting_test&key=Fanciness&value=9     |400            |9 not entered. Score is already set    |
-            |username=rick_james&username=jerry&tournament=painting_test&key=Fanciness&value=8          |400            |8 not entered. Score is already set    |
-
     # TODO User controls
     Scenario: another player
         Given I am on "/logout"
@@ -98,7 +71,7 @@ Feature: Enter a score for a player
         When I fill in "id_inputUsername" with "rick_james"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        When I fill in "id_key" with "Fanciness"
+        When I select "Fanciness" from "id_key"
         When I fill in "id_value" with "5"
         Then I press "Enter Score"
         Then the response status code should be 200
@@ -110,7 +83,7 @@ Feature: Enter a score for a player
         When I fill in "id_inputUsername" with "stevemcqueen"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        When I fill in "id_key" with "Fanciness"
+        When I select "Fanciness" from "id_key"
         When I fill in "id_value" with "5"
         Then I press "Enter Score"
         Then the response status code should be 200

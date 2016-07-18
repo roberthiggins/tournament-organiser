@@ -12,6 +12,7 @@ INSERT INTO score_category VALUES(100, 'northcon_2095', 'leastnortherly', DEFAUL
 SELECT create_user('charlie_murphy');
 
 SELECT half_tournament_test_setup('ranking_test', '2095-08-12');
+SELECT half_tournament_test_setup('enter_score_test', '2295-11-11');
 
 
 -- Set up some users
@@ -24,7 +25,7 @@ DECLARE
 BEGIN
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'Fanciness', DEFAULT, DEFAULT, 4, 15) RETURNING id INTO fanciness;
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'Fanciness', DEFAULT, TRUE, 4, 15) RETURNING id INTO fanciness;
 
     PERFORM add_player(tourn_name, tourn_id, 'stevemcqueen');
     PERFORM add_player(tourn_name, tourn_id, 'rick_james');

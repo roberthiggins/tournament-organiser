@@ -1,6 +1,7 @@
-describe('Signing up and seeing user details', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+describe('Signing up and seeing user details', function () {
+    'use strict';
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR;
 
     frisby.create('See user details')
         .get(API + 'user/charlie_murphy')

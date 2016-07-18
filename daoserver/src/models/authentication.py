@@ -6,29 +6,23 @@ from passlib.hash import sha256_crypt
 
 from models.dao.account import AccountSecurity
 
+class PermissionDeniedException(Exception):
+    """No permissions for requested action"""
+    pass
+
 def check_auth(username, password):
     """This function is called to check if a username /
     password combination is valid.
     """
-    try:
-        if not username or not password:
-            raise RuntimeError("Enter username and password")
+    if not username or not password:
+        raise ValueError("Enter username and password")
 
-        # pylint: disable=no-member
-        creds = AccountSecurity.query.filter_by(id=username).first().password
-        if not sha256_crypt.verify(password, creds):
-            raise RuntimeError("Username or password incorrect")
+    # pylint: disable=no-member
+    creds = AccountSecurity.query.filter_by(id=username).first().password
+    if sha256_crypt.verify(password, creds):
         return True
-    except RuntimeError:
-        return False
 
-def authenticate():
-    """Sends a 401 response that enables basic auth"""
-    return Response(
-        'Could not verify your access level for that URL.\n'
-        'You have to login with proper credentials',
-        401,
-        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    return False
 
 def requires_auth(func):
     """Decorator to check login creds for a request"""
@@ -37,6 +31,10 @@ def requires_auth(func):
         """decorator"""
         auth = request.authorization
         if not auth or not check_auth(auth.username, auth.password):
-            return authenticate()
+            return Response(
+                'Could not verify your access level for that URL.\n'
+                'You have to login with proper credentials',
+                401,
+                {'WWW-Authenticate': 'Basic realm="Login Required"'})
         return func(*args, **kwargs)
     return decorated

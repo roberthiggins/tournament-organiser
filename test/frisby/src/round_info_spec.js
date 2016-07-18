@@ -1,6 +1,7 @@
-describe('HTTP Method Test Suite', function() {
-    var frisby = require('frisby');
-    var API = process.env['API_ADDR']
+describe('HTTP Method Test Suite', function () {
+    'use strict';
+    var frisby = require('frisby'),
+        API = process.env.API_ADDR;
 
     frisby.create('POST 2 rounds to setup')
         .post(API + 'tournament/round_test/rounds', {

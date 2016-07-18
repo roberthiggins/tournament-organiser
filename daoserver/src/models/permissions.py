@@ -5,6 +5,7 @@ Module to handle permissions for accounts trying to modify a tournament.
 
 from sqlalchemy.sql.expression import and_
 
+from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.account import Account
 from models.dao.permissions import AccountProtectedObjectPermission, \
@@ -84,17 +85,23 @@ class PermissionsChecker(object):
 
         self.check_action_valid(action)
 
+        perm_denied = PermissionDeniedException(
+            'Permission denied for {} to perform {} on tournament {}'.\
+            format(user, action, tournament))
+
         if action == PERMISSIONS['ENTER_SCORE']:
             if Account.query.filter_by(username=user, is_superuser=True).\
                 first() is not None or self.is_organiser(user, tournament):
                 return True
             if user != for_user:
-                return False
-            return TournamentEntry.query.\
-                filter_by(tournament_id=tournament, player_id=user).first() \
-                is not None
+                raise perm_denied
 
-        return False
+            if TournamentEntry.query.\
+                    filter_by(tournament_id=tournament, player_id=user).first()\
+                    is not None:
+                return True
+
+        raise perm_denied
 
     def remove_permission(self, user, action, prot_obj):
         """
