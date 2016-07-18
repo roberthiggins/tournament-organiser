@@ -1,0 +1,7 @@
+#! /bin/bash
+
+docker build -t node_dev -f node/Dockerfile-dev node/
+
+docker kill nodedev
+docker rm nodedev
+docker run -d -p 5006:3000 --name=nodedev node_dev
