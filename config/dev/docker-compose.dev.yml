@@ -20,6 +20,11 @@ webserver:
         file: docker-compose.base.yml
         service: webserver
 
+node:
+    extends:
+        file: docker-compose.base.yml
+        service: node
+
 # Unit Test Specific
 unittest:
     links:
@@ -71,6 +76,11 @@ systemtestwebserver:
     links:
         - systemtestdaoserver
 
+systemtestnode:
+    extends:
+        file: docker-compose.base.yml
+        service: systemtestnode
+
 systemtest:
     extends:
         file: docker-compose.base.yml
@@ -79,6 +89,7 @@ systemtest:
         - selenium
         - systemtestdaoserver
         - systemtestwebserver
+        - systemtestnode
 
 selenium:
     extends:

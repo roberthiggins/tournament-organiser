@@ -29,6 +29,12 @@ webserver:
         file: docker-passwords.yml
         service: webpasswords
 
+node:
+    build: node
+    container_name: node
+    ports:
+        - "5005:3000"
+
 # Unit Test Specific
 
 unittest:
@@ -92,6 +98,12 @@ systemtestwebserver:
 systemtest:
     build: test/behat
     container_name: behat
+
+systemtestnode:
+    build: node
+    container_name: systemtestnode
+    ports:
+        - "5105:3000"
 
 selenium:
     image: selenium/standalone-firefox
