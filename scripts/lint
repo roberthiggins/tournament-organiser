@@ -1,3 +1,4 @@
 #! /bin/bash
 
 pylint $(find . -iname "*.py")
+eslint node test/frisby

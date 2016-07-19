@@ -1,6 +1,6 @@
 #! /bin/bash
 pylint $(find . -iname "*.py")
-jshint $(find . -iname "*.js")
+eslint node test/frisby
 
 # Build all containers and run all tests
 cp config/dev/docker-compose.dev.yml docker-compose.yml
