@@ -9,8 +9,10 @@ Feature: Place feedback to improve the sight
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
 
+    @javascript
     Scenario Outline: I navigate to the feedback section
         Given I am on "/<start_point>"
+        When I wait for 1 second
         When I follow "<link>"
         Then I should see "<intro>"
         Given I am on "/<url>"

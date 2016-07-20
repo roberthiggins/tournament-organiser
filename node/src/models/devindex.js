@@ -1,4 +1,5 @@
-var djangoURL = "http://localhost:" + process.env.DJANGO_WEBSERVER_PORT;
+var djangoURL = "http://" + process.env.DJANGO_WEBSERVER + ":"
+    + process.env.DJANGO_WEBSERVER_PORT;
 
 exports.enterT = {
     djangoURL: djangoURL,

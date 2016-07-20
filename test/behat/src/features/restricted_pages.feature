@@ -6,10 +6,12 @@ Feature: Restricted pages
     Background:
         Given I am on "/logout"
 
+    @javascript
     Scenario Outline:
         Given I am on "/<direct>"
         Then I should be on "/login?next=/<direct>"
         Given I am on "/devindex"
+        When I wait for 1 second
         When I follow "<link>"
         Then I should be on "/login?next=/<direct>"
 

@@ -9,11 +9,12 @@ Feature: List Entries for a tournament
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
 
+    @javascript
     Scenario: Visit the page from the front page
         Given I am on "/devindex"
+        When I wait for 1 second
         Then I follow "See entries for ranking_test"
         Then I am on "/ranking_test/entries"
-        Then the response status code should be 200
         Then I should see "Entries:"
         Then I should see "ranking_test_player_1"
         Then I should see "ranking_test_player_2"

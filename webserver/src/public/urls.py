@@ -2,6 +2,7 @@
 import os
 
 from django.conf.urls import url
+from django.views.generic import RedirectView
 
 from public import public_views, views
 
@@ -13,9 +14,12 @@ NODE_URL = 'http://{}:{}'.format(
 # pylint: disable=invalid-name
 urlpatterns = [
 
+    # Re-directs
+    url(r'^devindex$', RedirectView.as_view(url='{}/devindex'.format(NODE_URL)),
+        name='dev_index'),
+
     # Public views
     url(r'^$', public_views.index, name='index'),
-    url(r'^devindex$', public_views.dev_index, name='dev_index'),
     url(r'^login$', public_views.login, name='login'),
     url(r'^rankings/(?P<tournament_id>.+)$',
         public_views.tournament_rankings, name='tournament_rankings'),

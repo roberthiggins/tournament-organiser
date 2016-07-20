@@ -9,8 +9,10 @@ Feature: Create a Tournament
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
 
+    @javascript
     Scenario: I try to navigate to the page via the front page
         Given I am on "/devindex"
+        When I wait for 1 second
         When I follow "Create a Tournament"
         Then I should see "add a tournament here"
         Then I should see "Name"

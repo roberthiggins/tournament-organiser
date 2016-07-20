@@ -3,11 +3,13 @@ Feature: Rank Entries Based on Scores
     As a tournament organiser
     So I can give prizes appropriately
 
+    @javascript
     Scenario: Visit the page from the front page
         Given I am on "/devindex"
+        When I wait for 1 second
         Then I follow "See the current placings for ranking_test"
         Then I am on "/rankings/ranking_test"
-        Then the response status code should be 200
+        Then I should see "Placings for ranking_test"
 
     Scenario: I get a rankings when no scores have been entered
         Given I am on "/rankings/northcon_2095"
