@@ -1,8 +1,11 @@
 module.exports = {
-  entry: './src/devindex.js',
+  entry: {
+    devindex: './src/devindex.js',
+    login: './src/login.js'
+  },
   output: {
     path: './public',
-    filename: 'devindex.js'
+    filename: '[name].js'
   },
   module: {
     loaders: [

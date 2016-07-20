@@ -34,3 +34,7 @@ app.route("/").get(function(req, res) {
 app.route("/devindex").get(function(req, res) {
     res.render("devindex");
 });
+app.route("/login")
+    .get(function(req, res) {
+        res.render("login");
+    });
