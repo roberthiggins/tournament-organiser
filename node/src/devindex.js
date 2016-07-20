@@ -1,0 +1,97 @@
+var React = require('react'),
+    ReactDOM = require('react-dom'),
+    $ = require('jquery');
+
+var Description = React.createClass({
+    propTypes: {
+        desc: React.PropTypes.string.isRequired
+    },
+    render: function() {
+        return (<p>{this.props.desc}</p>);
+    }
+});
+
+var UserTask = React.createClass({
+    propTypes: {
+        userAction: React.PropTypes.object.isRequired
+    },
+    render: function() {
+        if (typeof this.props.userAction.href === "undefined") {
+            return (<li>{this.props.userAction.text}</li>);
+        }
+
+        // Get the location of the django server for re-directions
+        var href = this.props.userAction.djangoURL + "/" +
+            this.props.userAction.href;
+        return (
+            <li>
+                <a href={href}>
+                    {this.props.userAction.text}
+                </a>
+            </li>
+        );
+    }
+});
+
+var NamedList = React.createClass({
+    propTypes: {
+        items: React.PropTypes.array,
+        title: React.PropTypes.string.isRequired,
+        djangoURL: React.PropTypes.string.isRequired
+    },
+    render: function() {
+        var djangoURL = this.props.djangoURL,
+            listItems = this.props.items.map(function(userAction, idx) {
+                userAction.djangoURL = djangoURL;
+                return (
+                    <UserTask userAction={userAction} key={idx} />
+                );
+            });
+
+        return (
+            <div className="userAction">
+                <h2 className="actionGroup">
+                    {this.props.title}
+                </h2>
+                <ul>
+                    {listItems}
+                </ul>
+            </div>
+        );
+    }
+});
+
+var UserTaskList = React.createClass({
+    getInitialState: function() {
+        return {lists: []};
+    },
+    componentDidMount: function() {
+        this.serverRequest = $.get("/indexcontent", function (result) {
+            this.setState({lists: result});
+        }.bind(this));
+    },
+    componentWillUnmount: function() {
+        this.serverRequest.abort();
+    },
+    render: function() {
+        var namedLists = this.state.lists.map(function(namedList, idx) {
+            return (
+                <NamedList title={namedList.title} items={namedList.actions}
+                           djangoURL={namedList.djangoURL} key={idx} />
+            );
+        });
+
+        return (
+            <div className="userTaskList">
+                <Description desc="Basic behaviour for players as per documentation in the roles section."
+                />
+                {namedLists}
+           </div>
+        );
+    }
+});
+
+ReactDOM.render(
+    <UserTaskList />,
+    document.getElementById('content')
+);

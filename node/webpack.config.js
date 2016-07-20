@@ -1,19 +1,22 @@
 module.exports = {
-  entry: './src/client.js',
+  entry: './src/devindex.js',
   output: {
     path: './public',
-    filename: 'bundle.js'       
+    filename: 'devindex.js'
   },
   module: {
     loaders: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        loader: 'babel',
+        query: {
+           presets: ['es2016', 'react']
+        }
       }
     ]
   },
   resolve: {
-    extensions: ['', '.js', '.json'] 
+    extensions: ['', '.js', '.json']
   }
 };

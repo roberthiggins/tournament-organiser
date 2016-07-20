@@ -34,6 +34,8 @@ node:
     container_name: node
     ports:
         - "5005:3000"
+    environment:
+        DJANGO_WEBSERVER_PORT: "5000"
 
 # Unit Test Specific
 
@@ -104,6 +106,8 @@ systemtestnode:
     container_name: systemtestnode
     ports:
         - "5105:3000"
+    environment:
+        DJANGO_WEBSERVER_PORT: "5004"
 
 selenium:
     image: selenium/standalone-firefox
