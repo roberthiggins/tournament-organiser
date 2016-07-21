@@ -32,7 +32,7 @@ def login():
         - inputPassword
     """
     if g.account is None:
-        raise ValueError('Cannot find user {}'.format(g.username))
+        raise ValueError('Username or password incorrect')
 
     return "Login successful" if check_auth(g.username, inputPassword) \
         else "Login unsuccessful"

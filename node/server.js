@@ -1,4 +1,5 @@
-var express = require("express"),
+var bodyParser = require("body-parser"),
+    express = require("express"),
     expressSession = require("express-session"),
     users = require("./src/users.js"),
     passport = require("passport");
@@ -20,6 +21,10 @@ app.use(function(req, res, next) {
 app.set("views", "./views");
 app.set("view engine", "jade");
 app.use("/", express.static("public"));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 
 // Express sessions for session management
 app.use(expressSession({

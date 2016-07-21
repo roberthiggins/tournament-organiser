@@ -1,35 +1,50 @@
-var React = require('react'),
-    ReactDOM = require('react-dom');
+var React = require("react"),
+    ReactDOM = require("react-dom"),
+    $ = require("jquery");
 
-var InputField = React.createClass({
-    propTypes: {
-        name:    React.PropTypes.string.isRequired,
-        display: React.PropTypes.string.isRequired,
-        type:    React.PropTypes.string.isRequired
+var LoginWidget = React.createClass({
+    getInitialState: function () {
+        return ({error: ""});
+    },
+    handleSubmit: function (e) {
+        // you are the devil! This controller crap should be in a separate file.
+        e.preventDefault();
+        var _this = this,
+            username = $("input#username").val(),
+            password = $("input#password").val(),
+            getNext = function () {
+                // URL manip. You had one job! And now I have to use 'new'.
+                return decodeURIComponent((new RegExp('[?|&]' + "next" + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+            };
+
+        $.post("/login", {
+            username: username,
+            password: password
+            },
+            function success() {
+                window.location.replace(getNext() || "/devindex");
+                return false;
+            })
+            .fail(function (res) {
+                _this.setState({error: res.responseJSON.message});
+            });
     },
     render: function() {
         return (
-            <p>
-                <label htmlFor={this.props.name}>
-                    {this.props.display}:
-                </label>
-                <input type={this.props.type} name={this.props.name}
-                       id={this.props.name} />
-            </p>
-        );
-    }
-});
-
-var LoginWidget = React.createClass({
-    render: function() {
-        return (
             <div>
-                <form method="POST" action="">
+                <form onSubmit={this.handleSubmit}>
                     <p>Login to your account</p>
-                    <InputField display="Username" name="username"
-                                type="text" />
-                    <InputField display="Password" name="password"
-                                type="password" />
+
+                    <div>{this.state.error}</div>
+                    <p>
+                        <label htmlFor="username">Username:</label>
+                        <input type="text" name="username" id="username" />
+                    </p>
+
+                    <p>
+                        <label htmlFor="password">Password:</label>
+                        <input type="password" name="password" id="password" />
+                    </p>
                     <button type="submit">Login</button>
                 </form>
                 <p>
@@ -45,5 +60,5 @@ var LoginWidget = React.createClass({
 
 ReactDOM.render(
     <LoginWidget />,
-    document.getElementById('content')
+    document.getElementById("content")
 );

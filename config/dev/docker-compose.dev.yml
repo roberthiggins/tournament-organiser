@@ -21,6 +21,8 @@ webserver:
         service: webserver
 
 node:
+    links:
+        - daoserver
     extends:
         file: docker-compose.base.yml
         service: node
@@ -77,6 +79,8 @@ systemtestwebserver:
         - systemtestdaoserver
 
 systemtestnode:
+    links:
+        - systemtestdaoserver
     extends:
         file: docker-compose.base.yml
         service: systemtestnode

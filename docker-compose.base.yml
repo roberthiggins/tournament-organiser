@@ -35,6 +35,7 @@ node:
     ports:
         - "5005:3000"
     environment:
+        DAO_CONTAINER: "DAOSERVER"
         DJANGO_WEBSERVER_PORT: "5000"
 
 # Unit Test Specific
@@ -107,6 +108,7 @@ systemtestnode:
     ports:
         - "5105:3000"
     environment:
+        DAO_CONTAINER: "SYSTEMTESTDAOSERVER"
         DJANGO_WEBSERVER_PORT: "5004"
 
 selenium:
