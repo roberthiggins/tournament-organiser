@@ -1,7 +1,7 @@
 var express = require("express"),
-    expressValidator = require("express-validator"),
     expressSession = require("express-session"),
-    users = require("./src/users.js");
+    users = require("./src/users.js"),
+    passport = require("passport");
 const app = express();
 
 app.listen(process.env.PORT || 3000);
@@ -29,6 +29,11 @@ app.use(expressSession({
     saveUninitialized: false
 // TODO MemoryStore is the default but isn't prod ready
 }));
+
+// Passport user auth
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(users.injectUserIntoRequest)
 
 app.route("/indexcontent")
     .get(function(req, res) {
