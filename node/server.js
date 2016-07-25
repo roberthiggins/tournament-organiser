@@ -16,26 +16,25 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.set('views', './views');
-app.set('view engine', 'jade');
+app.set("views", "./views");
+app.set("view engine", "jade");
 app.use("/", express.static("public"));
 
-app.get("/indexcontent", function(req, res) {
-    var content = require("./src/models/devindex.js");
-    res.send([
-        content.enterT,
-        content.orgT,
-        content.playT,
-        content.viewT,
-        content.feedback
-    ]);
-});
-app.route("/").get(function(req, res) {
-    res.render("devindex");
-});
-app.route("/devindex").get(function(req, res) {
-    res.render("devindex");
-});
+app.route("/indexcontent")
+    .get(function(req, res) {
+        var content = require("./src/models/devindex.js");
+        res.send([
+            content.enterT,
+            content.orgT,
+            content.playT,
+            content.viewT,
+            content.feedback
+        ]);
+    });
+app.route("/")
+    .get(function(req, res) { res.render("devindex"); });
+app.route("/devindex")
+    .get(function(req, res) { res.render("devindex"); });
 app.route("/login")
     .get(function(req, res) { res.render("login"); })
     .post(users.login);
