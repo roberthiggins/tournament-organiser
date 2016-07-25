@@ -34,7 +34,8 @@ def create_account(request):
         if form.is_valid():                             # pylint: disable=no-member
             form.save()
 
-            response = from_dao('/user', form)
+            username = form.cleaned_data['username']
+            response = from_dao('/user/{}'.format(username), form)
 
             if  response.status_code == 200:
                 return HttpResponse(response)
@@ -103,7 +104,8 @@ def login(request):
                 username=username,
                 password=password)
 
-        response = from_dao('/user/login', form=login_creds, request=request)
+        response = from_dao('/user/{}/login'.format(username), form=login_creds,
+                            request=request)
         if  response.status_code == 200:
             # The user might exist in the db but not on this webserver.
             create_or_update_user(login_creds)

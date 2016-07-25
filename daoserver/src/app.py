@@ -39,7 +39,7 @@ def create_app():
                            url_prefix='/tournament/<tournament_id>/rounds')
     app.register_blueprint(ENTRY,
                            url_prefix='/tournament/<tournament_id>/entry')
-    app.register_blueprint(USER, url_prefix='/user')
+    app.register_blueprint(USER, url_prefix='/user/<username>')
 
     @app.errorhandler(PermissionDeniedException)
     # pylint: disable=unused-variable
