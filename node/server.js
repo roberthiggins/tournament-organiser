@@ -1,4 +1,6 @@
-var express = require("express");
+var express = require("express"),
+    expressValidator = require("express-validator"),
+    users = require("./src/users.js");
 const app = express();
 
 app.listen(process.env.PORT || 3000);
@@ -35,6 +37,5 @@ app.route("/devindex").get(function(req, res) {
     res.render("devindex");
 });
 app.route("/login")
-    .get(function(req, res) {
-        res.render("login");
-    });
+    .get(function(req, res) { res.render("login"); })
+    .post(users.login);
