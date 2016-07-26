@@ -1,5 +1,6 @@
 var express = require("express"),
     expressValidator = require("express-validator"),
+    expressSession = require("express-session"),
     users = require("./src/users.js");
 const app = express();
 
@@ -19,6 +20,15 @@ app.use(function(req, res, next) {
 app.set("views", "./views");
 app.set("view engine", "jade");
 app.use("/", express.static("public"));
+
+// Express sessions for session management
+app.use(expressSession({
+    secret: "mySecretKeyTODO", // TODO get something from env vars
+    maxAge: 15 * 60 * 1000,
+    resave: false,
+    saveUninitialized: false
+// TODO MemoryStore is the default but isn't prod ready
+}));
 
 app.route("/indexcontent")
     .get(function(req, res) {
