@@ -101,3 +101,5 @@ selenium:
     extends:
         file: docker-compose.base.yml
         service: selenium
+    links:
+        - systemtestwebserver

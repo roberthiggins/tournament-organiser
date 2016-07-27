@@ -17,5 +17,5 @@ ADD src/ /
 # Install and setup behat
 RUN bin/behat --init
 
-CMD export BEHAT_PARAMS='{"extensions": { "Behat\\MinkExtension\\Extension": {"goutte": {}, "selenium2": {"wd_host":"http://'$SELENIUM_PORT_4444_TCP_ADDR':'$SELENIUM_PORT_4444_TCP_PORT'/wd/hub"}, "base_url": "http://'$SYSTEMTESTWEBSERVER_PORT_8000_TCP_ADDR':'$SYSTEMTESTWEBSERVER_PORT_8000_TCP_PORT'"}}, "context": {"parameters": {"api_url": "http://'$SYSTEMTESTDAOSERVER_PORT_5000_TCP_ADDR':'$SYSTEMTESTDAOSERVER_PORT_5000_TCP_PORT'"}}}' && \
-behat
+ADD behat.yml /
+CMD behat --config /behat.yml
