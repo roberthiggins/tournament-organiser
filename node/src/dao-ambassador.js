@@ -1,37 +1,39 @@
 /* Ambassador-like module for interacting with the DAO */
 const winston = require("winston"),
       querystring = require("querystring");
-/*
- * Gets a ClientRequest to the DAO.
- * Caller is responsible for attaching success and fail handlers
- */
-exports.postToDAORequest = function(path, JSONData, onSuccess, onFail) {
+
+// Make a request to the DAO server
+var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
+                                onFail) {
 
     var http            = require("http"),
-        querystring     = require("querystring"),
         daoIP           = process.env["DAOSERVER_PORT_5000_TCP_ADDR"],
         daoPort         = process.env["DAOSERVER_PORT_5000_TCP_PORT"],
-        postData        = querystring.stringify(JSONData),
-        postOptions     = {
+        opts            = {
             host: daoIP,
             port: daoPort,
             path: path,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Content-Length": Buffer.byteLength(postData)
-            }
+            method: method,
+            headers: headers
+        },
+        defaultOnSuccess = function(responseBody) {
+            res.status(200).json({message: responseBody});
+        },
+        defaultOnFail = function(responseBody) {
+            res.status(200).json({message: responseBody});
         };
+    onSuccess = typeof onSuccess === "function" ? onSuccess : defaultOnSuccess;
+    onFail = typeof onFail === "function" ? onFail : defaultOnFail;
 
-    var req = http.request(postOptions, function(res) {
-        var body = '';
-        res.setEncoding("utf8");
-        res.on('data', function(chunk) {
+    var DAOreq = http.request(opts, function(DAOres) {
+        var body = "";
+        DAOres.setEncoding("utf8");
+        DAOres.on("data", function(chunk) {
             body += chunk;
         });
 
-        res.on("end", function() {
-            if (typeof onSuccess === "function" && res.statusCode === 200) {
+        DAOres.on("end", function() {
+            if (typeof onSuccess === "function" && DAOres.statusCode === 200) {
                 winston.log("info", "Request to DAO succeeded", path);
                 onSuccess(body);
             } else if (typeof onFail === "function") {
@@ -41,10 +43,41 @@ exports.postToDAORequest = function(path, JSONData, onSuccess, onFail) {
         })
     });
 
-    req.on("error", function(err) {
+    DAOreq.on("error", function(err) {
         winston.log("error", "Problem with request to DAO", err.message);
     });
 
-    req.write(postData);
-    req.end();
+    return DAOreq;
+};
+
+/*
+ * GET request to the DAO server.
+ * Caller is responsible for attaching success and fail handlers
+ */
+exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
+
+    var headers = {"Content-Type": "application/json"},
+        DAOreq = DAORequestConfig(req, res, path, "GET", headers, onSuccess,
+            onFail);
+
+    DAOreq.end();
+};
+
+/*
+ * POST request to the DAO server.
+ * Caller is responsible for attaching success and fail handlers
+ */
+exports.postToDAORequest = function(req, res, path, JSONData, user, onSuccess,
+                                    onFail) {
+
+    var postData = querystring.stringify(JSONData),
+        headers  = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Length": Buffer.byteLength(postData)
+        },
+        DAOreq = DAORequestConfig(req, res, path, "POST", headers, onSuccess,
+            onFail);
+
+    DAOreq.write(postData);
+    DAOreq.end();
 };

@@ -46,6 +46,8 @@ passport.use('local-signin', new LocalStrategy(
                 inputPassword: password
             };
         DAOAmbassador.postToDAORequest(
+            null,
+            null,
             "/user/" + req.body.username + "/login",
             userDetails,
             function success() {
