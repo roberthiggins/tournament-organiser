@@ -25,7 +25,6 @@ webserver:
     environment:
         HOST_IP: 127.0.0.1
         DAO_CONTAINER: "DAOSERVER"
-        NODE_CONTAINER: "NODE"
     extends:
         file: docker-passwords.yml
         service: webpasswords
@@ -95,7 +94,6 @@ systemtestwebserver:
     environment:
         HOST_IP: 127.0.0.1
         DAO_CONTAINER: "SYSTEMTESTDAOSERVER"
-        NODE_CONTAINER: "SYSTEMTESTNODE"
     extends:
         file: docker-passwords.yml
         service: webpasswords

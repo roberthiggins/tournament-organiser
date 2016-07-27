@@ -5,10 +5,9 @@ from django.conf.urls import url
 
 from public import public_views, views
 
-NODE_NAME = os.environ['NODE_CONTAINER']
 NODE_URL = 'http://{}:{}'.format(
-    os.environ['{}_PORT_8000_TCP_ADDR'.format(NODE_NAME)],
-    os.environ['{}_PORT_8000_TCP_PORT'.format(NODE_NAME)]
+    os.environ['NODE_PORT_8000_TCP_ADDR'],
+    os.environ['NODE_PORT_8000_TCP_PORT']
 )
 
 # pylint: disable=invalid-name
