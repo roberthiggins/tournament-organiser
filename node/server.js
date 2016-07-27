@@ -58,3 +58,13 @@ app.route("/devindex/content")
 app.route("/login")
     .get(function(req, res) { res.render("login"); })
     .post(users.login);
+app.route("/tournaments")
+    .get(function(req, res) { res.render("tournamentList"); });
+app.route("/tournaments/content")
+    .get(function(req, res) {
+        var dao = require("./src/dao-ambassador.js");
+
+        dao.getFromDAORequest(req, res, "/tournament/", function(result) {
+            res.send(result);
+        });
+    });

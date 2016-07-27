@@ -1,7 +1,8 @@
 module.exports = {
   entry: {
     devindex: './src/views/devindex.js',
-    login: './src/views/login.js'
+    login: './src/views/login.js',
+    tournamentList: './src/views/tournamentList.js'
   },
   output: {
     path: './public',
