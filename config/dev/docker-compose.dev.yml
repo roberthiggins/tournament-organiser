@@ -12,7 +12,7 @@ daoserver:
 
 webserver:
     links:
-        - daoserver
+        - daoserver:daoserver
         - node:node
     environment:
         DEBUG: "True"
@@ -23,7 +23,7 @@ webserver:
 
 node:
     links:
-        - daoserver
+        - daoserver:daoserver
     extends:
         file: docker-compose.base.yml
         service: node
@@ -77,12 +77,12 @@ systemtestwebserver:
         DEBUG: "True"
         TEMPLATE_DEBUG: "True"
     links:
-        - systemtestdaoserver
+        - systemtestdaoserver:daoserver
         - systemtestnode:node
 
 systemtestnode:
     links:
-        - systemtestdaoserver
+        - systemtestdaoserver:daoserver
     extends:
         file: docker-compose.base.yml
         service: systemtestnode

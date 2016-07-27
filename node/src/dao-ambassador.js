@@ -9,9 +9,8 @@ exports.postToDAORequest = function(path, JSONData, onSuccess, onFail) {
 
     var http            = require("http"),
         querystring     = require("querystring"),
-        daoName         = process.env.DAO_CONTAINER,
-        daoIP           = process.env[daoName + "_PORT_5000_TCP_ADDR"],
-        daoPort         = process.env[daoName + "_PORT_5000_TCP_PORT"],
+        daoIP           = process.env["DAOSERVER_PORT_5000_TCP_ADDR"],
+        daoPort         = process.env["DAOSERVER_PORT_5000_TCP_PORT"],
         postData        = querystring.stringify(JSONData),
         postOptions     = {
             host: daoIP,
