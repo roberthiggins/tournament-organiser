@@ -5,7 +5,7 @@ database:
 
 daoserver:
     links:
-        - database
+        - database:database
     extends:
         file: docker-compose.base.yml
         service: daoserver
@@ -23,7 +23,7 @@ webserver:
 # Unit Test Specific
 unittest:
     links:
-        - database
+        - database:database
     extends:
         file: docker-compose.base.yml
         service: unittest
@@ -36,7 +36,7 @@ apitestdb:
 
 apitestdaoserver:
     links:
-        - apitestdb
+        - apitestdb:database
     extends:
         file: docker-compose.base.yml
         service: apitestdaoserver
@@ -56,7 +56,7 @@ systemtestdb:
 
 systemtestdaoserver:
     links:
-        - systemtestdb
+        - systemtestdb:database
     extends:
         file: docker-compose.base.yml
         service: systemtestdaoserver
