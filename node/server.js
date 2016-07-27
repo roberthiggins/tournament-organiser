@@ -18,7 +18,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.set("views", "./views");
+app.set("views", "./src/views/jade");
 app.set("view engine", "jade");
 app.use("/", express.static("public"));
 app.use(bodyParser.urlencoded({
@@ -41,9 +41,13 @@ app.use(passport.session());
 app.use(users.injectUserIntoRequest)
 
 app.route("/")
-    .get(function(req, res) { res.render("devindex"); });
+    .get(function(req, res) {
+        res.render("basic", {src_loc: "/devindex.js"});
+    });
 app.route("/devindex")
-    .get(function(req, res) { res.render("devindex"); });
+    .get(function(req, res) {
+        res.render("basic", {src_loc: "/devindex.js"});
+    });
 app.route("/devindex/content")
     .get(function(req, res) {
         var content = require("./src/models/devindex.js");
@@ -56,10 +60,14 @@ app.route("/devindex/content")
         ]);
     });
 app.route("/login")
-    .get(function(req, res) { res.render("login"); })
+    .get(function(req, res) {
+        res.render("basic", {src_loc: "/login.js"});
+    })
     .post(users.login);
 app.route("/tournaments")
-    .get(function(req, res) { res.render("tournamentList"); });
+    .get(function(req, res) {
+        res.render("basic", {src_loc: "/tournamentList.js"});
+    });
 app.route("/tournaments/content")
     .get(function(req, res) {
         var dao = require("./src/dao-ambassador.js");
