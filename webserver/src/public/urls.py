@@ -1,7 +1,15 @@
 # pylint: disable=missing-docstring
+import os
+
 from django.conf.urls import url
 
 from public import public_views, views
+
+NODE_NAME = os.environ['NODE_CONTAINER']
+NODE_URL = 'http://{}:{}'.format(
+    os.environ['{}_PORT_3000_TCP_ADDR'.format(NODE_NAME)],
+    os.environ['{}_PORT_3000_TCP_PORT'.format(NODE_NAME)]
+)
 
 # pylint: disable=invalid-name
 urlpatterns = [

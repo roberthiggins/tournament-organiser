@@ -13,6 +13,7 @@ daoserver:
 webserver:
     links:
         - daoserver
+        - node
     environment:
         DEBUG: "True"
         TEMPLATE_DEBUG: "True"
@@ -77,6 +78,7 @@ systemtestwebserver:
         TEMPLATE_DEBUG: "True"
     links:
         - systemtestdaoserver
+        - systemtestnode
 
 systemtestnode:
     links:
