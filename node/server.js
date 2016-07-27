@@ -1,8 +1,6 @@
 var bodyParser = require("body-parser"),
     express = require("express"),
     expressSession = require("express-session"),
-    feedback = require("./src/feedback.js"),
-    users = require("./src/users.js"),
     passport = require("passport");
 const app = express();
 
@@ -36,50 +34,10 @@ app.use(expressSession({
 // TODO MemoryStore is the default but isn't prod ready
 }));
 
+// Routing
+app.use("/", require('./src/public-routes'));
+app.use("/", require('./src/member-only-routes'));
+
 // Passport user auth
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(users.injectUserIntoRequest)
-
-app.route("/")
-    .get(function(req, res) {
-        res.render("basic", {src_loc: "/devindex.js"});
-    });
-app.route("/devindex")
-    .get(function(req, res) {
-        res.render("basic", {src_loc: "/devindex.js"});
-    });
-app.route("/devindex/content")
-    .get(function(req, res) {
-        var content = require("./src/models/devindex.js");
-        res.send([
-            content.enterT,
-            content.orgT,
-            content.playT,
-            content.viewT,
-            content.feedback
-        ]);
-    });
-app.route("/feedback")
-    .get(function(req, res) {
-        res.render("basic",
-                   {src_loc: "/feedback.js", subtitle: "Place Feedback"});
-    })
-    .post(feedback.placeFeedback);
-app.route("/login")
-    .get(function(req, res) {
-        res.render("basic", {src_loc: "/login.js"});
-    })
-    .post(users.login);
-app.route("/tournaments")
-    .get(function(req, res) {
-        res.render("basic", {src_loc: "/tournamentList.js"});
-    });
-app.route("/tournaments/content")
-    .get(function(req, res) {
-        var dao = require("./src/dao-ambassador.js");
-
-        dao.getFromDAORequest(req, res, "/tournament/", function(result) {
-            res.send(result);
-        });
-    });
