@@ -40,7 +40,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(users.injectUserIntoRequest)
 
-app.route("/indexcontent")
+app.route("/")
+    .get(function(req, res) { res.render("devindex"); });
+app.route("/devindex")
+    .get(function(req, res) { res.render("devindex"); });
+app.route("/devindex/content")
     .get(function(req, res) {
         var content = require("./src/models/devindex.js");
         res.send([
@@ -51,10 +55,6 @@ app.route("/indexcontent")
             content.feedback
         ]);
     });
-app.route("/")
-    .get(function(req, res) { res.render("devindex"); });
-app.route("/devindex")
-    .get(function(req, res) { res.render("devindex"); });
 app.route("/login")
     .get(function(req, res) { res.render("login"); })
     .post(users.login);

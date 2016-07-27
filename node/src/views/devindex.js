@@ -66,9 +66,10 @@ var UserTaskList = React.createClass({
         return {lists: []};
     },
     componentDidMount: function() {
-        this.serverRequest = $.get("/indexcontent", function (result) {
-            this.setState({lists: result});
-        }.bind(this));
+        this.serverRequest = $.get(window.location + "/content",
+            function (result) {
+                this.setState({lists: result});
+            }.bind(this));
     },
     componentWillUnmount: function() {
         this.serverRequest.abort();
