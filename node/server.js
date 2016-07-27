@@ -5,7 +5,7 @@ var bodyParser = require("body-parser"),
     passport = require("passport");
 const app = express();
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 8000);
 
 // Additional middleware which will set headers that we need on each request.
 app.use(function(req, res, next) {
