@@ -1,6 +1,7 @@
 var bodyParser = require("body-parser"),
     express = require("express"),
     expressSession = require("express-session"),
+    feedback = require("./src/feedback.js"),
     users = require("./src/users.js"),
     passport = require("passport");
 const app = express();
@@ -59,6 +60,12 @@ app.route("/devindex/content")
             content.feedback
         ]);
     });
+app.route("/feedback")
+    .get(function(req, res) {
+        res.render("basic",
+                   {src_loc: "/feedback.js", subtitle: "Place Feedback"});
+    })
+    .post(feedback.placeFeedback);
 app.route("/login")
     .get(function(req, res) {
         res.render("basic", {src_loc: "/login.js"});

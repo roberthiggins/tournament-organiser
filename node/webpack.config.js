@@ -1,6 +1,7 @@
 module.exports = {
   entry: {
     devindex: './src/views/devindex.js',
+    feedback: './src/views/feedback.js',
     login: './src/views/login.js',
     tournamentList: './src/views/tournamentList.js'
   },
