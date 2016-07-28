@@ -1,8 +1,9 @@
 /* Functions for assisting with user login and auth. */
 
-var passport = require("passport"),
+var DAOAmbassador = require("./dao-ambassador"),
+    passport      = require("passport"),
     LocalStrategy = require("passport-local").Strategy,
-    winston = require("winston");
+    winston       = require("winston");
 
 // Middleware to inject the user into the request
 exports.injectUserIntoRequest = function(req, res, next) {
@@ -40,8 +41,7 @@ passport.use('local-signin', new LocalStrategy(
     function(req, username, password, done) {
         // Checks for empty fields are handled by Passport before this.
 
-        var DAOAmbassador = require("./dao-ambassador"),
-            userDetails = {
+        var userDetails = {
                 inputUsername: username,
                 inputPassword: password
             };
@@ -70,4 +70,18 @@ exports.login = function(req, res, next) {
         req.session.user = user;
         return res.status(200).send("Login Successful");
     })(req, res, next);
+};
+
+
+exports.signup = function(req, res) {
+    var userDetails = {
+            email: req.body.email,
+            password1: req.body.password1,
+            password2: req.body.password2
+        };
+    DAOAmbassador.postToDAORequest(
+        req,
+        res,
+        "/user/" + req.body.username,
+        userDetails);
 };

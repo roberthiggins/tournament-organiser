@@ -33,6 +33,11 @@ router.route("/login")
         res.render("basic", {src_loc: "/login.js"});
     })
     .post(users.login);
+router.route("/signup")
+    .get(function(req, res) {
+        res.render("basic", {src_loc: "/signup.js"});
+    })
+    .post(users.signup);
 
 
 // Tournaments
