@@ -35,8 +35,9 @@ app.use(expressSession({
 }));
 
 // Routing
-app.use("/", require('./src/public-routes'));
 app.use("/", require('./src/member-only-routes'));
+app.use("/", require('./src/public-routes'));
+app.use("/", require('./src/tournament-routes'));
 
 // Passport user auth
 app.use(passport.initialize());

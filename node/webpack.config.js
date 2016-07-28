@@ -4,7 +4,8 @@ module.exports = {
     feedback: './src/views/feedback.js',
     login: './src/views/login.js',
     signup: './src/views/signup.js',
-    tournamentList: './src/views/tournamentList.js'
+    tournamentInfo: './src/views/tournament-info.js',
+    tournamentList: './src/views/tournament-list.js'
   },
   output: {
     path: './public',

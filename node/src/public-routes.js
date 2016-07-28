@@ -1,6 +1,5 @@
 // Publicly available routes
-var dao     = require("./dao-ambassador"),
-    express = require('express'),
+var express = require('express'),
     router  = express.Router(),
     users   = require("./users");
 
@@ -39,18 +38,5 @@ router.route("/signup")
     })
     .post(users.signup);
 
-
-// Tournaments
-router.route("/tournaments")
-    .get(function(req, res) {
-        res.render("basic", {src_loc: "/tournamentList.js"});
-    });
-router.route("/tournaments/content")
-    .get(function(req, res) {
-
-        dao.getFromDAORequest(req, res, "/tournament/", function(result) {
-            res.send(result);
-        });
-    });
 
 module.exports = router;
