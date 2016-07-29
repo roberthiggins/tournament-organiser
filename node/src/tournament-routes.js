@@ -17,6 +17,35 @@ router.route("/tournaments/content")
             });
     });
 
+router.route("/tournament/create")
+    .get(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res) {
+            res.render("basic", {
+                src_loc: "/tournamentCreate.js",
+                subtitle: "Add a Tournament"
+            });
+        })
+    .post(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res){
+            DAOAmbassador.postToDAORequest(
+                req,
+                res,
+                "/tournament",
+                {
+                    inputTournamentName: req.body.name,
+                    inputTournamentDate: req.body.date
+                },
+                req.user,
+                undefined,
+                function(responseBody) {
+                    res.status(400).json({error: responseBody});
+                });
+        });
+
 router.route("/tournament/:tournament")
     .get(function(req, res) {
         res.render("basic", {

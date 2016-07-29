@@ -58,8 +58,11 @@ class Tournament(object):
             raise RuntimeError('A tournament with name {} already exists! \
             Please choose another name'.format(self.tournament_id))
 
-        date = datetime.datetime.strptime(date, "%Y-%m-%d")
-        if date.date() < datetime.date.today():
+        try:
+            date = datetime.datetime.strptime(date, "%Y-%m-%d")
+            if date.date() < datetime.date.today():
+                raise ValueError()
+        except ValueError:
             raise ValueError('Enter a valid date')
 
         dao = TournamentDB(self.tournament_id)
