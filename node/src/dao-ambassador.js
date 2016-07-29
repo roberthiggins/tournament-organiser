@@ -67,13 +67,17 @@ exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
  * POST request to the DAO server.
  * Caller is responsible for attaching success and fail handlers
  */
-exports.postToDAORequest = function(req, res, path, JSONData, user, onSuccess,
+exports.postToDAORequest = function(req, res, path, JSONData, onSuccess,
                                     onFail) {
 
-    var postData = querystring.stringify(JSONData),
+    var user     = req && req.user ? req.user : null,
+        postData = querystring.stringify(JSONData),
+        auth     = user ? "Basic " + new Buffer(user.username + ":" +
+                    user.password).toString("base64") : null,
         headers  = {
             "Content-Type": "application/x-www-form-urlencoded",
-            "Content-Length": Buffer.byteLength(postData)
+            "Content-Length": Buffer.byteLength(postData),
+            "Authorization": auth
         },
         DAOreq = DAORequestConfig(req, res, path, "POST", headers, onSuccess,
             onFail);
