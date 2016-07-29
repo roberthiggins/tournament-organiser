@@ -26,6 +26,15 @@ exports.ensureAuthenticated = function(req, res, next) {
     }
 }
 
+exports.logout = function(req, res) {
+    req.logOut(); // Why you no work?
+    delete req.user;
+    delete res.locals.user;
+    req.session.destroy(function () {
+        res.redirect('/devindex');
+    });
+}
+
 passport.serializeUser(function(user, done) {
     winston.log("info", "serializing ", user.username);
     done(null, user.username);

@@ -16,5 +16,8 @@ router.route("/feedback")
     })
     .post(injectAuthUser, feedback.placeFeedback);
 
+router.route("/logout")
+    .get(injectAuthUser, users.logout);
+
 
 module.exports = router;
