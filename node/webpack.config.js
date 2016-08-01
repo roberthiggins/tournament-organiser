@@ -8,7 +8,8 @@ module.exports = {
     tournamentCreate: './src/views/tournament-create.js',
     tournamentDraw: './src/views/tournament-draw.js',
     tournamentInfo: './src/views/tournament-info.js',
-    tournamentList: './src/views/tournament-list.js'
+    tournamentList: './src/views/tournament-list.js',
+    tournamentRounds: './src/views/tournament-rounds.js'
   },
   output: {
     path: './public',

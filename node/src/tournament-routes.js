@@ -39,7 +39,6 @@ router.route("/tournament/create")
                     inputTournamentName: req.body.name,
                     inputTournamentDate: req.body.date
                 },
-                req.user,
                 undefined,
                 function(responseBody) {
                     res.status(400).json({error: responseBody});
@@ -71,6 +70,71 @@ router.route("/tournament/:tournament/content")
             "/tournament/" + req.params.tournament,
             function(result) {
                 res.status(200).json(result);
+            });
+    });
+
+router.route("/tournament/:tournament/rounds")
+    .get(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res) {
+            res.render("basic", {
+                src_loc: "/tournamentRounds.js",
+                subtitle: "Set Round for " + req.params.tournament
+            });
+        })
+    .post(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res){
+            DAOAmbassador.postToDAORequest(
+                req,
+                res,
+                "/tournament/" + req.params.tournament + "/rounds",
+                {numRounds: req.body.rounds});
+        });
+router.route("/tournament/:tournament/rounds/content")
+    .get(function(req, res) {
+        var url = "/tournament/" + req.params.tournament;
+
+        DAOAmbassador.getFromDAORequest(req, res, url,
+            function(responseBody) {
+                var responseDict = JSON.parse(responseBody);
+                responseDict.tournament = req.params.tournament,
+
+                res.status(200).json(responseDict);
+            },
+            function(responseBody) {
+                res.status(200).json({error: responseBody});
+            });
+    });
+
+router.route("/tournament/:tournament/round/:round/draw")
+    .get(function(req, res) {
+       res.render("basic", {
+            src_loc: "/tournamentDraw.js",
+            subtitle: "Draw for Round " + req.params.round + ", "
+                      + req.params.tournament
+        });
+    });
+router.route("/tournament/:tournament/round/:round/draw/content")
+    .get(function(req, res) {
+        var url = "/tournament/" + req.params.tournament + "/rounds/"
+                + req.params.round;
+
+        DAOAmbassador.getFromDAORequest(
+            req,
+            res,
+            url,
+            function(responseBody) {
+                var responseDict = JSON.parse(responseBody);
+                responseDict.tournament = req.params.tournament,
+                responseDict.round = req.params.round;
+
+                res.status(200).json(responseDict);
+            },
+            function(responseBody) {
+                res.status(200).json({error: responseBody});
             });
     });
 
