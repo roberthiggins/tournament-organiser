@@ -398,7 +398,9 @@ class ScoreCategoryPair(object):
 
         try:
             self.percentage = int(percentage)
-        except TypeError:
+            if self.percentage > 100 or self.percentage < 1:
+                raise ValueError()
+        except ValueError:
             raise ValueError('Percentage must be an integer (1-100)')
 
         try:
