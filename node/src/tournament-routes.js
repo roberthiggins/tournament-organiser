@@ -138,5 +138,58 @@ router.route("/tournament/:tournament/round/:round/draw/content")
             });
     });
 
+router.route("/tournament/:tournament/categories")
+    .get(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res) {
+            res.render("basic", {
+                src_loc: "/tournamentCategories.js",
+                subtitle: "Set Categories for " + req.params.tournament
+            });
+        })
+    .post(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res){
+            var categories  = req.body.categories,
+                postData    = {},
+                catKeys     = [];
+
+            categories.forEach(function(cat, idx) {
+                var catName = "categories_" + idx;
+
+                catKeys.push(catName);
+                postData[catName] = JSON.stringify(cat);
+            });
+            postData.categories = JSON.stringify(catKeys);
+
+            DAOAmbassador.postToDAORequest(
+                req,
+                res,
+                "/tournament/" + req.params.tournament + "/score_categories",
+                postData);
+        });
+router.route("/tournament/:tournament/categories/content")
+    .get(function(req, res) {
+        var url = "/tournament/" + req.params.tournament
+                    + "/score_categories";
+
+        DAOAmbassador.getFromDAORequest(
+            req,
+            res,
+            url,
+            function(responseBody) {
+                var responseDict = {categories: JSON.parse(responseBody)};
+                responseDict.tournament = req.params.tournament,
+                responseDict.message = "Set the score categories for "
+                    + req.params.tournament
+                    + " here. For example, \"Battle\", \"Sports\", etc.";
+                res.status(200).json(responseDict);
+            },
+            function(responseBody) {
+                res.status(200).json({error: responseBody});
+            });
+    });
 
 module.exports = router;

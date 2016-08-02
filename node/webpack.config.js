@@ -5,6 +5,7 @@ module.exports = {
     feedback: './src/views/feedback.js',
     login: './src/views/login.js',
     signup: './src/views/signup.js',
+    tournamentCategories: './src/views/tournament-categories.js',
     tournamentCreate: './src/views/tournament-create.js',
     tournamentDraw: './src/views/tournament-draw.js',
     tournamentInfo: './src/views/tournament-info.js',
