@@ -38,16 +38,17 @@ Feature: Enter a score for a player
         Then the response status code should be 404
         Then I should see "Entry for ranking_test_player_3 in tournament painting_test not found"
 
+    @javascript
     Scenario Outline: I only know the tournament and username
         Given I am on "/enterscore/<tournament>/<username>"
+        When I wait for 2 seconds
         Then I should be on "<destination>"
-        Then the response status code should be <code>
+        Then I should see "<code>"
         Examples:
-            |tournament         |username       |destination                    |code   |
-            |                   |rick_james     |/enterscore//rick_james        |404    |
-            |painting_test      |               |/enterscore/painting_test/     |404    |
-            |foobar             |rick_james     |/enterscore/foobar/rick_james  |404    |
-            |painting_test      |jimmy          |/enterscore/painting_test/jimmy|404    |
+            |tournament    |username   |destination                    |code            |
+            |              |rick_james |/enterscore//rick_james        |Not Found       |
+            |painting_test |           |/enterscore/painting_test/     |Not Found       |
+            |painting_test |jimmy      |/enterscore/painting_test/jimmy|Unknown player  |
 
     @javascript
     Scenario Outline: I enter some scores

@@ -148,3 +148,26 @@ Feature: Modify the scoring categories for a tournament
             |     | 1   | 1   | Category must have a name              |
             | cat | 1   | 1   | Score categories set                   |
             | cat | 1   | 2   | Score categories set                   |
+
+    Scenario Outline: I fill in some incorrect percentages
+        Given I am on "/setcategories/category_test"
+        Then I fill in "id_categories_0_0" with "<cat>"
+        Then I fill in "id_categories_0_1" with "<percentage>"
+        Then I fill in "id_categories_0_3" with "1"
+        Then I fill in "id_categories_0_4" with "2"
+        Then I fill in "id_categories_1_0" with ""
+        Then I fill in "id_categories_1_1" with ""
+        Then I fill in "id_categories_1_3" with ""
+        Then I fill in "id_categories_1_4" with ""
+        Then I press "Set"
+        Then the response status code should be 200
+        Then I should see "<message>"
+
+        Examples:
+            | cat | percentage | message                                |
+            | cat | -1         | Percentage must be an integer (1-100)  |
+            | cat |            | Percentage must be an integer (1-100)  |
+            | cat | null       | Percentage must be an integer (1-100)  |
+            | cat | None       | Percentage must be an integer (1-100)  |
+            | cat | 101        | Percentage must be an integer (1-100)  |
+            | cat | 0          | Percentage must be an integer (1-100)  |

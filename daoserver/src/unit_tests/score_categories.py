@@ -84,9 +84,11 @@ class ScoreCategoryTests(TestCase):
         zero_min = ScoreCategoryPair('categories_painting', 10, False, 0, 20)
         equal = ScoreCategoryPair('categories_painting', 10, False, 1, 1)
         fifty_one = ScoreCategoryPair('categories_painting', 51, False, 1, 20)
-        zero_pct = ScoreCategoryPair('categories_painting', 0, False, 1, 20)
-        neg_pct = ScoreCategoryPair('categories_painting', 0, False, 1, 20)
 
+        self.assertRaises(ValueError, ScoreCategoryPair,\
+            'categories_painting', -1, False, 1, 20)
+        self.assertRaises(ValueError, ScoreCategoryPair,\
+            'categories_painting', 0, False, 1, 20)
         self.assertRaises(ValueError, ScoreCategoryPair,\
             'categories_painting', 10, False, 'a', 20)
         self.assertRaises(ValueError, ScoreCategoryPair,\
@@ -112,5 +114,3 @@ class ScoreCategoryTests(TestCase):
         self.assertRaises(ValueError, set_cats_func, [zero_max])
         self.assertRaises(ValueError, set_cats_func, [min_high])
         self.assertRaises(ValueError, set_cats_func, [fifty_one, fifty_one])
-        self.assertRaises(ValueError, set_cats_func, [zero_pct])
-        self.assertRaises(ValueError, set_cats_func, [neg_pct])

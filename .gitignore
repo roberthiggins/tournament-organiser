@@ -10,3 +10,7 @@
 *config.yml
 docker-compose.yml
 docker-passwords.yml
+
+# Node dependenices
+*node_modules
+*.md
