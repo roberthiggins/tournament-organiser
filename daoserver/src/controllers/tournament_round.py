@@ -2,14 +2,15 @@
 Individual rounds in a tournament
 """
 from flask import Blueprint
-import jsonpickle
 
-from controllers.request_helpers import enforce_request_variables, text_response
+from controllers.request_helpers import enforce_request_variables, \
+json_response, text_response
 from models.tournament import Tournament
 
 TOURNAMENT_ROUND = Blueprint('TOURNAMENT_ROUND', __name__)
 
 @TOURNAMENT_ROUND.route('/<round_id>', methods=['GET'])
+@json_response
 def get_round_info(tournament_id, round_id):
     """
     GET the information about a round
@@ -25,12 +26,10 @@ def get_round_info(tournament_id, round_id):
         } for t in draw]
 
     # We will return all round info for all requests regardless of method
-    return jsonpickle.encode(
-        {
-            'draw': draw_info,
-            'mission': rnd.mission
-        },
-        unpicklable=False)
+    return {
+        'draw': draw_info,
+        'mission': rnd.mission
+    }
 
 @TOURNAMENT_ROUND.route('', methods=['POST'])
 @text_response
@@ -39,8 +38,12 @@ def set_rounds(tournament_id):
     """Set the number of rounds for a tournament"""
 
     # pylint: disable=undefined-variable
-    rounds = int(numRounds)
-    if rounds < 1:
+    try:
+        rounds = int(numRounds)
+        if rounds < 1:
+            raise ValueError()
+    except ValueError:
         raise ValueError('Set at least 1 round')
+
     Tournament(tournament_id).set_number_of_rounds(rounds)
     return 'Rounds set: {}'.format(rounds)

@@ -3,7 +3,7 @@ Users for the site. Note this is separate from an entry in a tournament.
 """
 
 import re
-from flask import Blueprint
+from flask import Blueprint, g
 
 from controllers.request_helpers import enforce_request_variables, \
 json_response, text_response
@@ -12,29 +12,39 @@ from models.dao.account import Account, add_account
 
 USER = Blueprint('USER', __name__)
 
+@USER.url_value_preprocessor
+# pylint: disable=unused-argument
+def get_user(endpoint, values):
+    """Attempt to retrieve user from URL"""
+    g.username = values.pop('username', None)
+    if g.username:
+        # pylint: disable=no-member
+        g.account = Account.query.filter_by(username=g.username).first()
+
+# pylint: disable=undefined-variable
 @USER.route('/login', methods=['POST'])
 @text_response
-@enforce_request_variables('inputUsername', 'inputPassword')
+@enforce_request_variables('inputPassword')
 def login():
     """
     POST to login
     Expects:
-        - inputUsername
         - inputPassword
     """
-    # pylint: disable=E0602
-    return "Login successful" if check_auth(inputUsername, inputPassword) \
+    if g.account is None:
+        raise ValueError('Cannot find user {}'.format(g.username))
+
+    return "Login successful" if check_auth(g.username, inputPassword) \
         else "Login unsuccessful"
 
 # pylint: disable=undefined-variable
 @USER.route('', methods=['POST'])
 @text_response
-@enforce_request_variables('username', 'email', 'password1', 'password2')
+@enforce_request_variables('email', 'password1', 'password2')
 def create():
     """
     POST to add an account
     Expects:
-        - username
         - email
         - password1
         - password2
@@ -45,26 +55,24 @@ def create():
     if password1 != password2:
         raise ValueError('Please enter two matching passwords')
 
-    if Account.username_exists(username):
+    if g.account:
         raise ValueError('A user with the username {} already exists! \
-            Please choose another name'.format(username))
+            Please choose another name'.format(g.username))
 
-    add_account(username, email, password1)
+    add_account(g.username, email, password1)
 
     return '<p>Account created! You submitted the following \
         fields:</p><ul><li>User Name: {}</li><li>Email: {}\
-        </li></ul>'.format(username, email)
+        </li></ul>'.format(g.username, email)
 
-@USER.route('/<u_name>', methods=['GET'])
+@USER.route('', methods=['GET'])
 @json_response
-def user_details(u_name=None):
+def user_details():
     """
     GET to get account details in url form
     TODO security
     """
-    # pylint: disable=no-member
-    user = Account.query.filter_by(username=u_name).first()
-    if user is None:
-        raise ValueError('Cannot find user {}'.format(u_name))
+    if g.account is None:
+        raise ValueError('Cannot find user {}'.format(g.username))
 
-    return {u_name: user.contact_email}
+    return {g.username: g.account.contact_email}
