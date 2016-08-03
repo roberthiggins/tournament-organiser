@@ -48,7 +48,7 @@ def add_tournament():
 def list_missions():
     """GET list of missions for a tournament."""
     return jsonpickle.encode(
-        [x.mission for x in g.tournament.get_dao().rounds],
+        [x.mission for x in g.tournament.get_dao().rounds.order_by('ordering')],
         unpicklable=False)
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['GET'])
