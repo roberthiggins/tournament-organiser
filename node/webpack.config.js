@@ -10,6 +10,7 @@ module.exports = {
     tournamentDraw: './src/views/tournament-draw.js',
     tournamentInfo: './src/views/tournament-info.js',
     tournamentList: './src/views/tournament-list.js',
+    tournamentMissions: './src/views/tournament-missions.js',
     tournamentRounds: './src/views/tournament-rounds.js'
   },
   output: {

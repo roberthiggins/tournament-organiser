@@ -192,4 +192,65 @@ router.route("/tournament/:tournament/categories/content")
             });
     });
 
+router.route("/tournament/:tournament/missions")
+    .get(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res) {
+            res.render("basic", {
+                src_loc: "/tournamentMissions.js",
+                subtitle: "Set Missions for " + req.params.tournament
+            });
+        })
+    .post(
+        users.injectUserIntoRequest,
+        users.ensureAuthenticated,
+        function(req, res){
+
+            var url = "/tournament/" + req.params.tournament + "/missions",
+                missionList = function(postData) {
+
+                    var idx = 0,
+                        missions = [],
+                        missionsInPost = true;
+
+                    while (missionsInPost) {
+                        var mission = postData["missions_" + idx];
+                        if (typeof mission !== "undefined") {
+                            missions.push(mission);
+                            idx = idx +1;
+                        }
+                        else {
+                            missionsInPost = false;
+                        }
+                    }
+
+                    return JSON.stringify(missions);
+                },
+                postData = {missions: missionList(req.body)};
+
+            DAOAmbassador.postToDAORequest(req, res, url, postData);
+        });
+router.route("/tournament/:tournament/missions/content")
+    .get(function(req, res) {
+        var url = "/tournament/" + req.params.tournament + "/missions";
+
+        DAOAmbassador.getFromDAORequest(
+            req,
+            res,
+            url,
+            function(responseBody) {
+                var responseDict = {
+                    missions: JSON.parse(responseBody),
+                    tournament: req.params.tournament,
+                    message: "Set the missions for " + req.params.tournament
+                                + " here:"
+                };
+                res.status(200).json(responseDict);
+            },
+            function(responseBody) {
+                res.status(200).json({error: responseBody});
+            });
+    });
+
 module.exports = router;
