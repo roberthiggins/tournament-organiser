@@ -19,6 +19,9 @@ urlpatterns = [
         name='dev_index'),
     url(r'^logintonode$', RedirectView.as_view(url='{}/login'.format(NODE_URL)),
         name='login_to_node'),
+    url(r'^feedback$',
+        RedirectView.as_view(url='{}/feedback'.format(NODE_URL)),
+        name='feedback'),
 
     # Public views
     url(r'^$', public_views.index, name='index'),
@@ -44,7 +47,6 @@ urlpatterns = [
         views.enter_score_for_game, name='enter_score_for_game'),
     url(r'^(?P<tournament_id>.+)/entries$',
         views.entry_list, name='tournament_entry_list'),
-    url(r'^feedback$', views.feedback, name='feedback'),
     url(r'^logout$', views.logout, name='logout'),
     url(r'^setcategories/(?P<tournament_id>.+)$',
         views.set_categories, name='set_categories'),
@@ -54,6 +56,4 @@ urlpatterns = [
         views.register_for_tournament, name='apply_for_tournament'),
     url(r'^setrounds/(?P<tournament_id>.+)$',
         views.set_rounds, name='set_rounds'),
-    url(r'^suggestimprovement$',
-        views.suggest_improvement, name='suggest_improvement'),
 ]

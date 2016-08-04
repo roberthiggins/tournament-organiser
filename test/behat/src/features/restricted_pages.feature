@@ -21,4 +21,3 @@ Feature: Restricted pages
             |createtournament           |Create a Tournament            | 
             |feedback                   |Place Feedback                 | 
             |registerforatournament     |Register for a Tournament      | 
-            |suggestimprovement         |Suggest Improvement            | 

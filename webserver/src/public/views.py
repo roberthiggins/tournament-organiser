@@ -12,7 +12,7 @@ HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from public.forms import AddTournamentForm, ApplyForTournamentForm, \
-EnterScoreForm, FeedbackForm, SetRoundsForm, EnterGameScoreForm, \
+EnterScoreForm, SetRoundsForm, EnterGameScoreForm, \
 SetCategoriesForm, SetMissionsForm
 from public.view_helpers import from_dao
 
@@ -160,33 +160,6 @@ def entry_list(request, tournament_id):
         RequestContext(request)
     )
 
-@login_required
-def feedback(request):
-    """ Page for user to place feedback"""
-
-    form = FeedbackForm()
-
-    if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/feedback', form)
-
-            if  response.status_code == 200:
-                return HttpResponse(response)
-            else:
-                form.add_error(None, response.content)  # pylint: disable=E1103
-
-    context_dict = {
-        'title': 'Place Feedback',
-        'intro': 'Please give us feedback on your experience on the site',
-        'form': form
-    }
-    return render_to_response(
-        'feedback.html',
-        context_dict,
-        RequestContext(request)
-    )
-
 def logout(request):
     """ logout the user from current request """
     auth.logout(request)
@@ -325,33 +298,6 @@ def set_rounds(request, tournament_id):
             'form': form,
             'tournament': tournament_id
         },
-        RequestContext(request)
-    )
-
-@login_required
-def suggest_improvement(request):
-    """Page to suggest improvements to the site"""
-
-    form = FeedbackForm()
-
-    if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('/feedback', form)
-
-            if  response.status_code == 200:
-                return HttpResponse(response)
-            else:
-                form.add_error(None, response.content)  # pylint: disable=E1103
-
-    context_dict = {
-        'title': 'Suggest Improvement',
-        'intro': 'Suggest a feature you would like to see on the site',
-        'form': form
-    }
-    return render_to_response(
-        'feedback.html',
-        context_dict,
         RequestContext(request)
     )
 

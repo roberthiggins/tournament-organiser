@@ -101,13 +101,6 @@ class EnterScoreForm(ErrorStringForm):                  # pylint: disable=no-ini
         )
     value = forms.CharField(label='Score', )
 
-class FeedbackForm(ErrorStringForm):                    # pylint: disable=no-init
-    """ Feedback and suggestions"""
-    inputFeedback = forms.CharField(
-        widget=forms.Textarea(attrs={'id': 'inputFeedback'}),
-        label='Feedback',
-        max_length=500)
-
 class LoginForm(ErrorStringForm):                       # pylint: disable=no-init
     """ Login """
     inputUsername = forms.CharField(label='Username')

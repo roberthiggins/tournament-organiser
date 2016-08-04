@@ -20,12 +20,9 @@ var UserTask = React.createClass({
             return (<li>{this.props.userAction.text}</li>);
         }
 
-        // Get the location of the django server for re-directions
-        var href = this.props.userAction.djangoURL + "/" +
-            this.props.userAction.href;
         return (
             <li>
-                <a href={href}>
+                <a href={this.props.userAction.href}>
                     {this.props.userAction.text}
                 </a>
             </li>
@@ -37,12 +34,9 @@ var NamedList = React.createClass({
     propTypes: {
         items: React.PropTypes.array,
         title: React.PropTypes.string.isRequired,
-        djangoURL: React.PropTypes.string.isRequired
     },
     render: function() {
-        var djangoURL = this.props.djangoURL,
-            listItems = this.props.items.map(function(userAction, idx) {
-                userAction.djangoURL = djangoURL;
+        var listItems = this.props.items.map(function(userAction, idx) {
                 return (
                     <UserTask userAction={userAction} key={idx} />
                 );
@@ -78,7 +72,7 @@ var UserTaskList = React.createClass({
         var namedLists = this.state.lists.map(function(namedList, idx) {
             return (
                 <NamedList title={namedList.title} items={namedList.actions}
-                           djangoURL={namedList.djangoURL} key={idx} />
+                           key={idx} />
             );
         });
 
