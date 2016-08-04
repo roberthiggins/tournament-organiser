@@ -37,6 +37,28 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * Spin for waiting for a response
+     */
+    public function spin($lambda, $wait = 5)
+    {
+        $time = time();
+        $stopTime = $time + $wait;
+        while (time() < $stopTime)
+        {
+            try {
+                if ($lambda($this)) {
+                    return;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            usleep(250000);
+        }
+
+        throw new \Exception("Spin function timed out after {$wait} seconds");
+    }
+    /**
      * This will wait for up to n seconds
      *
      * Note you'll need to add the @javascript decorator
@@ -47,6 +69,38 @@ class FeatureContext extends MinkContext
     {
         $time = 1000 * $delay; // milliseconds
         $this->getSession()->wait($time);
+    }
+
+    /**
+     * @When /^I wait for "([^"]*)" to appear$/
+     * @Then /^I should see "([^"]*)" appear$/
+     * @param $text
+     * @throws \Exception
+     */
+    public function iWaitForTextToAppear($text)
+    {
+        $this->spin(function(FeatureContext $context) use ($text) {
+            try {
+                $context->assertPageContainsText($text);
+                return true;
+            }
+            catch(ResponseTextException $e) {
+                // NOOP
+            }
+            return false;
+        });
+    }
+
+    /**
+    * @Given /^I am authenticated as "([^"]*)" using "([^"]*)"$/
+    */
+    public function iAmAuthenticatedAs($username, $password) {
+        $this->visit('/logintonode');
+        $this->iWaitForTextToAppear('Login to your account');
+        $this->fillField('username', $username);
+        $this->fillField('password', $password);
+        $this->pressButton('Login');
+        $this->iWaitForTextToAppear('Basic behaviour');
     }
 
 //
