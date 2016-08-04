@@ -17,6 +17,8 @@ urlpatterns = [
     # Re-directs
     url(r'^devindex$', RedirectView.as_view(url='{}/devindex'.format(NODE_URL)),
         name='dev_index'),
+    url(r'^logintonode$', RedirectView.as_view(url='{}/login'.format(NODE_URL)),
+        name='login_to_node'),
 
     # Public views
     url(r'^$', public_views.index, name='index'),
