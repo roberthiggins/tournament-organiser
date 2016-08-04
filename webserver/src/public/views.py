@@ -11,33 +11,11 @@ from django.http import HttpResponse, HttpResponseNotFound, \
 HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from public.forms import AddTournamentForm, ApplyForTournamentForm, \
+from public.forms import ApplyForTournamentForm, \
 EnterScoreForm, SetRoundsForm, EnterGameScoreForm, \
 SetCategoriesForm, SetMissionsForm
 from public.view_helpers import from_dao
 
-@login_required
-def create_tournament(request):
-    """Page for creating a tournament"""
-
-    form = AddTournamentForm()
-
-    if request.method == 'POST':
-        form = AddTournamentForm(request.POST)
-        if form.is_valid():                     # pylint: disable=no-member
-            response = from_dao('/tournament', form, request)
-
-            if  response.status_code == 200:
-                return HttpResponse(response)
-            else:
-                form.add_error(None, response.content)  # pylint: disable=E1103
-
-
-    return render_to_response(
-        'create-a-tournament.html',
-        {'form': form},
-        RequestContext(request)
-    )
 
 def entry_info(tournament_id, username):
     """Get information about an entry"""

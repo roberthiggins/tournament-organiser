@@ -15,6 +15,9 @@ NODE_URL = 'http://{}:{}'.format(
 urlpatterns = [
 
     # Re-directs
+    url(r'^createtournament$',
+        RedirectView.as_view(url='{}/tournament/create'.format(NODE_URL)),
+        name='create_tournament'),
     url(r'^devindex$', RedirectView.as_view(url='{}/devindex'.format(NODE_URL)),
         name='dev_index'),
     url(r'^logintonode$', RedirectView.as_view(url='{}/login'.format(NODE_URL)),
@@ -39,8 +42,6 @@ urlpatterns = [
         public_views.list_tournaments, name='list_tournaments'),
 
     # Logged in views
-    url(r'^createtournament$',
-        views.create_tournament, name='create_tournament'),
     url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)$',
         views.enter_score, name='enter_score'),
     url(r'^entergamescore/(?P<t_id>.+)/(?P<user>.+)$',

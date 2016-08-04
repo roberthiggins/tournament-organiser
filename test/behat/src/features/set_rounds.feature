@@ -26,13 +26,3 @@ Feature: Set the number of rounds
         Then the API response status code should be 200
         Then the response is JSON
         Then the API response should contain "8"
-
-    Scenario: I check a newly minted tournament
-        Given I am on "/createtournament"
-        When I fill in "id_inputTournamentName" with "round_test"
-        When I fill in "id_inputTournamentDate" with "2030-03-15"
-        When I press "Create"
-        Given I am on "/setrounds/round_test"
-        Then the "numRounds" field should contain "5"
-
-    Scenario: I set some insane values for the number of rounds

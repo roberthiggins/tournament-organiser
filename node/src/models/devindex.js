@@ -15,7 +15,7 @@ exports.enterT = {
 exports.orgT = {
     title: "Organise a Tournament",
     actions: [
-        {href: djangoURL + "/createtournament", text: "Create a Tournament"},
+        {href: "/tournament/create", text: "Create a Tournament"},
         {href: djangoURL + "/setrounds/mission_test",
          text: "Set num rounds for mission_test"},
         {href: djangoURL + "/setcategories/mission_test",

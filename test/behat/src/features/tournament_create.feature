@@ -4,38 +4,37 @@ Feature: Create a Tournament
     I need to be able to create a tournament
 
     Background:
-        Given I am on "/login"
-        When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "password"
-        When I press "Login"
+        Given I am authenticated as "charlie_murphy" using "password"
 
     @javascript
     Scenario: I try to navigate to the page via the front page
         Given I am on "/devindex"
-        When I wait for 1 second
+        When I wait for "Create a Tournament" to appear
         When I follow "Create a Tournament"
-        Then I should see "add a tournament here"
-        Then I should see "Name"
-        #TODO All the other fields
+        Then I should see "add a tournament here" appear
+        Then I should see "Name" appear
 
+    @javascript
     Scenario: I try to navigate to the page via the URL
         Given I am on "/createtournament"
-        Then I should see "add a tournament here"
-        Then I should see "Name"
+        Then I should see "You can add a tournament here" appear
+        Then I should see "Tournament Name" appear
+        Then I should see "Tournament Date" appear
 
+    @javascript
     Scenario Outline: Valid and invalid values
         Given I am on "/createtournament"
-        When I fill in "id_inputTournamentName" with "<name>"
-        When I fill in "id_inputTournamentDate" with "<date>"
+        When I wait for "You can add a tournament here" to appear
+        When I fill in "name" with "<name>"
+        When I fill in "date" with "<date>"
         When I press "Create"
-        Then I should see "<response>"
+        Then I should see "<response>" appear
 
         Examples:
             | name              | date          | response                      |
-            |                   |               | This field is required        |
-            | Red Harvest       |               | This field is required        |
-            |                   | 2095-01-01    | This field is required        |
-            | Red Harvest       | 2095-01-011   | Enter a valid date            |
+            |                   |               | Enter a valid                 |
+            | Red Harvest       |               | Enter a valid date            |
+            |                   | 2095-01-01    | Enter a valid name            |
             | Red Harvest       | 2095-13-01    | Enter a valid date            |
             | Red Harvest       | Red Harvest   | Enter a valid date            |
             | Red Harvest       | 2095-01-01    | Tournament created            |

@@ -12,13 +12,6 @@ class ErrorStringForm(forms.Form):                      # pylint: disable=no-ini
     def error_code(self):                         # pylint: disable=missing-docstring,R0201
         return 'Enter the required fields'
 
-class AddTournamentForm(ErrorStringForm):               # pylint: disable=no-init
-    """ Add a tournament """
-    inputTournamentName = forms.CharField(label='Tournament Name', )
-    inputTournamentDate = forms.DateField(
-        label='Tournament Date',
-    )
-
 class ApplyForTournamentForm(ErrorStringForm):          # pylint: disable=no-init
     """ Apply for a tournament """
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002
