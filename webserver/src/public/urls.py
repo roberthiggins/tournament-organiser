@@ -25,6 +25,9 @@ urlpatterns = [
     url(r'^feedback$',
         RedirectView.as_view(url='{}/feedback'.format(NODE_URL)),
         name='feedback'),
+    url(r'^tournaments$',
+        RedirectView.as_view(url='{}/tournaments'.format(NODE_URL)),
+        name='list_tournaments'),
 
     # Public views
     url(r'^$', public_views.index, name='index'),
@@ -36,10 +39,6 @@ urlpatterns = [
         public_views.tournament_draw, name='draw'),
     url(r'^tournament/(?P<tournament_id>.+)$',
         public_views.tournament, name='tournament'),
-    url(r'^tournament/$',
-        public_views.list_tournaments, name='apply_for_tournament'),
-    url(r'^tournaments$',
-        public_views.list_tournaments, name='list_tournaments'),
 
     # Logged in views
     url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)$',

@@ -4,7 +4,7 @@ var djangoURL = "http://" + process.env.DJANGO_WEBSERVER + ":"
 exports.enterT = {
     title: "Enter a Tournament",
     actions: [
-        {text: "See a list of tournaments", href: djangoURL + "/tournaments"},
+        {text: "See a list of tournaments", href: "/tournaments"},
         {text: "Register for a Tournament",
          href: djangoURL + "/registerforatournament"},
         {text: "Update my player details"},
