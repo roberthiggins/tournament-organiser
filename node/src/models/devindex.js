@@ -46,12 +46,12 @@ exports.playT = {
     ]
 };
 exports.viewT = {
-    title: "Feedback",
+    title: "Information",
     actions: [
             {text: "See the current placings for ranking_test",
              href: djangoURL + "/rankings/ranking_test"},
             {text: "See Northcon 2095",
-             href: djangoURL + "/tournament/northcon_2095"},
+             href: "/tournament/northcon_2095"},
             {text: "See the 1st Round draw for ranking_test",
              href: djangoURL + "/draw/ranking_test/1"},
             {text: "See entries for ranking_test",

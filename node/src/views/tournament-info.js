@@ -27,7 +27,7 @@ var TournamentInfoPage = React.createClass({
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
-                this.setState(JSON.parse(result));
+                this.setState(result);
             }.bind(this));
     },
     componentWillUnmount: function() {

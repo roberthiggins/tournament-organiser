@@ -2,6 +2,7 @@
 Basic URL mappings for the webserver
 """
 
+import os
 import json
 from ratelimit.decorators import ratelimit
 
@@ -125,25 +126,16 @@ def render_login(request, form):
     )
 
 @ratelimit(key='ip', rate='100/m', block=True)
+# pylint: disable=unused-argument
 def tournament(request, tournament_id):
     """ See information about a single tournament"""
-    if tournament_id is None:
-        return list_tournaments(request)
-    if request.method == 'POST':
-        return HttpResponseRedirect('/registerforatournament')
+    node_url = 'http://{}:{}'.format(
+        os.environ['NODE_PORT_8000_TCP_ADDR'],
+        os.environ['NODE_PORT_8000_TCP_PORT']
+    )
 
-    try:
-        response = from_dao('/tournament/%s' % tournament_id).content
-        t_info = json.loads(response)
-        return render_to_response(
-            'tournament-info.html',
-            {'id': tournament_id, 'info': t_info},
-            RequestContext(request)
-        )
-    except AttributeError:
-        return HttpResponse(response)
-    except ValueError:
-        return HttpResponse(response)
+    return HttpResponseRedirect('{}/tournament/{}'.\
+        format(node_url, tournament_id))
 
 @ratelimit(key='ip', rate='100/m', block=True)
 def tournament_draw(request, tournament_id, round_id):

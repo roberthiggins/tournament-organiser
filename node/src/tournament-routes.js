@@ -69,7 +69,10 @@ router.route("/tournament/:tournament/content")
             res,
             "/tournament/" + req.params.tournament,
             function(result) {
-                res.status(200).json(result);
+                res.status(200).json(JSON.parse(result));
+            },
+            function(responseBody) {
+                res.status(200).json({error: responseBody});
             });
     });
 
