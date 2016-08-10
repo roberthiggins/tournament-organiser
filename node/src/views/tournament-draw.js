@@ -57,7 +57,7 @@ var TournamentDrawPagePage = React.createClass({
     getInitialState: function() {
         return ({
             draw: null,
-            message: "",
+            error: "",
             mission: "",
             round: "",
             tournament: ""
@@ -82,8 +82,8 @@ var TournamentDrawPagePage = React.createClass({
 
         return (
             <div>
-                <p>{this.state.message}</p>
-                {this.state.message ? null : draw}
+                <p>{this.state.error}</p>
+                {this.state.error ? null : draw}
             </div>
         );
     }

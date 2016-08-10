@@ -53,7 +53,7 @@ exports.viewT = {
             {text: "See Northcon 2095",
              href: "/tournament/northcon_2095"},
             {text: "See the 1st Round draw for ranking_test",
-             href: djangoURL + "/draw/ranking_test/1"},
+             href: "/draw/ranking_test/1"},
             {text: "See entries for ranking_test",
              href: djangoURL + "/ranking_test/entries"},
             {text: "Search for tournaments - by player, army, club, etc."},
