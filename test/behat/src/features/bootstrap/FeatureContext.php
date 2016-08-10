@@ -103,6 +103,23 @@ class FeatureContext extends MinkContext
         $this->iWaitForTextToAppear('Basic behaviour');
     }
 
+    /**
+    * @Given /^I visit category page for "([^"]*)"$/
+    */
+    public function iVisitCategoryPage($tourn) {
+        $this->visit('/setcategories/'.$tourn);
+        $this->iWaitForTextToAppear('Once per tournament');
+    }
+
+    /**
+    * @Given /^I fill category (\d+) with "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)"$/
+    */
+    public function iSetDefaultCategories($pos, $name, $per, $min, $max) {
+        $this->fillField($pos.'_name', $name);
+        $this->fillField($pos.'_percentage', $per);
+        $this->fillField($pos.'_min_val', $min);
+        $this->fillField($pos.'_max_val', $max);
+    }
 //
 // Place your definition and hook methods here:
 //

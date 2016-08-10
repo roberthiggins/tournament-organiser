@@ -18,7 +18,7 @@ exports.orgT = {
         {href: "/tournament/create", text: "Create a Tournament"},
         {href: djangoURL + "/setrounds/mission_test",
          text: "Set num rounds for mission_test"},
-        {href: djangoURL + "/setcategories/mission_test",
+        {href: "/tournament/mission_test/categories",
          text: "Set scoring categories for mission_test"},
         {href: djangoURL + "/setmissions/mission_test",
          text: "Set missions for mission_test"},

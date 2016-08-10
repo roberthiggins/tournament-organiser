@@ -2,6 +2,7 @@
 Basic URL mappings for the webserver
 """
 
+import os
 import json
 import urllib2
 
@@ -12,10 +13,13 @@ HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from public.forms import ApplyForTournamentForm, \
-EnterScoreForm, SetRoundsForm, EnterGameScoreForm, \
-SetCategoriesForm, SetMissionsForm
+EnterScoreForm, SetRoundsForm, EnterGameScoreForm, SetMissionsForm
 from public.view_helpers import from_dao
 
+NODE_URL = 'http://{}:{}'.format(
+    os.environ['NODE_PORT_8000_TCP_ADDR'],
+    os.environ['NODE_PORT_8000_TCP_PORT']
+)
 
 def entry_info(tournament_id, username):
     """Get information about an entry"""
@@ -143,42 +147,11 @@ def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
 
-@login_required
+# pylint: disable=unused-argument
 def set_categories(request, tournament_id):
     """Set the scoring categories for a tournament"""
-    cats = [[x['name'], x['percentage'], x['per_tournament'], x['min_val'], \
-        x['max_val']] for x in categories_info(tournament_id)]
-    form = SetCategoriesForm(tournament_id=tournament_id, categories=cats)
-
-    if request.method == 'POST':
-
-        form = SetCategoriesForm(request.POST,
-                                 tournament_id=tournament_id,
-                                 categories=cats)
-
-        if form.is_valid():
-            # We need to do some mangling. I suppose it could be built into the
-            # form but simpler to do it here.
-            form.cleaned_data['categories'] = json.dumps([
-                k for k, v in form.cleaned_data.iteritems() \
-                if k.startswith('categories_') and v != form.empty_field()])
-
-            dao_url = '/tournament/{}/score_categories'.format(tournament_id)
-            response = from_dao(dao_url, form)
-
-            if  response.status_code == 200:
-                return HttpResponse(response)
-            else:
-                form.add_error(None, response.content)
-
-    return render_to_response(
-        'set-categories.html',
-        {
-            'form': form,
-            'tournament': tournament_id,
-        },
-        RequestContext(request)
-    )
+    return HttpResponseRedirect('{}/tournament/{}/categories'.\
+        format(NODE_URL, tournament_id))
 
 @login_required
 def set_missions(request, tournament_id):

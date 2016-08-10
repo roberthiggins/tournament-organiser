@@ -132,29 +132,6 @@ class CategoriesField(forms.MultiValueField):
     def compress(self, data_list):      # pylint: disable=missing-docstring
         return json.dumps(data_list)
 
-class SetCategoriesForm(ErrorStringForm):
-    """Set the score categories for a tournament"""
-    def __init__(self, *args, **kwargs):
-        t_id = kwargs.pop('tournament_id')
-        initial_cats = kwargs.pop('categories', None)
-        num_fields = 5 # Should be enough
-
-        super(SetCategoriesForm, self).__init__(*args, **kwargs)
-
-        for fld in range(0, num_fields):
-            self.fields['categories_{}'.format(fld)] = CategoriesField(
-                label='', required=False)
-            if initial_cats is not None and len(initial_cats) > fld:
-                self.initial['categories_{}'.format(fld)] = initial_cats[fld]
-
-        self.fields['tournamentId'] = forms.CharField(
-            initial=t_id,
-            widget=forms.widgets.HiddenInput())
-
-    def empty_field(self):
-        """A string example of an empty field"""
-        return '["", "", false, "", ""]'
-
 class MissionWidget(forms.MultiWidget):
     """Widget to handle the input for the custom mission field"""
     def __init__(self, *args, **kwargs):# pylint: disable=E1002

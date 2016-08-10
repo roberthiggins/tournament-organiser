@@ -4,7 +4,7 @@ var React = require("react"),
 
 var ScoreField = React.createClass({
     getInitialState: function() {
-        return {value: ""};
+        return {value: this.props.val};
     },
     handleChange: function(event) {
         this.setState({value: event.target.value});
@@ -13,7 +13,8 @@ var ScoreField = React.createClass({
         id: React.PropTypes.string.isRequired,
         name: React.PropTypes.string.isRequired,
         type: React.PropTypes.string.isRequired,
-        val: React.PropTypes.any
+        val: React.PropTypes.oneOfType(
+                [React.PropTypes.string, React.PropTypes.number])
     },
     render: function() {
         return (
@@ -23,7 +24,7 @@ var ScoreField = React.createClass({
                         name={this.props.id}
                         id={this.props.id}
                         onChange={this.handleChange}
-                        value={this.state.value || this.props.val} />
+                        value={this.state.value } />
             </span>
         );
     }
@@ -117,12 +118,17 @@ var serializeCategory = function($categoryDiv) {
 
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
-        return ({error: "", successText: "", tournament: "", categories: []});
+        return ({error: "", successText: "", tournament: "", categories: [],
+                 inputWidget : null});
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
                 this.setState(result);
+                this.setState({
+                    inputWidget: <InputWidget submitHandler={this.handleSubmit}
+                                 categories={this.state.categories} />
+                });
             }.bind(this));
     },
     componentWillUnmount: function() {
@@ -132,14 +138,23 @@ var TournamentCategoriesPage = React.createClass({
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
         var _this = this,
-            categories = [];
+            categories = [],
+            error = false;
 
         $("form div.category").each(function() {
             var serialized = serializeCategory($(this));
             if (serialized.length === 5) {
                 categories.push(serialized);
             }
+            else if (serialized.length > 0) {
+                _this.setState({error: "Please fill in all fields"});
+                error = true;
+            }
         });
+
+        if (error) {
+            return;
+        }
 
         $.post(window.location,
             {categories: categories},
@@ -148,22 +163,17 @@ var TournamentCategoriesPage = React.createClass({
                     {successText: res.message, error: "", message: ""});
             })
             .fail(function (res) {
-                _this.setState({error: res.responseJSON.message});
+                _this.setState({error: res.responseJSON.error});
             });
     },
     render: function() {
         return (
             <div>
 
-                <div>{this.state.successText}</div>
-                <div>{this.state.error}</div>
-                <div>{this.state.message}</div>
-                {
-                    this.state.successText ?
-                        null
-                        : <InputWidget submitHandler={this.handleSubmit}
-                                       categories={this.state.categories} />
-                }
+                <p>{this.state.successText}</p>
+                <p>{this.state.error}</p>
+                <p>{this.state.message}</p>
+                {this.state.successText ? null : this.state.inputWidget}
             </div>
         );
     }
