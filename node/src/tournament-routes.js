@@ -76,6 +76,29 @@ router.route("/tournament/:tournament/content")
             });
     });
 
+router.route("/tournament/:tournament/rankings")
+    .get(function(req, res) {
+        res.render("basic", {
+            src_loc: "/tournamentRankings.js",
+            subtitle: "Placings for " + req.params.tournament
+        });
+    })
+router.route("/tournament/:tournament/rankings/content")
+    .get(function(req, res) {
+        var url = "/tournament/" + req.params.tournament + "/entry/rank";
+
+        DAOAmbassador.getFromDAORequest(req, res, url,
+            function(responseBody) {
+                var responseDict = {entries: JSON.parse(responseBody)};
+                responseDict.tournament = req.params.tournament,
+
+                res.status(200).json(responseDict);
+            },
+            function(responseBody) {
+                res.status(200).json({error: responseBody});
+            });
+    });
+
 router.route("/tournament/:tournament/rounds")
     .get(
         users.injectUserIntoRequest,

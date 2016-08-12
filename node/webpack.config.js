@@ -13,6 +13,7 @@ module.exports = {
     tournamentInfo: './src/views/tournament-info.js',
     tournamentList: './src/views/tournament-list.js',
     tournamentMissions: './src/views/tournament-missions.js',
+    tournamentRankings: './src/views/tournament-rankings.js',
     tournamentRounds: './src/views/tournament-rounds.js'
   },
   output: {
