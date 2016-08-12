@@ -52,7 +52,7 @@ def create():
     if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
         raise ValueError('This email does not appear valid')
 
-    if password1 != password2:
+    if password1 != password2 or not password1:
         raise ValueError('Please enter two matching passwords')
 
     if g.account:

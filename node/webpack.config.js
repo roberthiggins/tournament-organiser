@@ -4,6 +4,7 @@ module.exports = {
     entry: './src/views/entry.js',
     entryScore: './src/views/entry-score.js',
     feedback: './src/views/feedback.js',
+    index: './src/views/index.js',
     login: './src/views/login.js',
     signup: './src/views/signup.js',
     tournamentCategories: './src/views/tournament-categories.js',

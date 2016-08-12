@@ -92,13 +92,14 @@ var SignupPage = React.createClass({
             .fail(function (res) {
                 _this.setState({
                     success: false,
-                    error: res.responseJSON.message
+                    error: res.responseJSON.error
                 });
             });
     },
     render: function() {
         return (
             <div>
+                <p>{this.state.error}</p>
                 {this.state.success ?
                     <SuccessWidget email={this.state.email}
                                    username={this.state.username}/>

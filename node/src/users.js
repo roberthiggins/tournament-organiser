@@ -83,6 +83,12 @@ exports.login = function(req, res, next) {
 
 
 exports.signup = function(req, res) {
+
+    if (!req.body.username) {
+        res.status(400).json({error: "Please enter a username"});
+        return false;
+    }
+
     var userDetails = {
             email: req.body.email,
             password1: req.body.password1,
@@ -92,5 +98,9 @@ exports.signup = function(req, res) {
         req,
         res,
         "/user/" + req.body.username,
-        userDetails);
+        userDetails,
+        undefined,
+        function failure(responseBody) {
+            res.status(400).json({error: responseBody});
+        });
 };

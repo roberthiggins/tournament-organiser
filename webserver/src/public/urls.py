@@ -45,13 +45,15 @@ urlpatterns = [
         views.entry_list, name='tournament_entry_list'),
     url(r'^(?P<tournament_id>.+)/register$',
         views.register_for_tournament, name='apply_for_tournament'),
+    url(r'^signup$',
+        RedirectView.as_view(url='{}/signup'.format(NODE_URL)),
+        name='create_account'),
+    url(r'^$', RedirectView.as_view(url='{}'.format(NODE_URL)), name='index'),
 
     # Public views
-    url(r'^$', public_views.index, name='index'),
     url(r'^login$', public_views.login, name='login'),
     url(r'^rankings/(?P<tournament_id>.+)$',
         public_views.tournament_rankings, name='tournament_rankings'),
-    url(r'^signup$', public_views.create_account, name='create_account'),
 
     # Logged in views
     url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)$',

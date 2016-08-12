@@ -7,7 +7,7 @@ var express = require('express'),
 // Home
 router.route("/")
     .get(function(req, res) {
-        res.render("basic", {src_loc: "/devindex.js"});
+        res.render("basic", {src_loc: "/index.js"});
     });
 router.route("/devindex")
     .get(function(req, res) {
