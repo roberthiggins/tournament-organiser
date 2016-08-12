@@ -55,7 +55,7 @@ exports.viewT = {
             {text: "See the 1st Round draw for ranking_test",
              href: "/draw/ranking_test/1"},
             {text: "See entries for ranking_test",
-             href: djangoURL + "/ranking_test/entries"},
+             href: "/tournament/ranking_test/entries"},
             {text: "Search for tournaments - by player, army, club, etc."},
             {text: "View results of tournies they've played in."}
     ]

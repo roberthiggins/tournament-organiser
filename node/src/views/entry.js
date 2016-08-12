@@ -38,6 +38,7 @@ var TournamentEntriesPage = React.createClass({
         var registerURL = "/tournament/" + this.state.tournament + "/register";
         return (
             <div>
+                <p>{this.state.message}</p>
                 {this.state.tournament && !this.state.entries.length ?
                     <p>
                         There are no entries yet.

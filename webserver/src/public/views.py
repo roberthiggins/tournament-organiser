@@ -12,8 +12,7 @@ from django.http import HttpResponse, HttpResponseNotFound, \
 HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from public.forms import ApplyForTournamentForm, EnterScoreForm, \
-EnterGameScoreForm
+from public.forms import EnterScoreForm, EnterGameScoreForm
 from public.view_helpers import from_dao
 
 NODE_URL = 'http://{}:{}'.format(
@@ -126,21 +125,11 @@ def enter_score_for_game(request, t_id, user):
         RequestContext(request)
     )
 
-@login_required
+# pylint: disable=unused-argument
 def entry_list(request, tournament_id):
     """List entrants for a tournament"""
-    response = from_dao('/tournament/{}/entry/'.format(tournament_id))
-    if response.status_code != 200:
-        return HttpResponse(response, status=response.status_code)
-
-    return render_to_response(
-        'entry-list.html',
-        {
-            'tournament': tournament_id,
-            'entries': json.loads(response.content)
-        },
-        RequestContext(request)
-    )
+    return HttpResponseRedirect('{}/tournament/{}/entries'.\
+        format(NODE_URL, tournament_id))
 
 def logout(request):
     """ logout the user from current request """
