@@ -49,6 +49,8 @@ urlpatterns = [
         RedirectView.as_view(url='{}/signup'.format(NODE_URL)),
         name='create_account'),
     url(r'^$', RedirectView.as_view(url='{}'.format(NODE_URL)), name='index'),
+    url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)$',
+        views.enter_score, name='enter_score'),
 
     # Public views
     url(r'^login$', public_views.login, name='login'),
@@ -56,8 +58,6 @@ urlpatterns = [
         public_views.tournament_rankings, name='tournament_rankings'),
 
     # Logged in views
-    url(r'^enterscore/(?P<tournament_id>.+)/(?P<username>.+)$',
-        views.enter_score, name='enter_score'),
     url(r'^entergamescore/(?P<t_id>.+)/(?P<user>.+)$',
         views.enter_score_for_game, name='enter_score_for_game'),
     url(r'^logout$', views.logout, name='logout'),

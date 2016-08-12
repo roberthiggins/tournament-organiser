@@ -82,7 +82,7 @@ var EnterScorePage = React.createClass({
                     {successText: res.message, error: "", message: ""});
             })
             .fail(function (res) {
-                _this.setState({error: res.responseJSON.message});
+                _this.setState(res.responseJSON);
             });
     },
     render: function() {

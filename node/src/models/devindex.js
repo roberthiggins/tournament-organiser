@@ -40,7 +40,7 @@ exports.playT = {
         {text: "Submit a score"},
         {text: "Submit a soft score"},
         {text: "Submit a once off score for ranking_test entry homer",
-         href: djangoURL + "/enterscore/ranking_test/homer"},
+         href: "/tournament/ranking_test/entry/homer/enterscore"},
         {text: "See their total score"},
         {text: "Review previous games"}
     ]

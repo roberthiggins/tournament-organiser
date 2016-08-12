@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseNotFound, \
 HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from public.forms import EnterScoreForm, EnterGameScoreForm
+from public.forms import EnterGameScoreForm
 from public.view_helpers import from_dao
 
 NODE_URL = 'http://{}:{}'.format(
@@ -34,43 +34,11 @@ def categories_info(tournament_id):
         raise ValueError('Tournament {} not found'.format(tournament_id))
     return json.loads(resp.content)
 
-@login_required
+# pylint: disable=unused-argument
 def enter_score(request, tournament_id, username):      # pylint: disable=W0613
     """Enter score for entry"""
-
-    try:
-        entry_info(tournament_id, username)
-        cats = [(x['name'], x['name']) for x in categories_info(tournament_id) \
-                if x['per_tournament']]
-    except ValueError as err:
-        return HttpResponseNotFound(err)
-
-    form = EnterScoreForm(username=username,
-                          tournament=tournament_id,
-                          poster=request.user.username,
-                          categories=cats)
-
-    if request.method == 'POST':
-        form = EnterScoreForm(data=request.POST,
-                              username=username,
-                              tournament=tournament_id,
-                              poster=request.user.username,
-                              categories=cats)
-
-        if form.is_valid():                     # pylint: disable=no-member
-            url = '/tournament/{}/entry/{}/entertournamentscore'.\
-                format(tournament_id, username)
-            response = from_dao(url, form, request)
-            if  response.status_code == 200:
-                return HttpResponse(response)
-            else:
-                form.add_error(None, response.content)  # pylint: disable=E1103
-
-    return render_to_response(
-        'enter-score.html',
-        {'form': form, 'username': username},
-        RequestContext(request)
-    )
+    return HttpResponseRedirect('{}/tournament/{}/entry/{}/enterscore'.\
+        format(NODE_URL, tournament_id, username))
 
 def get_next_game_info(t_id, user):
     """Get the next game for entry"""

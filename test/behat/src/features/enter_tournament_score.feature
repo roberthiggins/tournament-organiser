@@ -7,57 +7,53 @@ Feature: Enter a score for a player
     # or by using the entry id directly
 
     Background:
-        Given I am on "/login"
-        When I fill in "id_inputUsername" with "superman"
-        When I fill in "id_inputPassword" with "password"
-        When I press "Login"
+        Given I am authenticated as "superman" using "password"
 
+    @javascript
     Scenario: Logged in
         Given I am on "/enterscore/ranking_test/ranking_test_player_4"
 
+    @javascript
     Scenario: Logged out
-        Given I am on "/logout"
+        Given I am on "/logoutfromnode"
         Given I am on "/enterscore/ranking_test/ranking_test_player_4"
         Then I should be on "/login"
 
+    @javascript
     Scenario: No permissions
-        Given I am on "/logout"
-        Given I am on "/login"
-        When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "password"
-        When I press "Login"
+        Given I am on "/logoutfromnode"
+        Given I am authenticated as "charlie_murphy" using "password"
         Given I am on "/enterscore/painting_test/rick_james"
-        When I select "Fanciness" from "id_key"
-        When I fill in "id_value" with "1"
+        When I wait for "Enter score for rick_james" to appear
+        When I select "Fanciness" from "key"
+        When I fill in "value" with "1"
         Then I press "Enter Score"
-        Then the response status code should be 200
-        Then I should see "Permission denied"
+        Then I should see "Permission denied" appear
 
+    @javascript
     Scenario: A player not in the tournament
         Given I am on "/enterscore/painting_test/ranking_test_player_3"
-        Then the response status code should be 404
-        Then I should see "Entry for ranking_test_player_3 in tournament painting_test not found"
+        Then I should see "Entry for ranking_test_player_3 in tournament painting_test not found" appear
 
     @javascript
     Scenario Outline: I only know the tournament and username
         Given I am on "/enterscore/<tournament>/<username>"
-        When I wait for 2 seconds
         Then I should be on "<destination>"
-        Then I should see "<code>"
+        Then I should see "<code>" appear
         Examples:
             |tournament    |username   |destination                    |code            |
             |              |rick_james |/enterscore//rick_james        |Not Found       |
             |painting_test |           |/enterscore/painting_test/     |Not Found       |
-            |painting_test |jimmy      |/enterscore/painting_test/jimmy|Unknown player  |
+            |painting_test |jimmy      |/tournament/painting_test/entry/jimmy/enterscore|Unknown player  |
 
     @javascript
     Scenario Outline: I enter some scores
         Given I am on "/enterscore/painting_test/rick_james"
-        When I wait for 1 second
-        When I select "Fanciness" from "id_key"
-        Then I fill in "id_value" with "<score>"
+        When I wait for "Enter score for rick_james" to appear
+        When I select "Fanciness" from "key"
+        Then I fill in "value" with "<score>"
         Then I press "Enter Score"
-        Then I should see "<content>"
+        Then I should see "<content>" appear
         Examples:
             |score | content                                    |
             | 3    | Invalid score: 3                           |
@@ -65,28 +61,24 @@ Feature: Enter a score for a player
             | 5    | Score entered for rick_james: 5            |
             | 6    | 6 not entered. Score is already set        |
 
-    # TODO User controls
+    @javascript
     Scenario: another player
-        Given I am on "/logout"
+        Given I am on "/logoutfromnode"
+        Given I am authenticated as "rick_james" using "password"
         Given I am on "/enterscore/painting_test/stevemcqueen"
-        When I fill in "id_inputUsername" with "rick_james"
-        When I fill in "id_inputPassword" with "password"
-        When I press "Login"
-        When I select "Fanciness" from "id_key"
-        When I fill in "id_value" with "5"
+        When I wait for "Enter score for stevemcqueen" to appear
+        When I select "Fanciness" from "key"
+        When I fill in "value" with "5"
         Then I press "Enter Score"
-        Then the response status code should be 200
-        Then I should see "Permission denied"
+        Then I should see "Permission denied" appear
 
+    @javascript
     Scenario: A non super user
-        Given I am on "/logout"
+        Given I am on "/logoutfromnode"
+        Given I am authenticated as "stevemcqueen" using "password"
         Given I am on "/enterscore/painting_test/stevemcqueen"
-        When I fill in "id_inputUsername" with "stevemcqueen"
-        When I fill in "id_inputPassword" with "password"
-        When I press "Login"
-        When I select "Fanciness" from "id_key"
-        When I fill in "id_value" with "5"
+        When I wait for "Enter score for stevemcqueen" to appear
+        When I select "Fanciness" from "key"
+        When I fill in "value" with "5"
         Then I press "Enter Score"
-        Then the response status code should be 200
-        Then I should not see "Permission denied"
-        Then I should see "Score entered for stevemcqueen: 5"
+        Then I should see "Score entered for stevemcqueen: 5" appear
