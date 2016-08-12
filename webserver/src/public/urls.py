@@ -34,6 +34,8 @@ urlpatterns = [
         public_views.tournament_draw, name='draw'),
     url(r'^setcategories/(?P<tournament_id>.+)$',
         views.set_categories, name='set_categories'),
+    url(r'^setrounds/(?P<tournament_id>.+)$',
+        views.set_rounds, name='set_rounds'),
 
     # Public views
     url(r'^$', public_views.index, name='index'),
@@ -54,6 +56,4 @@ urlpatterns = [
         views.set_missions, name='set_missions'),
     url(r'^registerforatournament$',
         views.register_for_tournament, name='apply_for_tournament'),
-    url(r'^setrounds/(?P<tournament_id>.+)$',
-        views.set_rounds, name='set_rounds'),
 ]

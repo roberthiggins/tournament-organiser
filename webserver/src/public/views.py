@@ -13,7 +13,7 @@ HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from public.forms import ApplyForTournamentForm, \
-EnterScoreForm, SetRoundsForm, EnterGameScoreForm, SetMissionsForm
+EnterScoreForm, EnterGameScoreForm, SetMissionsForm
 from public.view_helpers import from_dao
 
 NODE_URL = 'http://{}:{}'.format(
@@ -219,38 +219,11 @@ def register_for_tournament(request):
         RequestContext(request)
     )
 
-@login_required
+#pylint: disable=unused-argument
 def set_rounds(request, tournament_id):
     """Set the number of rounds for a competition"""
-    tourn_path = '/tournament/{}'.format(tournament_id)
-    t_details = from_dao(tourn_path)
-    if t_details.status_code != 200:
-        return HttpResponseNotFound(
-            'Tournament {} not found'.format(tournament_id))
-    rounds = int(json.loads(t_details.content)['rounds'])
-    rounds = 5 if rounds < 1 else rounds
-
-    form = SetRoundsForm(
-        initial={'numRounds': rounds}, tournament_id=tournament_id)
-
-    if request.method == 'POST':
-        form = SetRoundsForm(request.POST, tournament_id=tournament_id)
-        if form.is_valid():                             # pylint: disable=no-member
-            response = from_dao('{}/rounds'.format(tourn_path), form)
-
-            if  response.status_code == 200:
-                return HttpResponse(response)
-            else:
-                form.add_error(None, response.content)  # pylint: disable=E1103
-
-    return render_to_response(
-        'set-rounds.html',
-        {
-            'form': form,
-            'tournament': tournament_id
-        },
-        RequestContext(request)
-    )
+    return HttpResponseRedirect('{}/tournament/{}/rounds'.\
+        format(NODE_URL, tournament_id))
 
 def score_categories(tournament_id):
     """

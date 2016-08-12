@@ -8,11 +8,14 @@ Feature: Enter a score for a player
         When I fill in "id_inputUsername" with "superman"
         When I fill in "id_inputPassword" with "password"
         When I press "Login"
-        When I am on "/setrounds/enter_score_test"
-        When I fill in "numRounds" with "6"
-        When I press "Set"
 
+    @javascript
     Scenario: Logged in
+        Given I am authenticated as "superman" using "password"
+        When I am on "/setrounds/enter_score_test"
+        Then I should see "Number of rounds" appear
+        When I fill in "rounds" with "6"
+        When I press "Set"
         Given I am on "/entergamescore/enter_score_test/enter_score_test_player_1"
 
     Scenario: Logged out

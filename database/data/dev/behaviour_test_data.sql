@@ -5,6 +5,7 @@ INSERT INTO tournament VALUES (DEFAULT, 'northcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'southcon_2095', '2095-06-01');
 INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
 INSERT INTO tournament VALUES (DEFAULT, 'empty_tournament', '2021-06-04');
+INSERT INTO tournament VALUES (DEFAULT, 'rounds_test', '2021-06-04');
 
 INSERT INTO score_category VALUES(DEFAULT, 'southcon_2095', 'some_category', DEFAULT, DEFAULT, 1, 10);
 INSERT INTO score_category VALUES(100, 'northcon_2095', 'leastnortherly', DEFAULT, DEFAULT, 1, 10);
