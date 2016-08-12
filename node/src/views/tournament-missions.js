@@ -4,11 +4,14 @@ var React = require("react"),
 
 
 var MissionField = React.createClass({
-    getInitialState: function(){ return {value: ""}; },
+    getInitialState: function(){
+        return {value: this.props.val};
+    },
     propTypes: {
-        id: React.PropTypes.string.isRequired,
+        id:   React.PropTypes.string.isRequired,
         name: React.PropTypes.string.isRequired,
-        val: React.PropTypes.string
+        val:  React.PropTypes.oneOfType(
+                [React.PropTypes.string, React.PropTypes.number])
     },
     handleChange: function(event) {
         this.setState({value: event.target.value});
@@ -21,7 +24,7 @@ var MissionField = React.createClass({
                         name={this.props.id}
                         id={this.props.id}
                         onChange={this.handleChange}
-                        value={this.state.value || this.props.val} />
+                        value={this.state.value} />
             </p>);
     }
 });
@@ -58,6 +61,10 @@ var TournamentMissionsPage = React.createClass({
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
                 this.setState(result);
+                this.setState({
+                    missionForm: <MissionForm submitHandler={this.handleSubmit}
+                                 missions={this.state.missions} />
+                });
             }.bind(this));
     },
     componentWillUnmount: function() {
@@ -84,12 +91,7 @@ var TournamentMissionsPage = React.createClass({
                 <div>{this.state.successText}</div>
                 <div>{this.state.error}</div>
                 <div>{this.state.message}</div>
-                {
-                    this.state.successText ?
-                        null
-                        : <MissionForm submitHandler={this.handleSubmit}
-                                       missions={this.state.missions} />
-                }
+                {this.state.successText ? null : this.state.missionForm}
             </div>
         );
     }

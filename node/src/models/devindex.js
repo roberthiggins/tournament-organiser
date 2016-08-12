@@ -20,9 +20,9 @@ exports.orgT = {
          text: "Set num rounds for mission_test"},
         {href: "/tournament/mission_test/categories",
          text: "Set scoring categories for mission_test"},
-        {href: djangoURL + "/setmissions/mission_test",
+        {href: "/tournament/mission_test/missions",
          text: "Set missions for mission_test"},
-        {href: djangoURL + "/tournamentsetup/northcon_2095",
+        {href: "/tournament/northcon_2095/missions",
          text: "Setup Northcon_2095"}
     ]
 };

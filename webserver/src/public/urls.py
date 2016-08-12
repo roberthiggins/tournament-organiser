@@ -36,6 +36,8 @@ urlpatterns = [
         views.set_categories, name='set_categories'),
     url(r'^setrounds/(?P<tournament_id>.+)$',
         views.set_rounds, name='set_rounds'),
+    url(r'^setmissions/(?P<tournament_id>.+)$',
+        views.set_missions, name='set_missions'),
 
     # Public views
     url(r'^$', public_views.index, name='index'),
@@ -52,8 +54,6 @@ urlpatterns = [
     url(r'^(?P<tournament_id>.+)/entries$',
         views.entry_list, name='tournament_entry_list'),
     url(r'^logout$', views.logout, name='logout'),
-    url(r'^setmissions/(?P<tournament_id>.+)$',
-        views.set_missions, name='set_missions'),
     url(r'^registerforatournament$',
         views.register_for_tournament, name='apply_for_tournament'),
 ]
