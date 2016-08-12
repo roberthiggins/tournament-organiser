@@ -5,8 +5,8 @@ exports.enterT = {
     title: "Enter a Tournament",
     actions: [
         {text: "See a list of tournaments", href: "/tournaments"},
-        {text: "Register for a Tournament",
-         href: djangoURL + "/registerforatournament"},
+        {text: "Register To Play In ranking_test",
+         href: "/tournament/ranking_test"},
         {text: "Update my player details"},
         {text: "Update application"},
         {text: "See application status"},

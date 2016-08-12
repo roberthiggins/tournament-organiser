@@ -43,6 +43,8 @@ urlpatterns = [
         views.set_missions, name='set_missions'),
     url(r'^(?P<tournament_id>.+)/entries$',
         views.entry_list, name='tournament_entry_list'),
+    url(r'^(?P<tournament_id>.+)/register$',
+        views.register_for_tournament, name='apply_for_tournament'),
 
     # Public views
     url(r'^$', public_views.index, name='index'),
@@ -57,6 +59,4 @@ urlpatterns = [
     url(r'^entergamescore/(?P<t_id>.+)/(?P<user>.+)$',
         views.enter_score_for_game, name='enter_score_for_game'),
     url(r'^logout$', views.logout, name='logout'),
-    url(r'^registerforatournament$',
-        views.register_for_tournament, name='apply_for_tournament'),
 ]
