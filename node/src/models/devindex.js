@@ -1,6 +1,3 @@
-var djangoURL = "http://" + process.env.DJANGO_WEBSERVER + ":"
-    + process.env.DJANGO_WEBSERVER_PORT;
-
 exports.enterT = {
     title: "Enter a Tournament",
     actions: [
@@ -49,7 +46,7 @@ exports.viewT = {
     title: "Information",
     actions: [
             {text: "See the current placings for ranking_test",
-             href: djangoURL + "/rankings/ranking_test"},
+             href: "/tournament/ranking_test/rankings"},
             {text: "See Northcon 2095",
              href: "/tournament/northcon_2095"},
             {text: "See the 1st Round draw for ranking_test",

@@ -8,8 +8,7 @@ from ratelimit.decorators import ratelimit
 
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect, \
-                        HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from public.forms import CreateAccountForm, LoginForm
@@ -146,21 +145,8 @@ def tournament_draw(request, tournament_id, round_id):
         format(NODE_URL, tournament_id, round_id))
 
 @ratelimit(key='ip', rate='100/m', block=True)
+# pylint: disable=unused-argument
 def tournament_rankings(request, tournament_id):
     """Get placings for the entries in the tournament"""
-    if tournament_id is None:
-        return HttpResponseNotFound()
-    try:
-        json_data = json.loads(
-            from_dao('/tournament/{}/entry/rank'.format(tournament_id)).content)
-
-        return render_to_response(
-            'tournament-rankings.html',
-            {
-                'tournament_id': tournament_id,
-                'placings': json_data,
-            },
-            RequestContext(request)
-            )
-    except ValueError:
-        return HttpResponseNotFound()
+    return HttpResponseRedirect('{}/tournament/{}/rankings'.\
+        format(NODE_URL, tournament_id))
