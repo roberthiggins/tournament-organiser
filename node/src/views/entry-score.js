@@ -1,11 +1,12 @@
 var React = require("react"),
     ReactDOM = require("react-dom"),
-    $ = require("jquery");
+    $ = require("jquery"),
+    scores = require("./component-tournament-categories.js");
 
 var EnterScoreForm = React.createClass({
     propTypes: {
-        categories: React.PropTypes.array.isRequired,
-        submitHandler: React.PropTypes.func.isRequired
+        submitHandler:       React.PropTypes.func.isRequired,
+        perTournamentScores: React.PropTypes.bool.isRequired
     },
     render: function() {
         return (
@@ -14,12 +15,8 @@ var EnterScoreForm = React.createClass({
                     <label htmlFor="value">Score:</label>
                     <input type="text" name="value" id="value" />
                 </p>
-                <p>
-                    <label htmlFor="key">Select a score category:</label>
-                    <select name="key" id="key">
-                        {this.props.categories}
-                    </select>
-                </p>
+                <scores.scoreCategoryWidget
+                    perTournamentScores={this.props.perTournamentScores} />
                 <button type="submit">Enter Score</button>
             </form>
         );
@@ -28,27 +25,9 @@ var EnterScoreForm = React.createClass({
 
 var EnterScorePage = React.createClass({
     getInitialState: function () {
-        return ({error: "", successText: "", categoryOptions: [] });
+        return ({error: "", successText: "", perTournament: false});
     },
     componentDidMount: function() {
-
-        var perTournCats = function(categories) {
-            if (!categories) {
-                return [];
-            }
-
-            return categories
-                .filter(function(cat) {
-                    return cat.per_tournament;
-                })
-                .map(function(cat, idx){
-                    return (
-                        <option value={cat.name} key={idx}>
-                            {cat.name}
-                        </option>);
-                });
-        };
-
 
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
@@ -56,16 +35,7 @@ var EnterScorePage = React.createClass({
                     this.setState({successText : result.error});
                     return;
                 }
-
-                result.categoryOptions = perTournCats(result.categories);
-
-                this.setState(result.categoryOptions.length < 1 ?
-                    {
-                        error: "",
-                        message: "",
-                        successText: "No per-tournament categories available"
-                    }
-                    : result);
+                this.setState(result);
             }.bind(this));
     },
     componentWillUnmount: function() {
@@ -95,7 +65,7 @@ var EnterScorePage = React.createClass({
                     this.state.successText ?
                         null
                         : <EnterScoreForm submitHandler={this.handleSubmit}
-                                categories={this.state.categoryOptions} />
+                            perTournamentScores={this.state.perTournament} />
                 }
             </div>
         );

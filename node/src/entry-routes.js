@@ -68,25 +68,25 @@ router.route("/tournament/:tournament/entry/:username/enterscore")
                 res.status(400).json({error: responseBody});
             });
         });
-router.route("/tournament/:tournament/entry/:username/enterscore/content")
+router.route("/tournament/:tournament/entry/:username/enterscore/scorecategories")
     .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
         var url = "/tournament/" + req.params.tournament
-            + "/score_categories"
+            + "/score_categories";
 
-        DAOAmbassador.getFromDAORequest(
-            req,
-            res,
-            url,
+        DAOAmbassador.getFromDAORequest(req, res, url,
             function(responseBody) {
-                var responseDict = {
-                    categories: JSON.parse(responseBody),
-                    message: "Enter score for " + req.params.username,
-                };
-                res.status(200).json(responseDict);
+                res.status(200).json({categories: JSON.parse(responseBody)});
             },
             function(responseBody) {
                 res.status(200).json({error: responseBody});
             });
+    })
+router.route("/tournament/:tournament/entry/:username/enterscore/content")
+    .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
+        res.status(200).json({
+            message: "Enter score for " + req.params.username,
+            perTournament : true
+        });
     });
 
 
