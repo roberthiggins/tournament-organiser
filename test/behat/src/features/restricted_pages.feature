@@ -11,7 +11,7 @@ Feature: Restricted pages
         Given I am on "/<direct>"
         Then I should be on "/login?next=/<direct>"
         Given I am on "/devindex"
-        When I wait for 1 second
+        When I wait for "<link>" to appear
         When I follow "<link>"
         Then I should be on "/login?next=/<direct>"
 

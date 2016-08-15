@@ -15,13 +15,13 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: Logged out
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Given I am on "/enterscore/ranking_test/ranking_test_player_4"
         Then I should be on "/login"
 
     @javascript
     Scenario: No permissions
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Given I am authenticated as "charlie_murphy" using "password"
         Given I am on "/enterscore/painting_test/rick_james"
         When I wait for "Enter score for rick_james" to appear
@@ -63,7 +63,7 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: another player
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Given I am authenticated as "rick_james" using "password"
         Given I am on "/enterscore/painting_test/stevemcqueen"
         When I wait for "Enter score for stevemcqueen" to appear
@@ -74,7 +74,7 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: A non super user
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Given I am authenticated as "stevemcqueen" using "password"
         Given I am on "/enterscore/painting_test/stevemcqueen"
         When I wait for "Enter score for stevemcqueen" to appear

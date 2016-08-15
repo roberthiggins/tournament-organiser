@@ -17,13 +17,13 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: Logged out
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
         Then I should be on "/login"
 
     @javascript
     Scenario: No permissions
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Given I am authenticated as "enter_score_test_player_2" using "password"
         Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
         When I wait for "Fair Play" to appear
@@ -54,7 +54,7 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: A regular user filling in their scores
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Given I am authenticated as "enter_score_test_player_4" using "password"
         Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_4/entergamescore"
         When I wait for "Fair Play" to appear

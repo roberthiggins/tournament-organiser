@@ -38,7 +38,7 @@ Feature: List Entries for a tournament
 
     @javascript
     Scenario: A logged-out user
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
         Then I am on "/ranking_test/entries"
         Then I should be on "/login"
 

@@ -95,7 +95,7 @@ class FeatureContext extends MinkContext
     * @Given /^I am authenticated as "([^"]*)" using "([^"]*)"$/
     */
     public function iAmAuthenticatedAs($username, $password) {
-        $this->visit('/logintonode');
+        $this->visit('/login');
         $this->iWaitForTextToAppear('Login to your account');
         $this->fillField('username', $username);
         $this->fillField('password', $password);

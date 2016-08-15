@@ -4,7 +4,7 @@ Feature: Login
     So I can access data specific to me
 
     Background:
-        Given I am on "/logoutfromnode"
+        Given I am on "/logout"
 
     @javascript
     Scenario: I Want to go to the login page
@@ -15,14 +15,14 @@ Feature: Login
         Then I should see "Password" appear
         Then I should see "Forgot Password" appear
 
-        Given I am on "/logintonode"
+        Given I am on "/login"
         Then I should see "Username" appear
         Then I should see "Password" appear
         Then I should see "Forgot Password" appear
 
     @javascript
     Scenario: I log in with correct details
-        Given I am on "/logintonode"
+        Given I am on "/login"
         When I wait for "Login to your account" to appear
         When I fill in "username" with "charlie_murphy"
         When I fill in "password" with "password"
@@ -31,7 +31,7 @@ Feature: Login
 
     @javascript
     Scenario Outline: I try to log in
-        Given I am on "/logintonode"
+        Given I am on "/login"
         When I wait for "Login to your account" to appear
         When I fill in "username" with "<uname>"
         When I fill in "password" with "<password>"
@@ -49,14 +49,14 @@ Feature: Login
 
     @javascript
     Scenario: While logged in I try to log in again
-        Given I am on "/logintonode"
+        Given I am on "/login"
         When I wait for "Login to your account" to appear
         When I fill in "username" with "charlie_murphy"
         When I fill in "password" with "password"
         When I press "Login"
         When I wait for "Enter a Tournament" to appear
         Then I should be on "/devindex"
-        Given I am on "/logintonode"
+        Given I am on "/login"
         When I wait for "Login to your account" to appear
         When I fill in "username" with "charlie_murphy"
         When I fill in "password" with "password"
