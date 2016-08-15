@@ -6,7 +6,8 @@ var React = require("react"),
 var EnterScoreForm = React.createClass({
     propTypes: {
         submitHandler:       React.PropTypes.func.isRequired,
-        perTournamentScores: React.PropTypes.bool.isRequired
+        perTournamentScores: React.PropTypes.bool.isRequired,
+        gameId:              React.PropTypes.number
     },
     render: function() {
         return (
@@ -17,6 +18,7 @@ var EnterScoreForm = React.createClass({
                 </p>
                 <scores.scoreCategoryWidget
                     perTournamentScores={this.props.perTournamentScores} />
+                <input type="hidden" name="gameId" defaultValue={this.props.gameId} />
                 <button type="submit">Enter Score</button>
             </form>
         );
@@ -65,7 +67,8 @@ var EnterScorePage = React.createClass({
                     this.state.successText ?
                         null
                         : <EnterScoreForm submitHandler={this.handleSubmit}
-                            perTournamentScores={this.state.perTournament} />
+                            perTournamentScores={this.state.perTournament}
+                            gameId={this.state.game_id} />
                 }
             </div>
         );
