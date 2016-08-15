@@ -31,15 +31,33 @@ app.use(expressSession({
     maxAge: 15 * 60 * 1000,
     resave: false,
     saveUninitialized: false
-// TODO MemoryStore is the default but isn't prod ready
+// TODO MemoryStore is the default but is not prod ready
 }));
 
 // Routing
 app.use("/", require("./src/entry-routes"));
-app.use("/", require('./src/member-only-routes'));
-app.use("/", require('./src/public-routes'));
-app.use("/", require('./src/tournament-routes'));
+app.use("/", require("./src/member-only-routes"));
+app.use("/", require("./src/public-routes"));
+app.use("/", require("./src/tournament-routes"));
 
 // Passport user auth
 app.use(passport.initialize());
 app.use(passport.session());
+
+// 404 handling
+app.use(function(req, res){
+    res.status(404);
+
+    res.format({
+        "text/html": function(){
+            res.render("404", { url: req.url });
+        },
+        "application/json": function(){
+            res.send({ error: "Not found" });
+        },
+        "default": function() {
+            // log the request and respond with 406
+            res.status(406).send("Not Acceptable");
+        }
+    });
+});
