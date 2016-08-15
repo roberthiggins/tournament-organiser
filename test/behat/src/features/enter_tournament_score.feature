@@ -11,19 +11,19 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: Logged in
-        Given I am on "/enterscore/ranking_test/ranking_test_player_4"
+        Given I am on "/tournament/ranking_test/entry/ranking_test_player_4/enterscore"
 
     @javascript
     Scenario: Logged out
         Given I am on "/logout"
-        Given I am on "/enterscore/ranking_test/ranking_test_player_4"
+        Given I am on "/tournament/ranking_test/entry/ranking_test_player_4/enterscore"
         Then I should be on "/login"
 
     @javascript
     Scenario: No permissions
         Given I am on "/logout"
         Given I am authenticated as "charlie_murphy" using "password"
-        Given I am on "/enterscore/painting_test/rick_james"
+        Given I am on "/tournament/painting_test/entry/rick_james/enterscore"
         When I wait for "Enter score for rick_james" to appear
         When I select "Fanciness" from "key"
         When I fill in "value" with "1"
@@ -32,23 +32,23 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: A player not in the tournament
-        Given I am on "/enterscore/painting_test/ranking_test_player_3"
+        Given I am on "/tournament/painting_test/entry/ranking_test_player_3/enterscore"
         Then I should see "Entry for ranking_test_player_3 in tournament painting_test not found" appear
 
     @javascript
     Scenario Outline: I only know the tournament and username
-        Given I am on "/enterscore/<tournament>/<username>"
-        Then I should be on "<destination>"
+        Given I am on "/tournament/<tournament>/entry/<username>/enterscore"
+        Then I should be on "/tournament/<destination>"
         Then I should see "<code>" appear
         Examples:
-            |tournament    |username   |destination                    |code            |
-            |              |rick_james |/enterscore//rick_james        |Not Found       |
-            |painting_test |           |/enterscore/painting_test/     |Not Found       |
-            |painting_test |jimmy      |/tournament/painting_test/entry/jimmy/enterscore|Unknown player  |
+            |tournament    |username   |destination                         |code            |
+            |              |rick_james |/entry/rick_james/enterscore        |Not Found       |
+            |painting_test |           |painting_test/entry//enterscore     |Not Found       |
+            |painting_test |jimmy      |painting_test/entry/jimmy/enterscore|Unknown player  |
 
     @javascript
     Scenario Outline: I enter some scores
-        Given I am on "/enterscore/painting_test/rick_james"
+        Given I am on "/tournament/painting_test/entry/rick_james/enterscore"
         When I wait for "Enter score for rick_james" to appear
         When I select "Fanciness" from "key"
         Then I fill in "value" with "<score>"
@@ -65,7 +65,7 @@ Feature: Enter a score for a player
     Scenario: another player
         Given I am on "/logout"
         Given I am authenticated as "rick_james" using "password"
-        Given I am on "/enterscore/painting_test/stevemcqueen"
+        Given I am on "/tournament/painting_test/entry/stevemcqueen/enterscore"
         When I wait for "Enter score for stevemcqueen" to appear
         When I select "Fanciness" from "key"
         When I fill in "value" with "5"
@@ -76,7 +76,7 @@ Feature: Enter a score for a player
     Scenario: A non super user
         Given I am on "/logout"
         Given I am authenticated as "stevemcqueen" using "password"
-        Given I am on "/enterscore/painting_test/stevemcqueen"
+        Given I am on "/tournament/painting_test/entry/stevemcqueen/enterscore"
         When I wait for "Enter score for stevemcqueen" to appear
         When I select "Fanciness" from "key"
         When I fill in "value" with "5"

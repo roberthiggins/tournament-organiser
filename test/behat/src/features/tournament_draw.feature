@@ -11,7 +11,7 @@ Feature: Check the draw
 
     @javascript
     Scenario Outline: Check the draw
-        Given I am on "/draw/<tournament>/<round>"
+        Given I am on "/tournament/<tournament>/round/<round>/draw"
         Then I should see "<text>" appear
         Examples:
             |tournament         | round | text                         |

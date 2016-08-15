@@ -8,7 +8,7 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: Logged in
-        When I am on "/setrounds/enter_score_test"
+        When I am on "/tournament/enter_score_test/rounds"
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "6"
         When I press "Set"

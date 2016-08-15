@@ -10,17 +10,6 @@ daoserver:
         file: docker-compose.base.yml
         service: daoserver
 
-webserver:
-    links:
-        - daoserver:daoserver
-        - node:node
-    environment:
-        DEBUG: "True"
-        TEMPLATE_DEBUG: "True"
-    extends:
-        file: docker-compose.base.yml
-        service: webserver
-
 node:
     links:
         - daoserver:daoserver
@@ -69,17 +58,6 @@ systemtestdaoserver:
         file: docker-compose.base.yml
         service: systemtestdaoserver
 
-systemtestwebserver:
-    extends:
-        file: docker-compose.base.yml
-        service: systemtestwebserver
-    environment:
-        DEBUG: "True"
-        TEMPLATE_DEBUG: "True"
-    links:
-        - systemtestdaoserver:daoserver
-        - systemtestnode:node
-
 systemtestnode:
     links:
         - systemtestdaoserver:daoserver
@@ -94,7 +72,6 @@ systemtest:
     links:
         - selenium
         - systemtestdaoserver
-        - systemtestwebserver
         - systemtestnode
 
 selenium:
@@ -102,4 +79,4 @@ selenium:
         file: docker-compose.base.yml
         service: selenium
     links:
-        - systemtestwebserver
+        - systemtestnode

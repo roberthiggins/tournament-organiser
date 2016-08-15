@@ -4,7 +4,7 @@ default:
                 goutte: ~
                 selenium2:
                     wd_host: http://selenium:4444/wd/hub
-                base_url: http://systemtestwebserver:8000
+                base_url: http://systemtestnode:8000
     context:
         parameters:
             api_url: systemtestdaoserver:5000

@@ -107,7 +107,7 @@ class FeatureContext extends MinkContext
     * @Given /^I visit category page for "([^"]*)"$/
     */
     public function iVisitCategoryPage($tourn) {
-        $this->visit('/setcategories/'.$tourn);
+        $this->visit('/tournament/'.$tourn.'/categories');
         $this->iWaitForTextToAppear('Once per tournament');
     }
 

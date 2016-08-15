@@ -16,14 +16,14 @@ Feature: Create a Tournament
 
     @javascript
     Scenario: I try to navigate to the page via the URL
-        Given I am on "/createtournament"
+        Given I am on "/tournament/create"
         Then I should see "You can add a tournament here" appear
         Then I should see "Tournament Name" appear
         Then I should see "Tournament Date" appear
 
     @javascript
     Scenario Outline: Valid and invalid values
-        Given I am on "/createtournament"
+        Given I am on "/tournament/create"
         When I wait for "You can add a tournament here" to appear
         When I fill in "name" with "<name>"
         When I fill in "date" with "<date>"

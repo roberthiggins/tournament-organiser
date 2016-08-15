@@ -17,25 +17,11 @@ daoserver:
         file: docker-passwords.yml
         service: dbpasswords
 
-webserver:
-    build: webserver
-    container_name: webserver
-    ports:
-        - "5000:8000"
-    environment:
-        HOST_IP: 127.0.0.1
-    extends:
-        file: docker-passwords.yml
-        service: webpasswords
-
 node:
     build: node
     container_name: node
     ports:
         - "5005:8000"
-    environment:
-        DJANGO_WEBSERVER: "webserver"
-        DJANGO_WEBSERVER_PORT: "8000"
 
 # Unit Test Specific
 
@@ -85,17 +71,6 @@ systemtestdaoserver:
         file: docker-passwords.yml
         service: dbpasswords
 
-systemtestwebserver:
-    build: webserver
-    container_name: systemtestwebserver
-    ports:
-        - "5004:8000"
-    environment:
-        HOST_IP: 127.0.0.1
-    extends:
-        file: docker-passwords.yml
-        service: webpasswords
-
 systemtest:
     build: test/behat
     container_name: behat
@@ -105,9 +80,6 @@ systemtestnode:
     container_name: systemtestnode
     ports:
         - "5105:8000"
-    environment:
-        DJANGO_WEBSERVER: "systemtestwebserver"
-        DJANGO_WEBSERVER_PORT: "8000"
 
 selenium:
     image: selenium/standalone-firefox

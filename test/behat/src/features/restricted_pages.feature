@@ -17,6 +17,6 @@ Feature: Restricted pages
 
 
         Examples:
-            |direct                     |link                           |
-            |createtournament           |Create a Tournament            | 
-            |feedback                   |Place Feedback                 | 
+            |direct            |link                |
+            |tournament/create |Create a Tournament |
+            |feedback          |Place Feedback      |
