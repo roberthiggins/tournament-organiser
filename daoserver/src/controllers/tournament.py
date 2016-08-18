@@ -12,7 +12,8 @@ from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_round import TournamentRound
-from models.tournament import Tournament, ScoreCategoryPair
+from models.score import ScoreCategoryPair
+from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__)
 

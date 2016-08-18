@@ -9,7 +9,8 @@ from app import create_app
 from models.dao.db_connection import db
 from models.dao.score import ScoreCategory
 
-from models.tournament import Tournament, ScoreCategoryPair
+from models.score import ScoreCategoryPair
+from models.tournament import Tournament
 from unit_tests.tournament_injector import TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring

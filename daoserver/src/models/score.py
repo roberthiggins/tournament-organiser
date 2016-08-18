@@ -48,3 +48,28 @@ def validate_score(score, category, game_id=None):
     except ValueError:
         raise ValueError('Invalid score: {}'.format(score))
 
+
+# pylint: disable=too-many-arguments
+class ScoreCategoryPair(object):
+    """A holder object for score category information"""
+    def __init__(self, name, percentage, per_tourn, min_val, max_val):
+        if not name:
+            raise ValueError('Category must have a name')
+
+        try:
+            self.percentage = int(percentage)
+            if self.percentage > 100 or self.percentage < 1:
+                raise ValueError()
+        except ValueError:
+            raise ValueError('Percentage must be an integer (1-100)')
+
+        try:
+            self.min_val = int(min_val)
+            self.max_val = int(max_val)
+        except ValueError:
+            raise ValueError('Min and Max Scores must be integers')
+        except TypeError:
+            raise ValueError('Min and Max Scores must be integers')
+
+        self.name = name
+        self.per_tournament = per_tourn
