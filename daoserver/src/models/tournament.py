@@ -24,7 +24,7 @@ from models.table_strategy import ProtestAvoidanceStrategy
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
-    def wrapped(self, *args, **kwargs):                 # pylint: disable=missing-docstring
+    def wrapped(self, *args, **kwargs): # pylint: disable=missing-docstring
         if not self.exists_in_db:
             print 'Tournament not found: {}'.format(self.tournament_id)
             raise ValueError(
