@@ -30,6 +30,27 @@ def is_score_entered(game_dao):
     return False
 
 
+def upsert_tourn_score_cat(tournament_id, cat):
+    """
+    Upsert a tournament score category to the DB
+    """
+    # pylint: disable=no-member
+    dao = ScoreCategory.query.\
+        filter_by(tournament_id=tournament_id, name=cat.name).first()
+
+    if dao is None:
+        dao = ScoreCategory(tournament_id,
+                            cat.name,
+                            cat.percentage,
+                            cat.per_tournament,
+                            cat.min_val,
+                            cat.max_val,)
+    dao.percentage = int(cat.percentage)
+    dao.per_tournament = cat.per_tournament
+    db.session.add(dao)
+    db.session.flush()
+
+
 def validate_score(score, category, game_id=None):
     """Validate an entered score. Returns True or raises Exception"""
     try:

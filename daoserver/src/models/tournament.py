@@ -20,7 +20,7 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker, PERMISSIONS
 from models.ranking_strategies import RankingStrategy
-from models.score import validate_score
+from models.score import upsert_tourn_score_cat, write_score
 from models.table_strategy import ProtestAvoidanceStrategy
 
 def must_exist_in_db(func):
@@ -103,21 +103,7 @@ class Tournament(object):
 
 
             for cat in new_categories:
-                dao = ScoreCategory.query.\
-                    filter_by(tournament_id=self.tournament_id,
-                              name=cat.name).first()
-
-                if dao is None:
-                    dao = ScoreCategory(self.tournament_id,
-                                        cat.name,
-                                        cat.percentage,
-                                        cat.per_tournament,
-                                        cat.min_val,
-                                        cat.max_val,)
-                dao.percentage = int(cat.percentage)
-                dao.per_tournament = cat.per_tournament
-                db.session.add(dao)
-                db.session.flush()
+                upsert_tourn_score_cat(self.tournament_id, cat)
 
             # check for clashes before actually writing
             for cat in new_categories:
