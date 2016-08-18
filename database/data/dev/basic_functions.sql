@@ -71,6 +71,16 @@ BEGIN
     RETURN game_id;
 END $$;
 
+-- Make a score_category
+CREATE OR REPLACE FUNCTION create_score_category(tourn_name varchar, name varchar, percentage integer, per_tourn boolean DEFAULT FALSE, min_val integer DEFAULT 1, max_val integer DEFAULT 20) RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    cat_1 int := 0;
+BEGIN
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, name, percentage, per_tourn, min_val, max_val) RETURNING id INTO cat_1;
+
+    return cat_1;
+END $$;
+
 -- Make a partially complete tournament
 CREATE OR REPLACE FUNCTION half_tournament_test_setup(tourn_name varchar, tourn_date date) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
@@ -99,8 +109,9 @@ BEGIN
     INSERT INTO tournament       VALUES(DEFAULT, tourn_name, tourn_date, DEFAULT, prot_obj_id) RETURNING id INTO tourn_id;
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Kill')                        RETURNING id INTO round_1_id;
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, DEFAULT)                       RETURNING id INTO round_2_id;
-    INSERT INTO score_category   VALUES(DEFAULT, tourn_name, 'Battle', 90, DEFAULT, 0, 20)     RETURNING id INTO cat_1;
-    INSERT INTO score_category   VALUES(DEFAULT, tourn_name, 'Fair Play', 10, DEFAULT, 1, 5)   RETURNING id INTO cat_2;
+
+    cat_1 = create_score_category(tourn_name, 'Battle', 90, FALSE, 0, 20);
+    cat_2 = create_score_category(tourn_name, 'Fair Play', 10, FALSE, 1, 5);
 
     ent_1_id := add_player(tourn_name, tourn_id, ent_1_name);
     INSERT INTO table_allocation VALUES(ent_1_id, 1, 1);

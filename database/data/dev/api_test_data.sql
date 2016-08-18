@@ -49,9 +49,10 @@ DO $$
 DECLARE
     tourn_name varchar := 'category_test';
     protect_object_id int := 0;
+    cat_1 int := 0;
 BEGIN
     PERFORM create_tournament(tourn_name, '2095-07-05');
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'category_1', 15, DEFAULT, 1, 10);
+    PERFORM create_score_category(tourn_name, 'category_1', 15, FALSE, 1, 10);
 END $$;
 
 
@@ -81,16 +82,17 @@ BEGIN
     -- Create a tournament that will be restricted
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_1', DEFAULT, TRUE, 4, 15);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_2', DEFAULT, TRUE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_3', DEFAULT, TRUE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_su', DEFAULT, TRUE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_to', DEFAULT, TRUE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_1', DEFAULT, FALSE, 4, 15);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_2', DEFAULT, FALSE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_3', DEFAULT, FALSE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_su', DEFAULT, FALSE, 1, 5);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'enter_score_test_category_per_game_to', DEFAULT, FALSE, 1, 5);
+
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_1', 1, TRUE, 4, 15);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_2', 1, TRUE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_3', 1, TRUE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_su', 1, TRUE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_to', 1, TRUE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_1', 1, FALSE, 4, 15);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_2', 1, FALSE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_3', 1, FALSE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_su', 1, FALSE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_to', 1, FALSE, 1, 5);
 
     -- Create a tournament organiser
     PERFORM create_user('to');

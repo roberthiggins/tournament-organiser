@@ -7,8 +7,8 @@ INSERT INTO tournament VALUES (DEFAULT, 'conquest_2095', '2095-10-31');
 INSERT INTO tournament VALUES (DEFAULT, 'empty_tournament', '2021-06-04');
 INSERT INTO tournament VALUES (DEFAULT, 'rounds_test', '2021-06-04');
 
-INSERT INTO score_category VALUES(DEFAULT, 'southcon_2095', 'some_category', DEFAULT, DEFAULT, 1, 10);
-INSERT INTO score_category VALUES(100, 'northcon_2095', 'leastnortherly', DEFAULT, DEFAULT, 1, 10);
+SELECT create_score_category('southcon_2095', 'some_category', 10, FALSE, 1, 10);
+SELECT create_score_category('northcon_2095', 'leastnortherly', 10, FALSE, 1, 10);
 
 SELECT create_user('charlie_murphy');
 
@@ -26,7 +26,7 @@ DECLARE
 BEGIN
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-10-10', DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'Fanciness', DEFAULT, TRUE, 4, 15) RETURNING id INTO fanciness;
+    fanciness = create_score_category(tourn_name, 'Fanciness', 10, TRUE, 4, 15);
 
     PERFORM add_player(tourn_name, tourn_id, 'stevemcqueen');
     PERFORM add_player(tourn_name, tourn_id, 'rick_james');
@@ -53,7 +53,7 @@ DECLARE
 BEGIN
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3, protect_object_id);
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, 'category_1', 15, DEFAULT, 1, 10);
+    PERFORM create_score_category(tourn_name, 'category_1', 15, FALSE, 1, 10);
 END $$;
 
 -- Make a tournament for the purposes of testing permissions
