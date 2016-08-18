@@ -9,6 +9,7 @@ enforce_request_variables, text_response
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
+from models.score import is_score_entered
 from models.tournament import Tournament
 
 ENTRY = Blueprint('ENTRY', __name__)
@@ -143,7 +144,7 @@ def get_next_game():
     games = sorted(games, key=lambda game: game.tournament_round.ordering)
 
     for game in games:
-        if not Tournament.is_score_entered(game):
+        if not is_score_entered(game):
             return {
                 'game_id': game.id,
                 'round': game.tournament_round.ordering,
