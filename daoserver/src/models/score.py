@@ -1,7 +1,12 @@
 """
 Logic for scores goes here
 """
+from sqlalchemy.exc import DataError, IntegrityError
+from sqlalchemy.sql.expression import and_
+
 from models.dao.db_connection import db
+from models.dao.score import Score, ScoreCategory, TournamentScore, \
+GameScore
 
 def is_score_entered(game_dao):
     """
@@ -68,6 +73,75 @@ def validate_score(score, category, game_id=None):
                 format(category.name))
     except ValueError:
         raise ValueError('Invalid score: {}'.format(score))
+
+
+def write_score(tournament, entry_id, score_cat, score, game_id=None):
+    """
+    Enters a score for category into tournament for player.
+
+    Expects: All fields required
+        - entry_id - of the entry
+        - score_cat - e.g. round_3_battle
+        - score - integer
+
+    Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
+        there is an issue inserting the score.
+    """
+    # score_cat should mean something in the context of the tournie
+    cat = db.session.query(ScoreCategory).filter_by(
+        tournament_id=tournament.name, name=score_cat).first()
+
+    try:
+        validate_score(score, cat, game_id)
+    except AttributeError:
+        raise TypeError('Unknown category: {}'.format(score_cat))
+
+    # Has it already been entered?
+    if game_id is None:
+        # pylint: disable=no-member
+        existing_score = TournamentScore.query.join(Score).\
+            join(ScoreCategory).\
+            filter(and_(
+                TournamentScore.entry_id == entry_id,
+                TournamentScore.tournament_id == tournament.id,
+                ScoreCategory.id == cat.id)).first() is not None
+    else:
+        try:
+            # pylint: disable=no-member
+            existing_score = GameScore.query.join(Score).\
+                filter(and_(GameScore.entry_id == entry_id, \
+                            GameScore.game_id == game_id,
+                            Score.score_category_id == cat.id)).\
+                first() is not None
+        except DataError:
+            db.session.rollback()
+            raise AttributeError('{} not entered. Game {} cannot be found'.\
+                format(score, game_id))
+
+    if existing_score:
+        raise ValueError(
+            '{} not entered. Score is already set'.format(score))
+
+    try:
+        score_dao = Score(entry_id, cat.id, score)
+        db.session.add(score_dao)
+        db.session.flush()
+
+        if game_id is not None:
+            db.session.add(GameScore(entry_id, game_id, score_dao.id))
+        else:
+            db.session.add(
+                TournamentScore(entry_id, tournament.id, score_dao.id))
+        db.session.commit()
+    except IntegrityError as err:
+        db.session.rollback()
+        if 'is not present in table "entry"' in err.__repr__():
+            raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
+                format(score, entry_id))
+        elif 'is not present in table "game"' in err.__repr__():
+            raise AttributeError('{} not entered. Game {} cannot be found'.\
+                format(score, game_id))
+        raise err
 
 
 # pylint: disable=too-many-arguments
