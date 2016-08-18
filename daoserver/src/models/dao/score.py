@@ -25,7 +25,7 @@ class ScoreCategory(db.Model):
     tournament_id = db.Column(db.String(50),
                               db.ForeignKey(Tournament.name),
                               nullable=False)
-    display_name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     min_val = db.Column(db.Integer)
     max_val = db.Column(db.Integer)
     per_tournament = db.Column(db.Boolean, nullable=False, default=False)
@@ -33,10 +33,10 @@ class ScoreCategory(db.Model):
     tournament = db.relationship(Tournament, backref=db.backref(
         'score_categories', lazy='dynamic'))
 
-    def __init__(self, tournament_id, display_name, percentage, per_tourn,
+    def __init__(self, tournament_id, name, percentage, per_tourn,
                  min_val, max_val):
         self.tournament_id = tournament_id
-        self.display_name = display_name
+        self.name = name
         self.per_tournament = per_tourn
 
         try:
@@ -63,7 +63,7 @@ class ScoreCategory(db.Model):
     def __repr__(self):
         return '<ScoreCategory ({}, {}, {}, {}, {}, {})>'.format(
             self.tournament_id,
-            self.display_name,
+            self.name,
             self.percentage,
             self.per_tournament,
             self.min_val,
@@ -77,7 +77,7 @@ class ScoreCategory(db.Model):
         """
         existing = ScoreCategory.query.\
             filter(and_(ScoreCategory.tournament_id == self.tournament_id,
-                        ScoreCategory.display_name != self.display_name)).all()
+                        ScoreCategory.name != self.name)).all()
 
         if (sum([x.percentage for x in existing]) + self.percentage) > 100:
             raise ValueError('percentage too high: {}'.format(self))

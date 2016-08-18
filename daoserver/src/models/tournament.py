@@ -88,7 +88,7 @@ class Tournament(object):
         """
 
         # check for duplicates
-        keys = [cat.display_name for cat in new_categories]
+        keys = [cat.name for cat in new_categories]
         if len(keys) != len(set(keys)):
             raise ValueError("You cannot set multiple keys with the same name")
 
@@ -97,18 +97,18 @@ class Tournament(object):
             # Delete the ones no longer needed
             to_delete = ScoreCategory.query.\
                 filter(and_(ScoreCategory.tournament_id == self.tournament_id,
-                            ~ScoreCategory.display_name.in_(keys)))
+                            ~ScoreCategory.name.in_(keys)))
             to_delete.delete(synchronize_session='fetch')
 
 
             for cat in new_categories:
                 dao = ScoreCategory.query.\
                     filter_by(tournament_id=self.tournament_id,
-                              display_name=cat.display_name).first()
+                              name=cat.name).first()
 
                 if dao is None:
                     dao = ScoreCategory(self.tournament_id,
-                                        cat.display_name,
+                                        cat.name,
                                         cat.percentage,
                                         cat.per_tournament,
                                         cat.min_val,
@@ -122,7 +122,7 @@ class Tournament(object):
             for cat in new_categories:
                 ScoreCategory.query.\
                     filter_by(tournament_id=self.tournament_id,
-                              display_name=cat.display_name).first().clashes()
+                              name=cat.name).first().clashes()
 
             db.session.commit()
         except ValueError:
@@ -156,11 +156,11 @@ class Tournament(object):
             if game_id and category.per_tournament:
                 raise TypeError('Cannot enter a per-tournament score '\
                     '({}) for a game (game_id: {})'.\
-                    format(category.display_name, game_id))
+                    format(category.name, game_id))
 
             if game_id is None and not category.per_tournament:
                 raise TypeError('{} should be entered per-tournament'.\
-                    format(category.display_name))
+                    format(category.name))
         except ValueError:
             raise ValueError('Invalid score: {}'.format(score))
 
@@ -179,8 +179,7 @@ class Tournament(object):
         """
         # score_cat should mean something in the context of the tournie
         cat = db.session.query(ScoreCategory).filter_by(
-            tournament_id=self.get_dao().name, display_name=score_cat).\
-            first()
+            tournament_id=self.get_dao().name, name=score_cat).first()
 
         try:
             self.validate_score(score, cat, game_id)
@@ -270,7 +269,7 @@ class Tournament(object):
             entry.score_info = [
                 {
                     'score': x.value,
-                    'category': x.score_category.display_name,
+                    'category': x.score_category.name,
                     'min_val': x.score_category.min_val,
                     'max_val': x.score_category.max_val,
                 } for x in entry.scores
@@ -407,5 +406,5 @@ class ScoreCategoryPair(object):
         except TypeError:
             raise ValueError('Min and Max Scores must be integers')
 
-        self.display_name = name
+        self.name = name
         self.per_tournament = per_tourn

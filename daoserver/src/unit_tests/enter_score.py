@@ -116,8 +116,8 @@ class TestScoreEntered(TestCase):
 
         # A completed game
         game = self.get_game_by_round(entry_4_id, 1)
-        tourn.enter_score(entry_2_id, category_1.display_name, 2, game.id)
-        tourn.enter_score(entry_4_id, category_1.display_name, 4, game.id)
+        tourn.enter_score(entry_2_id, category_1.name, 2, game.id)
+        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
         self.assertTrue(entry_4_id in entrants)
@@ -125,7 +125,7 @@ class TestScoreEntered(TestCase):
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
-        tourn.enter_score(entry_3_id, category_1.display_name, 3, game.id)
+        tourn.enter_score(entry_3_id, category_1.name, 3, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
         self.assertTrue(entry_3_id in entrants)
@@ -140,14 +140,14 @@ class TestScoreEntered(TestCase):
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
-        tourn.enter_score(entry_4_id, category_1.display_name, 4, game.id)
+        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
         self.assertFalse(Tournament.is_score_entered(game))
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tournament_1)
-        tourn.enter_score(entry_5_id, category_1.display_name, 5, game.id)
+        tourn.enter_score(entry_5_id, category_1.name, 5, game.id)
         self.assertTrue(Tournament.is_score_entered(game))
 
     @staticmethod
@@ -209,28 +209,28 @@ class EnterScore(TestCase):
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_2.display_name,
+            self.category_2.name,
             5,
             game_id='foo')
         self.assertRaises(
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_2.display_name,
+            self.category_2.name,
             5,
             game_id=1000000)
         self.assertRaises(
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_2.display_name,
+            self.category_2.name,
             5,
             game_id=-1)
         self.assertRaises(
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_2.display_name,
+            self.category_2.name,
             5,
             game_id=0)
 
@@ -244,7 +244,7 @@ class EnterScore(TestCase):
             AttributeError,
             Tournament(self.tournament_1).enter_score,
             10000000,
-            self.category_1.display_name,
+            self.category_1.name,
             5)
         # bad key
         self.assertRaises(
@@ -258,21 +258,21 @@ class EnterScore(TestCase):
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_1.name,
             -1)
         # bad score - high
         self.assertRaises(
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_1.name,
             101)
         # bad score - character
         self.assertRaises(
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_1.name,
             'a')
 
     def test_enter_score(self):
@@ -284,7 +284,7 @@ class EnterScore(TestCase):
         tourn = Tournament(self.tournament_1)
 
         # a one-off score
-        tourn.enter_score(entry.id, self.category_1.display_name, 0)
+        tourn.enter_score(entry.id, self.category_1.name, 0)
         scores = TournamentScore.query.\
             filter_by(entry_id=entry.id, tournament_id=tourn.get_dao().id).all()
         compare(len(scores), 1)
@@ -300,8 +300,7 @@ class EnterScore(TestCase):
             filter(and_(GameEntrant.entrant_id == entry.id,
                         TournamentGame.tournament_round_id == round_id)).\
                 first().id
-        tourn.enter_score(entry.id, self.category_2.display_name, 17,
-                          game_id=game_id)
+        tourn.enter_score(entry.id, self.category_2.name, 17, game_id=game_id)
         scores = GameScore.query.\
             filter_by(entry_id=entry.id, game_id=game_id).all()
         compare(len(scores), 1)
@@ -312,14 +311,14 @@ class EnterScore(TestCase):
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_1.display_name,
+            self.category_1.name,
             100)
 
         self.assertRaises(
             ValueError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
-            self.category_2.display_name,
+            self.category_2.name,
             100,
             game_id=game_id)
 

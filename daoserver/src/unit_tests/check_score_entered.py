@@ -117,8 +117,8 @@ class TestScoreEntered(TestCase):
 
         # A completed game
         game = self.get_game_by_round(entry_4_id, 1)
-        tourn.enter_score(entry_2_id, category_1.display_name, 2, game.id)
-        tourn.enter_score(entry_4_id, category_1.display_name, 4, game.id)
+        tourn.enter_score(entry_2_id, category_1.name, 2, game.id)
+        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
         self.assertTrue(entry_4_id in entrants)
@@ -126,7 +126,7 @@ class TestScoreEntered(TestCase):
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
-        tourn.enter_score(entry_3_id, category_1.display_name, 3, game.id)
+        tourn.enter_score(entry_3_id, category_1.name, 3, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
         self.assertTrue(entry_3_id in entrants)
@@ -141,14 +141,14 @@ class TestScoreEntered(TestCase):
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
-        tourn.enter_score(entry_4_id, category_1.display_name, 4, game.id)
+        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
         self.assertFalse(Tournament.is_score_entered(game))
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tournament_1)
-        tourn.enter_score(entry_5_id, category_1.display_name, 5, game.id)
+        tourn.enter_score(entry_5_id, category_1.name, 5, game.id)
         self.assertTrue(Tournament.is_score_entered(game))
 
     @staticmethod

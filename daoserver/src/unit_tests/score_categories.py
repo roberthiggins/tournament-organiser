@@ -43,7 +43,7 @@ class ScoreCategoryTests(TestCase):
         # Enter a cat
         self.tournament.set_score_categories([self.cat_1])
         c_1 = ScoreCategory.query.\
-            filter_by(display_name=self.cat_1.display_name).first()
+            filter_by(name=self.cat_1.name).first()
         compare(c_1.percentage, self.cat_1.percentage)
         compare(c_1.per_tournament, self.cat_1.per_tournament)
         compare(c_1.min_val, self.cat_1.min_val)
@@ -52,14 +52,14 @@ class ScoreCategoryTests(TestCase):
         # Enter multiple cats
         self.tournament.set_score_categories([self.cat_2, self.cat_3])
         c_2 = ScoreCategory.query.\
-            filter_by(display_name=self.cat_2.display_name).first()
+            filter_by(name=self.cat_2.name).first()
         compare(c_2.percentage, self.cat_2.percentage)
         compare(c_2.per_tournament, self.cat_2.per_tournament)
         compare(c_2.min_val, self.cat_2.min_val)
         compare(c_2.max_val, self.cat_2.max_val)
 
         c_3 = ScoreCategory.query.\
-            filter_by(display_name=self.cat_3.display_name).first()
+            filter_by(name=self.cat_3.name).first()
         compare(c_3.percentage, self.cat_3.percentage)
         compare(c_3.per_tournament, self.cat_3.per_tournament)
         compare(c_3.min_val, self.cat_3.min_val)
@@ -71,7 +71,7 @@ class ScoreCategoryTests(TestCase):
 
         # Double check cat 1 is deleted.
         c_1 = ScoreCategory.query.\
-            filter_by(display_name=self.cat_1.display_name).first()
+            filter_by(name=self.cat_1.name).first()
         self.assertTrue(c_1 is None)
 
     # pylint: disable=unused-variable

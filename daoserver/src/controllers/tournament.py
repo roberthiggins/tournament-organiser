@@ -60,7 +60,7 @@ def list_score_categories():
     """
     return [{
         'id':             x.id,
-        'name':           x.display_name,
+        'name':           x.name,
         'percentage':     x.percentage,
         'per_tournament': x.per_tournament,
         'min_val':        x.min_val,
@@ -159,7 +159,7 @@ def set_score_categories():
     g.tournament.set_score_categories(new_categories)
 
     return 'Score categories set: {}'.\
-        format(', '.join([str(cat.display_name) for cat in new_categories]))
+        format(', '.join([str(cat.name) for cat in new_categories]))
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response
