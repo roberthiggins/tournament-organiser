@@ -296,15 +296,8 @@ class Tournament(object):
         [{ 'name': 'Painting', 'percentage': 20, 'id': 1,
            'per_tournament': False }]
         """
-        categories = ScoreCategory.query.\
+        return ScoreCategory.query.\
             filter_by(tournament_id=self.tournament_id).all()
-        return [
-            {'id': x.id,
-             'name': x.display_name,
-             'percentage': x.percentage,
-             'per_tournament': x.per_tournament,
-             'min_val': x.min_val,
-             'max_val': x.max_val} for x in categories]
 
     @must_exist_in_db
     def make_draw(self, round_id=1):

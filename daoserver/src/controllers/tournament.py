@@ -58,7 +58,14 @@ def list_score_categories():
     GET the score categories set for the tournament.
     e.g. [{ 'name': 'painting', 'percentage': 20, 'id': 2 }]
     """
-    return g.tournament.list_score_categories()
+    return [{
+        'id':             x.id,
+        'name':           x.display_name,
+        'percentage':     x.percentage,
+        'per_tournament': x.per_tournament,
+        'min_val':        x.min_val,
+        'max_val':        x.max_val
+    } for x in g.tournament.list_score_categories()]
 
 @TOURNAMENT.route('/', methods=['GET'])
 @json_response
