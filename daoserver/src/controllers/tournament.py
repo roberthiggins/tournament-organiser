@@ -12,7 +12,6 @@ from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_round import TournamentRound
-from models.score import ScoreCategoryPair
 from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__)
@@ -154,13 +153,17 @@ def set_score_categories():
         except TypeError:
             cat = request.get_json().get(json_cat)
 
-        new_categories.append(
-            ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
+        new_categories.append({
+            'name':       cat[0],
+            'percentage': cat[1],
+            'per_tourn':  cat[2],
+            'min_val':    cat[3],
+            'max_val':    cat[4]})
 
     g.tournament.set_score_categories(new_categories)
 
     return 'Score categories set: {}'.\
-        format(', '.join([str(cat.name) for cat in new_categories]))
+        format(', '.join([str(cat['name']) for cat in new_categories]))
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response

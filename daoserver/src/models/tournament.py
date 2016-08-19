@@ -88,7 +88,7 @@ class Tournament(object):
         """
 
         # check for duplicates
-        keys = [cat.name for cat in new_categories]
+        keys = [cat['name'] for cat in new_categories]
         if len(keys) != len(set(keys)):
             raise ValueError("You cannot set multiple keys with the same name")
 
@@ -108,7 +108,7 @@ class Tournament(object):
             for cat in new_categories:
                 ScoreCategory.query.\
                     filter_by(tournament_id=self.tournament_id,
-                              name=cat.name).first().clashes()
+                              name=cat['name']).first().clashes()
 
             db.session.commit()
         except ValueError:

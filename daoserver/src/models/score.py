@@ -41,15 +41,15 @@ def upsert_tourn_score_cat(tournament_id, cat):
     """
     # pylint: disable=no-member
     dao = ScoreCategory.query.\
-        filter_by(tournament_id=tournament_id, name=cat.name).first()
+        filter_by(tournament_id=tournament_id, name=cat['name']).first()
 
     score_args = {
         'tournament_id': tournament_id,
-        'name':          cat.name,
-        'percentage':    cat.percentage,
-        'per_tourn':     cat.per_tournament,
-        'min_val':       cat.min_val,
-        'max_val':       cat.max_val
+        'name':          cat['name'],
+        'percentage':    cat['percentage'],
+        'per_tourn':     cat['per_tourn'],
+        'min_val':       cat['min_val'],
+        'max_val':       cat['max_val']
     }
 
 
@@ -148,14 +148,3 @@ def write_score(tournament, entry_id, score_cat, score, game_id=None):
             raise AttributeError('{} not entered. Game {} cannot be found'.\
                 format(score, game_id))
         raise err
-
-
-# pylint: disable=too-many-arguments
-class ScoreCategoryPair(object):
-    """A holder object for score category information"""
-    def __init__(self, name, percentage, per_tourn, min_val, max_val):
-        self.percentage = percentage
-        self.min_val = min_val
-        self.max_val = max_val
-        self.name = name
-        self.per_tournament = per_tourn
