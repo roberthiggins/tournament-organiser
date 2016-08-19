@@ -43,19 +43,21 @@ def upsert_tourn_score_cat(tournament_id, cat):
     dao = ScoreCategory.query.\
         filter_by(tournament_id=tournament_id, name=cat.name).first()
 
-    if dao is None:
-        score_args = {
-            'tournament_id': tournament_id,
-            'name':          cat.name,
-            'percentage':    cat.percentage,
-            'per_tourn':     cat.per_tournament,
-            'min_val':       cat.min_val,
-            'max_val':       cat.max_val
-        }
+    score_args = {
+        'tournament_id': tournament_id,
+        'name':          cat.name,
+        'percentage':    cat.percentage,
+        'per_tourn':     cat.per_tournament,
+        'min_val':       cat.min_val,
+        'max_val':       cat.max_val
+    }
 
+
+    if dao is None:
         dao = ScoreCategory(**score_args)
-    dao.set_percentage(cat.percentage)
-    dao.per_tournament = cat.per_tournament
+    else:
+        dao.update(**score_args)
+
     db.session.add(dao)
     db.session.flush()
 
@@ -156,14 +158,7 @@ class ScoreCategoryPair(object):
             raise ValueError('Category must have a name')
 
         self.percentage = percentage
-
-        try:
-            self.min_val = int(min_val)
-            self.max_val = int(max_val)
-        except ValueError:
-            raise ValueError('Min and Max Scores must be integers')
-        except TypeError:
-            raise ValueError('Min and Max Scores must be integers')
-
+        self.min_val = min_val
+        self.max_val = max_val
         self.name = name
         self.per_tournament = per_tourn

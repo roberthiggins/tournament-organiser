@@ -42,21 +42,7 @@ class ScoreCategory(db.Model):
         self.tournament_id = args['tournament_id']
         self.name = args['name']
         self.per_tournament = args['per_tourn']
-
-        try:
-            self.min_val = int(args['min_val'])
-            self.max_val = int(args['max_val'])
-        except ValueError:
-            raise ValueError('Min and Max Scores must be integers')
-        except TypeError:
-            raise ValueError('Min and Max Scores must be integers')
-        if self.max_val <= 0:
-            raise ValueError("Max Score must be positive")
-        if self.min_val < 0:
-            raise ValueError("Min Score cannot be negative")
-        if self.min_val > self.max_val:
-            raise ValueError("Min Score must be less than Max Score")
-
+        self.set_min_max(args['min_val'], args['max_val'])
         self.set_percentage(args['percentage'])
 
     def __repr__(self):
@@ -91,6 +77,40 @@ class ScoreCategory(db.Model):
                 raise ValueError()
         except ValueError:
             raise ValueError("Percentage must be an integer (1-100)")
+
+    def set_min_max(self, min_val, max_val):
+        """Set the min and max scores"""
+        try:
+            self.min_val = int(min_val)
+            self.max_val = int(max_val)
+        except ValueError:
+            raise ValueError('Min and Max Scores must be integers')
+        except TypeError:
+            raise ValueError('Min and Max Scores must be integers')
+        if self.max_val <= 0:
+            raise ValueError("Max Score must be positive")
+        if self.min_val < 0:
+            raise ValueError("Min Score cannot be negative")
+        if self.min_val > self.max_val:
+            raise ValueError("Min Score must be less than Max Score")
+
+    def update(self, **args):
+        """Update an existing DAO"""
+
+        if args['tournament_id']:
+            self.tournament_id = args['tournament_id']
+
+        if args['name']:
+            self.name = args['name']
+
+        if args['per_tourn']:
+            self.per_tournament = args['per_tourn']
+
+        if args['min_val'] and args['max_val']:
+            self.set_min_max(args['min_val'], args['max_val'])
+
+        if args['percentage']:
+            self.set_percentage(args['percentage'])
 
 
 class Score(db.Model):

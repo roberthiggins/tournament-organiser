@@ -75,15 +75,37 @@ class ScoreCategoryTests(TestCase):
             filter_by(name=self.cat_1.name).first()
         self.assertTrue(c_1 is None)
 
+
     # pylint: disable=unused-variable
-    def test_broken_categories(self):
-        # ScoreCategoryPair should perform input validation only
+    def test_broken_min_max(self):
         neg_min = ScoreCategoryPair('categories_painting', 10, False, -1, 20)
         neg_max = ScoreCategoryPair('categories_painting', 10, False, 1, -1)
         zero_max = ScoreCategoryPair('categories_painting', 10, False, 0, 0)
         min_high = ScoreCategoryPair('categories_painting', 10, False, 10, 9)
         zero_min = ScoreCategoryPair('categories_painting', 10, False, 0, 20)
         equal = ScoreCategoryPair('categories_painting', 10, False, 1, 1)
+        no_min = ScoreCategoryPair('categories_painting', '10', False, '', 20)
+        no_max = ScoreCategoryPair('categories_painting', '10', False, 1, '')
+        none_min = ScoreCategoryPair('categories_painting', '1', False, None, 1)
+        none_max = ScoreCategoryPair('categories_painting', '1', False, 1, None)
+        char_min = ScoreCategoryPair('categories_painting', '1', False, 'a', 1)
+        char_max = ScoreCategoryPair('categories_painting', '1', False, 1, 'a')
+
+        set_cats_func = self.tournament.set_score_categories
+        self.assertRaises(ValueError, set_cats_func, [neg_min])
+        self.assertRaises(ValueError, set_cats_func, [neg_max])
+        self.assertRaises(ValueError, set_cats_func, [zero_max])
+        self.assertRaises(ValueError, set_cats_func, [min_high])
+        self.assertRaises(ValueError, set_cats_func, [no_min])
+        self.assertRaises(ValueError, set_cats_func, [no_max])
+        self.assertRaises(ValueError, set_cats_func, [none_min])
+        self.assertRaises(ValueError, set_cats_func, [none_max])
+        self.assertRaises(ValueError, set_cats_func, [char_min])
+        self.assertRaises(ValueError, set_cats_func, [char_max])
+
+
+    def test_broken_categories(self):
+        # ScoreCategoryPair should perform input validation only
         fifty_one = ScoreCategoryPair('categories_painting', 51, False, 1, 20)
         neg_pct = ScoreCategoryPair('categories_painting', -1, False, 1, 20)
         zero_pct = ScoreCategoryPair('categories_painting', 0, False, 1, 20)
@@ -91,27 +113,11 @@ class ScoreCategoryTests(TestCase):
         char_pct = ScoreCategoryPair('categories_painting', 'a', False, 1, 20)
 
         self.assertRaises(ValueError, ScoreCategoryPair,\
-            'categories_painting', 10, False, 'a', 20)
-        self.assertRaises(ValueError, ScoreCategoryPair,\
-            'categories_painting', 10, False, 1, 'a')
-        self.assertRaises(ValueError, ScoreCategoryPair,\
             '', 10, False, 1, 20)
         self.assertRaises(ValueError, ScoreCategoryPair,\
             None, 10, False, 1, 20)
-        self.assertRaises(ValueError, ScoreCategoryPair,\
-            'categories_painting', 10, False, 1, None)
-        self.assertRaises(ValueError, ScoreCategoryPair,\
-            'categories_painting', 10, False, None, 1)
-        self.assertRaises(ValueError, ScoreCategoryPair,\
-            'categories_painting', 10, False, 1, '')
-        self.assertRaises(ValueError, ScoreCategoryPair,\
-            'categories_painting', 10, False, '', 1)
 
         set_cats_func = self.tournament.set_score_categories
-        self.assertRaises(ValueError, set_cats_func, [neg_min])
-        self.assertRaises(ValueError, set_cats_func, [neg_max])
-        self.assertRaises(ValueError, set_cats_func, [zero_max])
-        self.assertRaises(ValueError, set_cats_func, [min_high])
         self.assertRaises(ValueError, set_cats_func, [neg_pct])
         self.assertRaises(ValueError, set_cats_func, [zero_pct])
         self.assertRaises(ValueError, set_cats_func, [lge_pct])
