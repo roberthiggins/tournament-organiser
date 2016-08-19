@@ -40,8 +40,8 @@ class ScoreCategory(db.Model):
                 format(args))
 
         self.tournament_id = args['tournament_id']
-        self.name = args['name']
         self.per_tournament = args['per_tourn']
+        self.set_name(args['name'])
         self.set_min_max(args['min_val'], args['max_val'])
         self.set_percentage(args['percentage'])
 
@@ -68,6 +68,13 @@ class ScoreCategory(db.Model):
             raise ValueError('percentage too high: {}'.format(self))
 
         return False
+
+    def set_name(self, name):
+        """Set the name. It must exist"""
+        if not name:
+            raise ValueError('Category must have a name')
+        self.name = name
+
 
     def set_percentage(self, pct):
         """Set the percentage and check it's legal"""
@@ -96,21 +103,11 @@ class ScoreCategory(db.Model):
 
     def update(self, **args):
         """Update an existing DAO"""
-
-        if args['tournament_id']:
-            self.tournament_id = args['tournament_id']
-
-        if args['name']:
-            self.name = args['name']
-
-        if args['per_tourn']:
-            self.per_tournament = args['per_tourn']
-
-        if args['min_val'] and args['max_val']:
-            self.set_min_max(args['min_val'], args['max_val'])
-
-        if args['percentage']:
-            self.set_percentage(args['percentage'])
+        self.tournament_id = args['tournament_id']
+        self.set_name(args['name'])
+        self.per_tournament = args['per_tourn']
+        self.set_min_max(args['min_val'], args['max_val'])
+        self.set_percentage(args['percentage'])
 
 
 class Score(db.Model):

@@ -111,15 +111,14 @@ class ScoreCategoryTests(TestCase):
         zero_pct = ScoreCategoryPair('categories_painting', 0, False, 1, 20)
         lge_pct = ScoreCategoryPair('categories_painting', 101, False, 1, 20)
         char_pct = ScoreCategoryPair('categories_painting', 'a', False, 1, 20)
-
-        self.assertRaises(ValueError, ScoreCategoryPair,\
-            '', 10, False, 1, 20)
-        self.assertRaises(ValueError, ScoreCategoryPair,\
-            None, 10, False, 1, 20)
+        no_name = ScoreCategoryPair('', 10, False, 1, 20)
+        none_name = ScoreCategoryPair(None, 10, False, 1, 20)
 
         set_cats_func = self.tournament.set_score_categories
         self.assertRaises(ValueError, set_cats_func, [neg_pct])
         self.assertRaises(ValueError, set_cats_func, [zero_pct])
         self.assertRaises(ValueError, set_cats_func, [lge_pct])
         self.assertRaises(ValueError, set_cats_func, [char_pct])
+        self.assertRaises(ValueError, set_cats_func, [no_name])
+        self.assertRaises(ValueError, set_cats_func, [none_name])
         self.assertRaises(ValueError, set_cats_func, [fifty_one, fifty_one])

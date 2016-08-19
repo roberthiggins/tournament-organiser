@@ -154,9 +154,6 @@ def write_score(tournament, entry_id, score_cat, score, game_id=None):
 class ScoreCategoryPair(object):
     """A holder object for score category information"""
     def __init__(self, name, percentage, per_tourn, min_val, max_val):
-        if not name:
-            raise ValueError('Category must have a name')
-
         self.percentage = percentage
         self.min_val = min_val
         self.max_val = max_val
