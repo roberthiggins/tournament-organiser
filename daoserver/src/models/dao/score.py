@@ -57,12 +57,7 @@ class ScoreCategory(db.Model):
         if self.min_val > self.max_val:
             raise ValueError("Min Score must be less than Max Score")
 
-        try:
-            self.percentage = int(args['percentage'])
-            if self.percentage <= 0 or self.percentage > 100:
-                raise TypeError()
-        except TypeError:
-            raise ValueError("Percentage must be between 1 and 100")
+        self.set_percentage(args['percentage'])
 
     def __repr__(self):
         return '<ScoreCategory ({}, {}, {}, {}, {}, {})>'.format(
@@ -87,6 +82,16 @@ class ScoreCategory(db.Model):
             raise ValueError('percentage too high: {}'.format(self))
 
         return False
+
+    def set_percentage(self, pct):
+        """Set the percentage and check it's legal"""
+        try:
+            self.percentage = int(pct)
+            if self.percentage <= 0 or self.percentage > 100:
+                raise ValueError()
+        except ValueError:
+            raise ValueError("Percentage must be an integer (1-100)")
+
 
 class Score(db.Model):
     """An individual score tied to a ScoreCategory"""

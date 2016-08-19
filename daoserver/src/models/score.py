@@ -54,7 +54,7 @@ def upsert_tourn_score_cat(tournament_id, cat):
         }
 
         dao = ScoreCategory(**score_args)
-    dao.percentage = int(cat.percentage)
+    dao.set_percentage(cat.percentage)
     dao.per_tournament = cat.per_tournament
     db.session.add(dao)
     db.session.flush()
@@ -155,12 +155,7 @@ class ScoreCategoryPair(object):
         if not name:
             raise ValueError('Category must have a name')
 
-        try:
-            self.percentage = int(percentage)
-            if self.percentage > 100 or self.percentage < 1:
-                raise ValueError()
-        except ValueError:
-            raise ValueError('Percentage must be an integer (1-100)')
+        self.percentage = percentage
 
         try:
             self.min_val = int(min_val)
