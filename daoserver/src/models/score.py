@@ -44,12 +44,16 @@ def upsert_tourn_score_cat(tournament_id, cat):
         filter_by(tournament_id=tournament_id, name=cat.name).first()
 
     if dao is None:
-        dao = ScoreCategory(tournament_id,
-                            cat.name,
-                            cat.percentage,
-                            cat.per_tournament,
-                            cat.min_val,
-                            cat.max_val,)
+        score_args = {
+            'tournament_id': tournament_id,
+            'name':          cat.name,
+            'percentage':    cat.percentage,
+            'per_tourn':     cat.per_tournament,
+            'min_val':       cat.min_val,
+            'max_val':       cat.max_val
+        }
+
+        dao = ScoreCategory(**score_args)
     dao.percentage = int(cat.percentage)
     dao.per_tournament = cat.per_tournament
     db.session.add(dao)

@@ -33,15 +33,19 @@ class ScoreCategory(db.Model):
     tournament = db.relationship(Tournament, backref=db.backref(
         'score_categories', lazy='dynamic'))
 
-    def __init__(self, tournament_id, name, percentage, per_tourn,
-                 min_val, max_val):
-        self.tournament_id = tournament_id
-        self.name = name
-        self.per_tournament = per_tourn
+    def __init__(self, **args):
+        if not args['tournament_id'] or not args['name'] \
+        or args['per_tourn'] is None:
+            raise ValueError('TournamentScoreCategory args missing: {}'.\
+                format(args))
+
+        self.tournament_id = args['tournament_id']
+        self.name = args['name']
+        self.per_tournament = args['per_tourn']
 
         try:
-            self.min_val = int(min_val)
-            self.max_val = int(max_val)
+            self.min_val = int(args['min_val'])
+            self.max_val = int(args['max_val'])
         except ValueError:
             raise ValueError('Min and Max Scores must be integers')
         except TypeError:
@@ -54,7 +58,7 @@ class ScoreCategory(db.Model):
             raise ValueError("Min Score must be less than Max Score")
 
         try:
-            self.percentage = int(percentage)
+            self.percentage = int(args['percentage'])
             if self.percentage <= 0 or self.percentage > 100:
                 raise TypeError()
         except TypeError:

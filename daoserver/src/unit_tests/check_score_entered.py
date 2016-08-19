@@ -93,8 +93,15 @@ class TestScoreEntered(TestCase):
 
     def test_score_entered(self):
         # Add a score category
-        category_1 = ScoreCategory(self.tournament_1, 'per_round', 50, False,
-                                   0, 100)
+        score_args = {
+            'tournament_id': self.tournament_1,
+            'name':          'per_round',
+            'percentage':    50,
+            'per_tourn':     False,
+            'min_val':       0,
+            'max_val':       100
+        }
+        category_1 = ScoreCategory(**score_args)
         db.session.add(category_1)
         db.session.flush()
 

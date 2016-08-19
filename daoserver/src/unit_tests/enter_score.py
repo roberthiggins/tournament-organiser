@@ -94,8 +94,15 @@ class TestScoreEntered(TestCase):
     def test_score_entered(self):
         tourn = Tournament(self.tournament_1)
 
-        category_1 = ScoreCategory(self.tournament_1, 'per_tourn', 50, False,
-                                   0, 100)
+        score_args = {
+            'tournament_id': self.tournament_1,
+            'name':          'per_round',
+            'percentage':    50,
+            'per_tourn':     False,
+            'min_val':       0,
+            'max_val':       100
+        }
+        category_1 = ScoreCategory(**score_args)
         db.session.add(category_1)
         db.session.flush()
 
@@ -182,15 +189,23 @@ class EnterScore(TestCase):
         db.session.add(TournamentRound(self.tournament_1, 1, 'foo_mission_1'))
         db.session.add(TournamentRound(self.tournament_1, 2, 'foo_mission_2'))
         self.injector.add_player(self.tournament_1, self.player)
+        score_args = {
+            'tournament_id': self.tournament_1,
+            'name':          'per_tourn',
+            'percentage':    50,
+            'per_tourn':     True,
+            'min_val':       0,
+            'max_val':       100
+        }
 
         # per tournament category
-        self.category_1 = ScoreCategory(self.tournament_1, 'per_tourn', 50,
-                                        True, 0, 100)
+        self.category_1 = ScoreCategory(**score_args)
         db.session.add(self.category_1)
 
         # per round category
-        self.category_2 = ScoreCategory(self.tournament_1, 'per_round', 50,
-                                        False, 0, 100)
+        score_args['name'] = 'per_round'
+        score_args['per_tourn'] = False
+        self.category_2 = ScoreCategory(**score_args)
         db.session.add(self.category_2)
         db.session.commit()
 
