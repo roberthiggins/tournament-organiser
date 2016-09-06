@@ -30,6 +30,7 @@ class ScoreCategory(db.Model):
     max_val = db.Column(db.Integer)
     per_tournament = db.Column(db.Boolean, nullable=False, default=False)
     percentage = db.Column(db.Integer, nullable=False, default=100)
+    zero_sum = db.Column(db.Boolean, nullable=False, default=False)
     tournament = db.relationship(Tournament, backref=db.backref(
         'score_categories', lazy='dynamic'))
 
@@ -44,15 +45,17 @@ class ScoreCategory(db.Model):
         self.set_name(args['name'])
         self.set_min_max(args['min_val'], args['max_val'])
         self.set_percentage(args['percentage'])
+        self.zero_sum = args.get('zero_sum', False)
 
     def __repr__(self):
-        return '<ScoreCategory ({}, {}, {}, {}, {}, {})>'.format(
+        return '<ScoreCategory ({}, {}, {}, {}, {}, {}, {})>'.format(
             self.tournament_id,
             self.name,
             self.percentage,
             self.per_tournament,
             self.min_val,
-            self.max_val)
+            self.max_val,
+            self.zero_sum)
 
     def clashes(self):
         """
