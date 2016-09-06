@@ -52,7 +52,7 @@ DECLARE
     cat_1 int := 0;
 BEGIN
     PERFORM create_tournament(tourn_name, '2095-07-05');
-    PERFORM create_score_category(tourn_name, 'category_1', 15, FALSE, 1, 10);
+    PERFORM create_score_category(tourn_name, 'category_1', 15, FALSE, 1, 10, TRUE);
 END $$;
 
 
@@ -88,11 +88,12 @@ BEGIN
     PERFORM create_score_category(tourn_name, 'enter_score_test_category_3', 1, TRUE, 1, 5);
     PERFORM create_score_category(tourn_name, 'enter_score_test_category_su', 1, TRUE, 1, 5);
     PERFORM create_score_category(tourn_name, 'enter_score_test_category_to', 1, TRUE, 1, 5);
-    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_1', 1, FALSE, 4, 15);
-    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_2', 1, FALSE, 1, 5);
-    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_3', 1, FALSE, 1, 5);
-    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_su', 1, FALSE, 1, 5);
-    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_to', 1, FALSE, 1, 5);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_1', 1, FALSE, 4, 15, TRUE);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_2', 1, FALSE, 1, 5, TRUE);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_3', 1, FALSE, 1, 5, TRUE);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_4', 1, FALSE, 1, 5, TRUE);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_su', 1, FALSE, 1, 5, TRUE);
+    PERFORM create_score_category(tourn_name, 'enter_score_test_category_per_game_to', 1, FALSE, 1, 5, TRUE);
 
     -- Create a tournament organiser
     PERFORM create_user('to');

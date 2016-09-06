@@ -194,4 +194,54 @@ describe('Enter score for single game for an entry', function () {
 
         })
         .toss();
+
+    frisby.create('get game_id of next game for enter_score_test_p_2')
+        .get(API + 'enter_score_test_p_2/nextgame')
+        .expectStatus(200)
+        .afterJSON(function (body) {
+            var gameId = body.game_id;
+
+            frisby.create('player enters a zero_sum score that is too high')
+                .post(API + 'enter_score_test_p_1/entergamescore',
+                    {
+                        game_id: gameId,
+                        scorer: 'enter_score_test_p_1',
+                        key: 'enter_score_test_category_per_game_4',
+                        value: 4
+                    },
+                    {json: true})
+                .expectStatus(200)
+                .expectBodyContains('Score entered for enter_score_test_p_1' +
+                    ': 4')
+                .toss();
+
+            frisby.create('player enters a zero_sum score that is too high')
+                .post(API + 'enter_score_test_p_2/entergamescore',
+                    {
+                        game_id: gameId,
+                        scorer: 'enter_score_test_p_2',
+                        key: 'enter_score_test_category_per_game_4',
+                        value: 2
+                    },
+                    {json: true})
+                .expectStatus(400)
+                .expectBodyContains('Invalid score: 2')
+                .toss();
+
+            frisby.create('player enters a zero_sum score acceptably')
+                .post(API + 'enter_score_test_p_2/entergamescore',
+                    {
+                        game_id: gameId,
+                        scorer: 'enter_score_test_p_2',
+                        key: 'enter_score_test_category_per_game_4',
+                        value: 1
+                    },
+                    {json: true})
+                .expectStatus(200)
+                .expectBodyContains('Score entered for enter_score_test_p_2' +
+                    ': 1')
+                .toss();
+
+        })
+        .toss();
 });

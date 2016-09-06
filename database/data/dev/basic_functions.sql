@@ -72,11 +72,11 @@ BEGIN
 END $$;
 
 -- Make a score_category
-CREATE OR REPLACE FUNCTION create_score_category(tourn_name varchar, name varchar, percentage integer, per_tourn boolean DEFAULT FALSE, min_val integer DEFAULT 1, max_val integer DEFAULT 20) RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION create_score_category(tourn_name varchar, name varchar, percentage integer, per_tourn boolean DEFAULT FALSE, min_val integer DEFAULT 1, max_val integer DEFAULT 20, zero_sum boolean DEFAULT FALSE) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
     cat_1 int := 0;
 BEGIN
-    INSERT INTO score_category VALUES(DEFAULT, tourn_name, name, percentage, per_tourn, min_val, max_val) RETURNING id INTO cat_1;
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, name, percentage, per_tourn, min_val, max_val, zero_sum) RETURNING id INTO cat_1;
 
     return cat_1;
 END $$;

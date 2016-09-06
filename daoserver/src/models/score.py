@@ -62,7 +62,7 @@ def upsert_tourn_score_cat(tournament_id, cat):
     db.session.flush()
 
 
-def validate_score(score, category, game_id=None):
+def validate_score(score, category, entry_id, game_id=None):
     """Validate an entered score. Returns True or raises Exception"""
     try:
         score = int(score)
@@ -77,6 +77,18 @@ def validate_score(score, category, game_id=None):
         if game_id is None and not category.per_tournament:
             raise TypeError('{} should be entered per-tournament'.\
                 format(category.name))
+
+        # If zero sum we need to check the score entered by the opponent
+        if category.zero_sum:
+            # pylint: disable=no-member
+            game_scores = GameScore.query.join(Score, ScoreCategory).\
+                    filter(and_(GameScore.game_id == game_id,
+                                ScoreCategory.name == category.name,
+                                GameScore.entry_id != entry_id)).all()
+            existing_score = sum([x.score.value for x in game_scores])
+            if existing_score + score > category.max_val:
+                raise ValueError()
+
     except ValueError:
         raise ValueError('Invalid score: {}'.format(score))
 
@@ -98,7 +110,7 @@ def write_score(tournament, entry_id, score_cat, score, game_id=None):
         tournament_id=tournament.name, name=score_cat).first()
 
     try:
-        validate_score(score, cat, game_id)
+        validate_score(score, cat, entry_id, game_id)
     except AttributeError:
         raise TypeError('Unknown category: {}'.format(score_cat))
 
