@@ -14,13 +14,14 @@ Feature: Check the draw
         Given I am on "/tournament/<tournament>/round/<round>/draw"
         Then I should see "<text>" appear
         Examples:
-            |tournament         | round | text                         |
-            |foo                | 1     | Tournament foo not found     |
-            |foo                | 0     | Tournament foo not found     |
-            |                   |       |                              |
-            |ranking_test       |       |                              |
-            |                   | 1     |                              |
-            |ranking_test       | 2     | mission_2                    |
-            |ranking_test       | 1     | mission_1                    |
-            |ranking_test       | 4     | TBA                          |
-            |ranking_test       | 5     | Tournament ranking_test does not have a round 5      |
+            |tournament         | round | text                     |
+            |foo                | 1     | Tournament foo not found |
+            |foo                | 0     | Tournament foo not found |
+            |                   |       |                          |
+            |ranking_test       |       |                          |
+            |                   | 1     |                          |
+            |ranking_test       | 2     | mission_2                |
+            |ranking_test       | 1     | mission_1                |
+            |ranking_test       | 4     | TBA                      |
+            |ranking_test       | 5     | Tournament ranking_test does not have a round 5|
+            |mission_test       | 1     | No draw is available     |

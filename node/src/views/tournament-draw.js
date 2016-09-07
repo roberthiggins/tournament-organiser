@@ -73,18 +73,17 @@ var TournamentDrawPagePage = React.createClass({
         this.serverRequest.abort();
     },
     render: function() {
-        var draw = this.state.draw && this.state.draw.length ?
-            <Draw draw={this.state.draw}
-                  mission={this.state.mission}
-                  round={this.state.round}
-                  tourn={this.state.tournament} />
-            : <p>No draw is available</p>
+
+        var msg = this.state.error ? this.state.error : "No draw is available",
+            widget = this.state.draw && this.state.draw.length ?
+                <Draw draw={this.state.draw}
+                      mission={this.state.mission}
+                      round={this.state.round}
+                      tourn={this.state.tournament} />
+            : <p>{msg}</p>;
 
         return (
-            <div>
-                <p>{this.state.error}</p>
-                {this.state.error ? null : draw}
-            </div>
+            <div>{widget}</div>
         );
     }
 });

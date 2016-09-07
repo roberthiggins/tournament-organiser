@@ -15,15 +15,22 @@ def get_round_info(tournament_id, round_id):
     """
     GET the information about a round
     """
+    no_draw = AttributeError('No draw is available')
     tourn = Tournament(tournament_id)
     rnd = tourn.get_round(round_id)
-    draw = tourn.make_draw(round_id)
+    try:
+        draw = tourn.make_draw(round_id)
+    except AttributeError:
+        raise no_draw
 
     draw_info = [
         {'table_number': t.table_number,
          'entrants': [x if isinstance(x, str) else x.player_id \
                       for x in t.entrants]
         } for t in draw]
+
+    if not draw_info and not rnd.mission:
+        raise no_draw
 
     # We will return all round info for all requests regardless of method
     return {

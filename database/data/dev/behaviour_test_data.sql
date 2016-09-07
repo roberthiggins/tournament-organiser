@@ -49,10 +49,8 @@ END $$;
 DO $$
 DECLARE
     tourn_name varchar := 'category_test';
-    protect_object_id int := 0;
 BEGIN
-    INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', 3, protect_object_id);
+    PERFORM create_tournament(tourn_name, '2095-07-12');
     PERFORM create_score_category(tourn_name, 'category_1', 15, FALSE, 1, 10);
 END $$;
 

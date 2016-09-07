@@ -48,8 +48,6 @@ END $$;
 DO $$
 DECLARE
     tourn_name varchar := 'category_test';
-    protect_object_id int := 0;
-    cat_1 int := 0;
 BEGIN
     PERFORM create_tournament(tourn_name, '2095-07-05');
     PERFORM create_score_category(tourn_name, 'category_1', 15, FALSE, 1, 10, TRUE);
@@ -117,3 +115,4 @@ SELECT create_tournament('round_test', '2095-07-07');
 SELECT half_tournament_test_setup('next_game_test', '2095-08-12');
 SELECT half_tournament_test_setup('rank_test', '1643-01-27');
 SELECT half_tournament_test_setup('schedule_test', '2163-09-15');
+SELECT half_tournament_test_setup('draw_test', '1985-01-27');

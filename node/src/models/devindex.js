@@ -13,8 +13,8 @@ exports.orgT = {
     title: "Organise a Tournament",
     actions: [
         {href: "/tournament/create", text: "Create a Tournament"},
-        {href: "/tournament/mission_test/rounds",
-         text: "Set num rounds for mission_test"},
+        {href: "/tournament/ranking_test/rounds",
+         text: "Set num rounds for ranking_test"},
         {href: "/tournament/mission_test/categories",
          text: "Set scoring categories for mission_test"},
         {href: "/tournament/mission_test/missions",
@@ -26,11 +26,11 @@ exports.orgT = {
 exports.playT = {
     title: "Play in a Tournament",
     actions: [
-        {text: "Get a game"},
-        {text: "Get a table"},
-        {text: "Get an opponent"},
+        {text: "Get a game for ranking_test",
+         href: "/tournament/ranking_test/round/1/draw"},
         {text: "Get the table layout"},
-        {text: "Get a mission"},
+        {text: "Get a mission for ranking_test round 1",
+         href: "/tournament/ranking_test/round/1/draw"},
         {text: "Get an opponent army list"},
         {text: "Get their army list (may be different between games)"},
         {text: "Get the time remaining in the round"},
