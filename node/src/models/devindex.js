@@ -34,10 +34,8 @@ exports.playT = {
         {text: "Get an opponent army list"},
         {text: "Get their army list (may be different between games)"},
         {text: "Get the time remaining in the round"},
-        {text: "Submit a score"},
-        {text: "Submit a soft score"},
-        {text: "Submit a once off score for ranking_test entry homer",
-         href: "/tournament/ranking_test/entry/homer/enterscore"},
+        {text: "Submit a score for ranking_test entry ranking_test_player_1",
+         href: "/tournament/ranking_test/entry/ranking_test_player_1/enterscore"},
         {text: "See their total score"},
         {text: "Review previous games"}
     ]
