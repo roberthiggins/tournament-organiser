@@ -58,18 +58,18 @@ var EnterScorePage = React.createClass({
             });
     },
     render: function() {
+
+        var widget = this.state.successText ?
+            <div>{this.state.successText}</div>
+            : <EnterScoreForm submitHandler={this.handleSubmit}
+                perTournamentScores={this.state.perTournament}
+                gameId={this.state.game_id} />;
+
         return (
             <div>
-                <div>{this.state.successText}</div>
                 <div>{this.state.error}</div>
                 <div>{this.state.message}</div>
-                {
-                    this.state.successText ?
-                        null
-                        : <EnterScoreForm submitHandler={this.handleSubmit}
-                            perTournamentScores={this.state.perTournament}
-                            gameId={this.state.game_id} />
-                }
+                {widget}
             </div>
         );
     }
