@@ -28,6 +28,8 @@ exports.playT = {
     actions: [
         {text: "Get a game for ranking_test",
          href: "/tournament/ranking_test/round/1/draw"},
+        {text: "Get next game for ranking_test_player_1",
+         href: "/tournament/ranking_test/entry/ranking_test_player_1/nextgame"},
         {text: "Get the table layout"},
         {text: "Get a mission for ranking_test round 1",
          href: "/tournament/ranking_test/round/1/draw"},
