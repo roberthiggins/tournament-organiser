@@ -38,7 +38,8 @@ exports.playT = {
         {text: "Get the time remaining in the round"},
         {text: "Submit a score for ranking_test entry ranking_test_player_1",
          href: "/tournament/ranking_test/entry/ranking_test_player_1/enterscore"},
-        {text: "See their total score"},
+        {text: "See total scores for ranking_test",
+         href: "/tournament/ranking_test/rankings"},
         {text: "Review previous games"}
     ]
 };
