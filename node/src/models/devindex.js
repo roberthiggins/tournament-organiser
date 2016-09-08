@@ -7,6 +7,8 @@ exports.enterT = {
         {text: "Update my player details"},
         {text: "Update application"},
         {text: "See application status"},
+        {text: "See upcoming tournaments for user user_1",
+         href: "user/user_1/tournaments"},
     ]
 };
 exports.orgT = {
