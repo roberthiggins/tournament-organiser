@@ -5,8 +5,8 @@ var React = require("react"),
 
 var EnterScoreForm = React.createClass({
     propTypes: {
+        categories:          React.PropTypes.array.isRequired,
         submitHandler:       React.PropTypes.func.isRequired,
-        perTournamentScores: React.PropTypes.bool.isRequired,
         gameId:              React.PropTypes.number
     },
     render: function() {
@@ -17,7 +17,7 @@ var EnterScoreForm = React.createClass({
                     <input type="text" name="value" id="value" />
                 </p>
                 <scores.scoreCategoryWidget
-                    perTournamentScores={this.props.perTournamentScores} />
+                    categories={this.props.categories} />
                 <input type="hidden" name="gameId" defaultValue={this.props.gameId} />
                 <button type="submit">Enter Score</button>
             </form>
@@ -27,21 +27,40 @@ var EnterScoreForm = React.createClass({
 
 var EnterScorePage = React.createClass({
     getInitialState: function () {
-        return ({error: "", successText: "", perTournament: false});
+        return ({
+            error: "",
+            successText: "",
+            perTournament: false,
+            categories: []
+        });
     },
     componentDidMount: function() {
 
-        this.serverRequest = $.get(window.location + "/content",
-            function (result) {
-                if (result.error) {
-                    this.setState({successText : result.error});
-                    return;
-                }
+        var getContent = function(result) {
                 this.setState(result);
-            }.bind(this));
+            }.bind(this),
+            getCategories = function() {
+                this.categoryRequest = $.get(
+                    window.location + "/scorecategories",
+                    function (result) {
+                        if (result.error) {
+                            this.setState(result);
+                            return;
+                        }
+
+                        var categories = scores.getCategories(
+                                result.categories,
+                                this.state.perTournament);
+
+                        this.setState({categories: categories});
+                    }.bind(this));
+            }.bind(this);
+
+        this.contentRequest = $.get(window.location + "/content", getContent)
+            .done(getCategories);
     },
     componentWillUnmount: function() {
-        this.serverRequest.abort();
+        this.contentRequest.abort();
     },
     handleSubmit: function (e) {
         e.preventDefault();
@@ -50,8 +69,8 @@ var EnterScorePage = React.createClass({
         $.post(window.location,
             $("form").serialize(),
             function success(res) {
-                _this.setState(
-                    {successText: res.message, error: "", message: ""});
+                _this.setState({successText: res.message, error: "",
+                    message: "", categories: []});
             })
             .fail(function (res) {
                 _this.setState(res.responseJSON);
@@ -59,16 +78,29 @@ var EnterScorePage = React.createClass({
     },
     render: function() {
 
-        var widget = this.state.successText ?
-            <div>{this.state.successText}</div>
-            : <EnterScoreForm submitHandler={this.handleSubmit}
-                perTournamentScores={this.state.perTournament}
+        var widget = null,
+            showMessage = true;
+        if (this.state.error) {
+            showMessage = false;
+            widget = <div>{this.state.error}</div>;
+        }
+        else if (this.state.successText) {
+            showMessage = false;
+            widget = <div>{this.state.successText}</div>;
+        }
+        else if (this.state.categories.length === 0) {
+            showMessage = false;
+            widget = <div>No score categories available</div>;
+        }
+        else {
+            widget = <EnterScoreForm submitHandler={this.handleSubmit}
+                categories={this.state.categories}
                 gameId={this.state.game_id} />;
+        }
 
         return (
             <div>
-                <div>{this.state.error}</div>
-                <div>{this.state.message}</div>
+                {showMessage ? <div>{this.state.message}</div> : null}
                 {widget}
             </div>
         );
