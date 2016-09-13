@@ -151,7 +151,7 @@ def get_next_game():
                 'opponent': get_opponent(game, g.entry),
                 'table': game.table_num,
             }
-    return {}
+    raise ValueError("Next game not scheduled. Check with the TO.")
 
 @ENTRY.route('/<username>/schedule', methods=['GET'])
 @json_response

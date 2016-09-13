@@ -10,9 +10,8 @@ describe('Get the next game for an entry', function () {
         .toss();
     frisby.create('See next_game_test_player_3 next game (none)')
         .get(API + 'entry/next_game_test_player_3/nextgame')
-        .expectStatus(200)
-        .expectHeaderContains('content-type', 'application/json')
-        .expectJSON({})
+        .expectStatus(400)
+        .expectBodyContains('Next game not scheduled. Check with the TO.')
         .toss();
 
 

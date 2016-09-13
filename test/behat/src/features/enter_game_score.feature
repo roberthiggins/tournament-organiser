@@ -7,6 +7,11 @@ Feature: Enter a score for a player
         Given I am authenticated as "superman" using "password"
 
     @javascript
+    Scenario: Enter a score for a round that's not ready
+        Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
+        Then I should see "Next game not scheduled. Check with the TO." appear
+
+    @javascript
     Scenario: Logged in
         When I am on "/tournament/enter_score_test/rounds"
         Then I should see "Number of rounds" appear
