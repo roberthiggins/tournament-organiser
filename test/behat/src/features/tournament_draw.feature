@@ -4,10 +4,17 @@ Feature: Check the draw
     I want to be able to see the draw
 
     Background: Set the missions for a round robin tournament
-        Given I POST "numRounds=4" to "/tournament/ranking_test/rounds" from the API
-        Then the API response status code should be 200
-        Then I POST "missions=[%22mission_1%22,%22mission_2%22,%22mission_3%22,%22%22]" to "/tournament/ranking_test/missions" from the API
-        Then the API response status code should be 200
+        Given I am authenticated as "superman" using "password"
+        When I am on "/tournament/ranking_test/rounds"
+        Then I should see "Number of rounds" appear
+        When I fill in "rounds" with "4"
+        When I press "Set"
+        Given I am on "/tournament/ranking_test/missions"
+        Then I wait for "Set the missions for ranking_test here" to appear
+        When I fill in "missions_0" with "mission_1"
+        When I fill in "missions_1" with "mission_2"
+        When I fill in "missions_2" with "mission_3"
+        When I press "Set"
 
     @javascript
     Scenario Outline: Check the draw
