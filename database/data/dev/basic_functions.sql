@@ -48,14 +48,14 @@ END $$;
 
 
 -- Make a tournament
-CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar) RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar, rounds int DEFAULT 0) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
     tourn_id int := 0;
     protect_object_id int := 0;
 BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), rounds, protect_object_id) RETURNING id INTO tourn_id;
 
     PERFORM create_to(tourn_name, protect_object_id);
 
