@@ -1,4 +1,4 @@
-INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_score');
+SELECT setup_permissions();
 
 INSERT INTO tournament VALUES (DEFAULT, 'northcon_2095', '2095-06-01');
 

@@ -8,6 +8,16 @@ BEGIN
     RETURN 0;
 END $$;
 
+-- Set Up Permissions
+CREATE OR REPLACE FUNCTION setup_permissions() RETURNS int LANGUAGE plpgsql AS $$
+BEGIN
+
+    INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_score');
+    INSERT INTO protected_object_action VALUES (DEFAULT, 'modify_tournament');
+
+    RETURN 0;
+END $$;
+
 -- Make a tournament
 CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
