@@ -18,6 +18,35 @@ BEGIN
     RETURN 0;
 END $$;
 
+-- Create TO for tourament
+CREATE OR REPLACE FUNCTION create_to(tourn_name varchar, protect_object_id integer) RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    username varchar := tourn_name || '_to';
+    protected_object_action_id int := 0;
+    protected_object_permission_id int := 0;
+BEGIN
+
+    PERFORM create_user(username);
+
+    SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'enter_score' LIMIT 1;
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id,
+        (SELECT id FROM protected_object_action
+            WHERE description = 'enter_score' LIMIT 1)
+        ) RETURNING id INTO protected_object_permission_id;
+    INSERT INTO account_protected_object_permission VALUES (username, protected_object_permission_id);
+
+    SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'modify_tournament' LIMIT 1;
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id,
+        (SELECT id FROM protected_object_action
+            WHERE description = 'modify_tournament' LIMIT 1)
+        ) RETURNING id INTO protected_object_permission_id;
+    INSERT INTO account_protected_object_permission VALUES (username, protected_object_permission_id);
+
+    RETURN 0;
+
+END $$;
+
+
 -- Make a tournament
 CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
@@ -27,6 +56,8 @@ BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
+
+    PERFORM create_to(tourn_name, protect_object_id);
 
     RETURN tourn_id;
 END $$;

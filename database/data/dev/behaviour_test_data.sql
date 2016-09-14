@@ -60,8 +60,6 @@ DECLARE
     tourn_name varchar := 'permission_test';
     tourn_id int := 0;
     protect_object_id int := 0;
-    protected_object_action_id int := 0;
-    protected_object_permission_id int := 0;
     username varchar := '';
 BEGIN
     -- Create a superuser
@@ -71,16 +69,7 @@ BEGIN
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, '2095-07-12', DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
 
-    -- Create a user with access to modify
-    PERFORM create_user('lex_luthor');
-
-    -- Give them permission to enter a score for it
-    SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'enter_score' LIMIT 1;
-    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id, 
-        (SELECT id FROM protected_object_action
-            WHERE description = 'enter_score' LIMIT 1)
-        ) RETURNING id INTO protected_object_permission_id;
-    INSERT INTO account_protected_object_permission VALUES ('lex_luthor', protected_object_permission_id);
+    PERFORM create_to(tourn_name, protect_object_id);
 
     -- Create a basic player
     PERFORM add_player(tourn_name, tourn_id, 'permission_test_player');
