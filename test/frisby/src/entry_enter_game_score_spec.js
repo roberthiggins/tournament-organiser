@@ -86,7 +86,7 @@ describe('Enter score for single game for an entry', function () {
                 .post(API + 'enter_score_test_p_1/entergamescore',
                     {
                         game_id: gameId,
-                        scorer: 'to',
+                        scorer: 'enter_score_test_to',
                         key: 'enter_score_test_category_per_game_to',
                         value: 5
                     },

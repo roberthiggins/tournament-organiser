@@ -66,7 +66,7 @@ describe('Enter a tournament score for an entry', function () {
     frisby.create('to enters a score')
         .post(API + 'enter_score_test_p_1/entertournamentscore',
             {
-                scorer: 'to',
+                scorer: 'enter_score_test_to',
                 key: 'enter_score_test_category_to',
                 value: 5
             },
