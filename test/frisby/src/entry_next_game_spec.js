@@ -29,12 +29,14 @@ describe('Get the next game for an entry', function () {
         .expectJSONTypes({
             'table' : Number,
             'game_id': Number,
+            'mission': String,
             'round': Number,
             'opponent': String
         })
         .expectJSON({
             'table'   : 1,
             'game_id' : Number,
+            'mission' : 'TBA',
             'round'   : 3,
             'opponent': 'next_game_test_player_4'
         })
