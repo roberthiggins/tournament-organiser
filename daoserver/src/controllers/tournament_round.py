@@ -1,11 +1,10 @@
 """
 Individual rounds in a tournament
 """
-from flask import Blueprint, g, request
+from flask import Blueprint, g
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, text_response
-from models.permissions import PERMISSIONS, PermissionsChecker
+json_response, text_response, ensure_permission
 from models.tournament import Tournament
 
 TOURNAMENT_ROUND = Blueprint('TOURNAMENT_ROUND', __name__)
@@ -51,17 +50,10 @@ def get_round_info(round_id):
 
 @TOURNAMENT_ROUND.route('', methods=['POST'])
 @text_response
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('numRounds')
 def set_rounds():
     """Set the number of rounds for a tournament"""
-
-    # get auth from request
-    user = request.authorization.username if request.authorization is not None \
-        else None
-    checker = PermissionsChecker()
-    # pylint: disable=undefined-variable
-    checker.check_permission(PERMISSIONS.get('MODIFY_TOURNAMENT'), user, user,
-                             g.tournament_id)
 
     # pylint: disable=undefined-variable
     try:
