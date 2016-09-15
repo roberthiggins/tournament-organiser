@@ -4,7 +4,7 @@ Feature: Modify the scoring categories for a tournament
     I need to be able to view and set the scoreing categories for a tournament (battle, sports, etc)
 
     Background: I set the categories for category_test
-        Given I am authenticated as "charlie_murphy" using "password"
+        Given I am authenticated as "category_test_to" using "password"
         Given I visit category page for "category_test"
         Given I fill category 0 with "foo" "10" "10" "10"
         Given I fill category 1 with "bar" "10" "10" "10"

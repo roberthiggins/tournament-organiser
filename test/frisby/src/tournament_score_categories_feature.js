@@ -21,6 +21,8 @@ describe('HTTP Method Test Suite', function () {
             categories_0: ['categories_test_one', 8, true, 4, 12],
             categories_1: ['categories_test_two', 13, false, 3, 11]
         }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('category_test_to:password').toString("base64"))
         .expectStatus(200)
         .toss();
     frisby.create('GET a list of tournament categories')
@@ -62,6 +64,8 @@ describe('HTTP Method Test Suite', function () {
             categories: ['categories_3'],
             categories_3: ['categories_test_three', 99, true, 1, 2]
         }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('category_test_to:password').toString("base64"))
         .expectStatus(200)
         .toss();
     frisby.create('GET a list of tournament categories')
@@ -86,6 +90,8 @@ describe('HTTP Method Test Suite', function () {
         .post(API + 'tournament/category_test/score_categories', {
             categories: []
         }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('category_test_to:password').toString("base64"))
         .expectStatus(200)
         .toss();
     frisby.create('GET categories from now empty tournament')
@@ -117,5 +123,51 @@ describe('HTTP Method Test Suite', function () {
         .expectStatus(400)
         .toss();
 
-
+    // Permissions
+    frisby.create('set the score categories for category_test to none')
+        .post(API + 'tournament/category_test/score_categories', {
+            categories: []
+        }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('category_test_to:password').toString("base64"))
+        .expectStatus(200)
+        .toss();
+    frisby.create('set the score categories for category_test to none')
+        .post(API + 'tournament/category_test/score_categories', {
+            categories: []
+        }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('category_test_tofdsfdf:password').toString("base64"))
+        .expectStatus(403)
+        .toss();
+    frisby.create('set the score categories for category_test to none')
+        .post(API + 'tournament/category_test/score_categories', {
+            categories: []
+        }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('category_test_player_1:password').toString("base64"))
+        .expectStatus(403)
+        .toss();
+    frisby.create('set the score categories for category_test to none')
+        .post(API + 'tournament/category_test/score_categories', {
+            categories: []
+        }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('superuser:password').toString("base64"))
+        .expectStatus(200)
+        .toss();
+    frisby.create('set the score categories for category_test to none')
+        .post(API + 'tournament/category_test/score_categories', {
+            categories: []
+        }, {json: true, inspectOnFailure: true})
+        .addHeader('Authorization', "Basic " +
+            new Buffer('ranking_test_to:password').toString("base64"))
+        .expectStatus(403)
+        .toss();
+    frisby.create('set the score categories for category_test to none')
+        .post(API + 'tournament/category_test/score_categories', {
+            categories: []
+        }, {json: true, inspectOnFailure: true})
+        .expectStatus(403)
+        .toss();
 });

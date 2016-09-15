@@ -135,6 +135,7 @@ def set_missions():
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('categories')
 def set_score_categories():
     # pylint: disable=undefined-variable
