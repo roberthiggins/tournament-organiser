@@ -9,6 +9,8 @@ describe('Enter score for single game for an entry', function () {
             process.env.API_ADDR + 'tournament/enter_score_test/rounds',
             {numRounds: 1}
         )
+        .addHeader('Authorization', "Basic " +
+            new Buffer('superuser:password').toString("base64"))
         .expectStatus(200)
         .toss();
     frisby.create('get game_id of next game for enter_score_test_p_1')

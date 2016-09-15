@@ -14,6 +14,8 @@ describe('HTTP Method Test Suite', function () {
             process.env.API_ADDR + 'tournament/draw_test/rounds',
             {numRounds: 2}
         )
+        .addHeader('Authorization', "Basic " +
+            new Buffer('superuser:password').toString("base64"))
         .expectStatus(200)
         .toss();
     frisby.create('Check the draw')

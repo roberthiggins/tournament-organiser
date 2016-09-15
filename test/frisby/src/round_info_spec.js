@@ -1,18 +1,23 @@
 describe('HTTP Method Test Suite', function () {
     'use strict';
     var frisby = require('frisby'),
-        API = process.env.API_ADDR;
+        API = process.env.API_ADDR,
+        auth = function(user, pass){
+            return "Basic " + new Buffer(user + ":" + pass).toString("base64");
+        };
 
     frisby.create('POST 2 rounds to setup')
         .post(API + 'tournament/round_test/rounds', {
             numRounds: 2
         }, {json: true})
+        .addHeader('Authorization', auth('superuser', 'password'))
         .expectStatus(200)
         .toss();
     frisby.create('POST 2 missions to setup')
         .post(API + 'tournament/round_test/missions', {
             missions: ['mission_1', 'mission_2']
         }, {json: true})
+        .addHeader('Authorization', auth('superuser', 'password'))
         .expectStatus(200)
         .toss();
     frisby.create('Check those missions exist')
@@ -40,6 +45,28 @@ describe('HTTP Method Test Suite', function () {
         })
         .toss();
 
+    frisby.create('TO auth')
+        .post(API + 'tournament/round_test/rounds', {
+            numRounds: 2
+        }, {json: true})
+        .addHeader('Authorization', auth('round_test_to', 'password'))
+        .expectStatus(200)
+        .toss();
+    frisby.create('No auth')
+        .post(API + 'tournament/round_test/rounds', {
+            numRounds: 2
+        }, {json: true})
+        .expectStatus(403)
+        .expectBodyContains('Permission denied')
+        .toss();
+    frisby.create('Bad auth')
+        .post(API + 'tournament/round_test/rounds', {
+            numRounds: 2
+        }, {json: true})
+        .addHeader('Authorization', auth('enter_score_entry_1', 'password'))
+        .expectStatus(403)
+        .expectBodyContains('Permission denied')
+        .toss();
     frisby.create('malformations')
         .get(API + 'tournament/foo/rounds/1')
         .expectStatus(400)

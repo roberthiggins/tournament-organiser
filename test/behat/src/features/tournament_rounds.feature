@@ -4,7 +4,7 @@ Feature: Set the number of rounds
     So that the tournament can have more than one round
 
     Background: Login
-        Given I am authenticated as "charlie_murphy" using "password"
+        Given I am authenticated as "rounds_test_to" using "password"
         Given I am on "/tournament/rounds_test/rounds"
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "5"

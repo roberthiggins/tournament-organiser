@@ -16,17 +16,14 @@ SELECT half_tournament_test_setup('ranking_test', '2095-08-12');
 SELECT half_tournament_test_setup('enter_score_test', '2295-11-11');
 
 
--- Set up some users
 DO $$
 DECLARE
-    fanciness int := 0;
     tourn_id int := 0;
     tourn_name varchar := 'painting_test';
 BEGIN
     tourn_id := create_tournament(tourn_name, '2095-10-10');
 
-    fanciness = create_score_category(tourn_name, 'Fanciness', 10, TRUE, 4, 15);
-
+    PERFORM create_score_category(tourn_name, 'Fanciness', 10, TRUE, 4, 15);
     PERFORM add_player(tourn_name, tourn_id, 'stevemcqueen');
     PERFORM add_player(tourn_name, tourn_id, 'rick_james');
 END $$;
