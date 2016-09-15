@@ -90,20 +90,17 @@ class PermissionsChecker(object):
             'Permission denied for {} to perform {} on tournament {}'.\
             format(user, action, tournament))
 
-        if action == PERMISSIONS['ENTER_SCORE']:
-            if Account.query.filter_by(username=user, is_superuser=True).\
+        if Account.query.filter_by(username=user, is_superuser=True).\
                 first() is not None or self.is_organiser(user, tournament):
-                return True
+            return True
+
+        if action == PERMISSIONS['ENTER_SCORE']:
             if user != for_user:
                 raise perm_denied
 
             if TournamentEntry.query.\
                     filter_by(tournament_id=tournament, player_id=user).first()\
                     is not None:
-                return True
-        elif action == PERMISSIONS['MODIFY_TOURNAMENT']:
-            if Account.query.filter_by(username=user, is_superuser=True).\
-                first() is not None or self.is_organiser(user, tournament):
                 return True
 
         raise perm_denied
