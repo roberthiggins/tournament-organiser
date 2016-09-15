@@ -46,6 +46,34 @@ def enforce_request_variables(*vars_to_enforce):
         return wrapped
     return decorator
 
+def ensure_permission(permission):
+    """
+    Check that the user in the request authorization has appropriate
+    permissions
+    A permission should be a dict:
+        {
+            permission: String PERMISSION,
+        }
+    """
+    def decorator(func):                # pylint: disable=missing-docstring
+        @wraps(func)
+        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
+
+            user = getattr(request.authorization, 'username', None)
+            target = getattr(g, 'username', None)
+
+            checker = PermissionsChecker()
+            # pylint: disable=undefined-variable
+            checker.check_permission(
+                PERMISSIONS.get(permission.get('permission')),
+                user,
+                target,
+                g.tournament_id)
+
+            return func(*args, **kwargs)
+        return wrapped
+    return decorator
+
 def json_response(func):
     """Wrap the return value of func with jsonpickle and return as Response"""
     @wraps(func)
@@ -69,34 +97,3 @@ def text_response(func):
             return text # Probably an error response
 
     return wrapped
-
-def ensure_permission(permission):
-    """
-    Check that the user in the request authorization has appropriate
-    permissions
-    A permission should be a dict:
-        {
-            permission: String PERMISSION,
-            target_user: String (the user being acted upon; optional key/val),
-        }
-    """
-    def decorator(func):                # pylint: disable=missing-docstring
-        @wraps(func)
-        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
-
-            user = request.authorization.username \
-                if request.authorization is not None \
-                else None
-            target = permission.get('target_user', user)
-
-            checker = PermissionsChecker()
-            # pylint: disable=undefined-variable
-            checker.check_permission(
-                PERMISSIONS.get(permission.get('permission')),
-                user,
-                target,
-                g.tournament_id)
-
-            return func(*args, **kwargs)
-        return wrapped
-    return decorator
