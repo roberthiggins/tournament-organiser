@@ -4,7 +4,7 @@ Feature: Set the missions through the web front end.
     So I don't have to discuss the missions in person
 
     Background: I log in
-        Given I am authenticated as "charlie_murphy" using "password"
+        Given I am authenticated as "mission_test_to" using "password"
         Given I am on "/tournament/mission_test/missions"
         Then I wait for "Set the missions for mission_test here" to appear
         When I fill in "missions_0" with "missionzz"

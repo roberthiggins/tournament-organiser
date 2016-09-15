@@ -10,11 +10,13 @@ SELECT create_user('superuser', TRUE);
 DO $$
 DECLARE
     tourn_name varchar := 'mission_test';
+    tourn_id int := 0;
 BEGIN
-    PERFORM create_tournament(tourn_name, '2095-07-01');
+    tourn_id := create_tournament(tourn_name, '2095-07-01');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Mission the First');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, 'Mission the Second');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 3, 'Mission the Third');
+    PERFORM add_player(tourn_name, tourn_id, 'mission_test_player_1');
 END $$;
 
 

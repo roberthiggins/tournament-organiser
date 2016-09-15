@@ -7,7 +7,7 @@ from flask import Blueprint, g, request
 from sqlalchemy.exc import IntegrityError
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, text_response
+json_response, text_response, ensure_permission
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
@@ -106,11 +106,12 @@ def register():
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])
 @text_response
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('missions')
 def set_missions():
+    """POST to set the missions for a tournament. A list of strings expected"""
     # pylint: disable=undefined-variable
 
-    """POST to set the missions for a tournament.A list of strings expected"""
     rounds = g.tournament.details()['rounds']
     try:
         json_missions = json.loads(missions)
