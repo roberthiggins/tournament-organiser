@@ -2,6 +2,7 @@ module.exports = {
   entry: {
     devindex: './src/views/devindex.js',
     entry: './src/views/entry.js',
+    entryNextGame: './src/views/entry-next-game.js',
     entryScore: './src/views/entry-score.js',
     feedback: './src/views/feedback.js',
     index: './src/views/index.js',

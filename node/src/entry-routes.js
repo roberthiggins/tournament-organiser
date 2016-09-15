@@ -142,5 +142,31 @@ router.route("/tournament/:tournament/entry/:username/enterscore/content")
         });
     });
 
+router.route("/tournament/:tournament/entry/:username/nextgame")
+    .get(needsUser, function(req, res) {
+        res.render("basic", {
+            src_loc: "/entryNextGame.js",
+            subtitle: "Next Game Information for " + req.params.username
+        });
+    });
+router.route("/tournament/:tournament/entry/:username/nextgame/content")
+    .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
+        var url = "/tournament/" + req.params.tournament + "/entry/"
+            + req.params.username + "/nextgame";
+
+        DAOAmbassador.getFromDAORequest(req, res, url,
+            function(responseBody) {
+                res.status(200).json({
+                    message: "Next Game Info for " + req.params.username,
+                    nextgame: JSON.parse(responseBody)
+                });
+            },
+            function(responseBody) {
+                res.status(200).json({
+                    message: responseBody,
+                    nextgame: null
+                });
+            });
+    });
 
 module.exports = router;
