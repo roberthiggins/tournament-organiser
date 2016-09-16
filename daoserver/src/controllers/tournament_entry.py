@@ -5,7 +5,7 @@ from decimal import Decimal as Dec
 from flask import Blueprint, g
 
 from controllers.request_helpers import json_response, \
-enforce_request_variables, text_response, ensure_permission
+enforce_request_variables, requires_auth, text_response, ensure_permission
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.score import is_score_entered
@@ -55,6 +55,7 @@ def get_entry_id(tournament_id, username):
 
 
 @ENTRY.route('/<username>/entergamescore', methods=['POST'])
+@requires_auth
 @text_response
 @ensure_permission({'permission': 'ENTER_SCORE'})
 @enforce_request_variables('key', 'value', 'game_id')
