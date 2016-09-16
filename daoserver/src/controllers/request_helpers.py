@@ -5,6 +5,7 @@ Basic decorator for enforcing request elements
 from functools import wraps
 from flask import g, Response, request
 import jsonpickle
+from models.authentication import check_auth
 from models.permissions import PERMISSIONS, PermissionsChecker
 
 def enforce_request_variables(*vars_to_enforce):
@@ -82,6 +83,23 @@ def json_response(func):
         return Response(
             jsonpickle.encode(func(*args, **kwargs), unpicklable=False),
             mimetype='application/json')
+
+    return wrapped
+
+def requires_auth(func):
+    """Checks the authorization of the request for a valid user password"""
+    @wraps(func)
+    def wrapped(*args, **kwargs):       # pylint: disable=missing-docstring
+
+        if not check_auth(getattr(request.authorization, 'username', None),
+                          getattr(request.authorization, 'password', None)):
+            return Response(
+                'Could not verify your access level for that URL.\n'
+                'You have to login with proper credentials',
+                401,
+                {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+        return func(*args, **kwargs)
 
     return wrapped
 
