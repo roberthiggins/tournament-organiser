@@ -7,7 +7,7 @@ from flask import Blueprint, g, request
 from sqlalchemy.exc import IntegrityError
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, text_response, ensure_permission
+json_response, requires_auth, text_response, ensure_permission
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
@@ -25,6 +25,7 @@ def get_tournament(endpoint, values):
         g.tournament = Tournament(g.tournament_id)
 
 @TOURNAMENT.route('', methods=['POST'])
+@requires_auth
 @text_response
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')
 def add_tournament():
