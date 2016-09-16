@@ -138,6 +138,7 @@ def set_missions():
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
+@requires_auth
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('categories')
 def set_score_categories():
