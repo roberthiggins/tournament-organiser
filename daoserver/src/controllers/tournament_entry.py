@@ -5,7 +5,7 @@ from decimal import Decimal as Dec
 from flask import Blueprint, g
 
 from controllers.request_helpers import json_response, \
-enforce_request_variables, text_response
+enforce_request_variables, text_response, ensure_permission
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS, PermissionsChecker
@@ -87,26 +87,16 @@ def enter_game_score():
 
 @ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
 @text_response
-@enforce_request_variables('scorer', 'key', 'value')
+@ensure_permission({'permission': 'ENTER_SCORE'})
+@enforce_request_variables('key', 'value')
 def enter_tournament_score():
     """
     POST to enter a score for a player in a tournament.
 
     Expects:
-        - scorer - username of the user entering the escore
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
-    checker = PermissionsChecker()
-    # pylint: disable=undefined-variable
-    if not checker.check_permission(
-            PERMISSIONS.get('ENTER_SCORE'),
-            scorer,
-            g.username,
-            g.tournament_id):
-        raise ValueError('Permission denied. {}'.\
-            format('You cannot enter scores for this game. Contact the TO.'))
-
     if not g.entry:
         raise ValueError('Unknown player: {}'.format(g.username))
 

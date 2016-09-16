@@ -112,7 +112,6 @@ router.route("/tournament/:tournament/entry/:username/enterscore")
             + req.params.username + "/entertournamentscore",
             postData = {
                 key:    req.body.key,
-                scorer: req.user.username,
                 value:  req.body.value
             };
         DAOAmbassador.postToDAORequest(req, res, url, postData,
