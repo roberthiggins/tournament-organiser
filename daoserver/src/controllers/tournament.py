@@ -108,6 +108,7 @@ def register():
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])
 @text_response
+@requires_auth
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('missions')
 def set_missions():

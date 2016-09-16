@@ -84,14 +84,14 @@ describe('Check Missions', function () {
             missions: ['mission_1', 'mission_2', 'mission_3']
         }, {json: true})
         .addHeader('Authorization', "Basic " +
-            new Buffer('ranking_test_player_1:password').toString("base64"))
+            new Buffer('rank_test_player_1:password').toString("base64"))
         .expectStatus(403)
         .toss();
     frisby.create('POST missions with no auth')
         .post(API + 'tournament/mission_test/missions', {
             missions: ['mission_1', 'mission_2', 'mission_3']
         }, {json: true})
-        .expectStatus(403)
+        .expectStatus(401)
         .toss();
 
 

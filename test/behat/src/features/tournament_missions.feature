@@ -23,6 +23,7 @@ Feature: Set the missions through the web front end.
     @javascript
     Scenario: I set some missions for the tournament
         Given I am on "/tournament/mission_test/missions"
+        Then I wait for "Set the missions for mission_test here" to appear
         When I fill in "missions_0" with "foo"
         When I fill in "missions_1" with "foo"
         When I fill in "missions_2" with "baz"
