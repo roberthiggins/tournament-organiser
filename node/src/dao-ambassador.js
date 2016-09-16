@@ -50,13 +50,24 @@ var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
     return DAOreq;
 };
 
+var makeAuth = function (req) {
+    var user = req && req.session && req.session.user ? req.session.user : null,
+        auth = user ? "Basic " + new Buffer(user.username + ":" +
+                user.password).toString("base64") : null;
+
+    return auth;
+};
+
 /*
  * GET request to the DAO server.
  * Caller is responsible for attaching success and fail handlers
  */
 exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
 
-    var headers = {"Content-Type": "application/json"},
+    var headers = {
+            "Content-Type": "application/json",
+            "Authorization": makeAuth(req)
+        },
         DAOreq = DAORequestConfig(req, res, path, "GET", headers, onSuccess,
             onFail);
 
@@ -70,17 +81,13 @@ exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
 exports.postToDAORequest = function(req, res, path, JSONData, onSuccess,
                                     onFail) {
 
-    var user     = req && req.session && req.session.user
-                    ? req.session.user : null,
-        postData = querystring.stringify(JSONData),
-        auth     = user ? "Basic " + new Buffer(user.username + ":" +
-                    user.password).toString("base64") : null,
+    var postData = querystring.stringify(JSONData),
         headers  = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Content-Length": Buffer.byteLength(postData),
-            "Authorization": auth
+            "Authorization": makeAuth(req)
         },
-        DAOreq = DAORequestConfig(req, res, path, "POST", headers, onSuccess,
+        DAOreq   = DAORequestConfig(req, res, path, "POST", headers, onSuccess,
             onFail);
 
     DAOreq.write(postData);
