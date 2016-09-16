@@ -76,6 +76,7 @@ def enter_game_score():
     return 'Score entered for {}: {}'.format(g.username, value)
 
 @ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
+@requires_auth
 @text_response
 @ensure_permission({'permission': 'ENTER_SCORE'})
 @enforce_request_variables('key', 'value')

@@ -10,8 +10,8 @@ describe('Enter a tournament score for an entry', function () {
                 value: 5
             },
             {json: true})
-        .expectStatus(403)
-        .expectBodyContains('Permission denied')
+        .expectStatus(401)
+        .expectBodyContains('Could not verify your access level')
         .toss();
 
     frisby.create('Non-playing user enters a score')
