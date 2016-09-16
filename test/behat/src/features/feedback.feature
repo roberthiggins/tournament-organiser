@@ -3,6 +3,8 @@ Feature: Place feedback to improve the sight
     As a site visitor
     I want to be able to log feedback
 
+    Background:
+        Given I am authenticated as "superman" using "password"
 
     @javascript
     Scenario: I navigate to the feedback section
