@@ -59,7 +59,6 @@ router.route("/tournament/:tournament/entry/:username/entergamescore")
             + req.params.username + "/entergamescore",
             postData = {
                 key:     req.body.key,
-                scorer:  req.user.username,
                 value:   req.body.value,
                 game_id: req.body.gameId
             };

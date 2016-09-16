@@ -8,7 +8,6 @@ from controllers.request_helpers import json_response, \
 enforce_request_variables, text_response, ensure_permission
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
-from models.permissions import PERMISSIONS, PermissionsChecker
 from models.score import is_score_entered
 from models.tournament import Tournament
 
@@ -57,27 +56,17 @@ def get_entry_id(tournament_id, username):
 
 @ENTRY.route('/<username>/entergamescore', methods=['POST'])
 @text_response
-@enforce_request_variables('scorer', 'key', 'value', 'game_id')
+@ensure_permission({'permission': 'ENTER_SCORE'})
+@enforce_request_variables('key', 'value', 'game_id')
 def enter_game_score():
     """
     POST to enter a score for a player in a game.
 
     Expects:
         - game_id - The id of the game that the score is for
-        - scorer - username of the user entering the escore
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
-    checker = PermissionsChecker()
-    # pylint: disable=undefined-variable
-    if not checker.check_permission(
-            PERMISSIONS.get('ENTER_SCORE'),
-            scorer,
-            g.username,
-            g.tournament_id):
-        raise ValueError('Permission denied. {}'.\
-            format('You cannot enter scores for this game. Contact the TO.'))
-
     if not g.entry:
         raise ValueError('Unknown player: {}'.format(g.username))
 
