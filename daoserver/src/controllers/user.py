@@ -6,7 +6,7 @@ import re
 from flask import Blueprint, g
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, text_response
+json_response, requires_auth, text_response
 from models.authentication import check_auth
 from models.dao.account import Account, add_account
 
@@ -66,6 +66,7 @@ def create():
         </li></ul>'.format(g.username, email)
 
 @USER.route('', methods=['GET'])
+@requires_auth
 @json_response
 def user_details():
     """

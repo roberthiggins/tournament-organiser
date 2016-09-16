@@ -97,6 +97,7 @@ def enter_tournament_score():
 
 
 @ENTRY.route('/<username>', methods=['GET'])
+@requires_auth
 @json_response
 def entry_info_from_tournament():
     """ Given entry_id, get info about player and tournament"""
