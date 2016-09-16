@@ -84,6 +84,7 @@ def list_tournaments():
     return {'tournaments' : details}
 
 @TOURNAMENT.route('/<tournament_id>/register', methods=['POST'])
+@requires_auth
 @text_response
 @enforce_request_variables('inputUserName')
 def register():
