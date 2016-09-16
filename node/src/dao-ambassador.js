@@ -70,7 +70,8 @@ exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
 exports.postToDAORequest = function(req, res, path, JSONData, onSuccess,
                                     onFail) {
 
-    var user     = req && req.user ? req.user : null,
+    var user     = req && req.session && req.session.user
+                    ? req.session.user : null,
         postData = querystring.stringify(JSONData),
         auth     = user ? "Basic " + new Buffer(user.username + ":" +
                     user.password).toString("base64") : null,

@@ -8,11 +8,9 @@ var DAOAmbassador = require("./dao-ambassador"),
 // Middleware to inject the user into the request
 exports.injectUserIntoRequest = function(req, res, next) {
     if (req.session && req.session.user) {
-        var user = req.session.user; // TODO actually verify the user exists
-        req.user = user;
+        req.user = JSON.parse(JSON.stringify(req.session.user));
         delete req.user.password;
-        req.session.user = user;  //refresh the session value
-        res.locals.user = user;
+        res.locals.user = req.user;
     }
     next();
 };
