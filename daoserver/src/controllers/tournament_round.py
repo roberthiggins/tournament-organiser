@@ -4,7 +4,7 @@ Individual rounds in a tournament
 from flask import Blueprint, g
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, text_response, ensure_permission
+json_response, requires_auth, text_response, ensure_permission
 from models.tournament import Tournament
 
 TOURNAMENT_ROUND = Blueprint('TOURNAMENT_ROUND', __name__)
@@ -49,6 +49,7 @@ def get_round_info(round_id):
     }
 
 @TOURNAMENT_ROUND.route('', methods=['POST'])
+@requires_auth
 @text_response
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('numRounds')

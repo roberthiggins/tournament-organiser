@@ -22,7 +22,7 @@ Feature: Set the number of rounds
         When I wait for "Number of rounds" to appear
         When I fill in "rounds" with "8"
         When I press "Set"
-
+        Then I should see "Rounds set: 8" appear
         Given I am on "/tournament/rounds_test/rounds"
         When I wait for "Number of rounds" to appear
         Then the "rounds" field should contain "8"

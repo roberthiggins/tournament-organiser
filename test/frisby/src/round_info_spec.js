@@ -56,16 +56,16 @@ describe('HTTP Method Test Suite', function () {
         .post(API + 'tournament/round_test/rounds', {
             numRounds: 2
         }, {json: true})
-        .expectStatus(403)
-        .expectBodyContains('Permission denied')
+        .expectStatus(401)
+        .expectBodyContains('Could not verify your access level')
         .toss();
     frisby.create('Bad auth')
         .post(API + 'tournament/round_test/rounds', {
             numRounds: 2
         }, {json: true})
         .addHeader('Authorization', auth('enter_score_entry_1', 'password'))
-        .expectStatus(403)
-        .expectBodyContains('Permission denied')
+        .expectStatus(401)
+        .expectBodyContains('Could not verify your access level')
         .toss();
     frisby.create('malformations')
         .get(API + 'tournament/foo/rounds/1')
