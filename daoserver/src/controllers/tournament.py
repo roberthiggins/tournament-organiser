@@ -104,6 +104,8 @@ def register():
     except IntegrityError:
         raise ValueError("Check username and tournament")
 
+    g.tournament.confirm_entries()
+
     return 'Application Submitted'
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])

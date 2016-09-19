@@ -5,11 +5,13 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.permissions import ProtObjAction, ProtObjPerm
+from models.dao.registration import TournamentRegistration
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDB
@@ -79,6 +81,25 @@ class Tournament(object):
     def get_dao(self):
         """Convenience method to recover DAO"""
         return TournamentDB.query.filter_by(name=self.tournament_id).first()
+
+    @must_exist_in_db
+    def confirm_entries(self):
+        """ Check all the applications and create entries for all who qualify"""
+
+        entries = [x.player_id for x in TournamentEntry.query.\
+            filter_by(tournament_id=self.tournament_id).all()]
+
+        pending_applications = TournamentRegistration.query.filter(and_(
+            TournamentRegistration.tournament_id == self.get_dao().id,
+            ~TournamentRegistration.player_id.in_(entries))).all()
+
+        for app in pending_applications:
+            try:
+                dao = TournamentEntry(app.player_id, self.tournament_id)
+                db.session.add(dao)
+            except IntegrityError:
+                pass
+        db.session.commit()
 
     @must_exist_in_db
     def set_score_categories(self, new_categories):
