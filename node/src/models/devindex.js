@@ -2,8 +2,8 @@ exports.enterT = {
     title: "Enter a Tournament",
     actions: [
         {text: "See a list of tournaments", href: "/tournaments"},
-        {text: "Register To Play In ranking_test",
-         href: "/tournament/ranking_test"},
+        {text: "Register To Play In register_test_1",
+         href: "/tournament/register_test_1"},
         {text: "Update my player details"},
         {text: "Update application"},
         {text: "See application status"},

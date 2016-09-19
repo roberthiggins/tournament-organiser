@@ -62,3 +62,8 @@ BEGIN
     tourn_id := create_tournament(tourn_name, '2095-07-12');
     PERFORM add_player(tourn_name, tourn_id, 'permission_test_player');
 END $$;
+
+SELECT create_tournament('register_test_1', '2222-06-01');
+SELECT create_tournament('register_test_2', '2222-06-02');
+SELECT create_tournament('register_test_3', '2222-06-02');
+SELECT create_user('register_test_player_1');
