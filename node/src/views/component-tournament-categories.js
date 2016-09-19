@@ -22,7 +22,7 @@ var getCategories = function(categories, perTournamentScores) {
 // A widget for list score categories
 var ScoreCategories = React.createClass({
     propTypes: {
-        categories:          React.PropTypes.array.isRequired
+        categories: React.PropTypes.array.isRequired
     },
     render: function() {
 

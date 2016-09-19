@@ -66,7 +66,7 @@ var InputWidget = React.createClass({
     render: function() {
 
         var numLines = 5,
-            lastIdx = 0,
+            lastIdx = -1,
             categoryFields = this.props.categories.map(function(cat, idx) {
                 lastIdx = idx;
                 return (<Category vals={cat} idx={idx} key={idx} />);
