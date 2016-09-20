@@ -59,8 +59,9 @@ router.route("/tournament/:tournament")
             DAOAmbassador.postToDAORequest(
                 req,
                 res,
-                "/tournament/" + req.params.tournament + "/register",
-                {inputUserName: req.user.username});
+                "/tournament/" + req.params.tournament + "/register/" +
+                req.user.username,
+                {});
         });
 router.route("/tournament/:tournament/content")
     .get(function(req, res) {

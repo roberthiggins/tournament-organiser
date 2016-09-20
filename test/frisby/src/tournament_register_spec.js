@@ -45,9 +45,7 @@ describe("Test seeing and registering for a tournament", function () {
         .toss();
 
     frisby.create("enter a user")
-        .post(API + "register_test/register",
-            {inputUserName: "register_test_player_1"},
-            {json: true})
+        .post(API + "register_test/register/register_test_player_1")
         .addHeader("Authorization", "Basic " +
             new Buffer("register_test_player_1:password").toString("base64"))
         .expectStatus(200)
@@ -62,19 +60,23 @@ describe("Test seeing and registering for a tournament", function () {
         .toss();
 
     frisby.create("enter a user a second time")
-        .post(API + "register_test/register",
-            {inputUserName: "register_test_player_1"},
-            {json: true})
+        .post(API + "register_test/register/register_test_player_1")
         .addHeader("Authorization", "Basic " +
             new Buffer("register_test_player_1:password").toString("base64"))
         .expectStatus(400)
         .expectBodyContains("You've already applied to register_test")
         .toss();
 
+    frisby.create("enter a user as someone else")
+        .post(API + "register_test/register/register_test_player_2")
+        .addHeader("Authorization", "Basic " +
+            new Buffer("register_test_player_1:password").toString("base64"))
+        .expectStatus(403)
+        .expectBodyContains("Permission denied")
+        .toss();
+
     frisby.create("enter user as superuser")
-        .post(API + "register_test/register",
-            {inputUserName: "register_test_player_2"},
-            {json: true})
+        .post(API + "register_test/register/register_test_player_2")
         .addHeader("Authorization", "Basic " +
             new Buffer("superuser:password").toString("base64"))
         .expectStatus(200)
@@ -90,12 +92,17 @@ describe("Test seeing and registering for a tournament", function () {
         .toss();
 
     frisby.create("enter a non-user")
-        .post(API + "register_test/register",
-            {inputUserName: "noone"},
-            {json: true})
+        .post(API + "register_test/register/noone")
         .addHeader("Authorization", "Basic " +
             new Buffer("superuser:password").toString("base64"))
         .expectStatus(400)
         .expectBodyContains("Check username and tournament")
+        .toss();
+
+    frisby.create("malformed")
+        .post(API + "register_test/register")
+        .addHeader("Authorization", "Basic " +
+            new Buffer("superuser:password").toString("base64"))
+        .expectStatus(404)
         .toss();
 });

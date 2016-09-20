@@ -24,6 +24,8 @@ def get_tournament(endpoint, values):
     if g.tournament_id:
         g.tournament = Tournament(g.tournament_id)
 
+    g.username = values.pop('username', None)
+
 @TOURNAMENT.route('', methods=['POST'])
 @requires_auth
 @text_response
@@ -83,19 +85,15 @@ def list_tournaments():
 
     return {'tournaments' : details}
 
-@TOURNAMENT.route('/<tournament_id>/register', methods=['POST'])
+@TOURNAMENT.route('/<tournament_id>/register/<username>', methods=['POST'])
 @requires_auth
+@ensure_permission({'permission': 'MODIFY_APPLICATION'})
 @text_response
-@enforce_request_variables('inputUserName')
 def register():
-    # pylint: disable=undefined-variable
-
     """
     POST to apply for entry to a tournament.
-    Expects:
-        - inputUserName - Username of player applying
     """
-    rego = TournamentRegistration(inputUserName, g.tournament_id)
+    rego = TournamentRegistration(g.username, g.tournament_id)
     rego.clashes()
 
     try:
