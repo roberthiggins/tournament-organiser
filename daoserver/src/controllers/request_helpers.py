@@ -3,8 +3,10 @@ Basic decorator for enforcing request elements
 """
 
 from functools import wraps
-from flask import Response, request
+from flask import g, Response, request
 import jsonpickle
+from models.authentication import check_auth
+from models.permissions import PERMISSIONS, PermissionsChecker
 
 def enforce_request_variables(*vars_to_enforce):
     """ A decorator that requires var exists in the request"""
@@ -45,6 +47,34 @@ def enforce_request_variables(*vars_to_enforce):
         return wrapped
     return decorator
 
+def ensure_permission(permission):
+    """
+    Check that the user in the request authorization has appropriate
+    permissions
+    A permission should be a dict:
+        {
+            permission: String PERMISSION,
+        }
+    """
+    def decorator(func):                # pylint: disable=missing-docstring
+        @wraps(func)
+        def wrapped(*args, **kwargs):   # pylint: disable=missing-docstring
+
+            user = getattr(request.authorization, 'username', None)
+            target = getattr(g, 'username', None)
+
+            checker = PermissionsChecker()
+            # pylint: disable=undefined-variable
+            checker.check_permission(
+                PERMISSIONS.get(permission.get('permission')),
+                user,
+                target,
+                g.tournament_id)
+
+            return func(*args, **kwargs)
+        return wrapped
+    return decorator
+
 def json_response(func):
     """Wrap the return value of func with jsonpickle and return as Response"""
     @wraps(func)
@@ -53,6 +83,23 @@ def json_response(func):
         return Response(
             jsonpickle.encode(func(*args, **kwargs), unpicklable=False),
             mimetype='application/json')
+
+    return wrapped
+
+def requires_auth(func):
+    """Checks the authorization of the request for a valid user password"""
+    @wraps(func)
+    def wrapped(*args, **kwargs):       # pylint: disable=missing-docstring
+
+        if not check_auth(getattr(request.authorization, 'username', None),
+                          getattr(request.authorization, 'password', None)):
+            return Response(
+                'Could not verify your access level for that URL.\n'
+                'You have to login with proper credentials',
+                401,
+                {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+        return func(*args, **kwargs)
 
     return wrapped
 

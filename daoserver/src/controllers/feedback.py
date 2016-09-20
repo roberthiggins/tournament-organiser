@@ -7,13 +7,14 @@ import re
 from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
 
-from controllers.request_helpers import text_response
+from controllers.request_helpers import requires_auth, text_response
 from models.dao.db_connection import db
 from models.dao.feedback import Feedback
 
 FEEDBACK = Blueprint('FEEDBACK', __name__)
 
 @FEEDBACK.route('', methods=['POST'])
+@requires_auth
 @text_response
 def place_feedback():
     """

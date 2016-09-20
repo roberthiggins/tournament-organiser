@@ -22,6 +22,8 @@ describe('See the schedule for an entry in a tournament', function () {
     frisby.create('Set homer schedule to 8 rounds')
         .post(API + 'rounds', {numRounds: 4})
         .expectBodyContains('Rounds set: 4')
+        .addHeader('Authorization', "Basic " +
+            new Buffer('superuser:password').toString("base64"))
         .expectStatus(200)
         .toss();
     frisby.create('See homer schedule')

@@ -2,26 +2,28 @@
 Basic URL mappings for the webserver
 """
 
+import os
 import json
 from ratelimit.decorators import ratelimit
 
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect, \
-                        HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from public.forms import CreateAccountForm, LoginForm
 from public.view_helpers import from_dao
 
+NODE_URL = 'http://{}:{}'.format(
+    os.environ['NODE_PORT_8000_TCP_ADDR'],
+    os.environ['NODE_PORT_8000_TCP_PORT']
+)
+
+
 @ratelimit(key='ip', rate='100/m', block=True)
 def index(request):                                     # pylint: disable=W0613
     """The index"""
     return render_to_response('index.html')
-
-def dev_index(request):                 # pylint: disable=unused-argument
-    """Some more tasks, used for dev only"""
-    return render_to_response('dev-index.html')
 
 @ratelimit(key='ip', rate='50/h', block=True)
 def create_account(request):
@@ -129,67 +131,22 @@ def render_login(request, form):
     )
 
 @ratelimit(key='ip', rate='100/m', block=True)
+# pylint: disable=unused-argument
 def tournament(request, tournament_id):
     """ See information about a single tournament"""
-    if tournament_id is None:
-        return list_tournaments(request)
-    if request.method == 'POST':
-        return HttpResponseRedirect('/registerforatournament')
-
-    try:
-        response = from_dao('/tournament/%s' % tournament_id).content
-        t_info = json.loads(response)
-        return render_to_response(
-            'tournament-info.html',
-            {'id': tournament_id, 'info': t_info},
-            RequestContext(request)
-        )
-    except AttributeError:
-        return HttpResponse(response)
-    except ValueError:
-        return HttpResponse(response)
+    return HttpResponseRedirect('{}/tournament/{}'.\
+        format(NODE_URL, tournament_id))
 
 @ratelimit(key='ip', rate='100/m', block=True)
+# pylint: disable=unused-argument
 def tournament_draw(request, tournament_id, round_id):
     """Get the entire tournament draw for a single round of a tournament"""
-    if tournament_id is None or round_id is None:
-        return HttpResponseNotFound()
-
-    try:
-        response = from_dao(
-            '/tournament/{}/rounds/{}'.format(tournament_id, round_id)
-        ).content
-        json_data = json.loads(response)
-    except ValueError:
-        return HttpResponse(response)
-
-    return render_to_response(
-        'draw.html',
-        {
-            'tournament_id': tournament_id,
-            'round': round_id,
-            'draw': json_data['draw'],
-            'mission': json_data['mission'],
-        },
-        RequestContext(request)
-    )
+    return HttpResponseRedirect('{}/tournament/{}/round/{}/draw'.\
+        format(NODE_URL, tournament_id, round_id))
 
 @ratelimit(key='ip', rate='100/m', block=True)
+# pylint: disable=unused-argument
 def tournament_rankings(request, tournament_id):
     """Get placings for the entries in the tournament"""
-    if tournament_id is None:
-        return HttpResponseNotFound()
-    try:
-        json_data = json.loads(
-            from_dao('/tournament/{}/entry/rank'.format(tournament_id)).content)
-
-        return render_to_response(
-            'tournament-rankings.html',
-            {
-                'tournament_id': tournament_id,
-                'placings': json_data,
-            },
-            RequestContext(request)
-            )
-    except ValueError:
-        return HttpResponseNotFound()
+    return HttpResponseRedirect('{}/tournament/{}/rankings'.\
+        format(NODE_URL, tournament_id))

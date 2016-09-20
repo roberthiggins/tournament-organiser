@@ -5,10 +5,10 @@ from decimal import Decimal as Dec
 from flask import Blueprint, g
 
 from controllers.request_helpers import json_response, \
-enforce_request_variables, text_response
+enforce_request_variables, requires_auth, text_response, ensure_permission
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
-from models.permissions import PERMISSIONS, PermissionsChecker
+from models.score import is_score_entered
 from models.tournament import Tournament
 
 ENTRY = Blueprint('ENTRY', __name__)
@@ -55,28 +55,19 @@ def get_entry_id(tournament_id, username):
 
 
 @ENTRY.route('/<username>/entergamescore', methods=['POST'])
+@requires_auth
 @text_response
-@enforce_request_variables('scorer', 'key', 'value', 'game_id')
+@ensure_permission({'permission': 'ENTER_SCORE'})
+@enforce_request_variables('key', 'value', 'game_id')
 def enter_game_score():
     """
     POST to enter a score for a player in a game.
 
     Expects:
         - game_id - The id of the game that the score is for
-        - scorer - username of the user entering the escore
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
-    checker = PermissionsChecker()
-    # pylint: disable=undefined-variable
-    if not checker.check_permission(
-            PERMISSIONS.get('ENTER_SCORE'),
-            scorer,
-            g.username,
-            g.tournament_id):
-        raise ValueError('Permission denied. {}'.\
-            format('You cannot enter scores for this game. Contact the TO.'))
-
     if not g.entry:
         raise ValueError('Unknown player: {}'.format(g.username))
 
@@ -85,27 +76,18 @@ def enter_game_score():
     return 'Score entered for {}: {}'.format(g.username, value)
 
 @ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
+@requires_auth
 @text_response
-@enforce_request_variables('scorer', 'key', 'value')
+@ensure_permission({'permission': 'ENTER_SCORE'})
+@enforce_request_variables('key', 'value')
 def enter_tournament_score():
     """
     POST to enter a score for a player in a tournament.
 
     Expects:
-        - scorer - username of the user entering the escore
         - key - the category e.g. painting, round_6_battle
         - value - the score. Integer
     """
-    checker = PermissionsChecker()
-    # pylint: disable=undefined-variable
-    if not checker.check_permission(
-            PERMISSIONS.get('ENTER_SCORE'),
-            scorer,
-            g.username,
-            g.tournament_id):
-        raise ValueError('Permission denied. {}'.\
-            format('You cannot enter scores for this game. Contact the TO.'))
-
     if not g.entry:
         raise ValueError('Unknown player: {}'.format(g.username))
 
@@ -115,6 +97,7 @@ def enter_tournament_score():
 
 
 @ENTRY.route('/<username>', methods=['GET'])
+@requires_auth
 @json_response
 def entry_info_from_tournament():
     """ Given entry_id, get info about player and tournament"""
@@ -143,14 +126,15 @@ def get_next_game():
     games = sorted(games, key=lambda game: game.tournament_round.ordering)
 
     for game in games:
-        if not Tournament.is_score_entered(game):
+        if not is_score_entered(game):
             return {
                 'game_id': game.id,
+                'mission': game.tournament_round.mission,
                 'round': game.tournament_round.ordering,
                 'opponent': get_opponent(game, g.entry),
                 'table': game.table_num,
             }
-    return {}
+    raise ValueError("Next game not scheduled. Check with the TO.")
 
 @ENTRY.route('/<username>/schedule', methods=['GET'])
 @json_response

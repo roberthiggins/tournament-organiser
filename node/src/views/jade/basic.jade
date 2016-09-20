@@ -1,0 +1,12 @@
+doctype html
+html(lang=en)
+    head
+        meta(charset=UTF-8)
+        title
+            | Tournament Organiser
+            |  
+            = ' ' + subtitle? subtitle : ''
+    body
+        div#content
+        if src_loc
+            script(type='text/javascript', src=src_loc, charset=utf-8)

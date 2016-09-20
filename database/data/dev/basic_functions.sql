@@ -8,15 +8,57 @@ BEGIN
     RETURN 0;
 END $$;
 
+-- Set Up Permissions
+CREATE OR REPLACE FUNCTION setup_permissions() RETURNS int LANGUAGE plpgsql AS $$
+BEGIN
+
+    INSERT INTO protected_object_action VALUES (DEFAULT, 'enter_score');
+    INSERT INTO protected_object_action VALUES (DEFAULT, 'modify_application');
+    INSERT INTO protected_object_action VALUES (DEFAULT, 'modify_tournament');
+
+    RETURN 0;
+END $$;
+
+-- Create TO for tourament
+CREATE OR REPLACE FUNCTION create_to(tourn_name varchar, protect_object_id integer) RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    username varchar := tourn_name || '_to';
+    protected_object_action_id int := 0;
+    protected_object_permission_id int := 0;
+BEGIN
+
+    PERFORM create_user(username);
+
+    SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'enter_score' LIMIT 1;
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id,
+        (SELECT id FROM protected_object_action
+            WHERE description = 'enter_score' LIMIT 1)
+        ) RETURNING id INTO protected_object_permission_id;
+    INSERT INTO account_protected_object_permission VALUES (username, protected_object_permission_id);
+
+    SELECT id INTO protected_object_action_id FROM protected_object_action WHERE description = 'modify_tournament' LIMIT 1;
+    INSERT INTO protected_object_permission VALUES (DEFAULT, protect_object_id,
+        (SELECT id FROM protected_object_action
+            WHERE description = 'modify_tournament' LIMIT 1)
+        ) RETURNING id INTO protected_object_permission_id;
+    INSERT INTO account_protected_object_permission VALUES (username, protected_object_permission_id);
+
+    RETURN 0;
+
+END $$;
+
+
 -- Make a tournament
-CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar) RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar, rounds int DEFAULT 0) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
     tourn_id int := 0;
     protect_object_id int := 0;
 BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), DEFAULT, protect_object_id) RETURNING id INTO tourn_id;
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), rounds, protect_object_id) RETURNING id INTO tourn_id;
+
+    PERFORM create_to(tourn_name, protect_object_id);
 
     RETURN tourn_id;
 END $$;
@@ -71,6 +113,16 @@ BEGIN
     RETURN game_id;
 END $$;
 
+-- Make a score_category
+CREATE OR REPLACE FUNCTION create_score_category(tourn_name varchar, name varchar, percentage integer, per_tourn boolean DEFAULT FALSE, min_val integer DEFAULT 1, max_val integer DEFAULT 20, zero_sum boolean DEFAULT FALSE) RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    cat_1 int := 0;
+BEGIN
+    INSERT INTO score_category VALUES(DEFAULT, tourn_name, name, percentage, per_tourn, min_val, max_val, zero_sum) RETURNING id INTO cat_1;
+
+    return cat_1;
+END $$;
+
 -- Make a partially complete tournament
 CREATE OR REPLACE FUNCTION half_tournament_test_setup(tourn_name varchar, tourn_date date) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
@@ -99,8 +151,9 @@ BEGIN
     INSERT INTO tournament       VALUES(DEFAULT, tourn_name, tourn_date, DEFAULT, prot_obj_id) RETURNING id INTO tourn_id;
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Kill')                        RETURNING id INTO round_1_id;
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, DEFAULT)                       RETURNING id INTO round_2_id;
-    INSERT INTO score_category   VALUES(DEFAULT, tourn_name, 'Battle', 90, DEFAULT, 0, 20)     RETURNING id INTO cat_1;
-    INSERT INTO score_category   VALUES(DEFAULT, tourn_name, 'Fair Play', 10, DEFAULT, 1, 5)   RETURNING id INTO cat_2;
+
+    cat_1 = create_score_category(tourn_name, 'Battle', 90, FALSE, 0, 20);
+    cat_2 = create_score_category(tourn_name, 'Fair Play', 10, FALSE, 1, 5);
 
     ent_1_id := add_player(tourn_name, tourn_id, ent_1_name);
     INSERT INTO table_allocation VALUES(ent_1_id, 1, 1);

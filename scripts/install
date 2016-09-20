@@ -13,4 +13,4 @@ docker-compose rm -f    &> /dev/null
 docker-compose pull     &> /dev/null
 docker-compose build    &> /dev/null
 
-docker-compose up -d database daoserver webserver  &> /dev/null
+docker-compose up -d database daoserver node &> /dev/null

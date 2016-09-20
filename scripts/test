@@ -7,7 +7,7 @@ cp config/dev/docker-compose.dev.yml docker-compose.yml
 cp config/dev/docker-passwords.dev.yml docker-passwords.yml
 ./scripts/install
 docker-compose up -d apitestdb apitestdaoserver &> /dev/null
-docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver &> /dev/null
+docker-compose up -d systemtestdb systemtestdaoserver systemtestnode &> /dev/null
 
 docker-compose run unittest
 

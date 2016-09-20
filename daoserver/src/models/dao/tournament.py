@@ -10,7 +10,7 @@ class Tournament(db.Model):
     """Represents a row in the tournament table"""
     __tablename__ = 'tournament'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
     date = db.Column(db.DateTime, nullable=False)
     num_rounds = db.Column(db.Integer, default=0)
     protected_object_id = db.Column(
@@ -19,6 +19,8 @@ class Tournament(db.Model):
     protected_object = db.relationship(ProtectedObject)
 
     def __init__(self, name):
+        if not name.strip():
+            raise ValueError('Enter a valid name')
         self.name = name
         self.protected_object = ProtectedObject()
         db.session.add(self.protected_object)

@@ -6,17 +6,17 @@ Feature: Restricted pages
     Background:
         Given I am on "/logout"
 
+    @javascript
     Scenario Outline:
         Given I am on "/<direct>"
         Then I should be on "/login?next=/<direct>"
         Given I am on "/devindex"
+        When I wait for "<link>" to appear
         When I follow "<link>"
         Then I should be on "/login?next=/<direct>"
 
 
         Examples:
-            |direct                     |link                           |
-            |createtournament           |Create a Tournament            | 
-            |feedback                   |Place Feedback                 | 
-            |registerforatournament     |Register for a Tournament      | 
-            |suggestimprovement         |Suggest Improvement            | 
+            |direct            |link                |
+            |tournament/create |Create a Tournament |
+            |feedback          |Place Feedback      |

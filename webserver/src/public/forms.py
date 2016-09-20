@@ -12,13 +12,6 @@ class ErrorStringForm(forms.Form):                      # pylint: disable=no-ini
     def error_code(self):                         # pylint: disable=missing-docstring,R0201
         return 'Enter the required fields'
 
-class AddTournamentForm(ErrorStringForm):               # pylint: disable=no-init
-    """ Add a tournament """
-    inputTournamentName = forms.CharField(label='Tournament Name', )
-    inputTournamentDate = forms.DateField(
-        label='Tournament Date',
-    )
-
 class ApplyForTournamentForm(ErrorStringForm):          # pylint: disable=no-init
     """ Apply for a tournament """
     def __init__(self, *args, **kwargs):                # pylint: disable=E1002
@@ -101,13 +94,6 @@ class EnterScoreForm(ErrorStringForm):                  # pylint: disable=no-ini
         )
     value = forms.CharField(label='Score', )
 
-class FeedbackForm(ErrorStringForm):                    # pylint: disable=no-init
-    """ Feedback and suggestions"""
-    inputFeedback = forms.CharField(
-        widget=forms.Textarea(attrs={'id': 'inputFeedback'}),
-        label='Feedback',
-        max_length=500)
-
 class LoginForm(ErrorStringForm):                       # pylint: disable=no-init
     """ Login """
     inputUsername = forms.CharField(label='Username')
@@ -145,29 +131,6 @@ class CategoriesField(forms.MultiValueField):
 
     def compress(self, data_list):      # pylint: disable=missing-docstring
         return json.dumps(data_list)
-
-class SetCategoriesForm(ErrorStringForm):
-    """Set the score categories for a tournament"""
-    def __init__(self, *args, **kwargs):
-        t_id = kwargs.pop('tournament_id')
-        initial_cats = kwargs.pop('categories', None)
-        num_fields = 5 # Should be enough
-
-        super(SetCategoriesForm, self).__init__(*args, **kwargs)
-
-        for fld in range(0, num_fields):
-            self.fields['categories_{}'.format(fld)] = CategoriesField(
-                label='', required=False)
-            if initial_cats is not None and len(initial_cats) > fld:
-                self.initial['categories_{}'.format(fld)] = initial_cats[fld]
-
-        self.fields['tournamentId'] = forms.CharField(
-            initial=t_id,
-            widget=forms.widgets.HiddenInput())
-
-    def empty_field(self):
-        """A string example of an empty field"""
-        return '["", "", false, "", ""]'
 
 class MissionWidget(forms.MultiWidget):
     """Widget to handle the input for the custom mission field"""

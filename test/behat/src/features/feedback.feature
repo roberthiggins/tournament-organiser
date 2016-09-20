@@ -4,34 +4,29 @@ Feature: Place feedback to improve the sight
     I want to be able to log feedback
 
     Background:
-        Given I am on "/login"
-        When I fill in "id_inputUsername" with "charlie_murphy"
-        When I fill in "id_inputPassword" with "password"
-        When I press "Login"
+        Given I am authenticated as "superman" using "password"
 
-    Scenario Outline: I navigate to the feedback section
-        Given I am on "/<start_point>"
-        When I follow "<link>"
-        Then I should see "<intro>"
-        Given I am on "/<url>"
-        Then I should see "<intro>"
+    @javascript
+    Scenario: I navigate to the feedback section
+        Given I am authenticated as "charlie_murphy" using "password"
+        Given I am on "/devindex"
+        When I wait for 1 second
+        When I follow "Place Feedback"
+        Then I should see "Please give us feedback on your experience on the site"
+        Given I am on "/feedback"
+        Then I should see "Please give us feedback on your experience on the site"
 
-        Examples:
-            | start_point       | url                       | link                  | intro                                                         |
-            | devindex          | feedback                  | Place Feedback        | Please give us feedback on your experience on the site        |
-            | devindex          | suggestimprovement        | Suggest Improvement   | Suggest a feature you would like to see on the site           |
-            |                   | suggestimprovement        | Suggest Improvement   | Suggest a feature you would like to see on the site           |
-
+    @javascript
     Scenario Outline: I enter some information
-        Given I am on "/<url>"
-        When I fill in "inputFeedback" with "<content>"
+        Given I am authenticated as "charlie_murphy" using "password"
+        Given I am on "/feedback"
+        When I wait for 1 second
+        When I fill in "feedback" with "<content>"
         When I press "Submit"
+        When I wait for 1 second
         Then I should see "<response>"
 
         Examples:
-            |url                |content         |response                                      |
-            |feedback           |                |This field is required                        |
-            |feedback           |lkjsdflkjsdflkj |Thanks for you help improving the site        |
-            |suggestimprovement |                |This field is required                        |
-            |suggestimprovement |lkjsdflkffffffj |Thanks for you help improving the site        |
-            |suggestimprovement |lkjsdflkffffffj |Thanks for you help improving the site        |
+            |content         |response                               |
+            |                |Please fill in the required fields     |
+            |lkjsdflkjsdflkj |Thanks for you help improving the site |

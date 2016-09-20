@@ -1,0 +1,10 @@
+# While in development, you can run scripts/reload-node to rebuild the server
+# without the lengthy process of re-installing all the npm modules.
+
+FROM tournamentorganiser_node
+
+# Build the app
+ADD . /usr/src/app
+RUN npm build
+
+CMD npm run start

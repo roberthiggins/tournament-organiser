@@ -30,20 +30,20 @@ class RankingStrategy(object):
         for cat in categories:
             agg_score = sum(
                 [x.value for x in scores \
-                if x.score_category.display_name == cat['name'] \
+                if x.score_category.name == cat.name \
                 and x.value is not None])
             agg_total = sum(
                 [x.score_category.max_val for x in scores \
-                if x.score_category.display_name == cat['name']])
+                if x.score_category.name == cat.name])
             try:
                 agg_score = float(agg_score)
                 agg_total = float(agg_total)
-                percentage = int(cat['percentage'])
-                cat['total_score'] = agg_score / agg_total * percentage
+                percentage = int(cat.percentage)
+                cat.total_score = agg_score / agg_total * percentage
             except ZeroDivisionError:
-                cat['total_score'] = 0
+                cat.total_score = 0
 
-        return sum([x['total_score'] for x in categories])
+        return sum([x.total_score for x in categories])
 
     def overall_ranking(self, entries, error_on_incomplete=False): # pylint: disable=W0613
         """

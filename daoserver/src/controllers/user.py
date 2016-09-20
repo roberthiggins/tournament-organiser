@@ -6,7 +6,7 @@ import re
 from flask import Blueprint, g
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, text_response
+json_response, requires_auth, text_response
 from models.authentication import check_auth
 from models.dao.account import Account, add_account
 
@@ -32,7 +32,7 @@ def login():
         - inputPassword
     """
     if g.account is None:
-        raise ValueError('Cannot find user {}'.format(g.username))
+        raise ValueError('Username or password incorrect')
 
     return "Login successful" if check_auth(g.username, inputPassword) \
         else "Login unsuccessful"
@@ -52,7 +52,7 @@ def create():
     if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
         raise ValueError('This email does not appear valid')
 
-    if password1 != password2:
+    if password1 != password2 or not password1:
         raise ValueError('Please enter two matching passwords')
 
     if g.account:
@@ -66,6 +66,7 @@ def create():
         </li></ul>'.format(g.username, email)
 
 @USER.route('', methods=['GET'])
+@requires_auth
 @json_response
 def user_details():
     """

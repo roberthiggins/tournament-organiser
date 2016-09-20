@@ -7,12 +7,12 @@ from flask import Blueprint, g, request
 from sqlalchemy.exc import IntegrityError
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, text_response
+json_response, requires_auth, text_response, ensure_permission
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_round import TournamentRound
-from models.tournament import Tournament, ScoreCategoryPair
+from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__)
 
@@ -24,7 +24,10 @@ def get_tournament(endpoint, values):
     if g.tournament_id:
         g.tournament = Tournament(g.tournament_id)
 
+    g.username = values.pop('username', None)
+
 @TOURNAMENT.route('', methods=['POST'])
+@requires_auth
 @text_response
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')
 def add_tournament():
@@ -58,7 +61,14 @@ def list_score_categories():
     GET the score categories set for the tournament.
     e.g. [{ 'name': 'painting', 'percentage': 20, 'id': 2 }]
     """
-    return g.tournament.list_score_categories()
+    return [{
+        'id':             x.id,
+        'name':           x.name,
+        'percentage':     x.percentage,
+        'per_tournament': x.per_tournament,
+        'min_val':        x.min_val,
+        'max_val':        x.max_val
+    } for x in g.tournament.list_score_categories()]
 
 @TOURNAMENT.route('/', methods=['GET'])
 @json_response
@@ -75,18 +85,15 @@ def list_tournaments():
 
     return {'tournaments' : details}
 
-@TOURNAMENT.route('/<tournament_id>/register', methods=['POST'])
+@TOURNAMENT.route('/<tournament_id>/register/<username>', methods=['POST'])
+@requires_auth
+@ensure_permission({'permission': 'MODIFY_APPLICATION'})
 @text_response
-@enforce_request_variables('inputUserName')
 def register():
-    # pylint: disable=undefined-variable
-
     """
     POST to apply for entry to a tournament.
-    Expects:
-        - inputUserName - Username of player applying
     """
-    rego = TournamentRegistration(inputUserName, g.tournament_id)
+    rego = TournamentRegistration(g.username, g.tournament_id)
     rego.clashes()
 
     try:
@@ -95,15 +102,19 @@ def register():
     except IntegrityError:
         raise ValueError("Check username and tournament")
 
+    g.tournament.confirm_entries()
+
     return 'Application Submitted'
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])
 @text_response
+@requires_auth
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('missions')
 def set_missions():
+    """POST to set the missions for a tournament. A list of strings expected"""
     # pylint: disable=undefined-variable
 
-    """POST to set the missions for a tournament.A list of strings expected"""
     rounds = g.tournament.details()['rounds']
     try:
         json_missions = json.loads(missions)
@@ -127,6 +138,8 @@ def set_missions():
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
+@requires_auth
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('categories')
 def set_score_categories():
     # pylint: disable=undefined-variable
@@ -146,13 +159,17 @@ def set_score_categories():
         except TypeError:
             cat = request.get_json().get(json_cat)
 
-        new_categories.append(
-            ScoreCategoryPair(cat[0], cat[1], cat[2], cat[3], cat[4]))
+        new_categories.append({
+            'name':       cat[0],
+            'percentage': cat[1],
+            'per_tourn':  cat[2],
+            'min_val':    cat[3],
+            'max_val':    cat[4]})
 
     g.tournament.set_score_categories(new_categories)
 
     return 'Score categories set: {}'.\
-        format(', '.join([str(cat.display_name) for cat in new_categories]))
+        format(', '.join([str(cat['name']) for cat in new_categories]))
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response

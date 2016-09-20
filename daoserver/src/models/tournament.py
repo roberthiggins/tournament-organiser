@@ -5,13 +5,14 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
-from sqlalchemy.exc import DataError, IntegrityError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.permissions import ProtObjAction, ProtObjPerm
-from models.dao.score import Score, ScoreCategory, TournamentScore, GameScore
+from models.dao.registration import TournamentRegistration
+from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDB
 from models.dao.tournament_entry import TournamentEntry
@@ -20,11 +21,12 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker, PERMISSIONS
 from models.ranking_strategies import RankingStrategy
+from models.score import upsert_tourn_score_cat, write_score
 from models.table_strategy import ProtestAvoidanceStrategy
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
-    def wrapped(self, *args, **kwargs):                 # pylint: disable=missing-docstring
+    def wrapped(self, *args, **kwargs): # pylint: disable=missing-docstring
         if not self.exists_in_db:
             print 'Tournament not found: {}'.format(self.tournament_id)
             raise ValueError(
@@ -58,8 +60,11 @@ class Tournament(object):
             raise RuntimeError('A tournament with name {} already exists! \
             Please choose another name'.format(self.tournament_id))
 
-        date = datetime.datetime.strptime(date, "%Y-%m-%d")
-        if date.date() < datetime.date.today():
+        try:
+            date = datetime.datetime.strptime(date, "%Y-%m-%d")
+            if date.date() < datetime.date.today():
+                raise ValueError()
+        except ValueError:
             raise ValueError('Enter a valid date')
 
         dao = TournamentDB(self.tournament_id)
@@ -78,6 +83,25 @@ class Tournament(object):
         return TournamentDB.query.filter_by(name=self.tournament_id).first()
 
     @must_exist_in_db
+    def confirm_entries(self):
+        """ Check all the applications and create entries for all who qualify"""
+
+        entries = [x.player_id for x in TournamentEntry.query.\
+            filter_by(tournament_id=self.tournament_id).all()]
+
+        pending_applications = TournamentRegistration.query.filter(and_(
+            TournamentRegistration.tournament_id == self.get_dao().id,
+            ~TournamentRegistration.player_id.in_(entries))).all()
+
+        for app in pending_applications:
+            try:
+                dao = TournamentEntry(app.player_id, self.tournament_id)
+                db.session.add(dao)
+            except IntegrityError:
+                pass
+        db.session.commit()
+
+    @must_exist_in_db
     def set_score_categories(self, new_categories):
         """
         Replace the existing score categories with those from the list. The list
@@ -85,7 +109,7 @@ class Tournament(object):
         """
 
         # check for duplicates
-        keys = [cat.display_name for cat in new_categories]
+        keys = [cat['name'] for cat in new_categories]
         if len(keys) != len(set(keys)):
             raise ValueError("You cannot set multiple keys with the same name")
 
@@ -94,32 +118,18 @@ class Tournament(object):
             # Delete the ones no longer needed
             to_delete = ScoreCategory.query.\
                 filter(and_(ScoreCategory.tournament_id == self.tournament_id,
-                            ~ScoreCategory.display_name.in_(keys)))
+                            ~ScoreCategory.name.in_(keys)))
             to_delete.delete(synchronize_session='fetch')
 
 
             for cat in new_categories:
-                dao = ScoreCategory.query.\
-                    filter_by(tournament_id=self.tournament_id,
-                              display_name=cat.display_name).first()
-
-                if dao is None:
-                    dao = ScoreCategory(self.tournament_id,
-                                        cat.display_name,
-                                        cat.percentage,
-                                        cat.per_tournament,
-                                        cat.min_val,
-                                        cat.max_val,)
-                dao.percentage = int(cat.percentage)
-                dao.per_tournament = cat.per_tournament
-                db.session.add(dao)
-                db.session.flush()
+                upsert_tourn_score_cat(self.tournament_id, cat)
 
             # check for clashes before actually writing
             for cat in new_categories:
                 ScoreCategory.query.\
                     filter_by(tournament_id=self.tournament_id,
-                              display_name=cat.display_name).first().clashes()
+                              name=cat['name']).first().clashes()
 
             db.session.commit()
         except ValueError:
@@ -142,118 +152,10 @@ class Tournament(object):
             'rounds': details.num_rounds,
         }
 
-    @staticmethod
-    def validate_score(score, category, game_id=None):
-        """Validate an entered score. Returns True or raises Exception"""
-        try:
-            score = int(score)
-            if score < category.min_val or score > category.max_val:
-                raise ValueError()
-
-            if game_id and category.per_tournament:
-                raise TypeError('Cannot enter a per-tournament score '\
-                    '({}) for a game (game_id: {})'.\
-                    format(category.display_name, game_id))
-
-            if game_id is None and not category.per_tournament:
-                raise TypeError('{} should be entered per-tournament'.\
-                    format(category.display_name))
-        except ValueError:
-            raise ValueError('Invalid score: {}'.format(score))
-
     @must_exist_in_db
     def enter_score(self, entry_id, score_cat, score, game_id=None):
-        """
-        Enters a score for category into tournament for player.
-
-        Expects: All fields required
-            - entry_id - of the entry
-            - score_cat - e.g. round_3_battle
-            - score - integer
-
-        Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
-            there is an issue inserting the score.
-        """
-        # score_cat should mean something in the context of the tournie
-        cat = db.session.query(ScoreCategory).filter_by(
-            tournament_id=self.get_dao().name, display_name=score_cat).\
-            first()
-
-        try:
-            self.validate_score(score, cat, game_id)
-        except AttributeError:
-            raise TypeError('Unknown category: {}'.format(score_cat))
-
-        # Has it already been entered?
-        if game_id is None:
-            existing_score = TournamentScore.query.join(Score).\
-                join(ScoreCategory).\
-                filter(and_(TournamentScore.entry_id == entry_id,
-                            TournamentScore.tournament_id == self.get_dao().id,
-                            ScoreCategory.id == cat.id)).first() is not None
-        else:
-            try:
-                existing_score = GameScore.query.join(Score).\
-                    filter(and_(GameScore.entry_id == entry_id, \
-                                GameScore.game_id == game_id,
-                                Score.score_category_id == cat.id)).\
-                    first() is not None
-            except DataError:
-                db.session.rollback()
-                raise AttributeError('{} not entered. Game {} cannot be found'.\
-                    format(score, game_id))
-
-        if existing_score:
-            raise ValueError(
-                '{} not entered. Score is already set'.format(score))
-
-        try:
-            score_dao = Score(entry_id, cat.id, score)
-            db.session.add(score_dao)
-            db.session.flush()
-
-            if game_id is not None:
-                db.session.add(GameScore(entry_id, game_id, score_dao.id))
-            else:
-                db.session.add(
-                    TournamentScore(entry_id, self.get_dao().id, score_dao.id))
-            db.session.commit()
-        except IntegrityError as err:
-            db.session.rollback()
-            if 'is not present in table "entry"' in err.__repr__():
-                raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
-                    format(score, entry_id))
-            elif 'is not present in table "game"' in err.__repr__():
-                raise AttributeError('{} not entered. Game {} cannot be found'.\
-                    format(score, game_id))
-            raise err
-
-    @staticmethod
-    def is_score_entered(game_dao):
-        """
-        Determine if all the scores have been entered for this game.
-        Not that, if false, the result will be double checked and possibly
-        updated
-        """
-        if game_dao is not None and game_dao.score_entered:
-            return True
-
-        per_game_scores = len(game_dao.tournament_round.tournament.\
-            score_categories.filter_by(per_tournament=False).all())
-        if per_game_scores <= 0:
-            raise AttributeError(
-                '{} does not have any scores associated with it'.\
-                format(game_dao))
-
-        scores_expected = per_game_scores * len(game_dao.entrants.all())
-
-        if len(game_dao.game_scores.all()) == scores_expected:
-            game_dao.score_entered = True
-            db.session.add(game_dao)
-            db.session.commit()
-            return True
-
-        return False
+        """Enter a score for score_cat into self for entry."""
+        write_score(self.get_dao(), entry_id, score_cat, score, game_id)
 
     @must_exist_in_db
     def entries(self):
@@ -267,7 +169,7 @@ class Tournament(object):
             entry.score_info = [
                 {
                     'score': x.value,
-                    'category': x.score_category.display_name,
+                    'category': x.score_category.name,
                     'min_val': x.score_category.min_val,
                     'max_val': x.score_category.max_val,
                 } for x in entry.scores
@@ -293,15 +195,8 @@ class Tournament(object):
         [{ 'name': 'Painting', 'percentage': 20, 'id': 1,
            'per_tournament': False }]
         """
-        categories = ScoreCategory.query.\
+        return ScoreCategory.query.\
             filter_by(tournament_id=self.tournament_id).all()
-        return [
-            {'id': x.id,
-             'name': x.display_name,
-             'percentage': x.percentage,
-             'per_tournament': x.per_tournament,
-             'min_val': x.min_val,
-             'max_val': x.max_val} for x in categories]
 
     @must_exist_in_db
     def make_draw(self, round_id=1):
@@ -388,28 +283,3 @@ class Tournament(object):
         if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
             for rnd in self.get_dao().rounds:
                 self.make_draw(rnd.ordering)
-
-# pylint: disable=too-many-arguments
-class ScoreCategoryPair(object):
-    """A holder object for score category information"""
-    def __init__(self, name, percentage, per_tourn, min_val, max_val):
-        if not name:
-            raise ValueError('Category must have a name')
-
-        try:
-            self.percentage = int(percentage)
-            if self.percentage > 100 or self.percentage < 1:
-                raise ValueError()
-        except ValueError:
-            raise ValueError('Percentage must be an integer (1-100)')
-
-        try:
-            self.min_val = int(min_val)
-            self.max_val = int(max_val)
-        except ValueError:
-            raise ValueError('Min and Max Scores must be integers')
-        except TypeError:
-            raise ValueError('Min and Max Scores must be integers')
-
-        self.display_name = name
-        self.per_tournament = per_tourn

@@ -5,25 +5,22 @@ database:
 
 daoserver:
     links:
-        - database
+        - database:database
     extends:
         file: docker-compose.base.yml
         service: daoserver
 
-webserver:
+node:
     links:
-        - daoserver
-    environment:
-        DEBUG: "True"
-        TEMPLATE_DEBUG: "True"
+        - daoserver:daoserver
     extends:
         file: docker-compose.base.yml
-        service: webserver
+        service: node
 
 # Unit Test Specific
 unittest:
     links:
-        - database
+        - database:database
     extends:
         file: docker-compose.base.yml
         service: unittest
@@ -36,7 +33,7 @@ apitestdb:
 
 apitestdaoserver:
     links:
-        - apitestdb
+        - apitestdb:database
     extends:
         file: docker-compose.base.yml
         service: apitestdaoserver
@@ -56,20 +53,17 @@ systemtestdb:
 
 systemtestdaoserver:
     links:
-        - systemtestdb
+        - systemtestdb:database
     extends:
         file: docker-compose.base.yml
         service: systemtestdaoserver
 
-systemtestwebserver:
+systemtestnode:
+    links:
+        - systemtestdaoserver:daoserver
     extends:
         file: docker-compose.base.yml
-        service: systemtestwebserver
-    environment:
-        DEBUG: "True"
-        TEMPLATE_DEBUG: "True"
-    links:
-        - systemtestdaoserver
+        service: systemtestnode
 
 systemtest:
     extends:
@@ -78,9 +72,11 @@ systemtest:
     links:
         - selenium
         - systemtestdaoserver
-        - systemtestwebserver
+        - systemtestnode
 
 selenium:
     extends:
         file: docker-compose.base.yml
         service: selenium
+    links:
+        - systemtestnode

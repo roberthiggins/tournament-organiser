@@ -25,20 +25,71 @@ class ScoreCategory(db.Model):
     tournament_id = db.Column(db.String(50),
                               db.ForeignKey(Tournament.name),
                               nullable=False)
-    display_name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     min_val = db.Column(db.Integer)
     max_val = db.Column(db.Integer)
     per_tournament = db.Column(db.Boolean, nullable=False, default=False)
     percentage = db.Column(db.Integer, nullable=False, default=100)
+    zero_sum = db.Column(db.Boolean, nullable=False, default=False)
     tournament = db.relationship(Tournament, backref=db.backref(
         'score_categories', lazy='dynamic'))
 
-    def __init__(self, tournament_id, display_name, percentage, per_tourn,
-                 min_val, max_val):
-        self.tournament_id = tournament_id
-        self.display_name = display_name
-        self.per_tournament = per_tourn
+    def __init__(self, **args):
+        if not args['tournament_id'] or not args['name'] \
+        or args['per_tourn'] is None:
+            raise ValueError('TournamentScoreCategory args missing: {}'.\
+                format(args))
 
+        self.tournament_id = args['tournament_id']
+        self.per_tournament = args['per_tourn']
+        self.set_name(args['name'])
+        self.set_min_max(args['min_val'], args['max_val'])
+        self.set_percentage(args['percentage'])
+        self.zero_sum = args.get('zero_sum', False)
+
+    def __repr__(self):
+        return '<ScoreCategory ({}, {}, {}, {}, {}, {}, {})>'.format(
+            self.tournament_id,
+            self.name,
+            self.percentage,
+            self.per_tournament,
+            self.min_val,
+            self.max_val,
+            self.zero_sum)
+
+    def clashes(self):
+        """
+        Check that the ScoreCategory will work in the proposed tournament. This
+        means that the total score percentage for all categories in the
+        tournament won't exceed 100%
+        """
+        existing = ScoreCategory.query.\
+            filter(and_(ScoreCategory.tournament_id == self.tournament_id,
+                        ScoreCategory.name != self.name)).all()
+
+        if (sum([x.percentage for x in existing]) + self.percentage) > 100:
+            raise ValueError('percentage too high: {}'.format(self))
+
+        return False
+
+    def set_name(self, name):
+        """Set the name. It must exist"""
+        if not name:
+            raise ValueError('Category must have a name')
+        self.name = name
+
+
+    def set_percentage(self, pct):
+        """Set the percentage and check it's legal"""
+        try:
+            self.percentage = int(pct)
+            if self.percentage <= 0 or self.percentage > 100:
+                raise ValueError()
+        except ValueError:
+            raise ValueError("Percentage must be an integer (1-100)")
+
+    def set_min_max(self, min_val, max_val):
+        """Set the min and max scores"""
         try:
             self.min_val = int(min_val)
             self.max_val = int(max_val)
@@ -53,36 +104,14 @@ class ScoreCategory(db.Model):
         if self.min_val > self.max_val:
             raise ValueError("Min Score must be less than Max Score")
 
-        try:
-            self.percentage = int(percentage)
-            if self.percentage <= 0 or self.percentage > 100:
-                raise TypeError()
-        except TypeError:
-            raise ValueError("Percentage must be between 1 and 100")
+    def update(self, **args):
+        """Update an existing DAO"""
+        self.tournament_id = args['tournament_id']
+        self.set_name(args['name'])
+        self.per_tournament = args['per_tourn']
+        self.set_min_max(args['min_val'], args['max_val'])
+        self.set_percentage(args['percentage'])
 
-    def __repr__(self):
-        return '<ScoreCategory ({}, {}, {}, {}, {}, {})>'.format(
-            self.tournament_id,
-            self.display_name,
-            self.percentage,
-            self.per_tournament,
-            self.min_val,
-            self.max_val)
-
-    def clashes(self):
-        """
-        Check that the ScoreCategory will work in the proposed tournament. This
-        means that the total score percentage for all categories in the
-        tournament won't exceed 100%
-        """
-        existing = ScoreCategory.query.\
-            filter(and_(ScoreCategory.tournament_id == self.tournament_id,
-                        ScoreCategory.display_name != self.display_name)).all()
-
-        if (sum([x.percentage for x in existing]) + self.percentage) > 100:
-            raise ValueError('percentage too high: {}'.format(self))
-
-        return False
 
 class Score(db.Model):
     """An individual score tied to a ScoreCategory"""
