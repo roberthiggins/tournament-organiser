@@ -8,7 +8,7 @@ Feature: Set the number of rounds
         Given I am on "/tournament/rounds_test/rounds"
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "5"
-        When I press "Set"        
+        When I press "Set"
 
     @javascript
     Scenario: I check the number of rounds in a tournament
