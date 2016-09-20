@@ -14,8 +14,9 @@ from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament import Tournament
 
 PERMISSIONS = {
-    'ENTER_SCORE'       : 'enter_score',
-    'MODIFY_TOURNAMENT' : 'modify_tournament'
+    'ENTER_SCORE'        : 'enter_score',
+    'MODIFY_APPLICATION' : 'modify_application',
+    'MODIFY_TOURNAMENT'  : 'modify_tournament'
 }
 
 def set_up_permissions(commit=False):
@@ -94,7 +95,9 @@ class PermissionsChecker(object):
                 first() is not None or self.is_organiser(user, tournament):
             return True
 
-        if action == PERMISSIONS['ENTER_SCORE']:
+        if action == PERMISSIONS['MODIFY_APPLICATION'] and user == for_user:
+            return True
+        elif action == PERMISSIONS['ENTER_SCORE']:
             if user != for_user:
                 raise perm_denied
 
