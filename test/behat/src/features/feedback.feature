@@ -4,27 +4,24 @@ Feature: Place feedback to improve the sight
     I want to be able to log feedback
 
     Background:
-        Given I am authenticated as "superman" using "password"
+        Given I am authenticated as "charlie_murphy" using "password"
 
     @javascript
     Scenario: I navigate to the feedback section
-        Given I am authenticated as "charlie_murphy" using "password"
         Given I am on "/devindex"
-        When I wait for 1 second
+        Then I should see "Place Feedback" appear
         When I follow "Place Feedback"
-        Then I should see "Please give us feedback on your experience on the site"
+        Then I should see "Please give us feedback on your experience on the site" appear
         Given I am on "/feedback"
-        Then I should see "Please give us feedback on your experience on the site"
+        Then I should see "Please give us feedback on your experience on the site" appear
 
     @javascript
     Scenario Outline: I enter some information
-        Given I am authenticated as "charlie_murphy" using "password"
         Given I am on "/feedback"
-        When I wait for 1 second
+        Then I should see "Please give us feedback" appear
         When I fill in "feedback" with "<content>"
         When I press "Submit"
-        When I wait for 1 second
-        Then I should see "<response>"
+        Then I should see "<response>" appear
 
         Examples:
             |content         |response                               |

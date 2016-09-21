@@ -49,13 +49,7 @@ Feature: Login
 
     @javascript
     Scenario: While logged in I try to log in again
-        Given I am on "/login"
-        When I wait for "Login to your account" to appear
-        When I fill in "username" with "charlie_murphy"
-        When I fill in "password" with "password"
-        When I press "Login"
-        When I wait for "Enter a Tournament" to appear
-        Then I should be on "/devindex"
+        Given I am authenticated as "superman" using "password"
         Given I am on "/login"
         When I wait for "Login to your account" to appear
         When I fill in "username" with "charlie_murphy"

@@ -31,22 +31,16 @@ Feature: Get the next game for a player
         Then I should see "Next game not scheduled. Check with the TO." appear
 
     @javascript
-    Scenario: Tournament that doesn't exist
-        When I am on "/tournament/foo/entry/next_game_test_player_1/nextgame"
+    Scenario Outline: Bad targets
+        When I am on "/tournament/<tournament>/entry/<user>/nextgame"
         Then I should see "Retrieving info for your next game..."
-        Then I should see "Tournament foo doesn't exist" appear
+        Then I should see "<result>" appear
 
-    @javascript
-    Scenario: Wrong player
-        When I am on "/tournament/next_game_test/entry/ranking_test_player_1/nextgame"
-        Then I should see "Retrieving info for your next game..."
-        Then I should see "Entry for ranking_test_player_1 in tournament next_game_test not found" appear
-
-    @javascript
-    Scenario: Non-existent player
-        When I am on "/tournament/next_game_test/entry/noone/nextgame"
-        Then I should see "Retrieving info for your next game..."
-        Then I should see "Unknown player: noone" appear
+        Examples:
+            | tournament     | user                    | result                                                                 |
+            | foo            | next_game_test_player_1 | Tournament foo doesn't exist                                           |
+            | next_game_test | ranking_test_player_1   | Entry for ranking_test_player_1 in tournament next_game_test not found |
+            | next_game_test | noone                   | Unknown player: noone                                                  |
 
     @javascript
     Scenario: Logged out
