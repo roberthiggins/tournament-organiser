@@ -34,8 +34,8 @@ def login():
     if g.account is None:
         raise ValueError('Username or password incorrect')
 
-    return "Login successful" if check_auth(g.username, inputPassword) \
-        else "Login unsuccessful"
+    return 'Login successful' if check_auth(g.username, inputPassword) \
+        else 'Login unsuccessful'
 
 # pylint: disable=undefined-variable
 @USER.route('', methods=['POST'])
