@@ -39,7 +39,7 @@ class FeatureContext extends MinkContext
     /**
      * Spin for waiting for a response
      */
-    public function spin($lambda, $wait = 5)
+    public function spin($text, $lambda, $wait = 5)
     {
         $time = time();
         $stopTime = $time + $wait;
@@ -56,7 +56,7 @@ class FeatureContext extends MinkContext
             usleep(250000);
         }
 
-        throw new \Exception("Spin function timed out after {$wait} seconds");
+        throw new \Exception("Spin function timed out: {$text}");
     }
     /**
      * This will wait for up to n seconds
@@ -79,7 +79,7 @@ class FeatureContext extends MinkContext
      */
     public function iWaitForTextToAppear($text)
     {
-        $this->spin(function(FeatureContext $context) use ($text) {
+        $this->spin($text, function(FeatureContext $context) use ($text) {
             try {
                 $context->assertPageContainsText($text);
                 return true;
