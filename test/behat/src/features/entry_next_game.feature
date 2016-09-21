@@ -5,15 +5,15 @@ Feature: Get the next game for a player
 
     Background:
         Given I am authenticated as "superman" using "password"
+
+    @javascript
+    Scenario: Check next game
         When I am on "/tournament/next_game_test/rounds"
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "5"
         When I press "Set"
-
-    @javascript
-    Scenario: Check next game
+        Then I should see "Rounds set: 5" appear
         When I am on "/tournament/next_game_test/entry/next_game_test_player_1/nextgame"
-        Then I should see "Retrieving info for your next game..."
         Then I should see "Next Game Info for next_game_test_player_1" appear
         Then I should see "Round: 4" appear
         Then I should see "Table: 3" appear
@@ -21,19 +21,8 @@ Feature: Get the next game for a player
         Then I should see "Mission: TBA" appear
 
     @javascript
-    Scenario: Round that's not ready
-        When I am on "/tournament/next_game_test/rounds"
-        Then I should see "Number of rounds" appear
-        When I fill in "rounds" with "2"
-        When I press "Set"
-        When I am on "/tournament/next_game_test/entry/next_game_test_player_1/nextgame"
-        Then I should see "Retrieving info for your next game..."
-        Then I should see "Next game not scheduled. Check with the TO." appear
-
-    @javascript
     Scenario Outline: Bad targets
         When I am on "/tournament/<tournament>/entry/<user>/nextgame"
-        Then I should see "Retrieving info for your next game..."
         Then I should see "<result>" appear
 
         Examples:
@@ -47,3 +36,12 @@ Feature: Get the next game for a player
         When I am on "/logout"
         When I am on "/tournament/next_game_test/entry/next_game_test_player_1/nextgame"
         Then I should be on "/login"
+
+    @javascript
+    Scenario: Round that's not ready
+        When I am on "/tournament/next_game_test/rounds"
+        Then I should see "Number of rounds" appear
+        When I fill in "rounds" with "2"
+        When I press "Set"
+        When I am on "/tournament/next_game_test/entry/next_game_test_player_1/nextgame"
+        Then I should see "Next game not scheduled. Check with the TO." appear

@@ -5,6 +5,9 @@ Feature: Check the draw
 
     Background: Set the missions for a round robin tournament
         Given I am authenticated as "superman" using "password"
+
+    @javascript
+    Scenario: Setup not needed in the background
         When I am on "/tournament/ranking_test/rounds"
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "4"

@@ -30,7 +30,7 @@ class FeatureContext extends MinkContext
                 // do nothing
             }
 
-            usleep(250000);
+            usleep(1000);
         }
 
         throw new \Exception("Spin function timed out: {$text}");
