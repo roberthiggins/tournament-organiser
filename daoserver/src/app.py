@@ -45,10 +45,7 @@ def create_app():
     # pylint: disable=unused-variable
     def permission_denied(err):
         """Permission denied (as opposed to auth failed)"""
-        print type(err).__name__
-        print err
-        import traceback
-        traceback.print_exc()
+        print '{}: {}'.format(type(err).__name__, err)
         return make_response(str(err), 403)
 
     @app.errorhandler(RuntimeError)
@@ -57,8 +54,7 @@ def create_app():
     # pylint: disable=unused-variable
     def input_error(err):
         """Input errors"""
-        print type(err).__name__
-        print err
+        print '{}: {}'.format(type(err).__name__, err)
         import traceback
         traceback.print_exc()
         return make_response(str(err), 400)
@@ -67,8 +63,7 @@ def create_app():
     # pylint: disable=unused-variable
     def unknown_error(err):
         """All other exceptions are essentially just raised with logging"""
-        print type(err).__name__
-        print err
+        print '{}: {}'.format(type(err).__name__, err)
         import traceback
         traceback.print_exc()
         return make_response(str(err), 500)
