@@ -28,6 +28,7 @@ def create_app():
             os.environ['DATABASE_PORT_5432_TCP_ADDR'],
             os.environ['DATABASE_PORT_5432_TCP_PORT'],
             os.environ['POSTGRES_DB'])
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
 
