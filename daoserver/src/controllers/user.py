@@ -16,6 +16,13 @@ def get_user(endpoint, values):
     """Attempt to retrieve user from URL"""
     g.user = User(values.pop('username', None))
 
+@USER.route('/actions', methods=['GET'])
+@requires_auth
+@json_response
+def available_actions():
+    """Returns a list of actions the user can perform"""
+    return g.user.available_actions()
+
 # pylint: disable=undefined-variable
 @USER.route('/login', methods=['POST'])
 @text_response

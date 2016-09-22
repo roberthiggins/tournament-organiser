@@ -8,6 +8,7 @@ import datetime
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
+from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.permissions import ProtObjAction, ProtObjPerm
@@ -286,3 +287,20 @@ class Tournament(object):
         if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
             for rnd in self.get_dao().rounds:
                 self.make_draw(rnd.ordering)
+
+def all_tournaments_with_permission(action, username):
+    """Find all tournaments where user has action. Returns list"""
+    all_tournaments = TournamentDAO.query.\
+        filter(TournamentDAO.date >= datetime.date.today()).\
+        order_by(TournamentDAO.date.asc()).all()
+    checker = PermissionsChecker()
+    modifiable_tournaments = []
+
+    for tourn in all_tournaments:
+        try:
+            if checker.check_permission(action, username, None, tourn.name):
+                modifiable_tournaments.append(tourn.name)
+        except PermissionDeniedException:
+            pass
+
+    return modifiable_tournaments
