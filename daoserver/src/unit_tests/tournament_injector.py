@@ -17,9 +17,9 @@ from models.dao.account import Account
 from models.dao.db_connection import db
 from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtectedObject, ProtObjAction, ProtObjPerm
-from models.dao.registration import TournamentRegistration as TRegistration
+from models.dao.registration import TournamentRegistration as TReg
 from models.dao.tournament import Tournament
-from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_entry import TournamentEntry as Entry
 from models.dao.tournament_round import TournamentRound
 
 from models.permissions import PermissionsChecker, PERMISSIONS, \
@@ -54,18 +54,18 @@ class TournamentInjector(object):
         self.delete_scores()
 
         from models.tournament import Tournament as Tourn
-        tourns = Tournament.query.filter(Tournament.id.in_(self.tournament_ids))
-        for tourn in tourns.all():
+        for tourn in self.tournaments().all():
             Tourn(tourn.name).set_number_of_rounds(0)
 
         self.delete_accounts()
 
         self.delete_tournaments()
 
-        ProtObjAction.query.\
-            filter(~ProtObjAction.id.in_(self.existing_perms)).\
-            delete(synchronize_session=False)
-        self.existing_perms = set()
+        if len(self.existing_perms):
+            ProtObjAction.query.\
+                filter(~ProtObjAction.id.in_(self.existing_perms)).\
+                delete(synchronize_session=False)
+            self.existing_perms = set()
 
         db.session.commit()
         return
@@ -74,7 +74,7 @@ class TournamentInjector(object):
         """Create player account and enter them"""
         db.session.add(Account(username, email))
         db.session.flush()
-        db.session.add(TournamentEntry(username, tournament_name))
+        db.session.add(Entry(username, tournament_name))
         db.session.flush()
         self.accounts.add(username)
 
@@ -107,7 +107,7 @@ class TournamentInjector(object):
             play_name = '{}_player_{}'.format(tourn_name, entry_no)
             db.session.add(Account(play_name, '{}@test.com'.format(play_name)))
             db.session.flush()
-            db.session.add(TournamentEntry(play_name, tourn_name))
+            db.session.add(Entry(play_name, tourn_name))
             db.session.flush()
             self.accounts.add(play_name)
 
@@ -118,12 +118,12 @@ class TournamentInjector(object):
 
         # Some relations can't be deleted via relationship for some reason
         # registrations and entries
-        TRegistration.query.\
-            filter(TRegistration.tournament_id.in_(self.tournament_ids)).\
-            delete(synchronize_session=False)
-        TournamentEntry.query.\
-            filter(TournamentEntry.tournament_id.in_(self.tournament_names)).\
-            delete(synchronize_session=False)
+        if len(self.tournament_ids):
+            TReg.query.filter(TReg.tournament_id.in_(self.tournament_ids)).\
+                delete(synchronize_session=False)
+        if len(self.tournament_names):
+            Entry.query.filter(Entry.tournament_id.in_(self.tournament_names)).\
+                delete(synchronize_session=False)
 
         # Accounts
         AccountProtectedObjectPermission.query.filter(
@@ -137,8 +137,7 @@ class TournamentInjector(object):
     def delete_scores(self):
         """Delete all scores for all tournaments injected"""
 
-        for tourn in Tournament.query.filter(Tournament.id.in_(
-                tuple(self.tournament_ids))).all():
+        for tourn in self.tournaments().all():
 
             if tourn is None:
                 return
@@ -158,16 +157,23 @@ class TournamentInjector(object):
         if not len(self.tournament_ids):
             return
 
-        tourns = Tournament.query.filter(Tournament.id.in_(self.tournament_ids))
+        tourns = self.tournaments()
         permission_ids = [t.protected_object.id for t in tourns.all()]
 
         tourns.delete(synchronize_session=False)
-        ProtObjPerm.query.\
-            filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
-            delete(synchronize_session=False)
-        ProtectedObject.query.\
-            filter(ProtectedObject.id.in_(permission_ids)).\
-            delete(synchronize_session=False)
+        if len(permission_ids):
+            ProtObjPerm.query.\
+                filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
+                delete(synchronize_session=False)
+            ProtectedObject.query.\
+                filter(ProtectedObject.id.in_(permission_ids)).\
+                delete(synchronize_session=False)
 
         self.tournament_ids = set()
         self.tournament_names = set()
+
+    def tournaments(self):
+        """query the tournaments. Call all to get list"""
+        from sqlalchemy.sql import false
+        return Tournament.query.filter(Tournament.id.in_(self.tournament_ids)) \
+        if len(self.tournament_ids) else Tournament.query.filter(false())

@@ -9,37 +9,14 @@ use Behat\Gherkin\Node\PyStringNode,
 
 use Behat\MinkExtension\Context\MinkContext;
 
-//
-// Require 3rd-party libraries here:
-//
-//   require_once 'PHPUnit/Autoload.php';
-//   require_once 'PHPUnit/Framework/Assert/Functions.php';
-//
-
 require 'vendor/autoload.php';
-require_once 'RestContext.php';
 
-/**
- * Features context.
- */
 class FeatureContext extends MinkContext
 {
     /**
-     * Initializes context.
-     * Every scenario gets its own context object.
-     *
-     * @param array $parameters context parameters (set them up through behat.yml)
-     */
-    public function __construct(array $parameters)
-    {
-        // Initialize your context here
-        $this->useContext('RestContext', new RestContext($parameters));
-    }
-
-    /**
      * Spin for waiting for a response
      */
-    public function spin($lambda, $wait = 5)
+    public function spin($text, $lambda, $wait = 5)
     {
         $time = time();
         $stopTime = $time + $wait;
@@ -56,7 +33,7 @@ class FeatureContext extends MinkContext
             usleep(250000);
         }
 
-        throw new \Exception("Spin function timed out after {$wait} seconds");
+        throw new \Exception("Spin function timed out: {$text}");
     }
     /**
      * This will wait for up to n seconds
@@ -79,7 +56,7 @@ class FeatureContext extends MinkContext
      */
     public function iWaitForTextToAppear($text)
     {
-        $this->spin(function(FeatureContext $context) use ($text) {
+        $this->spin($text, function(FeatureContext $context) use ($text) {
             try {
                 $context->assertPageContainsText($text);
                 return true;
@@ -120,17 +97,5 @@ class FeatureContext extends MinkContext
         $this->fillField($pos.'_min_val', $min);
         $this->fillField($pos.'_max_val', $max);
     }
-//
-// Place your definition and hook methods here:
-//
-//    /**
-//     * @Given /^I have done something with "([^"]*)"$/
-//     */
-//    public function iHaveDoneSomethingWith($argument)
-//    {
-//        doSomethingWith($argument);
-//    }
-//
-
 }
 
