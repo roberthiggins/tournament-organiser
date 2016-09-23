@@ -3,5 +3,5 @@ CREATE TABLE tournament(
     name                VARCHAR NOT NULL UNIQUE,
     date                DATE NOT NULL,
     num_rounds	        INTEGER DEFAULT 0,
-    protected_object_id INTEGER references protected_object(id)
+    protected_object_id INTEGER NOT NULL REFERENCES protected_object(id)
 );

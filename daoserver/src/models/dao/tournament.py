@@ -15,7 +15,9 @@ class Tournament(db.Model):
     num_rounds = db.Column(db.Integer, default=0)
     protected_object_id = db.Column(
         db.Integer,
-        db.ForeignKey(ProtectedObject.id))
+        db.ForeignKey(ProtectedObject.id),
+        nullable=False)
+
     protected_object = db.relationship(ProtectedObject)
 
     def __init__(self, name):
