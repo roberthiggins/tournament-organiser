@@ -13,7 +13,6 @@ var TournamentInfo = React.createClass({
                 <ul>
                     <li>Name: {this.props.name}</li>
                     <li>Date: {this.props.date || "N/A"}</li>
-                    
                 </ul>
             </div>
         );
@@ -67,23 +66,27 @@ var TournamentInfoPage = React.createClass({
             });
     },
     render: function() {
+
+        var infoWidget = this.state.name && !this.state.successText ?
+                 <TournamentInfo name={this.state.name}
+                                 date={this.state.date} />
+                 : null,
+            applyWidget = this.state.name && !this.state.successText ?
+                <form onSubmit={this.handleSubmit}>
+                    <input type="hidden" value={this.state.name}
+                           name="tournament" />
+                    <button type="submit">
+                        Apply to play in {this.state.name}
+                    </button>
+                </form>
+                : null;
+
         return (
             <div>
                 <p>{this.state.successText}</p>
                 <p>{this.state.error}</p>
-                {this.state.name && !this.state.successText ?
-                    <TournamentInfo name={this.state.name}
-                                    date={this.state.date} />
-                    : null}
-                {this.state.name && !this.state.successText ?
-                    <form onSubmit={this.handleSubmit}>
-                        <input type="hidden" value={this.state.name}
-                               name="tournament" />
-                        <button type="submit">
-                            Apply to play in {this.state.name}
-                        </button>
-                    </form>
-                    : null}
+                {infoWidget}
+                {applyWidget}
             </div>
         );
     }
