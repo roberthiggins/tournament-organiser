@@ -5,6 +5,7 @@ Feature: See a list of tournaments
 
     @javascript
     Scenario: I visit the page
+        Given I am authenticated as "superman" using "password"
         Given I am on "/devindex"
         When I wait for "See a list of tournaments" to appear
         When I follow "See a list of tournaments"

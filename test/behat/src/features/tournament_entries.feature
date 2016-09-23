@@ -8,10 +8,7 @@ Feature: List Entries for a tournament
 
     @javascript
     Scenario: Visit the page from the front page
-        Given I am on "/devindex"
-        When I wait for "See entries for ranking_test" to appear
-        Then I follow "See entries for ranking_test"
-        Then I am on "/tournament/ranking_test/entries"
+        Given I am on "/tournament/ranking_test/entries"
         Then I should see "Entries:" appear
         Then I should see "ranking_test_player_1" appear
         Then I should see "ranking_test_player_2" appear

@@ -4,14 +4,6 @@ Feature: Rank Entries Based on Scores
     So I can give prizes appropriately
 
     @javascript
-    Scenario: Visit the page from the front page
-        Given I am on "/devindex"
-        When I wait for "See the current placings for ranking_test" to appear
-        Then I follow "See the current placings for ranking_test"
-        Then I am on "/tournament/ranking_test/rankings"
-        Then I should see "Placings for ranking_test" appear
-
-    @javascript
     Scenario: Bad targets
         Given I am on "/tournament/northcon_2095/rankings"
         Then I should see "There are no players entered for this event" appear

@@ -3,6 +3,7 @@ ORM module for a tournament
 """
 # pylint: disable=invalid-name
 
+from models.dao.account import Account
 from models.dao.db_connection import db
 from models.dao.permissions import ProtectedObject
 
@@ -15,8 +16,15 @@ class Tournament(db.Model):
     num_rounds = db.Column(db.Integer, default=0)
     protected_object_id = db.Column(
         db.Integer,
-        db.ForeignKey(ProtectedObject.id))
+        db.ForeignKey(ProtectedObject.id),
+        nullable=False)
+    creator_username = db.Column(
+        db.String(50),
+        db.ForeignKey(Account.username),
+        nullable=False)
+
     protected_object = db.relationship(ProtectedObject)
+    creator = db.relationship(Account)
 
     def __init__(self, name):
         if not name.strip():

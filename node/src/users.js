@@ -29,7 +29,7 @@ exports.logout = function(req, res) {
     delete req.user;
     delete res.locals.user;
     req.session.destroy(function () {
-        res.redirect('/devindex');
+        res.redirect('/');
     });
 }
 

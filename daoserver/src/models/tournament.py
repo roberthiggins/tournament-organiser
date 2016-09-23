@@ -8,13 +8,14 @@ import datetime
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
+from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.permissions import ProtObjAction, ProtObjPerm
 from models.dao.registration import TournamentRegistration
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
-from models.dao.tournament import Tournament as TournamentDB
+from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as TR
@@ -37,9 +38,9 @@ def must_exist_in_db(func):
 
 # pylint: disable=no-member
 class Tournament(object):
-    """A tournament DAO"""
+    """A tournament model"""
 
-    def __init__(self, tournament_id=None, ranking_strategy=None, creator=None):
+    def __init__(self, tournament_id=None, ranking_strategy=None):
         self.tournament_id = tournament_id
         self.exists_in_db = self.get_dao() is not None
         self.ranking_strategy = \
@@ -48,9 +49,10 @@ class Tournament(object):
             else RankingStrategy(tournament_id, self.list_score_categories)
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
-        self.creator_username = creator
+        self.creator_username = None
+        self.date = None
 
-    def add_to_db(self, date):
+    def add_to_db(self):
         """
         add a tournament
         Expects:
@@ -60,27 +62,20 @@ class Tournament(object):
             raise RuntimeError('A tournament with name {} already exists! \
             Please choose another name'.format(self.tournament_id))
 
-        try:
-            date = datetime.datetime.strptime(date, "%Y-%m-%d")
-            if date.date() < datetime.date.today():
-                raise ValueError()
-        except ValueError:
-            raise ValueError('Enter a valid date')
-
-        dao = TournamentDB(self.tournament_id)
-        dao.date = date
+        dao = TournamentDAO(self.tournament_id)
+        dao.creator_username = self.creator_username
+        dao.date = self.date
         db.session.add(dao)
 
-        if self.creator_username is not None:
-            PermissionsChecker().add_permission(
-                self.creator_username,
-                PERMISSIONS['ENTER_SCORE'],
-                dao.protected_object)
+        PermissionsChecker().add_permission(
+            self.creator_username,
+            PERMISSIONS['ENTER_SCORE'],
+            dao.protected_object)
         db.session.commit()
 
     def get_dao(self):
-        """Convenience method to recover DAO"""
-        return TournamentDB.query.filter_by(name=self.tournament_id).first()
+        """Convenience method to recover TournamentDAO"""
+        return TournamentDAO.query.filter_by(name=self.tournament_id).first()
 
     @must_exist_in_db
     def confirm_entries(self):
@@ -100,6 +95,15 @@ class Tournament(object):
             except IntegrityError:
                 pass
         db.session.commit()
+
+    def set_date(self, date):
+        """Set the date for the tournament"""
+        try:
+            self.date = datetime.datetime.strptime(date, "%Y-%m-%d")
+            if self.date.date() < datetime.date.today():
+                raise ValueError()
+        except ValueError:
+            raise ValueError('Enter a valid date')
 
     @must_exist_in_db
     def set_score_categories(self, new_categories):
@@ -283,3 +287,20 @@ class Tournament(object):
         if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
             for rnd in self.get_dao().rounds:
                 self.make_draw(rnd.ordering)
+
+def all_tournaments_with_permission(action, username):
+    """Find all tournaments where user has action. Returns list"""
+    all_tournaments = TournamentDAO.query.\
+        filter(TournamentDAO.date >= datetime.date.today()).\
+        order_by(TournamentDAO.date.asc()).all()
+    checker = PermissionsChecker()
+    modifiable_tournaments = []
+
+    for tourn in all_tournaments:
+        try:
+            if checker.check_permission(action, username, None, tourn.name):
+                modifiable_tournaments.append(tourn.name)
+        except PermissionDeniedException:
+            pass
+
+    return modifiable_tournaments

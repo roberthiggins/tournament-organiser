@@ -56,9 +56,9 @@ DECLARE
 BEGIN
 
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), rounds, protect_object_id) RETURNING id INTO tourn_id;
-
     PERFORM create_to(tourn_name, protect_object_id);
+
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), rounds, protect_object_id, tourn_name || '_to') RETURNING id INTO tourn_id;
 
     RETURN tourn_id;
 END $$;
@@ -124,7 +124,7 @@ BEGIN
 END $$;
 
 -- Make a partially complete tournament
-CREATE OR REPLACE FUNCTION half_tournament_test_setup(tourn_name varchar, tourn_date date) RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION half_tournament_test_setup(tourn_name varchar, tourn_date varchar) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
     cat_1 int := 0;
     cat_2 int := 0;
@@ -147,8 +147,8 @@ DECLARE
     ent_5_name varchar := tourn_name || '_player_5';
 BEGIN
 
-    INSERT INTO protected_object VALUES(DEFAULT)                                               RETURNING id INTO prot_obj_id;
-    INSERT INTO tournament       VALUES(DEFAULT, tourn_name, tourn_date, DEFAULT, prot_obj_id) RETURNING id INTO tourn_id;
+    tourn_id := create_tournament(tourn_name, tourn_date);
+
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Kill')                        RETURNING id INTO round_1_id;
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, DEFAULT)                       RETURNING id INTO round_2_id;
 
