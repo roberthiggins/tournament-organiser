@@ -84,18 +84,19 @@ class TournamentInjector(object):
 
     def create_tournament(self, name, date, rounds=0):
         """Create a tournament"""
+        creator_name = '{}_creator'.format(name)
+        db.session.add(Account(creator_name, '{}@bar.com'.format(creator_name)))
+        db.session.flush()
+
         tourn = Tournament(name)
         tourn.num_rounds = rounds
         tourn.date = date
+        tourn.creator_username = creator_name
         db.session.add(tourn)
         db.session.flush()
         self.tournament_ids.add(tourn.id)
         self.tournament_names.add(tourn.name)
 
-        creator_name = '{}_creator'.format(tourn.name)
-        db.session.add(Account(creator_name, '{}@bar.com'.format(creator_name)))
-        db.session.flush()
-        self.accounts.add(creator_name)
         PermissionsChecker().add_permission(
             creator_name,
             PERMISSIONS['ENTER_SCORE'],
@@ -159,15 +160,21 @@ class TournamentInjector(object):
 
         tourns = self.tournaments()
         permission_ids = [t.protected_object.id for t in tourns.all()]
+        creators = Account.query.filter(
+            Account.username.in_([t.creator_username for t in tourns.all()]))
 
         tourns.delete(synchronize_session=False)
-        if len(permission_ids):
-            ProtObjPerm.query.\
-                filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
-                delete(synchronize_session=False)
-            ProtectedObject.query.\
-                filter(ProtectedObject.id.in_(permission_ids)).\
-                delete(synchronize_session=False)
+        AccountProtectedObjectPermission.query.filter(
+            AccountProtectedObjectPermission.account_username.\
+            in_([c.username for c in creators.all()])).\
+            delete(synchronize_session=False)
+        ProtObjPerm.query.\
+            filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
+            delete(synchronize_session=False)
+        ProtectedObject.query.\
+            filter(ProtectedObject.id.in_(permission_ids)).\
+            delete(synchronize_session=False)
+        creators.delete(synchronize_session=False)
 
         self.tournament_ids = set()
         self.tournament_names = set()

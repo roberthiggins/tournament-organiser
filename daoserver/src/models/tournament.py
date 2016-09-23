@@ -39,7 +39,7 @@ def must_exist_in_db(func):
 class Tournament(object):
     """A tournament DAO"""
 
-    def __init__(self, tournament_id=None, ranking_strategy=None, creator=None):
+    def __init__(self, tournament_id=None, ranking_strategy=None):
         self.tournament_id = tournament_id
         self.exists_in_db = self.get_dao() is not None
         self.ranking_strategy = \
@@ -48,7 +48,7 @@ class Tournament(object):
             else RankingStrategy(tournament_id, self.list_score_categories)
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
-        self.creator_username = creator
+        self.creator_username = None
         self.date = None
 
     def add_to_db(self):
@@ -62,14 +62,14 @@ class Tournament(object):
             Please choose another name'.format(self.tournament_id))
 
         dao = TournamentDB(self.tournament_id)
+        dao.creator_username = self.creator_username
         dao.date = self.date
         db.session.add(dao)
 
-        if self.creator_username is not None:
-            PermissionsChecker().add_permission(
-                self.creator_username,
-                PERMISSIONS['ENTER_SCORE'],
-                dao.protected_object)
+        PermissionsChecker().add_permission(
+            self.creator_username,
+            PERMISSIONS['ENTER_SCORE'],
+            dao.protected_object)
         db.session.commit()
 
     def get_dao(self):

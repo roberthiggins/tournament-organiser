@@ -66,6 +66,7 @@ class AccountProtectedObjectPermission(db.Model):
     protected_object_permission_id = db.Column(db.Integer(),
                                                db.ForeignKey(ProtObjPerm.id),
                                                primary_key=True)
+
     def __init__(self, username, perm_id):
         self.account_username = username
         self.protected_object_permission_id = perm_id

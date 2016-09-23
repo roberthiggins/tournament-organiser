@@ -39,10 +39,9 @@ def add_tournament():
         - inputTournamentName - Tournament name. Must be unique.
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
-    tourn = Tournament(
-        inputTournamentName,
-        creator=request.authorization.username)
+    tourn = Tournament(inputTournamentName)
     tourn.set_date(inputTournamentDate)
+    tourn.creator_username = request.authorization.username
     tourn.add_to_db()
     return '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\
