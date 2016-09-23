@@ -49,8 +49,9 @@ class Tournament(object):
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
         self.creator_username = creator
+        self.date = None
 
-    def add_to_db(self, date):
+    def add_to_db(self):
         """
         add a tournament
         Expects:
@@ -60,15 +61,8 @@ class Tournament(object):
             raise RuntimeError('A tournament with name {} already exists! \
             Please choose another name'.format(self.tournament_id))
 
-        try:
-            date = datetime.datetime.strptime(date, "%Y-%m-%d")
-            if date.date() < datetime.date.today():
-                raise ValueError()
-        except ValueError:
-            raise ValueError('Enter a valid date')
-
         dao = TournamentDB(self.tournament_id)
-        dao.date = date
+        dao.date = self.date
         db.session.add(dao)
 
         if self.creator_username is not None:
@@ -100,6 +94,15 @@ class Tournament(object):
             except IntegrityError:
                 pass
         db.session.commit()
+
+    def set_date(self, date):
+        """Set the date for the tournament"""
+        try:
+            self.date = datetime.datetime.strptime(date, "%Y-%m-%d")
+            if self.date.date() < datetime.date.today():
+                raise ValueError()
+        except ValueError:
+            raise ValueError('Enter a valid date')
 
     @must_exist_in_db
     def set_score_categories(self, new_categories):

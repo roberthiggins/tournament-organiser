@@ -42,7 +42,8 @@ def add_tournament():
     tourn = Tournament(
         inputTournamentName,
         creator=request.authorization.username)
-    tourn.add_to_db(inputTournamentDate)
+    tourn.set_date(inputTournamentDate)
+    tourn.add_to_db()
     return '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\
         format(inputTournamentName, inputTournamentDate)
