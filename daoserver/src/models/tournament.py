@@ -15,7 +15,7 @@ from models.dao.permissions import ProtObjAction, ProtObjPerm
 from models.dao.registration import TournamentRegistration
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
-from models.dao.tournament import Tournament as TournamentDB
+from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as TR
@@ -38,7 +38,7 @@ def must_exist_in_db(func):
 
 # pylint: disable=no-member
 class Tournament(object):
-    """A tournament DAO"""
+    """A tournament model"""
 
     def __init__(self, tournament_id=None, ranking_strategy=None):
         self.tournament_id = tournament_id
@@ -62,7 +62,7 @@ class Tournament(object):
             raise RuntimeError('A tournament with name {} already exists! \
             Please choose another name'.format(self.tournament_id))
 
-        dao = TournamentDB(self.tournament_id)
+        dao = TournamentDAO(self.tournament_id)
         dao.creator_username = self.creator_username
         dao.date = self.date
         db.session.add(dao)
@@ -74,8 +74,8 @@ class Tournament(object):
         db.session.commit()
 
     def get_dao(self):
-        """Convenience method to recover DAO"""
-        return TournamentDB.query.filter_by(name=self.tournament_id).first()
+        """Convenience method to recover TournamentDAO"""
+        return TournamentDAO.query.filter_by(name=self.tournament_id).first()
 
     @must_exist_in_db
     def confirm_entries(self):
