@@ -1,0 +1,18 @@
+#! /bin/bash
+
+SYSTEMS="apitestdb apitestdaoserver"
+# Build all containers and run all tests
+cp config/dev/docker-compose.dev.yml docker-compose.yml
+cp config/dev/docker-passwords.dev.yml docker-passwords.yml
+docker-compose kill     &> /dev/null
+docker-compose rm -f    &> /dev/null
+
+docker-compose pull $SYSTEMS  &> /dev/null
+docker-compose build $SYSTEMS &> /dev/null
+
+docker-compose up -d apitestdaoserver &> /dev/null
+docker exec apitestdaoserver bash -c '/webapp/wait-for-postgres.sh apitestdb bash'
+
+bash scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql
+bash scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql
+docker-compose run apitest
