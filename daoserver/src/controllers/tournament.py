@@ -24,6 +24,14 @@ def get_tournament(endpoint, values):
 
     g.username = values.pop('username', None)
 
+def load_json(val):
+    """Attempt to load a json argument from request"""
+    # pylint: disable=undefined-variable
+    try:
+        return json.loads(val)
+    except TypeError:
+        return val
+
 @TOURNAMENT.route('', methods=['POST'])
 @requires_auth
 @text_response
@@ -111,12 +119,7 @@ def register():
 def set_missions():
     """POST to set the missions for a tournament. A list of strings expected"""
     # pylint: disable=undefined-variable
-    try:
-        new_missions = json.loads(missions)
-    except TypeError:
-        new_missions = missions
-
-    return g.tournament.set_missions(new_missions)
+    return g.tournament.set_missions(load_json(missions))
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
@@ -124,16 +127,13 @@ def set_missions():
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('categories')
 def set_score_categories():
-    # pylint: disable=undefined-variable
-
     """
     POST to set tournament categories en masse
     """
+
     new_categories = []
-    try:
-        cats = json.loads(categories)
-    except TypeError:
-        cats = categories
+    # pylint: disable=undefined-variable
+    cats = load_json(categories)
 
     for json_cat in cats:
         try:
