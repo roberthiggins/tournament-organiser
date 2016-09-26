@@ -99,7 +99,8 @@ class Tournament(object):
     @must_exist_in_db
     def get_missions(self):
         """Get all the missions for the tournament. List ordered by ordering"""
-        return [x.mission for x in self.get_dao().rounds.order_by('ordering')]
+        return [x.get_mission()
+                for x in self.get_dao().rounds.order_by('ordering')]
 
     def set_date(self, date):
         """Set the date for the tournament"""
@@ -122,8 +123,7 @@ class Tournament(object):
 
         for i, mission in enumerate(missions):
             rnd = self.get_round(i + 1)
-            rnd.mission = mission if mission is not None \
-                else TR.__table__.c.mission.default.arg
+            rnd.mission = mission if mission is not None else rnd.get_mission()
             db.session.add(rnd)
 
         db.session.commit()

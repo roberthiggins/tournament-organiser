@@ -67,11 +67,10 @@ class SetRounds(TestCase):
         tourn = Tournament(name)
         tourn.set_number_of_rounds(4)
         compare(tourn.get_round(1).mission, 'mission_1')
-        compare(tourn.get_round(4).mission, 'TBA')
+        compare(tourn.get_round(4).mission, None)
 
-        compare(
-            [x.mission for x in Tournament(name).get_dao().rounds],
-            ['mission_1', 'mission_2', 'mission_3', 'TBA'])
+        compare(Tournament(name).get_missions(),
+                ['mission_1', 'mission_2', 'mission_3', 'TBA'])
 
     def test_get_round(self):
         """Test the round getter"""

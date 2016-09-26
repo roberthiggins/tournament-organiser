@@ -16,7 +16,7 @@ class TournamentRound(db.Model):
         db.ForeignKey(Tournament.name),
         primary_key=True)
     ordering = db.Column(db.Integer, default=1, primary_key=True)
-    mission = db.Column(db.String(20), default='TBA', nullable=False)
+    mission = db.Column(db.String(20))
     tournament = db.relationship(Tournament,
                                  backref=db.backref('rounds', lazy='dynamic'))
 
@@ -41,3 +41,10 @@ class TournamentRound(db.Model):
             self.tournament_name,
             self.ordering,
             self.mission)
+
+    def get_mission(self):
+        """
+        Get mission name or 'TBA'.
+        You can inspect self.mission to know if a mission has been set
+        """
+        return self.mission if self.mission is not None else 'TBA'
