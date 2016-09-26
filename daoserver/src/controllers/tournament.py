@@ -3,11 +3,9 @@ All tournament interactions.
 """
 import json
 from flask import Blueprint, g, request
-from sqlalchemy.exc import IntegrityError
 
 from controllers.request_helpers import enforce_request_variables, \
 json_response, requires_auth, text_response, ensure_permission
-from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
 from models.tournament import Tournament
@@ -81,7 +79,7 @@ def list_tournaments():
     """
     GET a list of tournaments
     Returns json. The only key is 'tournaments' and the value is a list of
-    tournament names
+    dicts - {name: '', date, 'YY-MM-DD', rounds: 1}
     """
     # pylint: disable=no-member
     details = [
@@ -99,14 +97,7 @@ def register():
     POST to apply for entry to a tournament.
     """
     rego = TournamentRegistration(g.username, g.tournament_id)
-    rego.clashes()
-
-    try:
-        db.session.add(rego)
-        db.session.commit()
-    except IntegrityError:
-        raise ValueError("Check username and tournament")
-
+    rego.add_to_db()
     g.tournament.confirm_entries()
 
     return 'Application Submitted'

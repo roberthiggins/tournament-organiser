@@ -3,6 +3,7 @@ ORM module for a registration of a user into a tournament
 """
 # pylint: disable=invalid-name, no-member
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.dao.account import Account
@@ -36,6 +37,16 @@ class TournamentRegistration(db.Model):
             self.player_id,
             self.tournament_id,
             self.tournament.name)
+
+    def add_to_db(self):
+        """Add the rego to db after checking for clashes"""
+        self.clashes()
+
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except IntegrityError:
+            raise ValueError("Check username and tournament")
 
     def clashes(self):
         """
