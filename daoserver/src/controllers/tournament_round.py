@@ -39,13 +39,13 @@ def get_round_info(round_id):
                       for x in t.entrants]
         } for t in draw]
 
-    if not draw_info and not rnd.mission:
+    if not draw_info and rnd.mission is None:
         raise no_draw
 
     # We will return all round info for all requests regardless of method
     return {
         'draw': draw_info,
-        'mission': rnd.mission
+        'mission': rnd.get_mission()
     }
 
 @TOURNAMENT_ROUND.route('', methods=['POST'])

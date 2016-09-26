@@ -129,7 +129,7 @@ def get_next_game():
         if not is_score_entered(game):
             return {
                 'game_id': game.id,
-                'mission': game.tournament_round.mission,
+                'mission': game.tournament_round.get_mission(),
                 'round': game.tournament_round.ordering,
                 'opponent': get_opponent(game, g.entry),
                 'table': game.table_num,

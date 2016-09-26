@@ -96,6 +96,12 @@ class Tournament(object):
                 pass
         db.session.commit()
 
+    @must_exist_in_db
+    def get_missions(self):
+        """Get all the missions for the tournament. List ordered by ordering"""
+        return [x.get_mission()
+                for x in self.get_dao().rounds.order_by('ordering')]
+
     def set_date(self, date):
         """Set the date for the tournament"""
         try:
@@ -104,6 +110,24 @@ class Tournament(object):
                 raise ValueError()
         except ValueError:
             raise ValueError('Enter a valid date')
+
+    @must_exist_in_db
+    def set_missions(self, missions=None):
+        """ Set missions for tournament. Must set a mission for each round"""
+        rounds = self.get_dao().num_rounds
+
+        if missions is None or len(missions) != int(rounds):
+            raise ValueError('Tournament {} has {} rounds. \
+                You submitted missions {}'.\
+                format(self.tournament_id, rounds, missions))
+
+        for i, mission in enumerate(missions):
+            rnd = self.get_round(i + 1)
+            rnd.mission = mission if mission is not None else rnd.get_mission()
+            db.session.add(rnd)
+
+        db.session.commit()
+        return 'Missions set: {}'.format(missions)
 
     @must_exist_in_db
     def set_score_categories(self, new_categories):

@@ -2,16 +2,12 @@
 All tournament interactions.
 """
 import json
-import jsonpickle
 from flask import Blueprint, g, request
-from sqlalchemy.exc import IntegrityError
 
 from controllers.request_helpers import enforce_request_variables, \
 json_response, requires_auth, text_response, ensure_permission
-from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
-from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__)
@@ -25,6 +21,14 @@ def get_tournament(endpoint, values):
         g.tournament = Tournament(g.tournament_id)
 
     g.username = values.pop('username', None)
+
+def load_json(val):
+    """Attempt to load a json argument from request"""
+    # pylint: disable=undefined-variable
+    try:
+        return json.loads(val)
+    except TypeError:
+        return val
 
 @TOURNAMENT.route('', methods=['POST'])
 @requires_auth
@@ -48,11 +52,10 @@ def add_tournament():
         format(inputTournamentName, inputTournamentDate)
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['GET'])
+@json_response
 def list_missions():
     """GET list of missions for a tournament."""
-    return jsonpickle.encode(
-        [x.mission for x in g.tournament.get_dao().rounds.order_by('ordering')],
-        unpicklable=False)
+    return g.tournament.get_missions()
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['GET'])
 @json_response
@@ -76,12 +79,11 @@ def list_tournaments():
     """
     GET a list of tournaments
     Returns json. The only key is 'tournaments' and the value is a list of
-    tournament names
+    dicts - {name: '', date, 'YY-MM-DD', rounds: 1}
     """
     # pylint: disable=no-member
-    details = [
-        {'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
-        for x in TournamentDAO.query.all()]
+    details = [{'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
+               for x in TournamentDAO.query.all()]
 
     return {'tournaments' : details}
 
@@ -94,14 +96,7 @@ def register():
     POST to apply for entry to a tournament.
     """
     rego = TournamentRegistration(g.username, g.tournament_id)
-    rego.clashes()
-
-    try:
-        db.session.add(rego)
-        db.session.commit()
-    except IntegrityError:
-        raise ValueError("Check username and tournament")
-
+    rego.add_to_db()
     g.tournament.confirm_entries()
 
     return 'Application Submitted'
@@ -114,27 +109,7 @@ def register():
 def set_missions():
     """POST to set the missions for a tournament. A list of strings expected"""
     # pylint: disable=undefined-variable
-
-    rounds = g.tournament.details()['rounds']
-    try:
-        json_missions = json.loads(missions)
-    except TypeError:
-        json_missions = missions
-
-    if len(json_missions) != int(rounds):
-        raise ValueError('Tournament {} has {} rounds. \
-            You submitted missions {}'.\
-            format(g.tournament_id, rounds, missions))
-
-    for i, mission in enumerate(json_missions):
-        rnd = g.tournament.get_round(i + 1)
-        # pylint: disable=no-member
-        rnd.mission = mission if mission else \
-            TournamentRound.__table__.c.mission.default.arg
-        db.session.add(rnd)
-
-    db.session.commit()
-    return 'Missions set: {}'.format(missions)
+    return g.tournament.set_missions(load_json(missions))
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
@@ -142,16 +117,13 @@ def set_missions():
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
 @enforce_request_variables('categories')
 def set_score_categories():
-    # pylint: disable=undefined-variable
-
     """
     POST to set tournament categories en masse
     """
+
     new_categories = []
-    try:
-        cats = json.loads(categories)
-    except TypeError:
-        cats = categories
+    # pylint: disable=undefined-variable
+    cats = load_json(categories)
 
     for json_cat in cats:
         try:
