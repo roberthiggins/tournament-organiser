@@ -2,7 +2,6 @@
 All tournament interactions.
 """
 import json
-import jsonpickle
 from flask import Blueprint, g, request
 from sqlalchemy.exc import IntegrityError
 
@@ -11,7 +10,6 @@ json_response, requires_auth, text_response, ensure_permission
 from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration
 from models.dao.tournament import Tournament as TournamentDAO
-from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
 
 TOURNAMENT = Blueprint('TOURNAMENT', __name__)
@@ -48,11 +46,10 @@ def add_tournament():
         format(inputTournamentName, inputTournamentDate)
 
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['GET'])
+@json_response
 def list_missions():
     """GET list of missions for a tournament."""
-    return jsonpickle.encode(
-        [x.mission for x in g.tournament.get_dao().rounds.order_by('ordering')],
-        unpicklable=False)
+    return g.tournament.get_missions()
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['GET'])
 @json_response
@@ -114,27 +111,12 @@ def register():
 def set_missions():
     """POST to set the missions for a tournament. A list of strings expected"""
     # pylint: disable=undefined-variable
-
-    rounds = g.tournament.details()['rounds']
     try:
-        json_missions = json.loads(missions)
+        new_missions = json.loads(missions)
     except TypeError:
-        json_missions = missions
+        new_missions = missions
 
-    if len(json_missions) != int(rounds):
-        raise ValueError('Tournament {} has {} rounds. \
-            You submitted missions {}'.\
-            format(g.tournament_id, rounds, missions))
-
-    for i, mission in enumerate(json_missions):
-        rnd = g.tournament.get_round(i + 1)
-        # pylint: disable=no-member
-        rnd.mission = mission if mission else \
-            TournamentRound.__table__.c.mission.default.arg
-        db.session.add(rnd)
-
-    db.session.commit()
-    return 'Missions set: {}'.format(missions)
+    return g.tournament.set_missions(new_missions)
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
