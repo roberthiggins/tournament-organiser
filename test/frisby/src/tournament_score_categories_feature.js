@@ -1,26 +1,16 @@
-describe("HTTP Method Test Suite", function () {
+var frisby = require("frisby"),
+    injector = require("./data_injector.js"),
+    API = process.env.API_ADDR +
+            "tournament/category_test/score_categories";
+
+describe("Set categories normal function", function () {
     "use strict";
-    var frisby = require("frisby"),
-        injector = require("./data_injector.js"),
-        API = process.env.API_ADDR;
 
-    frisby.create("GET from non-existent tournament")
-        .get(API + "tournament/not_a_thing/score_categories")
-        .expectStatus(400)
-        .toss();
-
-    frisby.create("GET from non-existent tournament")
-        .get(API + "tournament//score_categories")
-        .expectStatus(404)
-        .toss();
-
-
-    // Normal function of getting categories
     injector.setCategories("category_test", [
         ["categories_test_one", 8, true, 4, 12],
         ["categories_test_two", 13, false, 3, 11]]);
     frisby.create("GET a list of tournament categories")
-        .get(API + "tournament/category_test/score_categories")
+        .get(API)
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
         .expectJSONTypes("0", {
@@ -54,7 +44,7 @@ describe("HTTP Method Test Suite", function () {
 
     // Modify the categories
     frisby.create("set the score categories for category_test")
-        .post(API + "tournament/category_test/score_categories", {
+        .post(API, {
             categories: ["categories_3"],
             categories_3: ["categories_test_three", 99, true, 1, 2]
         }, {json: true, inspectOnFailure: true})
@@ -63,7 +53,7 @@ describe("HTTP Method Test Suite", function () {
         .expectStatus(200)
         .toss();
     frisby.create("GET a list of tournament categories")
-        .get(API + "tournament/category_test/score_categories")
+        .get(API)
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
         .expectJSON([
@@ -78,10 +68,32 @@ describe("HTTP Method Test Suite", function () {
         ])
         .toss();
 
+    frisby.create("set the score categories for category_test to none")
+        .post(API, {
+            categories: []
+        }, {json: true, inspectOnFailure: true})
+        .addHeader("Authorization", "Basic " +
+            new Buffer("category_test_to:password").toString("base64"))
+        .expectStatus(200)
+        .toss();
+});
+
+describe("Set categories malformed", function () {
+    "use strict";
+
+    frisby.create("GET from non-existent tournament")
+        .get(process.env.API_ADDR + "tournament/not_a_thing/score_categories")
+        .expectStatus(400)
+        .toss();
+
+    frisby.create("GET from non-existent tournament")
+        .get(process.env.API_ADDR + "tournament//score_categories")
+        .expectStatus(404)
+        .toss();
 
     // Empty the categories
     frisby.create("set the score categories for category_test to none")
-        .post(API + "tournament/category_test/score_categories", {
+        .post(API, {
             categories: []
         }, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", "Basic " +
@@ -89,7 +101,7 @@ describe("HTTP Method Test Suite", function () {
         .expectStatus(200)
         .toss();
     frisby.create("GET categories from now empty tournament")
-        .get(API + "tournament/category_test/score_categories")
+        .get(API)
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
         .expectJSON([])
@@ -98,70 +110,44 @@ describe("HTTP Method Test Suite", function () {
 
     // Modify the categories incorrectly
     frisby.create("Incorrect: categories don\"t match")
-        .post(API + "tournament/category_test/score_categories", {
+        .post(API, {
             categories: ["categories_3"],
             categories_1: ["categories_test_no_match", 5, true, 1, 2]
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create("Incorrect: No names")
-        .post(API + "tournament/category_test/score_categories", {
+        .post(API, {
             categories_1: ["categories_test_no_names", 5, true, 1, 2]
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create("Incorrect: No category info")
-        .post(API + "tournament/category_test/score_categories", {
+        .post(API, {
             categories: ["categories_3"]
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
+});
 
-    // Permissions
-    frisby.create("set the score categories for category_test to none")
-        .post(API + "tournament/category_test/score_categories", {
-            categories: []
-        }, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", "Basic " +
-            new Buffer("category_test_to:password").toString("base64"))
-        .expectStatus(200)
-        .toss();
-    frisby.create("set score categories with non-existent user")
-        .post(API + "tournament/category_test/score_categories", {
-            categories: []
-        }, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", "Basic " +
-            new Buffer("category_test_tofdsfdf:password").toString("base64"))
-        .expectStatus(401)
-        .toss();
-    frisby.create("set the score categories with player")
-        .post(API + "tournament/category_test/score_categories", {
-            categories: []
-        }, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", "Basic " +
-            new Buffer("category_test_player_1:password").toString("base64"))
-        .expectStatus(403)
-        .toss();
-    frisby.create("set the score categories with superuser")
-        .post(API + "tournament/category_test/score_categories", {
-            categories: []
-        }, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", "Basic " +
-            new Buffer("superuser:password").toString("base64"))
-        .expectStatus(200)
-        .toss();
-    frisby.create("set the score categories with another user")
-        .post(API + "tournament/category_test/score_categories", {
-            categories: []
-        }, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", "Basic " +
-            new Buffer("ranking_test_to:password").toString("base64"))
-        .expectStatus(403)
-        .toss();
+describe("Set categories permissions", function () {
+    "use strict";
+
+    var authTestCategories = function(msg, user, code){
+            frisby.create("POST categories as: " + msg)
+                .post(API, {categories: []}, {json: true})
+                .addHeader("Authorization", "Basic " +
+                    new Buffer(user + ":password").toString("base64"))
+                .expectStatus(code)
+                .toss();
+        };
+    authTestCategories("TO", "category_test_to", 200);
+    authTestCategories("Non user", "fadsfdsfasdfasdf", 401);
+    authTestCategories("Other user", "rank_test_player_1", 403);
+    authTestCategories("Player", "category_test_player_1", 403);
+    authTestCategories("Super", "superuser", 200);
     frisby.create("set the score categories with no auth")
-        .post(API + "tournament/category_test/score_categories", {
-            categories: []
-        }, {json: true, inspectOnFailure: true})
+        .post(API, {categories: []}, {json: true})
         .expectStatus(401)
         .toss();
 });

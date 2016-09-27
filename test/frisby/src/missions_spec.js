@@ -1,9 +1,10 @@
-describe('Check Missions', function () {
+var frisby = require('frisby'),
+    injector = require("./data_injector"),
+    tournament = 'mission_test',
+    API = process.env.API_ADDR;
+
+describe('Normal behaviour', function () {
     'use strict';
-    var frisby = require('frisby'),
-        injector = require("./data_injector"),
-        tournament = 'mission_test',
-        API = process.env.API_ADDR;
 
     // Normal behaviour
     injector.postRounds(tournament, 3);
@@ -31,32 +32,26 @@ describe('Check Missions', function () {
         .expectJSONTypes('*', Array)
         .expectJSON(['mission_1', 'mission_2', 'TBA'])
         .toss();
+});
 
+describe('Missions Auth', function () {
+    'use strict';
 
-    frisby.create('POST missions as to')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: ['mission_1', 'mission_2', 'mission_3']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('mission_test_to:password').toString("base64"))
-        .expectStatus(200)
-        .toss();
-    frisby.create('POST missions as player')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: ['mission_1', 'mission_2', 'mission_3']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('mission_test_player_1:password').toString("base64"))
-        .expectStatus(403)
-        .toss();
-    frisby.create('POST missions as other')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: ['mission_1', 'mission_2', 'mission_3']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('rank_test_player_1:password').toString("base64"))
-        .expectStatus(403)
-        .toss();
+    var authTestMissions = function(msg, user, code){
+            frisby.create('POST missions as: ' + msg)
+                .post(API + 'tournament/mission_test/missions', {
+                    missions: ['mission_1', 'mission_2', 'mission_3']
+                }, {json: true})
+                .addHeader('Authorization', "Basic " +
+                    new Buffer(user + ":password").toString("base64"))
+                .expectStatus(code)
+                .toss();
+        };
+    authTestMissions('TO', 'mission_test_to', 200);
+    authTestMissions('Player', 'mission_test_player_1', 403);
+    authTestMissions('Super', 'superuser', 200);
+    authTestMissions('Other user', 'rank_test_player_1', 403);
+    authTestMissions('Non-user', 'rfdsfsdfk_test_player_1', 401);
     frisby.create('POST missions with no auth')
         .post(API + 'tournament/mission_test/missions', {
             missions: ['mission_1', 'mission_2', 'mission_3']
@@ -65,42 +60,39 @@ describe('Check Missions', function () {
         .toss();
 
 
-    frisby.create('POST malformed missions')
-        .post(API + 'tournament/not_real/missions', {
-            missions: ['mission_1', 'mission_2', 'mission_3']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(400)
-        .toss();
-    frisby.create('POST malformed missions')
-        .post(API + 'tournament/mission_test/missions', {}, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(400)
-        .toss();
-    frisby.create('Too few')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: ['mission_1', 'mission_2']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(400)
-        .toss();
-    frisby.create('Too many')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: ['mission_1', 'mission_2', 'mission_3', 'mission_4']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(400)
-        .toss();
-    frisby.create('None')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: []
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(400)
-        .toss();
+    var postMalformedMissions = function(msg, tourn, postData){
+        frisby.create('POST malformed missions: ' + msg)
+            .post(API + 'tournament/' + tourn + '/missions', {
+                missions: postData
+            }, {json: true})
+            .addHeader('Authorization', "Basic " +
+                new Buffer('superuser:password').toString("base64"))
+            .expectStatus(400)
+            .toss();
+    };
+    postMalformedMissions('fake tourn', 'not_real', ['m_1', 'm_2', 'm_3']);
+    postMalformedMissions('dict', 'mission_test', {});
+    postMalformedMissions('too few', 'mission_test', ['m_1', 'm_2']);
+    postMalformedMissions('too many', 'mission_test', ['1', '2', '3', '4']);
+    postMalformedMissions('none', 'mission_test', []);
+});
+
+describe('Malformed Missions', function () {
+    'use strict';
+
+    var postMalformedMissions = function(msg, tourn, postData){
+        frisby.create('POST malformed missions: ' + msg)
+            .post(API + 'tournament/' + tourn + '/missions', {
+                missions: postData
+            }, {json: true})
+            .addHeader('Authorization', "Basic " +
+                new Buffer('superuser:password').toString("base64"))
+            .expectStatus(400)
+            .toss();
+    };
+    postMalformedMissions('fake tourn', 'not_real', ['m_1', 'm_2', 'm_3']);
+    postMalformedMissions('dict', 'mission_test', {});
+    postMalformedMissions('too few', 'mission_test', ['m_1', 'm_2']);
+    postMalformedMissions('too many', 'mission_test', ['1', '2', '3', '4']);
+    postMalformedMissions('none', 'mission_test', []);
 });
