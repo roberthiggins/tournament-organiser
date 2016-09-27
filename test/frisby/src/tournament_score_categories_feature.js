@@ -1,6 +1,7 @@
 describe('HTTP Method Test Suite', function () {
     'use strict';
     var frisby = require('frisby'),
+        injector = require('./data_injector.js'),
         API = process.env.API_ADDR;
 
     frisby.create('GET from non-existent tournament')
@@ -15,16 +16,9 @@ describe('HTTP Method Test Suite', function () {
 
 
     // Normal function of getting categories
-    frisby.create('set the score categories for category_test')
-        .post(API + 'tournament/category_test/score_categories', {
-            categories: ['categories_0', 'categories_1'],
-            categories_0: ['categories_test_one', 8, true, 4, 12],
-            categories_1: ['categories_test_two', 13, false, 3, 11]
-        }, {json: true, inspectOnFailure: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('category_test_to:password').toString("base64"))
-        .expectStatus(200)
-        .toss();
+    injector.setCategories('category_test', [
+        ['categories_test_one', 8, true, 4, 12],
+        ['categories_test_two', 13, false, 3, 11]]);
     frisby.create('GET a list of tournament categories')
         .get(API + 'tournament/category_test/score_categories')
         .expectStatus(200)
