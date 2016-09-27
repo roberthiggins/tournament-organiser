@@ -1,6 +1,7 @@
 describe('HTTP Method Test Suite', function () {
     'use strict';
     var frisby = require('frisby'),
+        injector = require("./data_injector"),
         API = process.env.API_ADDR;
 
     frisby.create('Check draw for tournament with no rounds')
@@ -9,23 +10,13 @@ describe('HTTP Method Test Suite', function () {
         .expectBodyContains('Tournament category_test does not have a round 1')
         .toss();
 
-    frisby.create('Setup some rounds for draw_test')
-        .post(
-            process.env.API_ADDR + 'tournament/draw_test/rounds',
-            {numRounds: 2}
-        )
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
+    injector.postRounds('draw_test', 2);
+    frisby.create('Check the draw')
+        .get(API + 'tournament/draw_test/rounds/1')
         .expectStatus(200)
-        .after(function() {
-            frisby.create('Check the draw')
-                .get(API + 'tournament/draw_test/rounds/1')
-                .expectStatus(200)
-                .expectJSON({
-                    draw: Array,
-                    mission: String
-                })
-                .toss();
-            })
+        .expectJSON({
+            draw: Array,
+            mission: String
+        })
         .toss();
 });

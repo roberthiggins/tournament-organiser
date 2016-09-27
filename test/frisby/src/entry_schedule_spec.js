@@ -1,6 +1,7 @@
 describe('See the schedule for an entry in a tournament', function () {
     'use strict';
     var frisby = require('frisby'),
+        injector = require("./data_injector"),
         API = process.env.API_ADDR + 'tournament/schedule_test/';
 
     frisby.create('See lisa schedule')
@@ -19,13 +20,7 @@ describe('See the schedule for an entry in a tournament', function () {
         ])
         .toss();
 
-    frisby.create('Set homer schedule to 8 rounds')
-        .post(API + 'rounds', {numRounds: 4})
-        .expectBodyContains('Rounds set: 4')
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(200)
-        .toss();
+    injector.postRounds('schedule_test', 4);
     frisby.create('See homer schedule')
         .get(API + 'entry/schedule_test_player_1/schedule')
         .expectStatus(200)

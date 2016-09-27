@@ -1,20 +1,12 @@
 describe('Check Missions', function () {
     'use strict';
     var frisby = require('frisby'),
-        API = process.env.API_ADDR,
-        postRounds = function(numRounds){
-            frisby.create('POST ' + numRounds + ' rounds to setup')
-                .post(API + 'tournament/mission_test/rounds', {
-                    numRounds: numRounds
-                }, {json: true})
-                .addHeader('Authorization', "Basic " +
-                    new Buffer('superuser:password').toString("base64"))
-                .expectStatus(200)
-                .toss();
-        };
+        injector = require("./data_injector"),
+        tournament = 'mission_test',
+        API = process.env.API_ADDR;
 
     // Normal behaviour
-    postRounds(3);
+    injector.postRounds(tournament, 3);
     frisby.create('POST 3 missions to setup')
         .post(API + 'tournament/mission_test/missions', {
             missions: ['mission_1', 'mission_2', 'mission_3']
@@ -33,7 +25,7 @@ describe('Check Missions', function () {
         .toss();
 
     // set missions and then change number of rounds
-    postRounds(3);
+    injector.postRounds(tournament, 3);
     frisby.create('POST 3 missions to setup')
         .post(API + 'tournament/mission_test/missions', {
             missions: ['mission_4', 'mission_5', 'mission_6']
@@ -48,15 +40,15 @@ describe('Check Missions', function () {
         .expectJSONTypes('*', Array)
         .expectJSON(['mission_4', 'mission_5', 'mission_6'])
         .toss();
-    postRounds(4);
+    injector.postRounds(tournament, 4);
     frisby.create('Check 4th round is TBA')
         .get(API + 'tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
         .expectJSON(['mission_4', 'mission_5', 'mission_6', 'TBA'])
         .toss();
-    postRounds(2);
-    postRounds(3);
+    injector.postRounds(tournament, 2);
+    injector.postRounds(tournament, 3);
     frisby.create('Check 3rd round is TBA and 4th is gone')
         .get(API + 'tournament/mission_test/missions')
         .expectStatus(200)

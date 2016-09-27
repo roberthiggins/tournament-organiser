@@ -1,18 +1,11 @@
 describe('Enter score for single game for an entry', function () {
     'use strict';
     var frisby = require('frisby'),
+        injector = require('./data_injector'),
         API = process.env.API_ADDR + 'tournament/enter_score_test/entry/';
 
     // Some setup
-    frisby.create('Set enter_score_test to 1 round')
-        .post(
-            process.env.API_ADDR + 'tournament/enter_score_test/rounds',
-            {numRounds: 1}
-        )
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(200)
-        .toss();
+    injector.postRounds('enter_score_test', 1);
     frisby.create('get game_id of next game for enter_score_test_p_1')
         .get(API + 'enter_score_test_p_1/nextgame')
         .expectStatus(200)

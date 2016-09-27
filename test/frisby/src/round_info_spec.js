@@ -4,46 +4,40 @@ describe('HTTP Method Test Suite', function () {
         API = process.env.API_ADDR,
         auth = function(user, pass){
             return "Basic " + new Buffer(user + ":" + pass).toString("base64");
-        };
+        },
+        injector = require("./data_injector");
 
-    frisby.create('POST 2 rounds to setup')
-        .post(API + 'tournament/round_test/rounds', {
-            numRounds: 2
+    injector.postRounds('round_test', 2);
+
+    frisby.create('POST 2 missions to setup')
+        .post(API + 'tournament/round_test/missions', {
+            missions: ['mission_1', 'mission_2']
         }, {json: true})
         .addHeader('Authorization', auth('superuser', 'password'))
         .expectStatus(200)
         .after(function(){
-            frisby.create('POST 2 missions to setup')
-                .post(API + 'tournament/round_test/missions', {
-                    missions: ['mission_1', 'mission_2']
-                }, {json: true})
-                .addHeader('Authorization', auth('superuser', 'password'))
+            frisby.create('Check those missions exist')
+                .get(API + 'tournament/round_test/rounds/1')
                 .expectStatus(200)
-                .after(function(){
-                    frisby.create('Check those missions exist')
-                        .get(API + 'tournament/round_test/rounds/1')
-                        .expectStatus(200)
-                        .expectJSONTypes({
-                            draw: Array,
-                            mission: String
-                        })
-                        .expectJSON({
-                            draw: Array,
-                            mission: 'mission_1'
-                        })
-                        .toss();
-                    frisby.create('Check those missions exist')
-                        .get(API + 'tournament/round_test/rounds/2')
-                        .expectStatus(200)
-                        .expectJSONTypes({
-                            draw: Array,
-                            mission: String
-                        })
-                        .expectJSON({
-                            draw: Array,
-                            mission: 'mission_2'
-                        })
-                        .toss();
+                .expectJSONTypes({
+                    draw: Array,
+                    mission: String
+                })
+                .expectJSON({
+                    draw: Array,
+                    mission: 'mission_1'
+                })
+                .toss();
+            frisby.create('Check those missions exist')
+                .get(API + 'tournament/round_test/rounds/2')
+                .expectStatus(200)
+                .expectJSONTypes({
+                    draw: Array,
+                    mission: String
+                })
+                .expectJSON({
+                    draw: Array,
+                    mission: 'mission_2'
                 })
                 .toss();
         })

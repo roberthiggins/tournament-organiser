@@ -1,19 +1,11 @@
 describe('Get the next game for an entry', function () {
     'use strict';
     var frisby = require('frisby'),
-        API = process.env.API_ADDR + 'tournament/next_game_test/',
-        postRounds = function(numRounds){
-            frisby.create('POST ' + numRounds + ' rounds to setup')
-                .post(API + 'rounds', {
-                    numRounds: numRounds
-                }, {json: true})
-                .addHeader('Authorization', "Basic " +
-                    new Buffer('superuser:password').toString("base64"))
-                .expectStatus(200)
-                .toss();
-        };
+        tournament = 'next_game_test',
+        API = process.env.API_ADDR + 'tournament/' + tournament + '/',
+        injector = require("./data_injector");
 
-    postRounds(2);
+    injector.postRounds(tournament, 2);
     frisby.create('See next_game_test_player_3 next game (none)')
         .get(API + 'entry/next_game_test_player_3/nextgame')
         .expectStatus(400)
@@ -21,7 +13,7 @@ describe('Get the next game for an entry', function () {
         .toss();
 
 
-    postRounds(4);
+    injector.postRounds(tournament, 4);
     frisby.create('See next_game_test_player_3 next game (none)')
         .get(API + 'entry/next_game_test_player_3/nextgame')
         .expectStatus(200)
