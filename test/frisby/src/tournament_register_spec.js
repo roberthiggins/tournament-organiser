@@ -1,7 +1,11 @@
 describe("Test seeing and registering for a tournament", function () {
     "use strict";
     var frisby = require("frisby"),
-        API = process.env.API_ADDR + "tournament/";
+        API = process.env.API_ADDR + "tournament/",
+        injector = require("./data_injector");
+
+    injector.createUser("register_test_player_1");
+    injector.createUser("register_test_player_2");
 
     frisby.create("See a list of tournaments")
         .get(API, {inspectOnFailure: true})

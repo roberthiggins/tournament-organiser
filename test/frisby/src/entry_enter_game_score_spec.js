@@ -5,9 +5,10 @@ describe("Enter score for single game for an entry", function () {
         API = process.env.API_ADDR + "tournament/enter_score_test/entry/";
 
     // Some setup
-    injector.postRounds("enter_score_test", 1);
-    frisby.create("get game_id of next game for enter_score_test_p_1")
-        .get(API + "enter_score_test_p_1/nextgame")
+    injector.createUser('charlie_murphy');
+    injector.postRounds('enter_score_test', 1);
+    frisby.create('get game_id of next game for enter_score_test_p_1')
+        .get(API + 'enter_score_test_p_1/nextgame')
         .expectStatus(200)
         .afterJSON(function (body) {
             var gameId = body.game_id;

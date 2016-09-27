@@ -95,8 +95,5 @@ SELECT half_tournament_test_setup('draw_test', '1985-01-27');
 SELECT create_tournament('northcon_2095', '2095-06-01');
 SELECT create_tournament('round_test', '2095-07-07');
 SELECT create_tournament('register_test', '2222-06-01');
-SELECT create_user('register_test_player_1');
-SELECT create_user('register_test_player_2');
 
-SELECT create_user('charlie_murphy');
 SELECT create_user('superuser', TRUE);
