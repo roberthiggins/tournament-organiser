@@ -25,6 +25,18 @@ exports.setCategories = function(tourn, categories){
         .toss();
 };
 
+// Set missions
+exports.setMissions = function(tourn, missions){
+    "use strict";
+    var API = process.env.API_ADDR + "tournament/" + tourn + "/missions";
+
+    frisby.create("POST " + missions.length + " missions to setup")
+        .post(API, {missions: missions}, {json: true, inspectOnFailure: true})
+        .addHeader("Authorization", auth("superuser", "password"))
+        .expectStatus(200)
+        .toss();
+};
+
 // Set number of rounds for a tournament
 exports.postRounds = function(tourn, rounds) {
     "use strict";

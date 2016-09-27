@@ -7,45 +7,21 @@ describe('Check Missions', function () {
 
     // Normal behaviour
     injector.postRounds(tournament, 3);
-    frisby.create('POST 3 missions to setup')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: ['mission_1', 'mission_2', 'mission_3']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(200)
-        .after(function(){
-            frisby.create('Check those missions exist')
-                .get(API + 'tournament/mission_test/missions')
-                .expectStatus(200)
-                .expectJSONTypes('*', Array)
-                .expectJSON(['mission_1', 'mission_2', 'mission_3'])
-                .toss();
-        })
-        .toss();
-
-    // set missions and then change number of rounds
-    injector.postRounds(tournament, 3);
-    frisby.create('POST 3 missions to setup')
-        .post(API + 'tournament/mission_test/missions', {
-            missions: ['mission_4', 'mission_5', 'mission_6']
-        }, {json: true})
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(200)
-        .toss();
+    injector.setMissions(tournament, ['mission_1', 'mission_2', 'mission_3']);
     frisby.create('Check those missions exist')
         .get(API + 'tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
-        .expectJSON(['mission_4', 'mission_5', 'mission_6'])
+        .expectJSON(['mission_1', 'mission_2', 'mission_3'])
         .toss();
+
+    // set missions and then change number of rounds
     injector.postRounds(tournament, 4);
     frisby.create('Check 4th round is TBA')
         .get(API + 'tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
-        .expectJSON(['mission_4', 'mission_5', 'mission_6', 'TBA'])
+        .expectJSON(['mission_1', 'mission_2', 'mission_3', 'TBA'])
         .toss();
     injector.postRounds(tournament, 2);
     injector.postRounds(tournament, 3);
@@ -53,7 +29,7 @@ describe('Check Missions', function () {
         .get(API + 'tournament/mission_test/missions')
         .expectStatus(200)
         .expectJSONTypes('*', Array)
-        .expectJSON(['mission_4', 'mission_5', 'TBA'])
+        .expectJSON(['mission_1', 'mission_2', 'TBA'])
         .toss();
 
 
