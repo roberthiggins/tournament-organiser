@@ -4,6 +4,10 @@ describe("See the schedule for an entry in a tournament", function () {
         injector = require("./data_injector"),
         API = process.env.API_ADDR + "tournament/schedule_test/";
 
+    injector.createUser("permission_test_player");
+    injector.createTournament("permission_test", "2095-07-06");
+    injector.enterTournament("permission_test", "permission_test_player");
+
     frisby.create("See lisa schedule")
         .get(API + "entry/schedule_test_player_3/schedule")
         .expectStatus(200)

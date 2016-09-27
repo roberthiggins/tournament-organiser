@@ -41,6 +41,18 @@ exports.createUser = function(username) {
         .toss();
 };
 
+// Enter user into tournament
+exports.enterTournament = function(tournament, username) {
+    "use strict";
+    var API = process.env.API_ADDR + "tournament/" + tournament + "/register/" +
+                username;
+    frisby.create("Add user " + username + " to " + tournament)
+        .post(API, {json: true, inspectOnFailure: true})
+        .addHeader("Authorization", auth(username, "password"))
+        .expectStatus(200)
+        .toss();
+};
+
 // Set the score categories
 exports.setCategories = function(tourn, categories){
     "use strict";

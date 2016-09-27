@@ -1,10 +1,17 @@
 describe("Get info about tournament entries", function () {
     "use strict";
     var frisby = require("frisby"),
-        API = process.env.API_ADDR;
+        injector = require("./data_injector"),
+        tournament = "entry_info_test",
+        entry = "entry_info_test_player",
+        API = process.env.API_ADDR + "tournament/" + tournament + "/entry/";
+
+    injector.createUser(entry);
+    injector.createTournament(tournament, "2095-07-02");
+    injector.enterTournament(tournament, entry);
 
     frisby.create("Info about an entry")
-        .get(API + "tournament/entry_info_test/entry/entry_info_player")
+        .get(API + entry)
         .addHeader("Authorization", "Basic " +
             new Buffer("superuser:password").toString("base64"))
         .expectStatus(200)
@@ -18,14 +25,14 @@ describe("Get info about tournament entries", function () {
         )
         .expectJSON(
             {
-                username: "entry_info_player",
-                tournament_name: "entry_info_test",
+                username: entry,
+                tournament_name: tournament,
             }
         )
         .toss();
 
     frisby.create("A non-existent user")
-        .get(API + "tournament/entry_info_test/entry/flubber")
+        .get(API + "flubber")
         .addHeader("Authorization", "Basic " +
             new Buffer("superuser:password").toString("base64"))
         .expectStatus(400)
@@ -33,7 +40,7 @@ describe("Get info about tournament entries", function () {
         .expectBodyContains("Unknown player: flubber")
         .toss();
     frisby.create("malformed")
-        .get(API + "tournament/entry_info_test/entry/entry_info_player/a")
+        .get(API + "entry_info_test_player/a")
         .addHeader("Authorization", "Basic " +
             new Buffer("superuser:password").toString("base64"))
         .expectStatus(404)
@@ -41,7 +48,7 @@ describe("Get info about tournament entries", function () {
 
     // permissions
     frisby.create("Info about an entry as random user")
-        .get(API + "tournament/entry_info_test/entry/entry_info_player")
+        .get(API + entry)
         .addHeader("Authorization", "Basic " +
             new Buffer("rank_test_player_1:password").toString("base64"))
         .expectStatus(200)
@@ -55,18 +62,18 @@ describe("Get info about tournament entries", function () {
         )
         .expectJSON(
             {
-                username: "entry_info_player",
-                tournament_name: "entry_info_test",
+                username: entry,
+                tournament_name: tournament,
             }
         )
         .toss();
     frisby.create("Info about an entry with no auth")
-        .get(API + "tournament/entry_info_test/entry/entry_info_player")
+        .get(API + entry)
         .expectStatus(401)
         .expectBodyContains("Could not verify your access level")
         .toss();
     frisby.create("Info about an entry with non-existent user")
-        .get(API + "tournament/entry_info_test/entry/entry_info_player")
+        .get(API + entry)
         .addHeader("Authorization", "Basic " +
             new Buffer("superusersuperuser:password").toString("base64"))
         .expectStatus(401)

@@ -4,6 +4,8 @@ describe("HTTP Method Test Suite", function () {
         injector = require("./data_injector"),
         API = process.env.API_ADDR;
 
+    injector.createTournament("category_test", "2095-07-05");
+
     frisby.create("Check draw for tournament with no rounds")
         .get(API + "tournament/category_test/rounds/1")
         .expectStatus(400)

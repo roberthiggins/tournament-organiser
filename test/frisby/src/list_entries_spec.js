@@ -1,7 +1,15 @@
 describe("Get a list of entries from a tournament", function () {
     "use strict";
     var frisby = require("frisby"),
+        injector = require("./data_injector"),
         API = process.env.API_ADDR;
+
+    injector.createTournament("entry_list_test", '2095-07-03');
+    injector.createUser("entry_list_test_player_1");
+    injector.createUser("entry_list_test_player_2");
+    injector.enterTournament("entry_list_test", "entry_list_test_player_1");
+    injector.enterTournament("entry_list_test", "entry_list_test_player_2");
+    injector.createTournament("entry_list_test_no_entries", '2095-07-04');
 
     frisby.create("Details for existing tournament")
         .get(API + "tournament/entry_list_test/entry/")
@@ -9,8 +17,8 @@ describe("Get a list of entries from a tournament", function () {
         .expectHeaderContains("content-type", "application/json")
         .expectJSONTypes("*", String)
         .expectJSON([
-            "entry_list_player",
-            "entry_list_player_2"
+            "entry_list_test_player_1",
+            "entry_list_test_player_2"
         ])
         .toss();
 

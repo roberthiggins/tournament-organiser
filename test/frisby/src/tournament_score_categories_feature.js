@@ -133,6 +133,9 @@ describe("Set categories malformed", function () {
 describe("Set categories permissions", function () {
     "use strict";
 
+    injector.createUser("category_test_player_1");
+    injector.enterTournament("category_test", "category_test_player_1");
+
     var authTestCategories = function(msg, user, code){
             frisby.create("POST categories as: " + msg)
                 .post(API, {categories: []}, {json: true})
