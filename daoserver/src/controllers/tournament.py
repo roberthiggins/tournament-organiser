@@ -85,7 +85,7 @@ def list_tournaments():
     details = [{'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
                for x in TournamentDAO.query.all()]
 
-    return {'tournaments' : details}
+    return {'tournaments' : sorted(details, key=lambda to: to['name'])}
 
 @TOURNAMENT.route('/<tournament_id>/register/<username>', methods=['POST'])
 @requires_auth
