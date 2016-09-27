@@ -4,6 +4,7 @@ describe("Test seeing and registering for a tournament", function () {
         API = process.env.API_ADDR + "tournament/",
         injector = require("./data_injector");
 
+    injector.createTournament("register_test", "2222-06-01");
     injector.createUser("register_test_player_1");
     injector.createUser("register_test_player_2");
 

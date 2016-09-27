@@ -5,6 +5,26 @@ var auth = function(user, pass) {
         return "Basic " + new Buffer(user + ":" + pass).toString("base64");
     };
 
+// Inserts a new tournament
+exports.createTournament = function(tournament, date) {
+    "use strict";
+    var API = process.env.API_ADDR + "tournament",
+        to = tournament + "_to",
+        postData = {
+            inputTournamentName: tournament,
+            inputTournamentDate: date
+        };
+
+    exports.createUser(to);
+
+    frisby.create("Insert tournament: " + tournament)
+        .post(API, postData, {json: true, inspectOnFailure: true})
+        .addHeader("Authorization", auth(to, "password"))
+        .expectStatus(200)
+        .toss();
+};
+
+
 // Insert a new user
 exports.createUser = function(username) {
     "use strict";

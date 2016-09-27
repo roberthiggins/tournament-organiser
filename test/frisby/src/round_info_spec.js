@@ -6,6 +6,8 @@ var frisby = require("frisby"),
     injector = require("./data_injector"),
     tournament = "round_test";
 
+injector.createTournament("round_test", "2095-07-07");
+
 describe("Set Rounds normally", function () {
     "use strict";
     injector.postRounds(tournament, 2);
