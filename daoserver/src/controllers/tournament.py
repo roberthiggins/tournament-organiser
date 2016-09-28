@@ -70,7 +70,8 @@ def list_score_categories():
         'percentage':     x.percentage,
         'per_tournament': x.per_tournament,
         'min_val':        x.min_val,
-        'max_val':        x.max_val
+        'max_val':        x.max_val,
+        'zero_sum':       x.zero_sum
     } for x in g.tournament.list_score_categories()]
 
 @TOURNAMENT.route('/', methods=['GET'])
@@ -137,7 +138,8 @@ def set_score_categories():
             'percentage': cat[1],
             'per_tourn':  cat[2],
             'min_val':    cat[3],
-            'max_val':    cat[4]})
+            'max_val':    cat[4],
+            'zero_sum':   cat[5] if len(cat) > 5 else False})
 
     g.tournament.set_score_categories(new_categories)
 

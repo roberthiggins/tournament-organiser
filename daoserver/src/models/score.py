@@ -49,7 +49,8 @@ def upsert_tourn_score_cat(tournament_id, cat):
         'percentage':    cat['percentage'],
         'per_tourn':     cat['per_tourn'],
         'min_val':       cat['min_val'],
-        'max_val':       cat['max_val']
+        'max_val':       cat['max_val'],
+        'zero_sum':      cat['zero_sum']
     }
 
 
