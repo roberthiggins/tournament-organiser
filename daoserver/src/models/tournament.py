@@ -225,6 +225,14 @@ class Tournament(object):
         return self.get_round(round_id).make_draw(self.entries())
 
     @must_exist_in_db
+    def make_draws(self):
+        """Makes the draws for all rounds"""
+        # If we can we determine all rounds
+        if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
+            for rnd in range(0, self.get_num_rounds()):
+                self.make_draw(rnd + 1)
+
+    @must_exist_in_db
     def get_round(self, round_num):
         """Get the relevant TournamentRound"""
         if int(round_num) not in range(1, self.get_num_rounds() + 1):
@@ -248,10 +256,7 @@ class Tournament(object):
 
         db.session.commit()
 
-        # If we can we determine all rounds
-        if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
-            for rnd in range(0, self.get_num_rounds()):
-                self.make_draw(rnd + 1)
+        self.make_draws()
 
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""
