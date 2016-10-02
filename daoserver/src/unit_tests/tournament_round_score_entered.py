@@ -35,8 +35,7 @@ class TestScoreEntered(TestCase):
         self.injector.add_round(self.tournament_1, 1, 'foo_mission_1')
         self.injector.add_round(self.tournament_1, 2, 'foo_mission_2')
         db.session.flush()
-        Tournament(self.tournament_1).make_draw(1)
-        Tournament(self.tournament_1).make_draw(2)
+        Tournament(self.tournament_1).make_draws()
 
     def tearDown(self):
         self.injector.delete()

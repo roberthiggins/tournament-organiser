@@ -12,6 +12,10 @@ from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as DAO
 from models.permissions import PermissionsChecker, PERMISSIONS
 
+class DrawException(Exception):
+    """For when a draw cannot be completed as scores entered already"""
+    pass
+
 class TournamentRound(object):
     """A Tournament Round"""
     # pylint: disable=no-member
@@ -21,7 +25,7 @@ class TournamentRound(object):
         self.tournament_name = tournament
         self.matching_strategy = matching_strategy
         self.table_strategy = table_strategy
-
+        self.draw = None
 
     def db_remove(self, commit=True):
         """Remove the dao and all associated games, entrants, etc. from db"""
@@ -46,6 +50,28 @@ class TournamentRound(object):
         if commit:
             db.session.commit()
 
+
+    def destroy_draw(self):
+        """
+        Removes the draw for the round.
+        """
+        rnd = self.get_dao()
+
+        for game in TournamentGame.query.filter_by(tournament_round_id=rnd.id).\
+        all():
+            if game.score_entered and len(game.entrants.all()) > 1: # not a BYE
+                raise DrawException()
+
+            for game_entrant in game.entrants:
+                PermissionsChecker().remove_permission(
+                    game_entrant.entrant.player_id,
+                    PERMISSIONS['ENTER_SCORE'],
+                    game.protected_object)
+            game.entrants.delete()
+
+        TournamentGame.query.filter_by(tournament_round_id=rnd.id).delete()
+        db.session.commit()
+
     def get_dao(self):
         """Convenience method to get the DAO"""
         return DAO.query.filter_by(tournament_name=self.tournament_name,
@@ -63,9 +89,10 @@ class TournamentRound(object):
         """Determines the draw for round. This draw is written to the db"""
 
         rnd = self.get_dao()
+
         match_ups = self.matching_strategy.match(rnd.ordering, entries)
-        draw = self.table_strategy.determine_tables(match_ups)
-        for match in draw:
+        self.draw = self.table_strategy.determine_tables(match_ups)
+        for match in self.draw:
 
             entrants = [None if x == 'BYE' else x for x in match.entrants]
 
@@ -95,4 +122,3 @@ class TournamentRound(object):
                     db.session.add(game)
 
         db.session.commit()
-        return draw

@@ -21,7 +21,7 @@ from models.permissions import PermissionsChecker, PERMISSIONS
 from models.ranking_strategies import RankingStrategy
 from models.score import upsert_tourn_score_cat, write_score
 from models.table_strategy import ProtestAvoidanceStrategy
-from models.tournament_round import TournamentRound
+from models.tournament_round import TournamentRound, DrawException
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
@@ -220,17 +220,16 @@ class Tournament(object):
             filter_by(tournament_id=self.tournament_id).all()
 
     @must_exist_in_db
-    def make_draw(self, round_id=1):
-        """Determines the draw for round. This draw is written to the db"""
-        return self.get_round(round_id).make_draw(self.entries())
-
-    @must_exist_in_db
     def make_draws(self):
         """Makes the draws for all rounds"""
         # If we can we determine all rounds
         if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
             for rnd in range(0, self.get_num_rounds()):
-                self.make_draw(rnd + 1)
+                try:
+                    self.get_round(rnd + 1).destroy_draw()
+                    self.get_round(rnd + 1).make_draw(self.entries())
+                except DrawException:
+                    pass
 
     @must_exist_in_db
     def get_round(self, round_num):

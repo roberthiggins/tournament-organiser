@@ -17,13 +17,15 @@ describe('HTTP Method Test Suite', function () {
         .addHeader('Authorization', "Basic " +
             new Buffer('superuser:password').toString("base64"))
         .expectStatus(200)
-        .toss();
-    frisby.create('Check the draw')
-        .get(API + 'tournament/draw_test/rounds/1')
-        .expectStatus(200)
-        .expectJSON({
-            draw: Array,
-            mission: String
-        })
+        .after(function() {
+            frisby.create('Check the draw')
+                .get(API + 'tournament/draw_test/rounds/1')
+                .expectStatus(200)
+                .expectJSON({
+                    draw: Array,
+                    mission: String
+                })
+                .toss();
+            })
         .toss();
 });

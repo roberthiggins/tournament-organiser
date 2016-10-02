@@ -35,8 +35,7 @@ class TestScoreEntered(TestCase):
         self.injector.add_round(self.tournament_1, 1, 'foo_mission_1')
         self.injector.add_round(self.tournament_1, 2, 'foo_mission_2')
         db.session.flush()
-        Tournament(self.tournament_1).make_draw(1)
-        Tournament(self.tournament_1).make_draw(2)
+        Tournament(self.tournament_1).make_draws()
 
     def tearDown(self):
         self.injector.delete()
@@ -304,8 +303,7 @@ class EnterScore(TestCase):
         compare(scores[0].score.value, 0)
 
         # a per_round score
-        tourn.make_draw(1)
-        tourn.make_draw(2)
+        tourn.make_draws()
 
         round_id = TournamentRound.query.\
             filter_by(tournament_name=self.tournament_1, ordering=2).first().id

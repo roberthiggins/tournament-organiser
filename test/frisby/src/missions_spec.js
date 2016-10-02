@@ -22,12 +22,14 @@ describe('Check Missions', function () {
         .addHeader('Authorization', "Basic " +
             new Buffer('superuser:password').toString("base64"))
         .expectStatus(200)
-        .toss();
-    frisby.create('Check those missions exist')
-        .get(API + 'tournament/mission_test/missions')
-        .expectStatus(200)
-        .expectJSONTypes('*', Array)
-        .expectJSON(['mission_1', 'mission_2', 'mission_3'])
+        .after(function(){
+            frisby.create('Check those missions exist')
+                .get(API + 'tournament/mission_test/missions')
+                .expectStatus(200)
+                .expectJSONTypes('*', Array)
+                .expectJSON(['mission_1', 'mission_2', 'mission_3'])
+                .toss();
+        })
         .toss();
 
     // set missions and then change number of rounds
