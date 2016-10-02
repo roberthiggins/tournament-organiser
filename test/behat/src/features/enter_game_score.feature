@@ -28,6 +28,7 @@ Feature: Enter a score for a player
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "6"
         When I press "Set"
+        Then I should see "Rounds set" appear
         Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
         Then I should see "Enter score for enter_score_test, Round 4" appear
 

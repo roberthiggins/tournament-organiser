@@ -27,7 +27,7 @@ def get_round_info(round_id):
     """
     no_draw = AttributeError('No draw is available')
     tourn = Tournament(g.tournament_id)
-    rnd = tourn.get_round(round_id)
+    rnd = tourn.get_round(round_id).get_dao()
     try:
         draw = tourn.make_draw(round_id)
     except AttributeError:

@@ -64,8 +64,8 @@ class SetRounds(TestCase):
 
         tourn = Tournament(name)
         tourn.set_number_of_rounds(4)
-        compare(tourn.get_round(1).mission, 'mission_1')
-        compare(tourn.get_round(4).mission, None)
+        compare(tourn.get_round(1).get_dao().mission, 'mission_1')
+        compare(tourn.get_round(4).get_dao().mission, None)
 
         compare(Tournament(name).get_missions(),
                 ['mission_1', 'mission_2', 'mission_3', 'TBA'])
@@ -78,8 +78,8 @@ class SetRounds(TestCase):
         tourn = Tournament(name)
         tourn.set_number_of_rounds(2)
 
-        self.assertTrue(tourn.get_round(1).ordering == 1)
-        self.assertTrue(tourn.get_round(2).ordering == 2)
+        self.assertTrue(tourn.get_round(1).get_dao().ordering == 1)
+        self.assertTrue(tourn.get_round(2).get_dao().ordering == 2)
 
         self.assertRaises(ValueError, tourn.get_round, 3)
         self.assertRaises(ValueError, tourn.get_round, -1)

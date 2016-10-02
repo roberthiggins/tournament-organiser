@@ -11,7 +11,6 @@ from sqlalchemy.sql.expression import and_
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
-from models.dao.permissions import ProtObjAction, ProtObjPerm
 from models.dao.registration import TournamentRegistration
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
@@ -24,6 +23,7 @@ from models.permissions import PermissionsChecker, PERMISSIONS
 from models.ranking_strategies import RankingStrategy
 from models.score import upsert_tourn_score_cat, write_score
 from models.table_strategy import ProtestAvoidanceStrategy
+from models.tournament_round import TournamentRound
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
@@ -127,7 +127,7 @@ class Tournament(object):
                 format(self.tournament_id, rounds, missions))
 
         for i, mission in enumerate(missions):
-            rnd = self.get_round(i + 1)
+            rnd = self.get_round(i + 1).get_dao()
             rnd.mission = mission if mission is not None else rnd.get_mission()
             db.session.add(rnd)
 
@@ -211,16 +211,6 @@ class Tournament(object):
         return entries
 
     @must_exist_in_db
-    def get_game_dao(self, round_num, table_num):
-        """
-        Get game_dao given table_num and round_num
-        """
-        return TournamentGame.query.join(TR).filter(
-            and_(TR.ordering == round_num,
-                 TournamentGame.table_num == table_num)).first()
-
-
-    @must_exist_in_db
     def list_score_categories(self):
         """
         List all the score categories available to this tournie and their
@@ -235,7 +225,7 @@ class Tournament(object):
     def make_draw(self, round_id=1):
         """Determines the draw for round. This draw is written to the db"""
 
-        rnd = self.get_round(round_id)
+        rnd = self.get_round(round_id).get_dao()
         match_ups = self.matching_strategy.match(rnd.ordering, self.entries())
         draw = self.table_strategy.determine_tables(match_ups)
         for match in draw:
@@ -277,45 +267,28 @@ class Tournament(object):
             raise ValueError('Tournament {} does not have a round {}'.format(
                 self.tournament_id, round_num))
 
-        return self.get_dao().rounds.filter_by(ordering=round_num).first()
+        return TournamentRound(self.tournament_id, round_num,
+                               self.matching_strategy, self.table_strategy)
 
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
         num_rounds = int(num_rounds)
         tourn = self.get_dao()
-        db.session.add(tourn)
 
-        for rnd in tourn.rounds.filter(TR.ordering > num_rounds).all():
-            for game in rnd.games:
-                entrants = GameEntrant.query.filter_by(game_id=game.id)
-                for entrant in entrants.all():
-                    PermissionsChecker().remove_permission(
-                        entrant.entrant.player_id,
-                        PERMISSIONS['ENTER_SCORE'],
-                        game.protected_object)
-                entrants.delete()
-                act_id = ProtObjAction.query.\
-                    filter_by(description=PERMISSIONS['ENTER_SCORE']).first().id
-                ProtObjPerm.query.filter_by(
-                    protected_object_id=game.protected_object.id,
-                    protected_object_action_id=act_id).delete()
-                prot_obj = game.protected_object
-                db.session.delete(game)
-                db.session.delete(prot_obj)
+        for rnd in tourn.rounds.filter(TR.ordering > num_rounds).\
+        order_by(TR.ordering.desc()).all():
+            self.get_round(rnd.ordering).db_remove(False)
 
-        tourn.rounds.filter(TR.ordering > num_rounds).delete()
-        db.session.flush()
+        for rnd in range(self.get_num_rounds(), num_rounds):
+            db.session.add(TR(self.tournament_id, rnd + 1))
 
-        existing_rnds = self.get_num_rounds()
-        for rnd in range(existing_rnds + 1, num_rounds + 1):
-            db.session.add(TR(self.tournament_id, rnd))
         db.session.commit()
 
         # If we can we determine all rounds
         if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
-            for rnd in self.get_dao().rounds:
-                self.make_draw(rnd.ordering)
+            for rnd in range(0, self.get_num_rounds()):
+                self.make_draw(rnd + 1)
 
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""

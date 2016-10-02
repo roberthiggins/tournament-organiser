@@ -22,7 +22,7 @@ def is_score_entered(game_dao):
     if per_game_scores <= 0:
         raise AttributeError(
             '{} does not have any scores associated with it'.\
-            format(game_dao))
+            format(game_dao.tournament_round.tournament.name))
 
     scores_expected = per_game_scores * len(game_dao.entrants.all())
 
