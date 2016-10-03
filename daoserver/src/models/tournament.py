@@ -10,13 +10,11 @@ from sqlalchemy.sql.expression import and_
 
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
-from models.dao.game_entry import GameEntrant
 from models.dao.registration import TournamentRegistration
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
-from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker, PERMISSIONS
@@ -224,41 +222,7 @@ class Tournament(object):
     @must_exist_in_db
     def make_draw(self, round_id=1):
         """Determines the draw for round. This draw is written to the db"""
-
-        rnd = self.get_round(round_id).get_dao()
-        match_ups = self.matching_strategy.match(rnd.ordering, self.entries())
-        draw = self.table_strategy.determine_tables(match_ups)
-        for match in draw:
-
-            entrants = [None if x == 'BYE' else x for x in match.entrants]
-
-            game = TournamentGame.query.filter_by(
-                tournament_round_id=rnd.id,
-                table_num=match.table_number).first()
-            if game is None:
-                game = TournamentGame(rnd.id, match.table_number)
-                db.session.add(game)
-                db.session.flush()
-
-            for entrant in entrants:
-                if entrant is not None:
-                    dao = TournamentEntry.query.\
-                        filter_by(id=entrant.id).first()
-                    game_entrant = GameEntrant.query.filter_by(
-                        game_id=game.id, entrant_id=dao.id).first()
-                    if game_entrant is None:
-                        db.session.add(GameEntrant(game.id, dao.id))
-                        PermissionsChecker().add_permission(
-                            dao.player_id,
-                            PERMISSIONS['ENTER_SCORE'],
-                            game.protected_object)
-                else:
-                    # The person playing the bye gets no points at the time
-                    game.score_entered = True
-                    db.session.add(game)
-
-        db.session.commit()
-        return draw
+        return self.get_round(round_id).make_draw(self.entries())
 
     @must_exist_in_db
     def get_round(self, round_num):
@@ -274,9 +238,8 @@ class Tournament(object):
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
         num_rounds = int(num_rounds)
-        tourn = self.get_dao()
 
-        for rnd in tourn.rounds.filter(TR.ordering > num_rounds).\
+        for rnd in self.get_dao().rounds.filter(TR.ordering > num_rounds).\
         order_by(TR.ordering.desc()).all():
             self.get_round(rnd.ordering).db_remove(False)
 
