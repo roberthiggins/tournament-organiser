@@ -185,7 +185,7 @@ class User(object):
                   'action': 'get_draw',
                   'tournament': next_tourn.name,
                   'round': x
-                 } for x in range(1, next_tourn.num_rounds)] \
+                 } for x in range(1, next_tourn.get_num_rounds())] \
             if next_tourn is not None else []
 
         draws = tuple(draws) if len(draws) > 0 else None

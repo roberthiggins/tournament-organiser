@@ -25,7 +25,7 @@ describe("Test seeing and registering for a tournament", function () {
             {date: "2095-08-12", name: "next_game_test",             rounds: 4},
             {date: "2095-06-01", name: "northcon_2095",              rounds: 0},
             {date: "2095-07-06", name: "permission_test",            rounds: 0},
-            {date: "1643-01-27", name: "rank_test",                  rounds: 0},
+            {date: "1643-01-27", name: "rank_test",                  rounds: 2},
             {date: "2222-06-01", name: "register_test",              rounds: 0},
             {date: "2095-07-07", name: "round_test",                 rounds: 2},
             {date: "2163-09-15", name: "schedule_test",              rounds: 4}])

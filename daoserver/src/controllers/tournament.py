@@ -82,7 +82,7 @@ def list_tournaments():
     dicts - {name: '', date, 'YY-MM-DD', rounds: 1}
     """
     # pylint: disable=no-member
-    details = [{'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
+    details = [{'name': x.name, 'date': x.date, 'rounds': x.rounds.count()}
                for x in TournamentDAO.query.all()]
 
     return {'tournaments' : sorted(details, key=lambda to: to['name'])}

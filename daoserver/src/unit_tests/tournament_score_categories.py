@@ -41,7 +41,7 @@ class ScoreCategoryTests(TestCase):
         self.cat_3 = score_cat_args('categories_sports', 10, True, 1, 5)
 
         # We will make a tournament with 5 entrants.
-        self.injector.inject(self.tourn_1, rounds=5)
+        self.injector.inject(self.tourn_1)
         self.tournament = Tournament(self.tourn_1)
 
     def tearDown(self):

@@ -102,6 +102,11 @@ class Tournament(object):
         return [x.get_mission()
                 for x in self.get_dao().rounds.order_by('ordering')]
 
+    @must_exist_in_db
+    def get_num_rounds(self):
+        """The number of rounds in the tournament"""
+        return self.get_dao().rounds.count()
+
     def set_date(self, date):
         """Set the date for the tournament"""
         try:
@@ -114,9 +119,9 @@ class Tournament(object):
     @must_exist_in_db
     def set_missions(self, missions=None):
         """ Set missions for tournament. Must set a mission for each round"""
-        rounds = self.get_dao().num_rounds
+        rounds = self.get_num_rounds()
 
-        if missions is None or len(missions) != int(rounds):
+        if missions is None or len(missions) != rounds:
             raise ValueError('Tournament {} has {} rounds. \
                 You submitted missions {}'.\
                 format(self.tournament_id, rounds, missions))
@@ -177,7 +182,7 @@ class Tournament(object):
         return {
             'name': details.name,
             'date': details.date,
-            'rounds': details.num_rounds,
+            'rounds': self.get_num_rounds(),
         }
 
     @must_exist_in_db
@@ -268,7 +273,7 @@ class Tournament(object):
     @must_exist_in_db
     def get_round(self, round_num):
         """Get the relevant TournamentRound"""
-        if int(round_num) not in range(1, self.get_dao().num_rounds + 1):
+        if int(round_num) not in range(1, self.get_num_rounds() + 1):
             raise ValueError('Tournament {} does not have a round {}'.format(
                 self.tournament_id, round_num))
 
@@ -277,11 +282,11 @@ class Tournament(object):
     @must_exist_in_db
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
+        num_rounds = int(num_rounds)
         tourn = self.get_dao()
-        tourn.num_rounds = int(num_rounds)
         db.session.add(tourn)
 
-        for rnd in tourn.rounds.filter(TR.ordering > tourn.num_rounds).all():
+        for rnd in tourn.rounds.filter(TR.ordering > num_rounds).all():
             for game in rnd.games:
                 entrants = GameEntrant.query.filter_by(game_id=game.id)
                 for entrant in entrants.all():
@@ -299,11 +304,11 @@ class Tournament(object):
                 db.session.delete(game)
                 db.session.delete(prot_obj)
 
-        tourn.rounds.filter(TR.ordering > tourn.num_rounds).delete()
+        tourn.rounds.filter(TR.ordering > num_rounds).delete()
         db.session.flush()
 
-        existing_rnds = len(tourn.rounds.filter().all())
-        for rnd in range(existing_rnds + 1, tourn.num_rounds + 1):
+        existing_rnds = self.get_num_rounds()
+        for rnd in range(existing_rnds + 1, num_rounds + 1):
             db.session.add(TR(self.tournament_id, rnd))
         db.session.commit()
 

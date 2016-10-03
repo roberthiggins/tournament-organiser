@@ -24,6 +24,7 @@ from models.dao.tournament_round import TournamentRound
 
 from models.permissions import PermissionsChecker, PERMISSIONS, \
 set_up_permissions
+from models.tournament import Tournament as Tourn
 
 class TournamentInjector(object):
     """Insert a tournament using the ORM. You can delete them as well"""
@@ -35,14 +36,14 @@ class TournamentInjector(object):
         self.existing_perms = set([o.id for o in ProtObjAction.query.all()])
         set_up_permissions()
 
-    def inject(self, name, rounds=0, num_players=6, date=None):
+    def inject(self, name, num_players=6, date=None):
         """Create a tournament and inkect it into the db."""
 
         # To avoid clashes we shift default tournament into the future
         if date is None:
             date = datetime.now() + timedelta(weeks=len(self.tournament_ids))
 
-        self.create_tournament(name, date, rounds)
+        self.create_tournament(name, date)
 
         self.create_players(name, num_players)
 
@@ -53,7 +54,6 @@ class TournamentInjector(object):
 
         self.delete_scores()
 
-        from models.tournament import Tournament as Tourn
         for tourn in self.tournaments().all():
             Tourn(tourn.name).set_number_of_rounds(0)
 
@@ -82,14 +82,13 @@ class TournamentInjector(object):
         """Add a TournamentRound. Caller's job to ensure clash avoidance"""
         db.session.add(TournamentRound(tourn_name, int(round_num), mission))
 
-    def create_tournament(self, name, date, rounds=0):
+    def create_tournament(self, name, date):
         """Create a tournament"""
         creator_name = '{}_creator'.format(name)
         db.session.add(Account(creator_name, '{}@bar.com'.format(creator_name)))
         db.session.flush()
 
         tourn = Tournament(name)
-        tourn.num_rounds = rounds
         tourn.date = date
         tourn.creator_username = creator_name
         db.session.add(tourn)

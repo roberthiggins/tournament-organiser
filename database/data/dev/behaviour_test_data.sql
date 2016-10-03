@@ -34,7 +34,7 @@ DO $$
 DECLARE
     tourn_name varchar := 'mission_test';
 BEGIN
-    PERFORM create_tournament(tourn_name, '2095-07-12', 3);
+    PERFORM create_tournament(tourn_name, '2095-07-12');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Mission the First');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, 'Mission the Second');
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 3, 'Mission the Third');

@@ -28,8 +28,8 @@ class TournamentRound(db.Model):
         if round_num <= 0:
             raise ValueError('Round ording must be a positive integer')
         # pylint: disable=no-member
-        if round_num > Tournament.query.filter_by(name=tournament).\
-        first().num_rounds + 1:
+        if round_num > Tournament.query.filter_by(name=tournament).first().\
+        rounds.count() + 1:
             raise ValueError('Tournament {} only has {} rounds'.format(
                 tournament,
                 round_num

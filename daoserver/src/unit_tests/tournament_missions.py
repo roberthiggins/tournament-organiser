@@ -25,7 +25,7 @@ class TournamentMissionsTests(TestCase):
         db.create_all()
         self.injector = TournamentInjector()
 
-        self.injector.inject(self.tourn_1, rounds=2)
+        self.injector.inject(self.tourn_1)
         self.injector.add_round(self.tourn_1, 1, None)
         self.injector.add_round(self.tourn_1, 2, None)
         self.tourn = Tournament(self.tourn_1)
