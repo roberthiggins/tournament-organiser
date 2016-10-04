@@ -54,8 +54,9 @@ class TournamentInjector(object):
 
         self.delete_scores()
 
-        for tourn in self.tournaments().all():
-            Tourn(tourn.name).set_number_of_rounds(0)
+        for tourn in [Tourn(t.name) for t in self.tournaments().all()]:
+            tourn.get_dao().in_progress = False
+            tourn.set_number_of_rounds(0)
 
         self.delete_accounts()
 

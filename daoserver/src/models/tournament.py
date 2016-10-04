@@ -34,6 +34,18 @@ def must_exist_in_db(func):
         return func(self, *args, **kwargs)
     return wrapped
 
+def not_in_progress(func):
+    """
+    Decorator to intercept actions that cannot be performed on an in-progress
+    tournament
+    """
+    def wrapped(self, *args, **kwargs): # pylint: disable=missing-docstring
+        if self.get_dao() is not None and self.get_dao().in_progress:
+            raise ValueError('You cannot perform this action on a tournament ' \
+                             'that is in progress')
+        return func(self, *args, **kwargs)
+    return wrapped
+
 # pylint: disable=no-member
 class Tournament(object):
     """A tournament model"""
@@ -76,6 +88,7 @@ class Tournament(object):
         return TournamentDAO.query.filter_by(name=self.tournament_id).first()
 
     @must_exist_in_db
+    @not_in_progress
     def confirm_entries(self):
         """ Check all the applications and create entries for all who qualify"""
 
@@ -105,6 +118,7 @@ class Tournament(object):
         """The number of rounds in the tournament"""
         return self.get_dao().rounds.count()
 
+    @not_in_progress
     def set_date(self, date):
         """Set the date for the tournament"""
         try:
@@ -113,6 +127,28 @@ class Tournament(object):
                 raise ValueError()
         except ValueError:
             raise ValueError('Enter a valid date')
+
+    @must_exist_in_db
+    @not_in_progress
+    def set_in_progress(self):
+        """
+        Attempt to mark the tournament as 'in progress'. After this point you
+        are unable to set rounds, missions, score_categories, entries, etc.
+
+        All those features need to have sane values for this to succeed.
+        """
+        if self.get_num_rounds() < 1:
+            raise ValueError('You need to add at least 1 round')
+        if len([x for x in self.get_missions() if x != 'TBA']) < 1:
+            raise ValueError('You need to set the missions')
+        if len(self.entries()) < 1:
+            raise ValueError('You need at least 1 entrant')
+        if len(self.list_score_categories()) < 1:
+            raise ValueError('You need to set the score categories')
+
+        self.get_dao().in_progress = True
+        db.session.add(self.get_dao())
+        db.session.commit()
 
     @must_exist_in_db
     def set_missions(self, missions=None):
@@ -133,12 +169,12 @@ class Tournament(object):
         return 'Missions set: {}'.format(missions)
 
     @must_exist_in_db
+    @not_in_progress
     def set_score_categories(self, new_categories):
         """
         Replace the existing score categories with those from the list. The list
         should contain a ScoreCategorys
         """
-
         # check for duplicates
         keys = [cat['name'] for cat in new_categories]
         if len(keys) != len(set(keys)):
@@ -242,6 +278,7 @@ class Tournament(object):
                                self.matching_strategy, self.table_strategy)
 
     @must_exist_in_db
+    @not_in_progress
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
         num_rounds = int(num_rounds)
