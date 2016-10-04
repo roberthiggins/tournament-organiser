@@ -23,6 +23,7 @@ DECLARE
     tourn_name varchar := 'painting_test';
 BEGIN
     tourn_id := create_tournament(tourn_name, '2095-10-10');
+    UPDATE tournament SET in_progress = TRUE WHERE id = tourn_id;
 
     PERFORM create_score_category(tourn_name, 'Fanciness', 10, TRUE, 4, 15);
     PERFORM add_player(tourn_name, tourn_id, 'stevemcqueen');

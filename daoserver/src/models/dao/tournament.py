@@ -21,6 +21,7 @@ class Tournament(db.Model):
         db.String(50),
         db.ForeignKey(Account.username),
         nullable=False)
+    in_progress = db.Column(db.Boolean, nullable=False, default=False)
 
     protected_object = db.relationship(ProtectedObject)
     creator = db.relationship(Account)

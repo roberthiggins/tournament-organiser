@@ -154,6 +154,7 @@ DECLARE
 BEGIN
 
     tourn_id := create_tournament(tourn_name, tourn_date);
+    UPDATE tournament SET in_progress = TRUE WHERE id = tourn_id;
 
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Kill')                        RETURNING id INTO round_1_id;
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, DEFAULT)                       RETURNING id INTO round_2_id;
