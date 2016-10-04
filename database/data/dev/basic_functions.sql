@@ -95,9 +95,15 @@ DECLARE
     prot_obj_id int := 0;
     game_id int := 0;
     perm_id int := 0;
+    bye boolean := true;
 BEGIN
+
+    IF ent_1_id IS NOT NULL AND ent_1_uname IS NOT NULL AND ent_2_id IS NOT NULL AND ent_2_uname IS NOT NULL THEN
+        bye = false;
+    END IF;
+
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO prot_obj_id;
-    INSERT INTO game VALUES(DEFAULT, round_id, table_num, prot_obj_id, True) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_id, table_num, prot_obj_id, bye) RETURNING id INTO game_id;
     INSERT INTO protected_object_permission VALUES (DEFAULT, prot_obj_id, prot_act_id) RETURNING id INTO perm_id;
 
     IF ent_1_id IS NOT NULL AND ent_1_uname IS NOT NULL THEN

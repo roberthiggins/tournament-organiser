@@ -12,7 +12,6 @@ describe("HTTP Method Test Suite", function () {
         .expectBodyContains("Tournament category_test does not have a round 1")
         .toss();
 
-    injector.postRounds("draw_test", 2);
     frisby.create("Check the draw")
         .get(API + "tournament/draw_test/rounds/1")
         .expectStatus(200)

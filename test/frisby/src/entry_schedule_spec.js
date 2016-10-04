@@ -8,7 +8,7 @@ describe("See the schedule for an entry in a tournament", function () {
     injector.createTournament("permission_test", "2095-07-06");
     injector.enterTournament("permission_test", "permission_test_player");
 
-    frisby.create("See lisa schedule")
+    frisby.create("See player_3 schedule")
         .get(API + "entry/schedule_test_player_3/schedule")
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
@@ -24,8 +24,7 @@ describe("See the schedule for an entry in a tournament", function () {
         ])
         .toss();
 
-    injector.postRounds("schedule_test", 4);
-    frisby.create("See homer schedule")
+    frisby.create("See schedule_test_player_1 schedule")
         .get(API + "entry/schedule_test_player_1/schedule")
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
@@ -42,18 +41,6 @@ describe("See the schedule for an entry in a tournament", function () {
                 "round": 2,
                 "opponent": "schedule_test_player_3"
             },
-            {
-                "game_id": Number,
-                "table": 3,
-                "round": 3,
-                "opponent": "BYE"
-            },
-            {
-                "game_id": Number,
-                "table": 3,
-                "round": 4,
-                "opponent": "schedule_test_player_4"
-            }
         ])
         .toss();
 
