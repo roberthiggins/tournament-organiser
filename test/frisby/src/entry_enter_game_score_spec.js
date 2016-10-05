@@ -89,7 +89,7 @@ describe("Enter score for single game for an entry", function () {
                 "enter_score_test_category_per_tournament_1", 5, 400,
                 "Cannot enter a per-tournament score " +
                 "(enter_score_test_category_per_tournament_1) for a game " +
-                "(game_id: " + gameId + ")");
+                "(id: " + gameId + ")");
         })
         .toss();
 });

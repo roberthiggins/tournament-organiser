@@ -218,33 +218,26 @@ class EnterScore(TestCase):
             player_id=self.player, tournament_id=self.tournament_1).first()
 
         self.assertRaises(
-            AttributeError,
+            TypeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
             self.category_2.name,
             5,
             game_id='foo')
         self.assertRaises(
-            AttributeError,
+            TypeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
             self.category_2.name,
             5,
             game_id=1000000)
         self.assertRaises(
-            AttributeError,
+            TypeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
             self.category_2.name,
             5,
             game_id=-1)
-        self.assertRaises(
-            AttributeError,
-            Tournament(self.tournament_1).enter_score,
-            entry.id,
-            self.category_2.name,
-            5,
-            game_id=0)
 
     def test_enter_score_bad_values(self):
         """These should all fail for one reason or another"""

@@ -5,7 +5,7 @@ It holds a tournament object for housing of scoring strategies, etc.
 """
 import datetime
 
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.authentication import PermissionDeniedException
@@ -15,6 +15,7 @@ from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker, PERMISSIONS
@@ -188,12 +189,8 @@ class Tournament(object):
                             ~ScoreCategory.name.in_(keys)))
             to_delete.delete(synchronize_session='fetch')
 
-
             for cat in new_categories:
                 upsert_tourn_score_cat(self.tournament_id, cat)
-
-            # check for clashes before actually writing
-            for cat in new_categories:
                 ScoreCategory.query.\
                     filter_by(tournament_id=self.tournament_id,
                               name=cat['name']).first().clashes()
@@ -204,6 +201,7 @@ class Tournament(object):
             raise
         except Exception:
             db.session.rollback()
+            raise
 
     @must_exist_in_db
     def details(self):
@@ -229,12 +227,18 @@ class Tournament(object):
         cat = db.session.query(ScoreCategory).filter_by(
             tournament_id=self.tournament_id, name=score_cat).first()
         try:
-            validate_score(score, cat, entry, game_id)
+            game = TournamentGame.query.filter_by(id=game_id).first()
+        except DataError:
+            db.session.rollback()
+            raise TypeError('{} not entered. Game {} cannot be found'.\
+                format(score, game_id))
+        try:
+            validate_score(score, cat, entry, game)
         except AttributeError:
             raise TypeError('Unknown category: {}'.format(score_cat))
 
+        write_score(self.get_dao(), entry, cat, score, game)
 
-        write_score(self.get_dao(), entry, cat, score, game_id)
 
     @must_exist_in_db
     def entries(self):
