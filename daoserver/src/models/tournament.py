@@ -222,7 +222,10 @@ class Tournament(object):
     @must_exist_in_db
     def enter_score(self, entry_id, score_cat, score, game_id=None):
         """Enter a score for score_cat into self for entry."""
-        write_score(self.get_dao(), entry_id, score_cat, score, game_id)
+        entry = TournamentEntry.query.filter_by(id=entry_id).first()
+        if entry is None:
+            raise ValueError('Unknown entrant: {}'.format(entry_id))
+        write_score(self.get_dao(), entry, score_cat, score, game_id)
 
     @must_exist_in_db
     def entries(self):

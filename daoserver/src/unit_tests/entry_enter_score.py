@@ -253,7 +253,7 @@ class EnterScore(TestCase):
 
         # bad entry
         self.assertRaises(
-            AttributeError,
+            ValueError,
             Tournament(self.tournament_1).enter_score,
             10000000,
             self.category_1.name,
