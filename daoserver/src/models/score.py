@@ -82,26 +82,16 @@ def validate_score(score, category, entry, game_id=None):
             raise invalid_score
 
 
-def write_score(tournament, entry, score_cat, score, game_id=None):
+def write_score(tournament, entry, category, score, game_id=None):
     """
     Enters a score for category into tournament for player.
 
     Expects: All fields required
-        - score_cat - e.g. round_3_battle
         - score - integer
 
     Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
         there is an issue inserting the score.
     """
-    # score_cat should mean something in the context of the tournie
-    cat = db.session.query(ScoreCategory).filter_by(
-        tournament_id=tournament.name, name=score_cat).first()
-
-    try:
-        validate_score(score, cat, entry, game_id)
-    except AttributeError:
-        raise TypeError('Unknown category: {}'.format(score_cat))
-
     # Has it already been entered?
     if game_id is None:
         # pylint: disable=no-member
@@ -110,14 +100,14 @@ def write_score(tournament, entry, score_cat, score, game_id=None):
             filter(and_(
                 TournamentScore.entry_id == entry.id,
                 TournamentScore.tournament_id == tournament.id,
-                ScoreCategory.id == cat.id)).first() is not None
+                ScoreCategory.id == category.id)).first() is not None
     else:
         try:
             # pylint: disable=no-member
             existing_score = GameScore.query.join(Score).\
                 filter(and_(GameScore.entry_id == entry.id, \
                             GameScore.game_id == game_id,
-                            Score.score_category_id == cat.id)).\
+                            Score.score_category_id == category.id)).\
                 first() is not None
         except DataError:
             db.session.rollback()
@@ -129,7 +119,7 @@ def write_score(tournament, entry, score_cat, score, game_id=None):
             '{} not entered. Score is already set'.format(score))
 
     try:
-        score_dao = Score(entry.id, cat.id, score)
+        score_dao = Score(entry.id, category.id, score)
         db.session.add(score_dao)
         db.session.flush()
 

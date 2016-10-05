@@ -19,7 +19,7 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker, PERMISSIONS
 from models.ranking_strategies import RankingStrategy
-from models.score import upsert_tourn_score_cat, write_score
+from models.score import upsert_tourn_score_cat, validate_score, write_score
 from models.table_strategy import ProtestAvoidanceStrategy
 from models.tournament_round import TournamentRound, DrawException
 
@@ -225,7 +225,16 @@ class Tournament(object):
         entry = TournamentEntry.query.filter_by(id=entry_id).first()
         if entry is None:
             raise ValueError('Unknown entrant: {}'.format(entry_id))
-        write_score(self.get_dao(), entry, score_cat, score, game_id)
+
+        cat = db.session.query(ScoreCategory).filter_by(
+            tournament_id=self.tournament_id, name=score_cat).first()
+        try:
+            validate_score(score, cat, entry, game_id)
+        except AttributeError:
+            raise TypeError('Unknown category: {}'.format(score_cat))
+
+
+        write_score(self.get_dao(), entry, cat, score, game_id)
 
     @must_exist_in_db
     def entries(self):
