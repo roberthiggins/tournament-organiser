@@ -71,7 +71,8 @@ def list_score_categories():
         'per_tournament': x.per_tournament,
         'min_val':        x.min_val,
         'max_val':        x.max_val,
-        'zero_sum':       x.zero_sum
+        'zero_sum':       x.zero_sum,
+        'opponent_score': x.opponent_score
     } for x in g.tournament.list_score_categories()]
 
 @TOURNAMENT.route('/', methods=['GET'])

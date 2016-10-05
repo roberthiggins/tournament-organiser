@@ -184,10 +184,10 @@ class Tournament(object):
         # pylint: disable=broad-except
         try:
             # Delete the ones no longer needed
-            to_delete = ScoreCategory.query.\
-                filter(and_(ScoreCategory.tournament_id == self.tournament_id,
-                            ~ScoreCategory.name.in_(keys)))
-            to_delete.delete(synchronize_session='fetch')
+            ScoreCategory.query.filter(and_(
+                ScoreCategory.tournament_id == self.tournament_id,
+                ~ScoreCategory.name.in_(keys)
+            )).delete(synchronize_session='fetch')
 
             for cat in new_categories:
                 upsert_tourn_score_cat(self.tournament_id, cat)
@@ -202,6 +202,7 @@ class Tournament(object):
         except Exception:
             db.session.rollback()
             raise
+
 
     @must_exist_in_db
     def details(self):

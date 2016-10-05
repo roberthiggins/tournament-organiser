@@ -11,7 +11,8 @@ CREATE TABLE score_category(
     per_tournament BOOLEAN NOT NULL DEFAULT FALSE,
     min_val        INTEGER,
     max_val        INTEGER,
-    zero_sum       BOOLEAN NOT NULL DEFAULT FALSE
+    zero_sum       BOOLEAN NOT NULL DEFAULT FALSE,
+    opponent_score BOOLEAN NOT NULL DEFAULT FALSE
 );
 COMMENT ON COLUMN score_category.percentage IS 'The raw score should be multiplied by this.';
 

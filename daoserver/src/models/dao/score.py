@@ -18,6 +18,7 @@ from models.dao.tournament import Tournament
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 
+# pylint: disable=too-many-instance-attributes
 class ScoreCategory(db.Model):
     """ A row from the score_category table"""
     __tablename__ = 'score_category'
@@ -31,6 +32,8 @@ class ScoreCategory(db.Model):
     per_tournament = db.Column(db.Boolean, nullable=False, default=False)
     percentage = db.Column(db.Integer, nullable=False, default=100)
     zero_sum = db.Column(db.Boolean, nullable=False, default=False)
+    opponent_score = db.Column(db.Boolean, nullable=False, default=False)
+
     tournament = db.relationship(Tournament, backref=db.backref(
         'score_categories', lazy='dynamic'))
 
@@ -45,16 +48,18 @@ class ScoreCategory(db.Model):
         self.set_min_max(args['min_val'], args['max_val'])
         self.set_percentage(args['percentage'])
         self.zero_sum = args.get('zero_sum', False)
+        self.opponent_score = args.get('opponent_score', False)
 
     def __repr__(self):
-        return '<ScoreCategory ({}, {}, {}, {}, {}, {}, {})>'.format(
+        return '<ScoreCategory ({}, {}, {}, {}, {}, {}, {}, {})>'.format(
             self.tournament_id,
             self.name,
             self.percentage,
             self.per_tournament,
             self.min_val,
             self.max_val,
-            self.zero_sum)
+            self.zero_sum,
+            self.opponent_score)
 
     def clashes(self):
         """
@@ -110,6 +115,8 @@ class ScoreCategory(db.Model):
         self.per_tournament = args['per_tournament']
         self.set_min_max(args['min_val'], args['max_val'])
         self.set_percentage(args['percentage'])
+        self.zero_sum = args.get('zero_sum', False)
+        self.opponent_score = args.get('opponent_score', False)
 
 
 class Score(db.Model):
