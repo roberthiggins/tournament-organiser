@@ -8,10 +8,10 @@ from sqlalchemy.sql.expression import and_
 
 from models.authentication import check_auth
 from models.dao.account import Account, add_account
-from models.dao.tournament import Tournament
+from models.dao.tournament import Tournament as TournDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS
-from models.tournament import all_tournaments_with_permission
+from models.tournament import all_tournaments_with_permission, Tournament
 
 # pylint: disable=no-member
 
@@ -122,17 +122,17 @@ class User(object):
 
     def get_last_tournament(self):
         """The last tournament for the user"""
-        return Tournament.query.join(TournamentEntry).filter(and_(
+        return TournDAO.query.join(TournamentEntry).filter(and_(
             TournamentEntry.player_id == self.username,
-            Tournament.date <= datetime.date.today()
-        )).order_by(Tournament.date.desc()).first()
+            TournDAO.date <= datetime.date.today()
+        )).order_by(TournDAO.date.desc()).first()
 
     def get_next_tournament(self):
         """The next tournament for the user"""
-        return Tournament.query.join(TournamentEntry).filter(and_(
+        return TournDAO.query.join(TournamentEntry).filter(and_(
             TournamentEntry.player_id == self.username,
-            Tournament.date >= datetime.date.today()
-        )).order_by(Tournament.date.asc()).first()
+            TournDAO.date >= datetime.date.today()
+        )).order_by(TournDAO.date.asc()).first()
 
     def get_organiser_actions(self):
         """Get all the actions the user can perform as a TO"""
@@ -179,16 +179,16 @@ class User(object):
                      'action': 'next_game',
                      'tournament': next_tourn.name} \
             if next_tourn is not None else None
+        tourn_rounds = [x for x in \
+                range(1, Tournament(next_tourn.name).get_num_rounds())] \
+            if next_tourn is not None else []
 
         draws = [{'text': 'Get the draw for {} round {}'.\
                           format(next_tourn.name, x),
                   'action': 'get_draw',
                   'tournament': next_tourn.name,
                   'round': x
-                 } for x in range(1, next_tourn.get_num_rounds())] \
-            if next_tourn is not None else []
-
-        draws = tuple(draws) if len(draws) > 0 else None
+                 } for x in tourn_rounds]
 
         return {
             'title': 'Play in a Tournament',
@@ -197,7 +197,7 @@ class User(object):
                 # Table layout
                 # {'text': 'Get the table layout',
                 #  'action': 'table_layout'},
-                draws,
+                tuple(draws) if len(draws) > 0 else None,
                 # Opponent army list
                 # {'text': 'Get an opponent army list',
                 #  'action': 'get_opponent'},
