@@ -9,16 +9,16 @@ Feature: Modify the scoring categories for a tournament
         Given I fill category 0 with "foo" "10" "10" "10"
         Given I fill category 1 with "bar" "10" "10" "10"
         Then I press "Set"
-        Then I should see "Score categories set" appear
+        Then I should see "Score categories set: foo, bar" appear
         Given I visit category page for "category_test"
-        Then the "0_name" field should contain "foo"
 
     @javascript
     Scenario: I modify the tournament categories through the webserver
         # Set
+        Given I fill category 0 with "foo" "10" "10" "10"
         Given I fill category 1 with "another_cat" "10" "10" "10"
         Then I press "Set"
-        Then I should see "Score categories set" appear
+        Then I should see "Score categories set: foo, another_cat" appear
         # Confirm
         Given I visit category page for "category_test"
         Then the "0_name" field should contain "foo"
@@ -26,7 +26,7 @@ Feature: Modify the scoring categories for a tournament
         Then the "2_name" field should contain ""
         # Re-submit
         Then I press "Set"
-        Then I should see "Score categories set" appear
+        Then I should see "Score categories set: foo, another_cat" appear
         Given I visit category page for "category_test"
         Then the "0_name" field should contain "foo"
         Then the "1_name" field should contain "another_cat"
