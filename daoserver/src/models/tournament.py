@@ -10,6 +10,7 @@ from sqlalchemy.sql.expression import and_
 
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
+from models.dao.game_entry import GameEntrant
 from models.dao.registration import TournamentRegistration
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
@@ -238,7 +239,12 @@ class Tournament(object):
         except AttributeError:
             raise TypeError('Unknown category: {}'.format(score_cat))
 
+        if cat.opponent_score:
+            entry = game.entrants.filter(GameEntrant.entrant_id != entry.id).\
+                first().entrant
+
         write_score(self.get_dao(), entry, cat, score, game)
+        return 'Score entered for {}: {}'.format(entry.player_id, score)
 
 
     @must_exist_in_db

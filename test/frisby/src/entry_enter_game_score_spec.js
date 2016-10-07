@@ -14,6 +14,7 @@ var frisby = require("frisby"),
         [tournament + "_category_per_tournament_to", 1, true, 1, 5],
         [tournament + "_category_per_game_1", 1, false, 4, 15, true],
         [tournament + "_category_per_game_2", 1, false, 1, 5, true],
+        [tournament + "_category_per_game_opp", 1, false, 1, 5, false, true],
         [tournament + "_category_per_game_su", 1, false, 1, 5, true],
         [tournament + "_category_per_game_to", 1, false, 1, 5, true]
     ]);
@@ -21,6 +22,7 @@ var frisby = require("frisby"),
     injector.createUser(p2);
     injector.enterTournament(tournament, p1);
     injector.enterTournament(tournament, p2);
+    injector.postRounds("enter_score_test", 1);
 })();
 
 var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
@@ -43,7 +45,6 @@ var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
 describe("Enter score for single game for an entry", function () {
     "use strict";
 
-    injector.postRounds("enter_score_test", 1);
     frisby.create("get game_id of next game for enter_score_test_p_1")
         .get(API + p1 + "/nextgame")
         .expectStatus(200)
@@ -90,6 +91,24 @@ describe("Enter score for single game for an entry", function () {
                 "Cannot enter a per-tournament score " +
                 "(enter_score_test_category_per_tournament_1) for a game " +
                 "(id: " + gameId + ")");
+        })
+        .toss();
+});
+
+describe("Oppostion scores", function() {
+    "use strict";
+    frisby.create("get game_id of next game for enter_score_test_p_2")
+        .get(API + p1 + "/nextgame")
+        .expectStatus(200)
+        .afterJSON(function (body) {
+            var gameId = body.game_id;
+            postScore("P1 enters opp score", gameId, p1,
+                "enter_score_test_category_per_game_opp", 4, 200,
+                "Score entered for enter_score_test_p_2: 4"); // NB P2
+
+            postScore("P1 enters opp score again", gameId, p1,
+                "enter_score_test_category_per_game_opp", 4, 400,
+                "4 not entered. Score is already set");
         })
         .toss();
 });

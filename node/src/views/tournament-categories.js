@@ -81,12 +81,13 @@ var serializeCategory = function($categoryDiv) {
     // Checkboxes won't be serialized if false
     category["per_tournament"] = category["per_tournament"] || false;
     category["zero_sum"] = category["zero_sum"] || false;
+    category["opponent_score"] = category["opponent_score"] || false;
 
     return category;
 };
 
 var category = function(idx, name, pct, per_tournament, min_val, max_val,
-                        zero_sum) {
+                        zero_sum, opp_score) {
     return (
         <div className="category" key={idx + "_category"}>
             <ScoreField name="Category" id={idx + "_name"} val={name}
@@ -103,6 +104,8 @@ var category = function(idx, name, pct, per_tournament, min_val, max_val,
                         key={idx + "_max_val"} />
             <ScoreCheckbox id={idx + "_zero_sum"} checked={zero_sum}
                            name="Zero Sum (score must be shared between game entrants)" />
+            <ScoreCheckbox id={idx + "_opponent_score"} checked={opp_score}
+                           name="Opponent enters score" />
         </div>
         );
 };
@@ -123,12 +126,13 @@ var TournamentCategoriesPage = React.createClass({
                         lastIdx = idx;
                         return category(idx, cat.name, cat.percentage,
                             cat.per_tournament, cat.min_val, cat.max_val,
-                            cat.zero_sum);
+                            cat.zero_sum, cat.opponent_score);
                     });
                 }
                 while (widgets.length < numLines) {
                     lastIdx = lastIdx + 1;
-                    widgets.push(category(lastIdx, "", "", false, "", "", false));
+                    widgets.push(
+                        category(lastIdx, "", "", false, "", "", false, false));
                 }
 
                 result.categories = widgets;

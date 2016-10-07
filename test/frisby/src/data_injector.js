@@ -69,7 +69,8 @@ exports.setCategories = function(tourn, categories){
             "per_tournament": cat[2],
             "min_val": cat[3],
             "max_val": cat[4],
-            "zero_sum": cat[5] || false
+            "zero_sum": cat[5] || false,
+            "opponent_score": cat[6] || false
             };
     });
 

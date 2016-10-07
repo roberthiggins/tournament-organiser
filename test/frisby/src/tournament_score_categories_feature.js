@@ -3,14 +3,15 @@ var frisby = require("frisby"),
     API = process.env.API_ADDR +
             "tournament/category_test/score_categories";
 
-var jsonCat = function(id, name, pct, per_tourn, min, max, z_sum) {
+var jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
     var cat = {
         "name": name,
         "percentage": pct,
         "per_tournament": per_tourn,
         "min_val": min,
         "max_val": max,
-        "zero_sum": z_sum
+        "zero_sum": z_sum,
+        "opponent_score": opp
         };
     if (id) {
         cat.id = id;
@@ -35,11 +36,12 @@ describe("Set categories normal function", function () {
             "per_tournament": Boolean,
             "min_val": Number,
             "max_val": Number,
-            "zero_sum": Boolean
+            "zero_sum": Boolean,
+            "opponent_score": Boolean
         })
         .expectJSON([
-            jsonCat(Number, "cat_t_one", 8, true, 4, 12, false),
-            jsonCat(Number, "cat_t_two", 13, false, 3, 11, true)
+            jsonCat(Number, "cat_t_one", 8, true, 4, 12, false, false),
+            jsonCat(Number, "cat_t_two", 13, false, 3, 11, true, true)
         ])
         .toss();
 
@@ -49,7 +51,7 @@ describe("Set categories normal function", function () {
         .post(API, {
             categories: ["categories_3"],
             categories_3:
-                jsonCat(null, "cat_t_three", 99, true, 1, 2, false)
+                jsonCat(null, "cat_t_three", 99, true, 1, 2, false, false)
             }, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", "Basic " +
             new Buffer("category_test_to:password").toString("base64"))
@@ -60,7 +62,7 @@ describe("Set categories normal function", function () {
                 .expectStatus(200)
                 .expectHeaderContains("content-type", "application/json")
                 .expectJSON([jsonCat(Number, "cat_t_three", 99, true,
-                    1, 2, false)])
+                    1, 2, false, false)])
                 .toss();
             })
         .toss();
@@ -110,14 +112,14 @@ describe("Set categories malformed", function () {
         .post(API, {
             categories: ["categories_3"],
             categories_1:
-                jsonCat(null, "cat_t_no_match", 5, true, 1, 2, false)
+                jsonCat(null, "cat_t_no_match", 5, true, 1, 2, false, false)
             }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create("Incorrect: No names")
         .post(API, {
             categories_1:
-                jsonCat(null, "cat_t_no_names", 5, true, 1, 2, false)
+                jsonCat(null, "cat_t_no_names", 5, true, 1, 2, false, false)
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
