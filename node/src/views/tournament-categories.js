@@ -12,7 +12,6 @@ var ScoreField = React.createClass({
     propTypes: {
         id: React.PropTypes.string.isRequired,
         name: React.PropTypes.string.isRequired,
-        type: React.PropTypes.string.isRequired,
         val: React.PropTypes.oneOfType(
                 [React.PropTypes.string, React.PropTypes.number])
     },
@@ -20,11 +19,37 @@ var ScoreField = React.createClass({
         return (
             <span>
                 <label htmlFor={this.props.id}>{this.props.name}:</label>
-                <input  type={this.props.type}
+                <input  type="text"
                         name={this.props.id}
                         id={this.props.id}
                         onChange={this.handleChange}
                         value={this.state.value } />
+            </span>
+        );
+    }
+});
+
+var ScoreCheckbox = React.createClass({
+    getInitialState: function() {
+        return {checked: this.props.checked};
+    },
+    handleChange: function(event) {
+        this.setState({checked: event.target.checked});
+    },
+    propTypes: {
+        checked: React.PropTypes.bool.isRequired,
+        id: React.PropTypes.string.isRequired,
+        name: React.PropTypes.string.isRequired,
+    },
+    render: function() {
+        return (
+            <span>
+                <label htmlFor={this.props.id}>{this.props.name}:</label>
+                <input  type="checkbox"
+                        name={this.props.id}
+                        id={this.props.id}
+                        checked={this.state.checked}
+                        onChange={this.handleChange} />
             </span>
         );
     }
@@ -44,19 +69,19 @@ var Category = React.createClass({
     render: function() {
         return (
             <div className="category">
-                <ScoreField type="text" name="Category"
+                <ScoreField name="Category"
                             id={this.props.idx + "_name"}
                             val={this.props.vals.name} />
-                <ScoreField type="text" name="Percentage"
+                <ScoreField name="Percentage"
                             id={this.props.idx + "_percentage"}
                             val={this.props.vals.percentage} />
-                <ScoreField type="checkbox" name="Once per tournament?"
-                            id={this.props.idx + "_per_tournament"}
-                            checked={this.props.vals.per_tournament} />
-                <ScoreField type="text" name="Min Score"
+                <ScoreCheckbox name="Once per tournament?"
+                               id={this.props.idx + "_per_tournament"}
+                               checked={this.props.vals.per_tournament} />
+                <ScoreField name="Min Score"
                             id={this.props.idx + "_min_val"}
                             val={this.props.vals.min_val} />
-                <ScoreField type="text" name="Max Score"
+                <ScoreField name="Max Score"
                             id={this.props.idx + "_max_val"}
                             val={this.props.vals.max_val} />
             </div>
@@ -72,7 +97,7 @@ Category.serialize = function($categoryDiv) {
                 // was only there for display help and convert checkboxes
                 // to true
                 return {
-                    name: dict.name.substr(2),
+                    key: dict.name.substr(2),
                     value: dict.value === "on" ? true : dict.value
                 };
             }),
