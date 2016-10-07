@@ -43,21 +43,12 @@ def upsert_tourn_score_cat(tournament_id, cat):
     dao = ScoreCategory.query.\
         filter_by(tournament_id=tournament_id, name=cat['name']).first()
 
-    score_args = {
-        'tournament_id': tournament_id,
-        'name':          cat['name'],
-        'percentage':    cat['percentage'],
-        'per_tourn':     cat['per_tourn'],
-        'min_val':       cat['min_val'],
-        'max_val':       cat['max_val'],
-        'zero_sum':      cat['zero_sum']
-    }
-
+    cat['tournament_id'] = tournament_id
 
     if dao is None:
-        dao = ScoreCategory(**score_args)
+        dao = ScoreCategory(**cat)
     else:
-        dao.update(**score_args)
+        dao.update(**cat)
 
     db.session.add(dao)
     db.session.flush()
