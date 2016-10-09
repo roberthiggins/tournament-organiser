@@ -33,7 +33,13 @@ var ScoreField = React.createClass({
 var Category = React.createClass({
     propTypes: {
         idx: React.PropTypes.number.isRequired,
-        vals: React.PropTypes.object.isRequired
+        vals: React.PropTypes.object
+    },
+    getDefaultProps: function(){
+        return {
+            vals: {name: "", percentage: "", per_tournament: false,
+                   min_val: "", max_val: ""}
+        };
     },
     render: function() {
         return (
@@ -70,13 +76,11 @@ var InputWidget = React.createClass({
             categoryFields = this.props.categories.map(function(cat, idx) {
                 lastIdx = idx;
                 return (<Category vals={cat} idx={idx} key={idx} />);
-            }),
-            emptyCats = { name: "", percentage: "", per_tournament: "",
-                min_val: "", max_val: ""};
+            });
         while (categoryFields.length < numLines) {
             lastIdx = lastIdx + 1;
             categoryFields.push(
-                <Category vals={emptyCats} idx={lastIdx} key={lastIdx} />);
+                <Category idx={lastIdx} key={lastIdx} />);
         }
 
         return (
