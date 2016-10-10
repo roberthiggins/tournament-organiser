@@ -9,7 +9,7 @@ Feature: Enter a score for a player
     @javascript
     Scenario: Logged out
         Given I am on "/logout"
-        Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
+        Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_5/entergamescore"
         Then I should be on "/login"
 
     @javascript
@@ -24,12 +24,8 @@ Feature: Enter a score for a player
 
     @javascript
     Scenario: Logged in
-        When I am on "/tournament/enter_score_test/rounds"
-        Then I should see "Number of rounds" appear
-        When I fill in "rounds" with "6"
-        When I press "Set"
-        Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
-        Then I should see "Enter score for enter_score_test, Round 4" appear
+        Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_5/entergamescore"
+        Then I should see "Enter score for enter_score_test, Round 2" appear
 
     @javascript
     Scenario Outline: I enter some scores
@@ -42,7 +38,7 @@ Feature: Enter a score for a player
         Then I should see "<content>" appear
         Examples:
             | auth                      |user                       | score | content                                        |
-            | enter_score_test_player_2 | enter_score_test_player_1 |  5    | Permission denied                              |
-            | enter_score_test_player_1 | enter_score_test_player_1 |  0    | Invalid score: 0                               |
-            | enter_score_test_player_1 | enter_score_test_player_1 |  5    | Score entered for enter_score_test_player_1: 5 |
-            | enter_score_test_player_1 | enter_score_test_player_1 |  5    | 5 not entered. Score is already set            |
+            | enter_score_test_player_2 | enter_score_test_player_5 |  5    | Permission denied                              |
+            | enter_score_test_player_5 | enter_score_test_player_5 |  0    | Invalid score: 0                               |
+            | enter_score_test_player_5 | enter_score_test_player_5 |  5    | Score entered for enter_score_test_player_5: 5 |
+            | enter_score_test_player_5 | enter_score_test_player_5 |  5    | 5 not entered. Score is already set            |

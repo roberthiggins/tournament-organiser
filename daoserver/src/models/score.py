@@ -1,7 +1,7 @@
 """
 Logic for scores goes here
 """
-from sqlalchemy.exc import DataError, IntegrityError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.dao.db_connection import db
@@ -22,7 +22,7 @@ def is_score_entered(game_dao):
     if per_game_scores <= 0:
         raise AttributeError(
             '{} does not have any scores associated with it'.\
-            format(game_dao))
+            format(game_dao.tournament_round.tournament.name))
 
     scores_expected = per_game_scores * len(game_dao.entrants.all())
 
@@ -43,120 +43,88 @@ def upsert_tourn_score_cat(tournament_id, cat):
     dao = ScoreCategory.query.\
         filter_by(tournament_id=tournament_id, name=cat['name']).first()
 
-    score_args = {
-        'tournament_id': tournament_id,
-        'name':          cat['name'],
-        'percentage':    cat['percentage'],
-        'per_tourn':     cat['per_tourn'],
-        'min_val':       cat['min_val'],
-        'max_val':       cat['max_val']
-    }
-
+    cat['tournament_id'] = tournament_id
 
     if dao is None:
-        dao = ScoreCategory(**score_args)
+        dao = ScoreCategory(**cat)
     else:
-        dao.update(**score_args)
+        dao.update(**cat)
 
     db.session.add(dao)
     db.session.flush()
 
 
-def validate_score(score, category, entry_id, game_id=None):
+def validate_score(score, category, entry, game=None):
     """Validate an entered score. Returns True or raises Exception"""
-    try:
-        score = int(score)
-        if score < category.min_val or score > category.max_val:
-            raise ValueError()
+    invalid_score = ValueError('Invalid score: {}'.format(score))
+    score = int(score)
+    if score < category.min_val or score > category.max_val:
+        raise invalid_score
 
-        if game_id and category.per_tournament:
-            raise TypeError('Cannot enter a per-tournament score '\
-                '({}) for a game (game_id: {})'.\
-                format(category.name, game_id))
+    if game is None and not category.per_tournament:
+        raise TypeError('{} should be entered per-tournament'.\
+            format(category.name))
 
-        if game_id is None and not category.per_tournament:
-            raise TypeError('{} should be entered per-tournament'.\
-                format(category.name))
+    if game is not None and category.per_tournament:
+        raise TypeError('Cannot enter a per-tournament score '\
+            '({}) for a game (id: {})'.\
+            format(category.name, game.id))
 
-        # If zero sum we need to check the score entered by the opponent
-        if category.zero_sum:
-            # pylint: disable=no-member
-            game_scores = GameScore.query.join(Score, ScoreCategory).\
-                    filter(and_(GameScore.game_id == game_id,
-                                ScoreCategory.name == category.name,
-                                GameScore.entry_id != entry_id)).all()
-            existing_score = sum([x.score.value for x in game_scores])
-            if existing_score + score > category.max_val:
-                raise ValueError()
-
-    except ValueError:
-        raise ValueError('Invalid score: {}'.format(score))
+    # If zero sum we need to check the score entered by the opponent
+    if game is not None and category.zero_sum:
+        # pylint: disable=no-member
+        game_scores = GameScore.query.join(Score, ScoreCategory).\
+                filter(and_(GameScore.game_id == game.id,
+                            ScoreCategory.name == category.name,
+                            GameScore.entry_id != entry.id)).all()
+        existing_score = sum([x.score.value for x in game_scores])
+        if existing_score + score > category.max_val:
+            raise invalid_score
 
 
-def write_score(tournament, entry_id, score_cat, score, game_id=None):
+def write_score(tournament, entry, category, score, game=None):
     """
     Enters a score for category into tournament for player.
 
     Expects: All fields required
-        - entry_id - of the entry
-        - score_cat - e.g. round_3_battle
         - score - integer
 
     Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
         there is an issue inserting the score.
     """
-    # score_cat should mean something in the context of the tournie
-    cat = db.session.query(ScoreCategory).filter_by(
-        tournament_id=tournament.name, name=score_cat).first()
-
-    try:
-        validate_score(score, cat, entry_id, game_id)
-    except AttributeError:
-        raise TypeError('Unknown category: {}'.format(score_cat))
-
+    # pylint: disable=no-member
     # Has it already been entered?
-    if game_id is None:
-        # pylint: disable=no-member
+    if game is None:
         existing_score = TournamentScore.query.join(Score).\
             join(ScoreCategory).\
             filter(and_(
-                TournamentScore.entry_id == entry_id,
+                TournamentScore.entry_id == entry.id,
                 TournamentScore.tournament_id == tournament.id,
-                ScoreCategory.id == cat.id)).first() is not None
+                ScoreCategory.id == category.id)).first()
     else:
-        try:
-            # pylint: disable=no-member
-            existing_score = GameScore.query.join(Score).\
-                filter(and_(GameScore.entry_id == entry_id, \
-                            GameScore.game_id == game_id,
-                            Score.score_category_id == cat.id)).\
-                first() is not None
-        except DataError:
-            db.session.rollback()
-            raise AttributeError('{} not entered. Game {} cannot be found'.\
-                format(score, game_id))
+        existing_score = GameScore.query.join(Score).\
+            filter(and_(GameScore.entry_id == entry.id, \
+                        GameScore.game_id == game.id,
+                        Score.score_category_id == category.id)).first()
 
-    if existing_score:
+    if existing_score is not None:
         raise ValueError(
             '{} not entered. Score is already set'.format(score))
 
     try:
-        score_dao = Score(entry_id, cat.id, score)
+        score_dao = Score(entry.id, category.id, score)
         db.session.add(score_dao)
         db.session.flush()
 
-        if game_id is not None:
-            db.session.add(GameScore(entry_id, game_id, score_dao.id))
+        if game is not None:
+            db.session.add(GameScore(entry.id, game.id, score_dao.id))
         else:
             db.session.add(
-                TournamentScore(entry_id, tournament.id, score_dao.id))
+                TournamentScore(entry.id, tournament.id, score_dao.id))
         db.session.commit()
     except IntegrityError as err:
         db.session.rollback()
         if 'is not present in table "entry"' in err.__repr__():
             raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
-                format(score, entry_id))
-        elif 'is not present in table "game"' in err.__repr__():
-            raise AttributeError('{} not entered. Game {} cannot be found'.\
-                format(score, game_id))
+                format(score, entry.id))
         raise err

@@ -1,248 +1,139 @@
-describe('Enter score for single game for an entry', function () {
-    'use strict';
-    var frisby = require('frisby'),
-        API = process.env.API_ADDR + 'tournament/enter_score_test/entry/';
+var frisby = require("frisby"),
+    injector = require("./data_injector"),
+    tournament = "enter_score_test",
+    p1 = tournament + "_p_1",
+    p2 = tournament + "_p_2",
+    API = process.env.API_ADDR + "tournament/" + tournament + "/entry/";
 
-    // Some setup
-    frisby.create('Set enter_score_test to 1 round')
-        .post(
-            process.env.API_ADDR + 'tournament/enter_score_test/rounds',
-            {numRounds: 1}
-        )
-        .addHeader('Authorization', "Basic " +
-            new Buffer('superuser:password').toString("base64"))
-        .expectStatus(200)
+(function setup() {
+    injector.createUser("charlie_murphy");
+    injector.createTournament(tournament, "2095-10-10");
+    injector.setCategories(tournament, [
+        [tournament + "_category_per_tournament_1", 1, true, 4, 15],
+        [tournament + "_category_per_tournament_su", 1, true, 1, 5],
+        [tournament + "_category_per_tournament_to", 1, true, 1, 5],
+        [tournament + "_category_per_game_1", 1, false, 4, 15, true],
+        [tournament + "_category_per_game_2", 1, false, 1, 5, true],
+        [tournament + "_category_per_game_su", 1, false, 1, 5, true],
+        [tournament + "_category_per_game_to", 1, false, 1, 5, true]
+    ]);
+    injector.createUser(p1);
+    injector.createUser(p2);
+    injector.enterTournament(tournament, p1);
+    injector.enterTournament(tournament, p2);
+})();
+
+var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
+    var key = scoreKey ? scoreKey : "enter_score_test_category_per_game_1";
+    frisby.create("POST score: " + msg)
+        .post(API + p1 + "/entergamescore",
+            {
+                game_id: gameId,
+                key: key,
+                value: score
+            },
+            {json: true, inspectOnFailure: true})
+        .addHeader("Authorization", "Basic " +
+            new Buffer(user + ":password").toString("base64"))
+        .expectStatus(code)
+        .expectBodyContains(resp)
         .toss();
-    frisby.create('get game_id of next game for enter_score_test_p_1')
-        .get(API + 'enter_score_test_p_1/nextgame')
+};
+
+describe("Enter score for single game for an entry", function () {
+    "use strict";
+
+    injector.postRounds("enter_score_test", 1);
+    frisby.create("get game_id of next game for enter_score_test_p_1")
+        .get(API + p1 + "/nextgame")
         .expectStatus(200)
         .afterJSON(function (body) {
             var gameId = body.game_id;
 
-            frisby.create('No auth enters a score')
-                .post(API + 'enter_score_test_p_1/entergamescore',
+            frisby.create("No auth enters a score")
+                .post(API + p1 + "/entergamescore",
                     {
                         game_id: gameId,
-                        key: 'enter_score_test_category_per_game_1',
+                        key: "enter_score_test_category_per_game_1",
                         value: 5
                     },
-                    {json: true})
+                    {json: true, inspectOnFailure: true})
                 .expectStatus(401)
-                .expectBodyContains('Could not verify your access level')
+                .expectBodyContains("Could not verify your access level")
                 .toss();
 
-            frisby.create('Non-playing user enters a score')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_1',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " +
-                    new Buffer('charlie_murphy:password').toString("base64"))
-                .expectStatus(403)
-                .expectBodyContains('Permission denied')
-                .toss();
+            postScore("Non-playing user", gameId, "charlie_murphy", null, 5,
+                403, "Permission denied");
+            postScore("Different entry", gameId, p2, null, 5, 403,
+                "Permission denied");
+            postScore("Superuser", gameId, "superuser",
+                "enter_score_test_category_per_game_su", 5, 200,
+                "Score entered for enter_score_test_p_1: 5");
+            postScore("TO", gameId, "enter_score_test_to",
+                "enter_score_test_category_per_game_to", 5, 200,
+                "Score entered for enter_score_test_p_1: 5");
+            postScore("Player", gameId, p1, null, 5, 200,
+                "Score entered for enter_score_test_p_1: 5");
 
-            frisby.create('Different entry enters a score')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_1',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_2:password').toString("base64"))
-                .expectStatus(403)
-                .expectBodyContains('Permission denied')
-                .toss();
+            postScore("Player enters a score twice",gameId,  p1, null, 4, 400,
+                "4 not entered. Score is already set");
 
-            frisby.create('superuser enters a score')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_su',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " +
-                    new Buffer('superuser:password').toString("base64"))
-                .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1: 5')
-                .toss();
-
-
-            frisby.create('to enters a score')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_to',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_to:password').toString("base64"))
-                .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1: 5')
-                .toss();
-
-            frisby.create('player enters a score')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_1',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1' +
-                    ': 5')
-                .toss();
-
-
-            frisby.create('player enters a score twice: first score')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_2',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1: 5')
-                .toss();
-            frisby.create('player enters a score twice: again')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_2',
-                        value: 4
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(400)
-                .expectBodyContains('4 not entered. Score is already set')
-                .toss();
-
-
-            frisby.create('score too low')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_3',
-                        value: 0
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(400)
-                .expectBodyContains('Invalid score: 0')
-                .toss();
-
-
-            frisby.create('score too high')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_3',
-                        value: 6
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(400)
-                .expectBodyContains('Invalid score: 6')
-                .toss();
-
-            frisby.create('Non-existent category')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_non_existent',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(400)
-                .expectBodyContains('Unknown category: ' +
-                    'enter_score_test_category_non_existent')
-                .toss();
-
-            frisby.create('Per tournament category')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_1',
-                        value: 5
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(400)
-                .expectBodyContains('Cannot enter a per-tournament score ' +
-                    '(enter_score_test_category_1) for a game (game_id: ' +
-                    gameId + ')')
-                .toss();
-
+            postScore("Score too low", gameId, p1, null, 0, 400,
+                "Invalid score: 0");
+            postScore("Score too high", gameId, p1, null, 16, 400,
+                "Invalid score: 16");
+            postScore("Fake category", gameId, p1,
+                "enter_score_test_category_non_existent", 5, 400,
+                "Unknown category: enter_score_test_category_non_existent");
+            postScore("Per tournament category", gameId, p1,
+                "enter_score_test_category_per_tournament_1", 5, 400,
+                "Cannot enter a per-tournament score " +
+                "(enter_score_test_category_per_tournament_1) for a game " +
+                "(id: " + gameId + ")");
         })
         .toss();
+});
 
-    frisby.create('get game_id of next game for enter_score_test_p_2')
-        .get(API + 'enter_score_test_p_2/nextgame')
+describe("Zero Sum scores", function () {
+    "use strict";
+
+    frisby.create("get game_id of next game for enter_score_test_p_2")
+        .get(API + p2 + "/nextgame")
         .expectStatus(200)
         .afterJSON(function (body) {
             var gameId = body.game_id;
 
-            frisby.create('player enters a zero_sum score that is too high')
-                .post(API + 'enter_score_test_p_1/entergamescore',
-                    {
-                        game_id: gameId,
-                        key: 'enter_score_test_category_per_game_4',
-                        value: 4
-                    },
-                    {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_1:password').toString("base64"))
-                .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_1' +
-                    ': 4')
-                .toss();
+            postScore("P1 enters zero_sum score", gameId, p1,
+                "enter_score_test_category_per_game_2", 4, 200,
+                "Score entered for enter_score_test_p_1: 4");
 
-            frisby.create('player enters a zero_sum score that is too high')
-                .post(API + 'enter_score_test_p_2/entergamescore',
+            frisby.create("player 2 enters a zero_sum score that is too high")
+                .post(API + p2 + "/entergamescore",
                     {
                         game_id: gameId,
-                        key: 'enter_score_test_category_per_game_4',
+                        key: "enter_score_test_category_per_game_2",
                         value: 2
                     },
                     {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_2:password').toString("base64"))
+                .addHeader("Authorization", "Basic " + new Buffer(
+                    "enter_score_test_p_2:password").toString("base64"))
                 .expectStatus(400)
-                .expectBodyContains('Invalid score: 2')
+                .expectBodyContains("Invalid score: 2")
                 .toss();
 
-            frisby.create('player enters a zero_sum score acceptably')
-                .post(API + 'enter_score_test_p_2/entergamescore',
+            frisby.create("player enters a zero_sum score acceptably")
+                .post(API + p2 + "/entergamescore",
                     {
                         game_id: gameId,
-                        key: 'enter_score_test_category_per_game_4',
+                        key: "enter_score_test_category_per_game_2",
                         value: 1
                     },
                     {json: true})
-                .addHeader('Authorization', "Basic " + new Buffer(
-                    'enter_score_test_p_2:password').toString("base64"))
+                .addHeader("Authorization", "Basic " + new Buffer(
+                    "enter_score_test_p_2:password").toString("base64"))
                 .expectStatus(200)
-                .expectBodyContains('Score entered for enter_score_test_p_2' +
-                    ': 1')
+                .expectBodyContains(
+                    "Score entered for enter_score_test_p_2: 1")
                 .toss();
 
         })

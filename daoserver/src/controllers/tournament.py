@@ -70,7 +70,8 @@ def list_score_categories():
         'percentage':     x.percentage,
         'per_tournament': x.per_tournament,
         'min_val':        x.min_val,
-        'max_val':        x.max_val
+        'max_val':        x.max_val,
+        'zero_sum':       x.zero_sum
     } for x in g.tournament.list_score_categories()]
 
 @TOURNAMENT.route('/', methods=['GET'])
@@ -82,10 +83,10 @@ def list_tournaments():
     dicts - {name: '', date, 'YY-MM-DD', rounds: 1}
     """
     # pylint: disable=no-member
-    details = [{'name': x.name, 'date': x.date, 'rounds': x.num_rounds}
+    details = [{'name': x.name, 'date': x.date, 'rounds': x.rounds.count()}
                for x in TournamentDAO.query.all()]
 
-    return {'tournaments' : details}
+    return {'tournaments' : sorted(details, key=lambda to: to['name'])}
 
 @TOURNAMENT.route('/<tournament_id>/register/<username>', methods=['POST'])
 @requires_auth
@@ -98,6 +99,7 @@ def register():
     rego = TournamentRegistration(g.username, g.tournament_id)
     rego.add_to_db()
     g.tournament.confirm_entries()
+    g.tournament.make_draws()
 
     return 'Application Submitted'
 
@@ -130,13 +132,7 @@ def set_score_categories():
             cat = json.loads(request.values.get(json_cat, []))
         except TypeError:
             cat = request.get_json().get(json_cat)
-
-        new_categories.append({
-            'name':       cat[0],
-            'percentage': cat[1],
-            'per_tourn':  cat[2],
-            'min_val':    cat[3],
-            'max_val':    cat[4]})
+        new_categories.append(cat)
 
     g.tournament.set_score_categories(new_categories)
 

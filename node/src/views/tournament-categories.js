@@ -33,7 +33,13 @@ var ScoreField = React.createClass({
 var Category = React.createClass({
     propTypes: {
         idx: React.PropTypes.number.isRequired,
-        vals: React.PropTypes.object.isRequired
+        vals: React.PropTypes.object
+    },
+    getDefaultProps: function(){
+        return {
+            vals: {name: "", percentage: "", per_tournament: false,
+                   min_val: "", max_val: ""}
+        };
     },
     render: function() {
         return (
@@ -57,38 +63,7 @@ var Category = React.createClass({
         );
     }
 });
-
-var InputWidget = React.createClass({
-    propTypes: {
-        categories: React.PropTypes.array,
-        submitHandler: React.PropTypes.func.isRequired
-    },
-    render: function() {
-
-        var numLines = 5,
-            lastIdx = -1,
-            categoryFields = this.props.categories.map(function(cat, idx) {
-                lastIdx = idx;
-                return (<Category vals={cat} idx={idx} key={idx} />);
-            }),
-            emptyCats = { name: "", percentage: "", per_tournament: "",
-                min_val: "", max_val: ""};
-        while (categoryFields.length < numLines) {
-            lastIdx = lastIdx + 1;
-            categoryFields.push(
-                <Category vals={emptyCats} idx={lastIdx} key={lastIdx} />);
-        }
-
-        return (
-            <form onSubmit={this.props.submitHandler}>
-                {categoryFields}
-                <button type="submit">Set</button>
-            </form>
-        );
-    }
-});
-
-var serializeCategory = function($categoryDiv) {
+Category.serialize = function($categoryDiv) {
     var elementsAsDictionaries = $categoryDiv
             .find(":input:text[value!=''],:input:checkbox:checked")
             .serializeArray()
@@ -112,23 +87,43 @@ var serializeCategory = function($categoryDiv) {
         categoryValues.push(elem.value);
     });
 
-    return categoryValues;
-};
+    if (categoryValues.length !== 5 && categoryValues.length !== 0) {
+        return null;
+    }
 
+    return {
+        "name": categoryValues[0],
+        "percentage": categoryValues[1],
+        "per_tourn": categoryValues[2],
+        "min_val": categoryValues[3],
+        "max_val": categoryValues[4]
+        };
+};
 
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
-        return ({error: "", successText: "", tournament: "", categories: [],
-                 inputWidget : null});
+        return ({error: "", successText: "", tournament: "", categories: []});
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
+                var numLines = 5,
+                    lastIdx = -1,
+                    widgets = [];
+
+                if (result.categories) {
+                    widgets = result.categories.map(function(cat, idx) {
+                        lastIdx = idx;
+                        return (<Category vals={cat} idx={idx} key={idx} />);
+                    });
+                }
+                while (widgets.length < numLines) {
+                    lastIdx = lastIdx + 1;
+                    widgets.push(<Category idx={lastIdx} key={lastIdx} />);
+                }
+
+                result.categories = widgets;
                 this.setState(result);
-                this.setState({
-                    inputWidget: <InputWidget submitHandler={this.handleSubmit}
-                                 categories={this.state.categories} />
-                });
             }.bind(this));
     },
     componentWillUnmount: function() {
@@ -142,14 +137,13 @@ var TournamentCategoriesPage = React.createClass({
             error = false;
 
         $("form div.category").each(function() {
-            var serialized = serializeCategory($(this));
-            if (serialized.length === 5) {
-                categories.push(serialized);
-            }
-            else if (serialized.length > 0) {
+            var serialized = Category.serialize($(this));
+            if (!serialized) {
                 _this.setState({error: "Please fill in all fields"});
                 error = true;
+                return;
             }
+            categories.push(serialized);
         });
 
         if (error) {
@@ -173,7 +167,11 @@ var TournamentCategoriesPage = React.createClass({
                 <p>{this.state.successText}</p>
                 <p>{this.state.error}</p>
                 <p>{this.state.message}</p>
-                {this.state.successText ? null : this.state.inputWidget}
+                {this.state.successText ? null:
+                    <form onSubmit={this.handleSubmit}>
+                        {this.state.categories}
+                        <button type="submit">Set</button>
+                    </form>}
             </div>
         );
     }

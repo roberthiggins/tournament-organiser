@@ -29,11 +29,9 @@ class SetRounds(TestCase):
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""
         name = 'test_set_rounds'
-        self.injector.inject(name, rounds=4)
+        self.injector.inject(name)
 
         tourn = Tournament(name)
-        self.assertTrue(tourn.details()['rounds'] == 4)
-
         tourn.set_number_of_rounds(6)
         self.assertTrue(tourn.details()['rounds'] == 6)
 
@@ -43,7 +41,7 @@ class SetRounds(TestCase):
     def test_tournament_round_deletion(self):
         """Check that the rounds get deleted when rounds are reduced"""
         name = 'test_tournament_round_deletion'
-        self.injector.inject(name, rounds=4)
+        self.injector.inject(name)
 
         tourn = Tournament(name)
         tourn.set_number_of_rounds(6)
@@ -59,15 +57,15 @@ class SetRounds(TestCase):
     def test_get_missions(self):
         """get missions for the rounds"""
         name = 'test_get_missions'
-        self.injector.inject(name, rounds=3)
+        self.injector.inject(name)
         self.injector.add_round(name, 1, 'mission_1')
         self.injector.add_round(name, 2, 'mission_2')
         self.injector.add_round(name, 3, 'mission_3')
 
         tourn = Tournament(name)
         tourn.set_number_of_rounds(4)
-        compare(tourn.get_round(1).mission, 'mission_1')
-        compare(tourn.get_round(4).mission, None)
+        compare(tourn.get_round(1).get_dao().mission, 'mission_1')
+        compare(tourn.get_round(4).get_dao().mission, None)
 
         compare(Tournament(name).get_missions(),
                 ['mission_1', 'mission_2', 'mission_3', 'TBA'])
@@ -80,8 +78,8 @@ class SetRounds(TestCase):
         tourn = Tournament(name)
         tourn.set_number_of_rounds(2)
 
-        self.assertTrue(tourn.get_round(1).ordering == 1)
-        self.assertTrue(tourn.get_round(2).ordering == 2)
+        self.assertTrue(tourn.get_round(1).get_dao().ordering == 1)
+        self.assertTrue(tourn.get_round(2).get_dao().ordering == 2)
 
         self.assertRaises(ValueError, tourn.get_round, 3)
         self.assertRaises(ValueError, tourn.get_round, -1)
@@ -99,7 +97,7 @@ class SetRounds(TestCase):
         self.assertRaises(TypeError, tourn.set_number_of_rounds, None)
 
         name_2 = 'test_errors_2'
-        self.injector.inject(name_2, rounds=5)
+        self.injector.inject(name_2)
         tourn = Tournament(name_2)
         self.assertRaises(ValueError, tourn.set_number_of_rounds, 'foo')
         self.assertRaises(ValueError, tourn.set_number_of_rounds, '')

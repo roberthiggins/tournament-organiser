@@ -11,17 +11,6 @@ Feature: Get information about a tournament
         Then I should see "Apply to play in painting_test" appear
 
     @javascript
-    Scenario: I try to enter a tournament from the page
-        Given I am authenticated as "charlie_murphy" using "password"
-        Given I am on "/tournament/painting_test"
-        When I wait for "Apply to play in painting_test" to appear
-        Then I press "Apply to play in painting_test"
-        Then I should see "Application submitted" appear
-        Given I am on "/tournament/painting_test"
-        Then I press "Apply to play in painting_test"
-        Then I should see "You've already applied to painting_test" appear
-
-    @javascript
     Scenario: I try to visit a non-existent page
         Given I am on "/tournament/not_a_tournament"
         Then I should see "Tournament not_a_tournament not found" appear

@@ -31,12 +31,11 @@ class TestScoreEntered(TestCase):
     def setUp(self):
         db.create_all()
         self.injector = TournamentInjector()
-        self.injector.inject(self.tournament_1, rounds=5, num_players=5)
-        db.session.add(TournamentRound(self.tournament_1, 1, 'foo_mission_1'))
-        db.session.add(TournamentRound(self.tournament_1, 2, 'foo_mission_2'))
+        self.injector.inject(self.tournament_1, num_players=5)
+        self.injector.add_round(self.tournament_1, 1, 'foo_mission_1')
+        self.injector.add_round(self.tournament_1, 2, 'foo_mission_2')
         db.session.flush()
-        Tournament(self.tournament_1).make_draw(1)
-        Tournament(self.tournament_1).make_draw(2)
+        Tournament(self.tournament_1).make_draws()
 
     def tearDown(self):
         self.injector.delete()
@@ -185,9 +184,9 @@ class EnterScore(TestCase):
     def setUp(self):
         db.create_all()
         self.injector = TournamentInjector()
-        self.injector.inject(self.tournament_1, rounds=5, num_players=5)
-        db.session.add(TournamentRound(self.tournament_1, 1, 'foo_mission_1'))
-        db.session.add(TournamentRound(self.tournament_1, 2, 'foo_mission_2'))
+        self.injector.inject(self.tournament_1, num_players=5)
+        self.injector.add_round(self.tournament_1, 1, 'foo_mission_1')
+        self.injector.add_round(self.tournament_1, 2, 'foo_mission_2')
         self.injector.add_player(self.tournament_1, self.player)
         score_args = {
             'tournament_id': self.tournament_1,
@@ -219,33 +218,26 @@ class EnterScore(TestCase):
             player_id=self.player, tournament_id=self.tournament_1).first()
 
         self.assertRaises(
-            AttributeError,
+            TypeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
             self.category_2.name,
             5,
             game_id='foo')
         self.assertRaises(
-            AttributeError,
+            TypeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
             self.category_2.name,
             5,
             game_id=1000000)
         self.assertRaises(
-            AttributeError,
+            TypeError,
             Tournament(self.tournament_1).enter_score,
             entry.id,
             self.category_2.name,
             5,
             game_id=-1)
-        self.assertRaises(
-            AttributeError,
-            Tournament(self.tournament_1).enter_score,
-            entry.id,
-            self.category_2.name,
-            5,
-            game_id=0)
 
     def test_enter_score_bad_values(self):
         """These should all fail for one reason or another"""
@@ -254,7 +246,7 @@ class EnterScore(TestCase):
 
         # bad entry
         self.assertRaises(
-            AttributeError,
+            ValueError,
             Tournament(self.tournament_1).enter_score,
             10000000,
             self.category_1.name,
@@ -304,8 +296,7 @@ class EnterScore(TestCase):
         compare(scores[0].score.value, 0)
 
         # a per_round score
-        tourn.make_draw(1)
-        tourn.make_draw(2)
+        tourn.make_draws()
 
         round_id = TournamentRound.query.\
             filter_by(tournament_name=self.tournament_1, ordering=2).first().id

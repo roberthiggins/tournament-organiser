@@ -26,26 +26,26 @@ def get_round_info(round_id):
     GET the information about a round
     """
     no_draw = AttributeError('No draw is available')
-    tourn = Tournament(g.tournament_id)
-    rnd = tourn.get_round(round_id)
-    try:
-        draw = tourn.make_draw(round_id)
-    except AttributeError:
-        raise no_draw
+    rnd = g.tournament.get_round(round_id)
+
+    if rnd.draw is None:
+        rnd.make_draw(g.tournament.entries())
+        if rnd.draw is None:
+            raise no_draw
 
     draw_info = [
         {'table_number': t.table_number,
          'entrants': [x if isinstance(x, str) else x.player_id \
                       for x in t.entrants]
-        } for t in draw]
+        } for t in rnd.draw]
 
-    if not draw_info and rnd.mission is None:
+    if not draw_info and rnd.get_dao().mission is None:
         raise no_draw
 
     # We will return all round info for all requests regardless of method
     return {
         'draw': draw_info,
-        'mission': rnd.get_mission()
+        'mission': rnd.get_dao().get_mission()
     }
 
 @TOURNAMENT_ROUND.route('', methods=['POST'])
@@ -64,5 +64,5 @@ def set_rounds():
     except ValueError:
         raise ValueError('Set at least 1 round')
 
-    Tournament(g.tournament_id).set_number_of_rounds(rounds)
+    g.tournament.set_number_of_rounds(rounds)
     return 'Rounds set: {}'.format(rounds)

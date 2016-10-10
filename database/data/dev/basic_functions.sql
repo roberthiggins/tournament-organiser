@@ -49,7 +49,7 @@ END $$;
 
 
 -- Make a tournament
-CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar, rounds int DEFAULT 0) RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION create_tournament(tourn_name varchar, tourn_date varchar) RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
     tourn_id int := 0;
     protect_object_id int := 0;
@@ -58,7 +58,7 @@ BEGIN
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO protect_object_id;
     PERFORM create_to(tourn_name, protect_object_id);
 
-    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), rounds, protect_object_id, tourn_name || '_to') RETURNING id INTO tourn_id;
+    INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), protect_object_id, tourn_name || '_to') RETURNING id INTO tourn_id;
 
     RETURN tourn_id;
 END $$;
@@ -95,9 +95,15 @@ DECLARE
     prot_obj_id int := 0;
     game_id int := 0;
     perm_id int := 0;
+    bye boolean := true;
 BEGIN
+
+    IF ent_1_id IS NOT NULL AND ent_1_uname IS NOT NULL AND ent_2_id IS NOT NULL AND ent_2_uname IS NOT NULL THEN
+        bye = false;
+    END IF;
+
     INSERT INTO protected_object VALUES (DEFAULT) RETURNING id INTO prot_obj_id;
-    INSERT INTO game VALUES(DEFAULT, round_id, table_num, prot_obj_id, True) RETURNING id INTO game_id;
+    INSERT INTO game VALUES(DEFAULT, round_id, table_num, prot_obj_id, bye) RETURNING id INTO game_id;
     INSERT INTO protected_object_permission VALUES (DEFAULT, prot_obj_id, prot_act_id) RETURNING id INTO perm_id;
 
     IF ent_1_id IS NOT NULL AND ent_1_uname IS NOT NULL THEN
@@ -148,6 +154,7 @@ DECLARE
 BEGIN
 
     tourn_id := create_tournament(tourn_name, tourn_date);
+    UPDATE tournament SET in_progress = TRUE WHERE id = tourn_id;
 
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 1, 'Kill')                        RETURNING id INTO round_1_id;
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, DEFAULT)                       RETURNING id INTO round_2_id;

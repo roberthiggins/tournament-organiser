@@ -25,7 +25,7 @@ class TournamentMissionsTests(TestCase):
         db.create_all()
         self.injector = TournamentInjector()
 
-        self.injector.inject(self.tourn_1, rounds=2)
+        self.injector.inject(self.tourn_1)
         self.injector.add_round(self.tourn_1, 1, None)
         self.injector.add_round(self.tourn_1, 2, None)
         self.tourn = Tournament(self.tourn_1)
@@ -47,3 +47,9 @@ class TournamentMissionsTests(TestCase):
 
         self.tourn.set_missions(['foo', 'bar'])
         compare(self.tourn.get_missions(), ['foo', 'bar'])
+
+    def test_round_change(self):
+        self.tourn.set_number_of_rounds(0)
+        self.tourn.set_number_of_rounds(1)
+
+        compare(self.tourn.get_round(1).get_dao().get_mission(), 'TBA')

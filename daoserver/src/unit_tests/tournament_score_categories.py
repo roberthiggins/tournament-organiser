@@ -12,14 +12,16 @@ from models.dao.score import ScoreCategory
 from models.tournament import Tournament
 from unit_tests.tournament_injector import TournamentInjector
 
-def score_cat_args(name, percentage, per_tourn, min_val, max_val):
+# pylint: disable=too-many-arguments
+def score_cat_args(name, pct, per_tourn, min_val, max_val, zero_sum=False):
     """Convenience function to make a ScoreCategory args blob"""
     return {
         'name':       name,
-        'percentage': percentage,
+        'percentage': pct,
         'per_tourn':  per_tourn,
         'min_val':    min_val,
-        'max_val':    max_val}
+        'max_val':    max_val,
+        'zero_sum':   zero_sum}
 
 # pylint: disable=no-member,invalid-name,missing-docstring
 class ScoreCategoryTests(TestCase):
@@ -41,7 +43,7 @@ class ScoreCategoryTests(TestCase):
         self.cat_3 = score_cat_args('categories_sports', 10, True, 1, 5)
 
         # We will make a tournament with 5 entrants.
-        self.injector.inject(self.tourn_1, rounds=5)
+        self.injector.inject(self.tourn_1)
         self.tournament = Tournament(self.tourn_1)
 
     def tearDown(self):

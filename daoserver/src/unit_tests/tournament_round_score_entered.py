@@ -31,12 +31,11 @@ class TestScoreEntered(TestCase):
     def setUp(self):
         db.create_all()
         self.injector = TournamentInjector()
-        self.injector.inject(self.tournament_1, rounds=5, num_players=5)
-        db.session.add(TournamentRound(self.tournament_1, 1, 'foo_mission_1'))
-        db.session.add(TournamentRound(self.tournament_1, 2, 'foo_mission_2'))
+        self.injector.inject(self.tournament_1, num_players=5)
+        self.injector.add_round(self.tournament_1, 1, 'foo_mission_1')
+        self.injector.add_round(self.tournament_1, 2, 'foo_mission_2')
         db.session.flush()
-        Tournament(self.tournament_1).make_draw(1)
-        Tournament(self.tournament_1).make_draw(2)
+        Tournament(self.tournament_1).make_draws()
 
     def tearDown(self):
         self.injector.delete()

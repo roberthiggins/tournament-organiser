@@ -31,7 +31,7 @@ class DrawStrategyTests(TestCase):
     def test_get_draw(self):
         """Test get_draw"""
 
-        self.injector.inject('dst', rounds=5, num_players=5)
+        self.injector.inject('dst', num_players=5)
 
         entries = Tournament('dst').entries()
         matching_strategy = RoundRobin()

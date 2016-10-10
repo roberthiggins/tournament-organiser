@@ -1,6 +1,6 @@
 #! /bin/bash
 
-SYSTEMS="apitestdb apitestdaoserver"
+SYSTEMS="apitestdb apitestdaoserver apitest"
 # Build all containers and run all tests
 cp config/dev/docker-compose.dev.yml docker-compose.yml
 cp config/dev/docker-passwords.dev.yml docker-passwords.yml

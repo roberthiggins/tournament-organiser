@@ -1,7 +1,10 @@
 describe('Getting tournament information', function () {
     'use strict';
     var frisby = require('frisby'),
-        API = process.env.API_ADDR;
+        API = process.env.API_ADDR,
+        injector = require('./data_injector');
+
+    injector.createTournament('northcon_2095', '2095-06-01');
 
     frisby.create('Details for existing tournament')
         .get(API + 'tournament/northcon_2095')
