@@ -91,47 +91,30 @@ Category.serialize = function($categoryDiv) {
         categoryValues : null;
 };
 
-var InputWidget = React.createClass({
-    propTypes: {
-        categories: React.PropTypes.array,
-        submitHandler: React.PropTypes.func.isRequired
-    },
-    render: function() {
-
-        var numLines = 5,
-            lastIdx = -1,
-            categoryFields = this.props.categories.map(function(cat, idx) {
-                lastIdx = idx;
-                return (<Category vals={cat} idx={idx} key={idx} />);
-            });
-        while (categoryFields.length < numLines) {
-            lastIdx = lastIdx + 1;
-            categoryFields.push(
-                <Category idx={lastIdx} key={lastIdx} />);
-        }
-
-        return (
-            <form onSubmit={this.props.submitHandler}>
-                {categoryFields}
-                <button type="submit">Set</button>
-            </form>
-        );
-    }
-});
-
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
-        return ({error: "", successText: "", tournament: "", categories: [],
-                 inputWidget : null});
+        return ({error: "", successText: "", tournament: "", categories: []});
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
+                var numLines = 5,
+                    lastIdx = -1,
+                    widgets = [];
+
+                if (result.categories) {
+                    widgets = result.categories.map(function(cat, idx) {
+                        lastIdx = idx;
+                        return (<Category vals={cat} idx={idx} key={idx} />);
+                    });
+                }
+                while (widgets.length < numLines) {
+                    lastIdx = lastIdx + 1;
+                    widgets.push(<Category idx={lastIdx} key={lastIdx} />);
+                }
+
+                result.categories = widgets;
                 this.setState(result);
-                this.setState({
-                    inputWidget: <InputWidget submitHandler={this.handleSubmit}
-                                 categories={this.state.categories} />
-                });
             }.bind(this));
     },
     componentWillUnmount: function() {
@@ -175,7 +158,11 @@ var TournamentCategoriesPage = React.createClass({
                 <p>{this.state.successText}</p>
                 <p>{this.state.error}</p>
                 <p>{this.state.message}</p>
-                {this.state.successText ? null : this.state.inputWidget}
+                {this.state.successText ? null:
+                    <form onSubmit={this.handleSubmit}>
+                        {this.state.categories}
+                        <button type="submit">Set</button>
+                    </form>}
             </div>
         );
     }
