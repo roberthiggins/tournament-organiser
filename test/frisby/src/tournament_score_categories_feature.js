@@ -46,26 +46,34 @@ describe("Set categories normal function", function () {
     frisby.create("set the score categories for category_test")
         .post(API, {
             categories: ["categories_3"],
-            categories_3: ["categories_test_three", 99, true, 1, 2]
-        }, {json: true, inspectOnFailure: true})
+            categories_3: {
+                "name": "categories_test_three",
+                "percentage": 99,
+                "per_tourn": true,
+                "min_val": 1,
+                "max_val": 2
+                }
+            }, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", "Basic " +
             new Buffer("category_test_to:password").toString("base64"))
         .expectStatus(200)
-        .toss();
-    frisby.create("GET a list of tournament categories")
-        .get(API)
-        .expectStatus(200)
-        .expectHeaderContains("content-type", "application/json")
-        .expectJSON([
-            {
-                "id": Number,
-                "name": "categories_test_three",
-                "percentage": 99,
-                "per_tournament": true,
-                "min_val": 1,
-                "max_val": 2
-            }
-        ])
+        .after(function() {
+            frisby.create("GET a list of tournament categories")
+                .get(API)
+                .expectStatus(200)
+                .expectHeaderContains("content-type", "application/json")
+                .expectJSON([
+                    {
+                        "id": Number,
+                        "name": "categories_test_three",
+                        "percentage": 99,
+                        "per_tournament": true,
+                        "min_val": 1,
+                        "max_val": 2
+                    }
+                ])
+                .toss();
+            })
         .toss();
 
     frisby.create("set the score categories for category_test to none")
@@ -112,13 +120,25 @@ describe("Set categories malformed", function () {
     frisby.create("Incorrect: categories don\"t match")
         .post(API, {
             categories: ["categories_3"],
-            categories_1: ["categories_test_no_match", 5, true, 1, 2]
-        }, {json: true, inspectOnFailure: true})
+            categories_1: {
+                "name": "categories_test_no_match",
+                "percentage": 5,
+                "per_tournament": true,
+                "min_val": 1,
+                "max_val": 2
+                }
+            }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create("Incorrect: No names")
         .post(API, {
-            categories_1: ["categories_test_no_names", 5, true, 1, 2]
+            categories_1: {
+                "name": "categories_test_no_names",
+                "percentage": 5,
+                "per_tournament": true,
+                "min_val": 1,
+                "max_val": 2
+                }
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();

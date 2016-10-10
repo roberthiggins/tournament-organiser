@@ -63,7 +63,14 @@ exports.setCategories = function(tourn, categories){
     categories.forEach(function(cat, idx){
         var key = "categories_" + idx;
         postData.categories.push(key);
-        postData[key] = cat;
+        postData[key] = {
+            "name": cat[0],
+            "percentage": cat[1],
+            "per_tourn": cat[2],
+            "min_val": cat[3],
+            "max_val": cat[4],
+            "zero_sum": cat[5] || false
+            };
     });
 
     frisby.create("set the score categories for " + tourn)

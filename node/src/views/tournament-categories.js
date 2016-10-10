@@ -87,8 +87,17 @@ Category.serialize = function($categoryDiv) {
         categoryValues.push(elem.value);
     });
 
-    return categoryValues.length === 5 || categoryValues.length === 0 ?
-        categoryValues : null;
+    if (categoryValues.length !== 5 && categoryValues.length !== 0) {
+        return null;
+    }
+
+    return {
+        "name": categoryValues[0],
+        "percentage": categoryValues[1],
+        "per_tourn": categoryValues[2],
+        "min_val": categoryValues[3],
+        "max_val": categoryValues[4]
+        };
 };
 
 var TournamentCategoriesPage = React.createClass({

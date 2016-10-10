@@ -132,14 +132,7 @@ def set_score_categories():
             cat = json.loads(request.values.get(json_cat, []))
         except TypeError:
             cat = request.get_json().get(json_cat)
-
-        new_categories.append({
-            'name':       cat[0],
-            'percentage': cat[1],
-            'per_tourn':  cat[2],
-            'min_val':    cat[3],
-            'max_val':    cat[4],
-            'zero_sum':   cat[5] if len(cat) > 5 else False})
+        new_categories.append(cat)
 
     g.tournament.set_score_categories(new_categories)
 
