@@ -63,6 +63,33 @@ var Category = React.createClass({
         );
     }
 });
+Category.serialize = function($categoryDiv) {
+    var elementsAsDictionaries = $categoryDiv
+            .find(":input:text[value!=''],:input:checkbox:checked")
+            .serializeArray()
+            .map(function(dict) {
+                // We can strip the index from the front of the name as it
+                // was only there for display help and convert checkboxes
+                // to true
+                return {
+                    name: dict.name.substr(2),
+                    value: dict.value === "on" ? true : dict.value
+                };
+            }),
+        categoryValues = [];
+
+    elementsAsDictionaries.forEach(function(elem, idx) {
+        if (idx === 2 && elem.key !== "per_tournament") {
+            // This should be a checkbox. If not we shim one in.
+            categoryValues.push(false);
+        }
+
+        categoryValues.push(elem.value);
+    });
+
+    return categoryValues.length === 5 || categoryValues.length === 0 ?
+        categoryValues : null;
+};
 
 var InputWidget = React.createClass({
     propTypes: {
@@ -92,34 +119,6 @@ var InputWidget = React.createClass({
     }
 });
 
-var serializeCategory = function($categoryDiv) {
-    var elementsAsDictionaries = $categoryDiv
-            .find(":input:text[value!=''],:input:checkbox:checked")
-            .serializeArray()
-            .map(function(dict) {
-                // We can strip the index from the front of the name as it
-                // was only there for display help and convert checkboxes
-                // to true
-                return {
-                    name: dict.name.substr(2),
-                    value: dict.value === "on" ? true : dict.value
-                };
-            }),
-        categoryValues = [];
-
-    elementsAsDictionaries.forEach(function(elem, idx) {
-        if (idx === 2 && elem.key !== "per_tournament") {
-            // This should be a checkbox. If not we shim one in.
-            categoryValues.push(false);
-        }
-
-        categoryValues.push(elem.value);
-    });
-
-    return categoryValues;
-};
-
-
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
         return ({error: "", successText: "", tournament: "", categories: [],
@@ -146,14 +145,13 @@ var TournamentCategoriesPage = React.createClass({
             error = false;
 
         $("form div.category").each(function() {
-            var serialized = serializeCategory($(this));
-            if (serialized.length === 5) {
-                categories.push(serialized);
-            }
-            else if (serialized.length > 0) {
+            var serialized = Category.serialize($(this));
+            if (!serialized) {
                 _this.setState({error: "Please fill in all fields"});
                 error = true;
+                return;
             }
+            categories.push(serialized);
         });
 
         if (error) {
