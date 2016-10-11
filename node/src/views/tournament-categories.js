@@ -55,40 +55,7 @@ var ScoreCheckbox = React.createClass({
     }
 });
 
-var Category = React.createClass({
-    propTypes: {
-        idx: React.PropTypes.number.isRequired,
-        vals: React.PropTypes.object
-    },
-    getDefaultProps: function(){
-        return {
-            vals: {name: "", percentage: "", per_tournament: false,
-                   min_val: "", max_val: ""}
-        };
-    },
-    render: function() {
-        return (
-            <div className="category">
-                <ScoreField name="Category"
-                            id={this.props.idx + "_name"}
-                            val={this.props.vals.name} />
-                <ScoreField name="Percentage"
-                            id={this.props.idx + "_percentage"}
-                            val={this.props.vals.percentage} />
-                <ScoreCheckbox name="Once per tournament?"
-                               id={this.props.idx + "_per_tournament"}
-                               checked={this.props.vals.per_tournament} />
-                <ScoreField name="Min Score"
-                            id={this.props.idx + "_min_val"}
-                            val={this.props.vals.min_val} />
-                <ScoreField name="Max Score"
-                            id={this.props.idx + "_max_val"}
-                            val={this.props.vals.max_val} />
-            </div>
-        );
-    }
-});
-Category.serialize = function($categoryDiv) {
+var serializeCategory = function($categoryDiv) {
     var elementsAsDictionaries = $categoryDiv
             .find(":input:text[value!=''],:input:checkbox:checked")
             .serializeArray()
@@ -125,6 +92,25 @@ Category.serialize = function($categoryDiv) {
         };
 };
 
+var category = function(idx, name, pct, per_tournament, min_val, max_val) {
+    return (
+        <div className="category" key={idx + "_category"}>
+            <ScoreField name="Category" id={idx + "_name"} val={name}
+                        key={idx + "_name"} />
+            <ScoreField name="Percentage" id={idx + "_percentage"} val={pct}
+                        key={idx + "_percentage"} />
+            <ScoreCheckbox name="Once per tournament?"
+                           id={idx + "_per_tournament"}
+                           checked={per_tournament}
+                           key={idx + "_per_tournament"} />
+            <ScoreField name="Min Score" id={idx + "_min_val"} val={min_val}
+                        key={idx + "_min_val"} />
+            <ScoreField name="Max Score"id={idx + "_max_val"} val={max_val}
+                        key={idx + "_max_val"} />
+        </div>
+        );
+};
+
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
         return ({error: "", successText: "", tournament: "", categories: []});
@@ -139,12 +125,13 @@ var TournamentCategoriesPage = React.createClass({
                 if (result.categories) {
                     widgets = result.categories.map(function(cat, idx) {
                         lastIdx = idx;
-                        return (<Category vals={cat} idx={idx} key={idx} />);
+                        return category(idx, cat.name, cat.percentage,
+                            cat.per_tournament, cat.min_val, cat.max_val);
                     });
                 }
                 while (widgets.length < numLines) {
                     lastIdx = lastIdx + 1;
-                    widgets.push(<Category idx={lastIdx} key={lastIdx} />);
+                    widgets.push(category(lastIdx, "", "", false, "", ""));
                 }
 
                 result.categories = widgets;
@@ -162,7 +149,7 @@ var TournamentCategoriesPage = React.createClass({
             error = false;
 
         $("form div.category").each(function() {
-            var serialized = Category.serialize($(this));
+            var serialized = serializeCategory($(this));
             if (!serialized) {
                 _this.setState({error: "Please fill in all fields"});
                 error = true;

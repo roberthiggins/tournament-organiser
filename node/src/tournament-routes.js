@@ -179,7 +179,7 @@ router.route("/tournament/:tournament/categories")
         users.injectUserIntoRequest,
         users.ensureAuthenticated,
         function(req, res){
-            var categories  = req.body.categories,
+            var categories  = req.body.categories || [],
                 postData    = {},
                 catKeys     = [];
 
