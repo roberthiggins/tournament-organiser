@@ -56,40 +56,33 @@ var ScoreCheckbox = React.createClass({
 });
 
 var serializeCategory = function($categoryDiv) {
-    var elementsAsDictionaries = $categoryDiv
-            .find(":input:text[value!=''],:input:checkbox:checked")
-            .serializeArray()
-            .map(function(dict) {
-                // We can strip the index from the front of the name as it
-                // was only there for display help and convert checkboxes
-                // to true
-                return {
-                    key: dict.name.substr(2),
-                    value: dict.value === "on" ? true : dict.value
-                };
-            }),
-        categoryValues = [];
-
-    elementsAsDictionaries.forEach(function(elem, idx) {
-        if (idx === 2 && elem.key !== "per_tournament") {
-            // This should be a checkbox. If not we shim one in.
-            categoryValues.push(false);
-        }
-
-        categoryValues.push(elem.value);
-    });
-
-    if (categoryValues.length !== 5 && categoryValues.length !== 0) {
+    var category = {},
+        requiredFields = ["name", "percentage", "min_val", "max_val"],
+        serialized = $categoryDiv
+                        .find(":input:text[value!=''],:input:checkbox:checked")
+                        .serializeArray();
+    if (!serialized.length) {
         return null;
     }
 
-    return {
-        "name": categoryValues[0],
-        "percentage": categoryValues[1],
-        "per_tourn": categoryValues[2],
-        "min_val": categoryValues[3],
-        "max_val": categoryValues[4]
-        };
+    serialized.forEach(function(dict) {
+        // We can strip the index from the front of the name as it
+        // was only there for display help and convert checkboxes
+        // to true
+        category[dict.name.substr(2)] = dict.value === "on" ? true : dict.value;
+    });
+
+    requiredFields.forEach(function(key){
+        if ((category[key] || "") === "") {
+            throw "Please fill in all fields";
+        }
+    });
+
+    // Checkboxes won't be serialized if false
+    category["per_tourn"] = category["per_tournament"] || false;
+    delete category["per_tournament"];
+
+    return category;
 };
 
 var category = function(idx, name, pct, per_tournament, min_val, max_val) {
@@ -145,20 +138,18 @@ var TournamentCategoriesPage = React.createClass({
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
         var _this = this,
-            categories = [],
-            error = false;
+            categories = [];
 
-        $("form div.category").each(function() {
-            var serialized = serializeCategory($(this));
-            if (!serialized) {
-                _this.setState({error: "Please fill in all fields"});
-                error = true;
-                return;
-            }
-            categories.push(serialized);
-        });
-
-        if (error) {
+        try {
+            $("form div.category").each(function() {
+                var serialized = serializeCategory($(this));
+                if (serialized) {
+                    categories.push(serialized);
+                }
+            });
+        }
+        catch (err) {
+            _this.setState({error: err});
             return;
         }
 
