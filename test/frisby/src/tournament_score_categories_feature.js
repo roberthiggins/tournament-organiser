@@ -3,6 +3,20 @@ var frisby = require("frisby"),
     API = process.env.API_ADDR +
             "tournament/category_test/score_categories";
 
+var jsonCat = function(id, name, pct, per_tourn, min, max) {
+    var cat = {
+        "name": name,
+        "percentage": pct,
+        "per_tournament": per_tourn,
+        "min_val": min,
+        "max_val": max
+        };
+    if (id) {
+        cat.id = id;
+    }
+    return cat;
+};
+
 describe("Set categories normal function", function () {
     "use strict";
 
@@ -22,22 +36,8 @@ describe("Set categories normal function", function () {
             "max_val": Number
         })
         .expectJSON([
-            {
-                "id": Number,
-                "name": "categories_test_one",
-                "percentage": 8,
-                "per_tournament": true,
-                "min_val": 4,
-                "max_val": 12
-            },
-            {
-                "id": Number,
-                "name": "categories_test_two",
-                "percentage": 13,
-                "per_tournament": false,
-                "min_val": 3,
-                "max_val": 11
-            }
+            jsonCat(Number, "categories_test_one", 8, true, 4, 12),
+            jsonCat(Number, "categories_test_two", 13, false, 3, 11)
         ])
         .toss();
 
@@ -46,13 +46,8 @@ describe("Set categories normal function", function () {
     frisby.create("set the score categories for category_test")
         .post(API, {
             categories: ["categories_3"],
-            categories_3: {
-                "name": "categories_test_three",
-                "percentage": 99,
-                "per_tournament": true,
-                "min_val": 1,
-                "max_val": 2
-                }
+            categories_3:
+                jsonCat(null, "categories_test_three", 99, true, 1, 2)
             }, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", "Basic " +
             new Buffer("category_test_to:password").toString("base64"))
@@ -62,16 +57,8 @@ describe("Set categories normal function", function () {
                 .get(API)
                 .expectStatus(200)
                 .expectHeaderContains("content-type", "application/json")
-                .expectJSON([
-                    {
-                        "id": Number,
-                        "name": "categories_test_three",
-                        "percentage": 99,
-                        "per_tournament": true,
-                        "min_val": 1,
-                        "max_val": 2
-                    }
-                ])
+                .expectJSON([jsonCat(Number, "categories_test_three", 99, true,
+                    1, 2)])
                 .toss();
             })
         .toss();
@@ -120,25 +107,15 @@ describe("Set categories malformed", function () {
     frisby.create("Incorrect: categories don\"t match")
         .post(API, {
             categories: ["categories_3"],
-            categories_1: {
-                "name": "categories_test_no_match",
-                "percentage": 5,
-                "per_tournament": true,
-                "min_val": 1,
-                "max_val": 2
-                }
+            categories_1:
+                jsonCat(null, "categories_test_no_match", 5, true, 1, 2)
             }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create("Incorrect: No names")
         .post(API, {
-            categories_1: {
-                "name": "categories_test_no_names",
-                "percentage": 5,
-                "per_tournament": true,
-                "min_val": 1,
-                "max_val": 2
-                }
+            categories_1:
+                jsonCat(null, "categories_test_no_names", 5, true, 1, 2)
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
