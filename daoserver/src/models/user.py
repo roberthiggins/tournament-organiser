@@ -233,4 +233,5 @@ class User(object):
     @must_exist_in_db
     def details(self):
         """ username and email for contact and identification"""
-        return {self.username: self.get_dao().contact_email}
+        return {'username': self.username, \
+                'email': self.get_dao().contact_email}
