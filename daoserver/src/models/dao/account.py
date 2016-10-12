@@ -49,10 +49,3 @@ class AccountSecurity(db.Model):
 
     def __repr__(self):
         return '<AccountSecurity ({}, {})>'.format(self.id, self.password)
-
-def add_account(username, email, password, commit=True):
-    """Add an account to the db"""
-    db.session.add(Account(username, email))
-    db.session.add(AccountSecurity(username, password))
-    if commit:
-        db.session.commit()

@@ -38,7 +38,11 @@ def login():
 @enforce_request_variables('email', 'password1', 'password2')
 def create():
     """POST to add an account"""
-    g.user.add_account(email, password1, password2)
+    g.user.add_account({
+        'email': email,
+        'password1': password1,
+        'password2': password2
+    })
     return '<p>Account created! You submitted the following \
         fields:</p><ul><li>User Name: {}</li><li>Email: {}\
         </li></ul>'.format(g.user.username, email)
