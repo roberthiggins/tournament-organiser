@@ -43,6 +43,16 @@ Feature: Modify the scoring categories for a tournament
         Then the "2_name" field should contain ""
 
     @javascript
+    Scenario: I remove the categories
+        Given I fill category 0 with "" "" "" ""
+        Given I fill category 1 with "" "" "" ""
+        Then I press "Set"
+        Then I should see "Score categories set" appear
+        Given I visit category page for "category_test"
+        Then the "0_name" field should contain ""
+        Then the "1_name" field should contain ""
+
+    @javascript
     Scenario Outline: I replace a category with an illegal category
         Given I fill category 0 with "<cat>" "<val>" "1" "1"
         Then I press "Set"

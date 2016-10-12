@@ -10,18 +10,8 @@ from models.dao.db_connection import db
 from models.dao.score import ScoreCategory
 
 from models.tournament import Tournament
-from unit_tests.tournament_injector import TournamentInjector
-
-# pylint: disable=too-many-arguments
-def score_cat_args(name, pct, per_tourn, min_val, max_val, zero_sum=False):
-    """Convenience function to make a ScoreCategory args blob"""
-    return {
-        'name':       name,
-        'percentage': pct,
-        'per_tourn':  per_tourn,
-        'min_val':    min_val,
-        'max_val':    max_val,
-        'zero_sum':   zero_sum}
+from unit_tests.tournament_injector import score_cat_args as cat, \
+TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring
 class ScoreCategoryTests(TestCase):
@@ -38,9 +28,9 @@ class ScoreCategoryTests(TestCase):
         self.injector = TournamentInjector()
 
         # Some default categories
-        self.cat_1 = score_cat_args('categories_painting', 10, False, 1, 20)
-        self.cat_2 = score_cat_args('categories_battle', 80, True, 1, 20)
-        self.cat_3 = score_cat_args('categories_sports', 10, True, 1, 5)
+        self.cat_1 = cat(self.tourn_1, 'painting', 10, False, 1, 20)
+        self.cat_2 = cat(self.tourn_1, 'cat_battle', 80, True, 1, 20)
+        self.cat_3 = cat(self.tourn_1, 'cat_sports', 10, True, 1, 5)
 
         # We will make a tournament with 5 entrants.
         self.injector.inject(self.tourn_1)
@@ -56,7 +46,7 @@ class ScoreCategoryTests(TestCase):
         c_1 = ScoreCategory.query.\
             filter_by(name=self.cat_1['name']).first()
         compare(c_1.percentage, self.cat_1['percentage'])
-        compare(c_1.per_tournament, self.cat_1['per_tourn'])
+        compare(c_1.per_tournament, self.cat_1['per_tournament'])
         compare(c_1.min_val, self.cat_1['min_val'])
         compare(c_1.max_val, self.cat_1['max_val'])
 
@@ -65,14 +55,14 @@ class ScoreCategoryTests(TestCase):
         c_2 = ScoreCategory.query.\
             filter_by(name=self.cat_2['name']).first()
         compare(c_2.percentage, self.cat_2['percentage'])
-        compare(c_2.per_tournament, self.cat_2['per_tourn'])
+        compare(c_2.per_tournament, self.cat_2['per_tournament'])
         compare(c_2.min_val, self.cat_2['min_val'])
         compare(c_2.max_val, self.cat_2['max_val'])
 
         c_3 = ScoreCategory.query.\
             filter_by(name=self.cat_3['name']).first()
         compare(c_3.percentage, self.cat_3['percentage'])
-        compare(c_3.per_tournament, self.cat_3['per_tourn'])
+        compare(c_3.per_tournament, self.cat_3['per_tournament'])
         compare(c_3.min_val, self.cat_3['min_val'])
         compare(c_3.max_val, self.cat_3['max_val'])
 
@@ -88,18 +78,18 @@ class ScoreCategoryTests(TestCase):
 
     # pylint: disable=unused-variable
     def test_broken_min_max(self):
-        neg_min = score_cat_args('categories_painting', 10, False, -1, 20)
-        neg_max = score_cat_args('categories_painting', 10, False, 1, -1)
-        zero_max = score_cat_args('categories_painting', 10, False, 0, 0)
-        min_high = score_cat_args('categories_painting', 10, False, 10, 9)
-        zero_min = score_cat_args('categories_painting', 10, False, 0, 20)
-        equal = score_cat_args('categories_painting', 10, False, 1, 1)
-        no_min = score_cat_args('categories_painting', '10', False, '', 20)
-        no_max = score_cat_args('categories_painting', '10', False, 1, '')
-        none_min = score_cat_args('categories_painting', '1', False, None, 1)
-        none_max = score_cat_args('categories_painting', '1', False, 1, None)
-        char_min = score_cat_args('categories_painting', '1', False, 'a', 1)
-        char_max = score_cat_args('categories_painting', '1', False, 1, 'a')
+        neg_min = cat(self.tourn_1, 'painting', 10, False, -1, 20)
+        neg_max = cat(self.tourn_1, 'painting', 10, False, 1, -1)
+        zero_max = cat(self.tourn_1, 'painting', 10, False, 0, 0)
+        min_high = cat(self.tourn_1, 'painting', 10, False, 10, 9)
+        zero_min = cat(self.tourn_1, 'painting', 10, False, 0, 20)
+        equal = cat(self.tourn_1, 'painting', 10, False, 1, 1)
+        no_min = cat(self.tourn_1, 'painting', '10', False, '', 20)
+        no_max = cat(self.tourn_1, 'painting', '10', False, 1, '')
+        none_min = cat(self.tourn_1, 'painting', '1', False, None, 1)
+        none_max = cat(self.tourn_1, 'painting', '1', False, 1, None)
+        char_min = cat(self.tourn_1, 'painting', '1', False, 'a', 1)
+        char_max = cat(self.tourn_1, 'painting', '1', False, 1, 'a')
 
         set_cats_func = self.tournament.set_score_categories
         self.assertRaises(ValueError, set_cats_func, [neg_min])
@@ -115,14 +105,14 @@ class ScoreCategoryTests(TestCase):
 
 
     def test_broken_categories(self):
-        # score_cat_args should perform input validation only
-        fifty_one = score_cat_args('categories_painting', 51, False, 1, 20)
-        neg_pct = score_cat_args('categories_painting', -1, False, 1, 20)
-        zero_pct = score_cat_args('categories_painting', 0, False, 1, 20)
-        lge_pct = score_cat_args('categories_painting', 101, False, 1, 20)
-        char_pct = score_cat_args('categories_painting', 'a', False, 1, 20)
-        no_name = score_cat_args('', 10, False, 1, 20)
-        none_name = score_cat_args(None, 10, False, 1, 20)
+        # cat should perform input validation only
+        fifty_one = cat(self.tourn_1, 'painting', 51, False, 1, 20)
+        neg_pct = cat(self.tourn_1, 'painting', -1, False, 1, 20)
+        zero_pct = cat(self.tourn_1, 'painting', 0, False, 1, 20)
+        lge_pct = cat(self.tourn_1, 'painting', 101, False, 1, 20)
+        char_pct = cat(self.tourn_1, 'painting', 'a', False, 1, 20)
+        no_name = cat(self.tourn_1, '', 10, False, 1, 20)
+        none_name = cat(self.tourn_1, None, 10, False, 1, 20)
 
         set_cats_func = self.tournament.set_score_categories
         self.assertRaises(ValueError, set_cats_func, [neg_pct])

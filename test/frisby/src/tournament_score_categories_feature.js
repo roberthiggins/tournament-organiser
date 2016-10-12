@@ -3,12 +3,28 @@ var frisby = require("frisby"),
     API = process.env.API_ADDR +
             "tournament/category_test/score_categories";
 
+var jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
+    var cat = {
+        "name": name,
+        "percentage": pct,
+        "per_tournament": per_tourn,
+        "min_val": min,
+        "max_val": max,
+        "zero_sum": z_sum,
+        "opponent_score": opp
+        };
+    if (id) {
+        cat.id = id;
+    }
+    return cat;
+};
+
 describe("Set categories normal function", function () {
     "use strict";
 
     injector.setCategories("category_test", [
-        ["categories_test_one", 8, true, 4, 12],
-        ["categories_test_two", 13, false, 3, 11]]);
+        ["cat_t_one", 8, true, 4, 12, false, false],
+        ["cat_t_two", 13, false, 3, 11, true, true]]);
     frisby.create("GET a list of tournament categories")
         .get(API)
         .expectStatus(200)
@@ -19,25 +35,13 @@ describe("Set categories normal function", function () {
             "percentage": Number,
             "per_tournament": Boolean,
             "min_val": Number,
-            "max_val": Number
+            "max_val": Number,
+            "zero_sum": Boolean,
+            "opponent_score": Boolean
         })
         .expectJSON([
-            {
-                "id": Number,
-                "name": "categories_test_one",
-                "percentage": 8,
-                "per_tournament": true,
-                "min_val": 4,
-                "max_val": 12
-            },
-            {
-                "id": Number,
-                "name": "categories_test_two",
-                "percentage": 13,
-                "per_tournament": false,
-                "min_val": 3,
-                "max_val": 11
-            }
+            jsonCat(Number, "cat_t_one", 8, true, 4, 12, false, false),
+            jsonCat(Number, "cat_t_two", 13, false, 3, 11, true, true)
         ])
         .toss();
 
@@ -46,13 +50,8 @@ describe("Set categories normal function", function () {
     frisby.create("set the score categories for category_test")
         .post(API, {
             categories: ["categories_3"],
-            categories_3: {
-                "name": "categories_test_three",
-                "percentage": 99,
-                "per_tourn": true,
-                "min_val": 1,
-                "max_val": 2
-                }
+            categories_3:
+                jsonCat(null, "cat_t_three", 99, true, 1, 2, false, false)
             }, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", "Basic " +
             new Buffer("category_test_to:password").toString("base64"))
@@ -62,16 +61,8 @@ describe("Set categories normal function", function () {
                 .get(API)
                 .expectStatus(200)
                 .expectHeaderContains("content-type", "application/json")
-                .expectJSON([
-                    {
-                        "id": Number,
-                        "name": "categories_test_three",
-                        "percentage": 99,
-                        "per_tournament": true,
-                        "min_val": 1,
-                        "max_val": 2
-                    }
-                ])
+                .expectJSON([jsonCat(Number, "cat_t_three", 99, true,
+                    1, 2, false, false)])
                 .toss();
             })
         .toss();
@@ -120,25 +111,15 @@ describe("Set categories malformed", function () {
     frisby.create("Incorrect: categories don\"t match")
         .post(API, {
             categories: ["categories_3"],
-            categories_1: {
-                "name": "categories_test_no_match",
-                "percentage": 5,
-                "per_tournament": true,
-                "min_val": 1,
-                "max_val": 2
-                }
+            categories_1:
+                jsonCat(null, "cat_t_no_match", 5, true, 1, 2, false, false)
             }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
     frisby.create("Incorrect: No names")
         .post(API, {
-            categories_1: {
-                "name": "categories_test_no_names",
-                "percentage": 5,
-                "per_tournament": true,
-                "min_val": 1,
-                "max_val": 2
-                }
+            categories_1:
+                jsonCat(null, "cat_t_no_names", 5, true, 1, 2, false, false)
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();

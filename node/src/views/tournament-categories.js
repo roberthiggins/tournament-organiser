@@ -12,7 +12,6 @@ var ScoreField = React.createClass({
     propTypes: {
         id: React.PropTypes.string.isRequired,
         name: React.PropTypes.string.isRequired,
-        type: React.PropTypes.string.isRequired,
         val: React.PropTypes.oneOfType(
                 [React.PropTypes.string, React.PropTypes.number])
     },
@@ -20,7 +19,7 @@ var ScoreField = React.createClass({
         return (
             <span>
                 <label htmlFor={this.props.id}>{this.props.name}:</label>
-                <input  type={this.props.type}
+                <input  type="text"
                         name={this.props.id}
                         id={this.props.id}
                         onChange={this.handleChange}
@@ -30,74 +29,85 @@ var ScoreField = React.createClass({
     }
 });
 
-var Category = React.createClass({
-    propTypes: {
-        idx: React.PropTypes.number.isRequired,
-        vals: React.PropTypes.object
+var ScoreCheckbox = React.createClass({
+    getInitialState: function() {
+        return {checked: this.props.checked};
     },
-    getDefaultProps: function(){
-        return {
-            vals: {name: "", percentage: "", per_tournament: false,
-                   min_val: "", max_val: ""}
-        };
+    handleChange: function(event) {
+        this.setState({checked: event.target.checked});
+    },
+    propTypes: {
+        checked: React.PropTypes.bool.isRequired,
+        id: React.PropTypes.string.isRequired,
+        name: React.PropTypes.string.isRequired,
     },
     render: function() {
         return (
-            <div className="category">
-                <ScoreField type="text" name="Category"
-                            id={this.props.idx + "_name"}
-                            val={this.props.vals.name} />
-                <ScoreField type="text" name="Percentage"
-                            id={this.props.idx + "_percentage"}
-                            val={this.props.vals.percentage} />
-                <ScoreField type="checkbox" name="Once per tournament?"
-                            id={this.props.idx + "_per_tournament"}
-                            checked={this.props.vals.per_tournament} />
-                <ScoreField type="text" name="Min Score"
-                            id={this.props.idx + "_min_val"}
-                            val={this.props.vals.min_val} />
-                <ScoreField type="text" name="Max Score"
-                            id={this.props.idx + "_max_val"}
-                            val={this.props.vals.max_val} />
-            </div>
+            <span>
+                <label htmlFor={this.props.id}>{this.props.name}:</label>
+                <input  type="checkbox"
+                        name={this.props.id}
+                        id={this.props.id}
+                        checked={this.state.checked}
+                        onChange={this.handleChange} />
+            </span>
         );
     }
 });
-Category.serialize = function($categoryDiv) {
-    var elementsAsDictionaries = $categoryDiv
-            .find(":input:text[value!=''],:input:checkbox:checked")
-            .serializeArray()
-            .map(function(dict) {
-                // We can strip the index from the front of the name as it
-                // was only there for display help and convert checkboxes
-                // to true
-                return {
-                    name: dict.name.substr(2),
-                    value: dict.value === "on" ? true : dict.value
-                };
-            }),
-        categoryValues = [];
 
-    elementsAsDictionaries.forEach(function(elem, idx) {
-        if (idx === 2 && elem.key !== "per_tournament") {
-            // This should be a checkbox. If not we shim one in.
-            categoryValues.push(false);
-        }
-
-        categoryValues.push(elem.value);
-    });
-
-    if (categoryValues.length !== 5 && categoryValues.length !== 0) {
+var serializeCategory = function($categoryDiv) {
+    var category = {},
+        requiredFields = ["name", "percentage", "min_val", "max_val"],
+        serialized = $categoryDiv
+                        .find(":input:text[value!=''],:input:checkbox:checked")
+                        .serializeArray();
+    if (!serialized.length) {
         return null;
     }
 
-    return {
-        "name": categoryValues[0],
-        "percentage": categoryValues[1],
-        "per_tourn": categoryValues[2],
-        "min_val": categoryValues[3],
-        "max_val": categoryValues[4]
-        };
+    serialized.forEach(function(dict) {
+        // We can strip the index from the front of the name as it
+        // was only there for display help and convert checkboxes
+        // to true
+        category[dict.name.substr(2)] = dict.value === "on" ? true : dict.value;
+    });
+
+    requiredFields.forEach(function(key){
+        if ((category[key] || "") === "") {
+            throw "Please fill in all fields";
+        }
+    });
+
+    // Checkboxes won't be serialized if false
+    category["per_tournament"] = category["per_tournament"] || false;
+    category["zero_sum"] = category["zero_sum"] || false;
+    category["opponent_score"] = category["opponent_score"] || false;
+
+    return category;
+};
+
+var category = function(idx, name, pct, per_tournament, min_val, max_val,
+                        zero_sum, opp_score) {
+    return (
+        <div className="category" key={idx + "_category"}>
+            <ScoreField name="Category" id={idx + "_name"} val={name}
+                        key={idx + "_name"} />
+            <ScoreField name="Percentage" id={idx + "_percentage"} val={pct}
+                        key={idx + "_percentage"} />
+            <ScoreCheckbox name="Once per tournament?"
+                           id={idx + "_per_tournament"}
+                           checked={per_tournament}
+                           key={idx + "_per_tournament"} />
+            <ScoreField name="Min Score" id={idx + "_min_val"} val={min_val}
+                        key={idx + "_min_val"} />
+            <ScoreField name="Max Score"id={idx + "_max_val"} val={max_val}
+                        key={idx + "_max_val"} />
+            <ScoreCheckbox id={idx + "_zero_sum"} checked={zero_sum}
+                           name="Zero Sum (score must be shared between game entrants)" />
+            <ScoreCheckbox id={idx + "_opponent_score"} checked={opp_score}
+                           name="Opponent enters score" />
+        </div>
+        );
 };
 
 var TournamentCategoriesPage = React.createClass({
@@ -114,12 +124,15 @@ var TournamentCategoriesPage = React.createClass({
                 if (result.categories) {
                     widgets = result.categories.map(function(cat, idx) {
                         lastIdx = idx;
-                        return (<Category vals={cat} idx={idx} key={idx} />);
+                        return category(idx, cat.name, cat.percentage,
+                            cat.per_tournament, cat.min_val, cat.max_val,
+                            cat.zero_sum, cat.opponent_score);
                     });
                 }
                 while (widgets.length < numLines) {
                     lastIdx = lastIdx + 1;
-                    widgets.push(<Category idx={lastIdx} key={lastIdx} />);
+                    widgets.push(
+                        category(lastIdx, "", "", false, "", "", false, false));
                 }
 
                 result.categories = widgets;
@@ -133,20 +146,18 @@ var TournamentCategoriesPage = React.createClass({
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
         var _this = this,
-            categories = [],
-            error = false;
+            categories = [];
 
-        $("form div.category").each(function() {
-            var serialized = Category.serialize($(this));
-            if (!serialized) {
-                _this.setState({error: "Please fill in all fields"});
-                error = true;
-                return;
-            }
-            categories.push(serialized);
-        });
-
-        if (error) {
+        try {
+            $("form div.category").each(function() {
+                var serialized = serializeCategory($(this));
+                if (serialized) {
+                    categories.push(serialized);
+                }
+            });
+        }
+        catch (err) {
+            _this.setState({error: err});
             return;
         }
 
