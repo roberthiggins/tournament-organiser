@@ -16,7 +16,7 @@ from models.dao.tournament_round import TournamentRound
 
 from models.score import is_score_entered
 from models.tournament import Tournament
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.tournament_injector import score_cat_args, TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
 class TestScoreEntered(TestCase):
@@ -92,15 +92,8 @@ class TestScoreEntered(TestCase):
 
     def test_score_entered(self):
         # Add a score category
-        score_args = {
-            'tournament_id': self.tournament_1,
-            'name':          'per_round',
-            'percentage':    50,
-            'per_tourn':     False,
-            'min_val':       0,
-            'max_val':       100
-        }
-        category_1 = ScoreCategory(**score_args)
+        args = score_cat_args(self.tournament_1, 'per_round', 50, False, 0, 100)
+        category_1 = ScoreCategory(**args)
         db.session.add(category_1)
         db.session.flush()
 

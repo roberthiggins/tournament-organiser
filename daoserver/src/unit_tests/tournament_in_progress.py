@@ -8,7 +8,7 @@ from models.dao.registration import TournamentRegistration
 from models.dao.tournament import db
 from models.tournament import Tournament
 
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.tournament_injector import score_cat_args, TournamentInjector
 
 # pylint: disable=no-member,no-init,invalid-name,missing-docstring
 class TournamentInProgress(TestCase):
@@ -28,14 +28,8 @@ class TournamentInProgress(TestCase):
         self.injector.add_round(self.name, 1, 'mission01')
         self.tournament = Tournament(self.name)
 
-        self.tournament.set_score_categories([{
-            'name':       'cat',
-            'percentage': 100,
-            'per_tourn':  True,
-            'min_val':    1,
-            'max_val':    1,
-            'zero_sum':   False
-        }])
+        args = score_cat_args(self.name, 'cat', 100, True, 1, 1, False)
+        self.tournament.set_score_categories([args])
 
     def tearDown(self):
         self.injector.delete()
@@ -69,14 +63,9 @@ class TournamentInProgress(TestCase):
         self.tournament.set_in_progress()
 
         self.assertRaises(ValueError, self.tournament.set_date, '3099-04-04')
+        args = score_cat_args(self.name, 'disallowed_cat', 100, True, 1, 1)
         self.assertRaises(ValueError, self.tournament.set_score_categories,
-                          [{
-                              'name':       'disallowed_category',
-                              'percentage': 100,
-                              'per_tourn':  True,
-                              'min_val':    1,
-                              'max_val':    1
-                          }])
+                          [args])
         self.assertRaises(ValueError, self.tournament.set_number_of_rounds, 5)
 
         rego = TournamentRegistration(self.player_1, self.name)

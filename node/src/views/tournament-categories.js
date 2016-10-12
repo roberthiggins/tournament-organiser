@@ -79,8 +79,7 @@ var serializeCategory = function($categoryDiv) {
     });
 
     // Checkboxes won't be serialized if false
-    category["per_tourn"] = category["per_tournament"] || false;
-    delete category["per_tournament"];
+    category["per_tournament"] = category["per_tournament"] || false;
 
     return category;
 };

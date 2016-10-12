@@ -49,7 +49,7 @@ describe("Set categories normal function", function () {
             categories_3: {
                 "name": "categories_test_three",
                 "percentage": 99,
-                "per_tourn": true,
+                "per_tournament": true,
                 "min_val": 1,
                 "max_val": 2
                 }

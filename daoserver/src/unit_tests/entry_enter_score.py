@@ -16,7 +16,8 @@ from models.dao.tournament_round import TournamentRound
 
 from models.score import is_score_entered
 from models.tournament import Tournament
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.tournament_injector import score_cat_args as cat, \
+TournamentInjector
 
 # pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
 class TestScoreEntered(TestCase):
@@ -93,14 +94,7 @@ class TestScoreEntered(TestCase):
     def test_score_entered(self):
         tourn = Tournament(self.tournament_1)
 
-        score_args = {
-            'tournament_id': self.tournament_1,
-            'name':          'per_round',
-            'percentage':    50,
-            'per_tourn':     False,
-            'min_val':       0,
-            'max_val':       100
-        }
+        score_args = cat(self.tournament_1, 'per_round', 50, False, 0, 100)
         category_1 = ScoreCategory(**score_args)
         db.session.add(category_1)
         db.session.flush()
@@ -188,14 +182,7 @@ class EnterScore(TestCase):
         self.injector.add_round(self.tournament_1, 1, 'foo_mission_1')
         self.injector.add_round(self.tournament_1, 2, 'foo_mission_2')
         self.injector.add_player(self.tournament_1, self.player)
-        score_args = {
-            'tournament_id': self.tournament_1,
-            'name':          'per_tourn',
-            'percentage':    50,
-            'per_tourn':     True,
-            'min_val':       0,
-            'max_val':       100
-        }
+        score_args = cat(self.tournament_1, 'per_tournament', 50, True, 0, 100)
 
         # per tournament category
         self.category_1 = ScoreCategory(**score_args)
@@ -203,7 +190,7 @@ class EnterScore(TestCase):
 
         # per round category
         score_args['name'] = 'per_round'
-        score_args['per_tourn'] = False
+        score_args['per_tournament'] = False
         self.category_2 = ScoreCategory(**score_args)
         db.session.add(self.category_2)
         db.session.commit()

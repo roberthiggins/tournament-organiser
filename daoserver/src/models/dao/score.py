@@ -35,13 +35,12 @@ class ScoreCategory(db.Model):
         'score_categories', lazy='dynamic'))
 
     def __init__(self, **args):
-        if not args['tournament_id'] or not args['name'] \
-        or args['per_tourn'] is None:
+        if not args['tournament_id'] or not args['name']:
             raise ValueError('TournamentScoreCategory args missing: {}'.\
                 format(args))
 
         self.tournament_id = args['tournament_id']
-        self.per_tournament = args['per_tourn']
+        self.per_tournament = args['per_tournament']
         self.set_name(args['name'])
         self.set_min_max(args['min_val'], args['max_val'])
         self.set_percentage(args['percentage'])
@@ -108,7 +107,7 @@ class ScoreCategory(db.Model):
         """Update an existing DAO"""
         self.tournament_id = args['tournament_id']
         self.set_name(args['name'])
-        self.per_tournament = args['per_tourn']
+        self.per_tournament = args['per_tournament']
         self.set_min_max(args['min_val'], args['max_val'])
         self.set_percentage(args['percentage'])
 

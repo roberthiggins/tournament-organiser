@@ -184,3 +184,16 @@ class TournamentInjector(object):
         from sqlalchemy.sql import false
         return Tournament.query.filter(Tournament.id.in_(self.tournament_ids)) \
         if len(self.tournament_ids) else Tournament.query.filter(false())
+
+# pylint: disable=too-many-arguments
+def score_cat_args(tourn_id, name, pct, per_tourn, min_val, max_val,
+                   zero_sum=False):
+    """Convenience function to make a ScoreCategory args blob"""
+    return {
+        'tournament_id':  tourn_id,
+        'name':           name,
+        'percentage':     pct,
+        'per_tournament': per_tourn,
+        'min_val':        min_val,
+        'max_val':        max_val,
+        'zero_sum':       zero_sum}
