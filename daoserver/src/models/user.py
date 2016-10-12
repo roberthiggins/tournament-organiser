@@ -99,6 +99,11 @@ class User(object):
         #  'action': 'update_details',
         #  'username': self.username},
 
+    @must_exist_in_db
+    def get_display_name(self):
+        """Get the real name of the user"""
+        return self.username
+
     def get_entry_actions(self):
         """Basic user actions for viewing and entering tournaments"""
 

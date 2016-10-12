@@ -10,6 +10,7 @@ from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.score import is_score_entered
 from models.tournament import Tournament
+from models.user import User
 
 ENTRY = Blueprint('ENTRY', __name__)
 
@@ -36,7 +37,7 @@ def list_entries():
     Return a list of the entrants for the tournament
     """
     # pylint: disable=no-member
-    return [ent.player_id for ent in \
+    return [User(ent.player_id).get_display_name() for ent in \
         TournamentEntry.query.filter_by(tournament_id=g.tournament_id).all()]
 
 def get_entry_id(tournament_id, username):
