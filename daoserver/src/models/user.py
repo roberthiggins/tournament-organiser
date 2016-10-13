@@ -44,6 +44,8 @@ class User(object):
         email = details['email']
         password1 = details['password1']
         password2 = details['password2']
+        first_name = details.get('first_name', None)
+        last_name = details.get('last_name', None)
 
         if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             raise ValueError('This email does not appear valid')
@@ -55,7 +57,8 @@ class User(object):
             raise ValueError('A user with the username {} already exists! \
                 Please choose another name'.format(self.username))
 
-        db.session.add(Account(self.username, email))
+        db.session.add(
+            Account(self.username, email, first_name, last_name))
         db.session.add(AccountSecurity(self.username, password1))
         db.session.commit()
 
@@ -109,7 +112,9 @@ class User(object):
     @must_exist_in_db
     def get_display_name(self):
         """Get the real name of the user"""
-        return self.username
+        full_name = '{} {}'.format(self.get_dao().first_name,
+                                   self.get_dao().last_name).strip()
+        return full_name if full_name is not '' else self.username
 
     def get_entry_actions(self):
         """Basic user actions for viewing and entering tournaments"""
