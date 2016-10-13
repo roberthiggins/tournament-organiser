@@ -10,6 +10,8 @@ Feature: See information about a user
         Then I should see "User details for ranking_test_player_1:" appear
         Then I should see "Username: ranking_test_player_1" appear
         Then I should see "Email: ranking_test_player_1@bar.com" appear
+        Then I should see "First Name: ranking_test" appear
+        Then I should see "Last Name: P1" appear
 
         Examples:
             |user                  |

@@ -15,6 +15,8 @@ var DetailsWidget = React.createClass({
                 <ul>
                     <li>Username: {user.username}</li>
                     <li>Email: {user.email}</li>
+                    <li>First Name: {user.first_name}</li>
+                    <li>Last Name: {user.last_name}</li>
                 </ul>
             </div>
         );
