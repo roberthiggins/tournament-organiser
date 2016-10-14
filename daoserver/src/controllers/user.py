@@ -5,7 +5,7 @@ Users for the site. Note this is separate from an entry in a tournament.
 from flask import Blueprint, g
 
 from controllers.request_helpers import enforce_request_variables, \
-json_response, requires_auth, text_response
+json_response, requires_auth, text_response, ensure_permission
 from models.user import User
 
 USER = Blueprint('USER', __name__)
@@ -14,7 +14,8 @@ USER = Blueprint('USER', __name__)
 # pylint: disable=unused-argument
 def get_user(endpoint, values):
     """Attempt to retrieve user from URL"""
-    g.user = User(values.pop('username', None))
+    g.username = values.pop('username', None)
+    g.user = User(g.username)
 
 @USER.route('/actions', methods=['GET'])
 @requires_auth
@@ -49,6 +50,7 @@ def create():
 
 @USER.route('', methods=['GET'])
 @requires_auth
+@ensure_permission({'permission': 'USER_DETAILS'})
 @json_response
 def user_details():
     """

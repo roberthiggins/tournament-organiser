@@ -119,6 +119,9 @@ class User(object):
             'actions': strip_none([
                 {'text': 'See a list of tournaments',
                  'action': 'tournament_list'},
+                {'text': 'See your user details',
+                 'action': 'user_details',
+                 'username': self.username},
             ])
         }
         # Get applications to update
