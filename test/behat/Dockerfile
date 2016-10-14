@@ -18,4 +18,4 @@ ADD src/ /
 RUN bin/behat --init
 
 ADD behat.yml /
-CMD behat --config /behat.yml
+CMD behat --config /behat.yml --stop-on-failure

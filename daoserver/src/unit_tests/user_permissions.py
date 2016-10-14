@@ -7,7 +7,7 @@ from testfixtures import compare
 
 from app import create_app
 from models.authentication import PermissionDeniedException
-from models.dao.account import db, Account, AccountSecurity, add_account
+from models.dao.account import db, Account, AccountSecurity
 from models.dao.permissions import ProtectedObject, ProtObjAction, \
 ProtObjPerm, AccountProtectedObjectPermission as AccountProtectedObjectPerm
 from models.permissions import PermissionsChecker
@@ -29,6 +29,10 @@ class UserPermissions(TestCase):
         db.create_all()
         self.injector = TournamentInjector()
 
+        db.session.add(Account(self.acc_1, 'foo@bar.com'))
+        db.session.add(AccountSecurity(self.acc_1, 'pwd1'))
+        db.session.commit()
+
     def tearDown(self):
         AccountProtectedObjectPerm.query.\
             filter(AccountProtectedObjectPerm.account_username == self.acc_1).\
@@ -43,7 +47,6 @@ class UserPermissions(TestCase):
         db.session.remove()
 
     def test_add_account(self):
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
         self.assertFalse(Account.query.\
             filter_by(username=self.acc_1).first().is_superuser)
 
@@ -69,7 +72,6 @@ class UserPermissions(TestCase):
     def test_superuser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False)
         Account.query.filter_by(username=self.acc_1).first().is_superuser = True
         self.injector.inject(self.tourn_1)
 
@@ -101,7 +103,6 @@ class UserPermissions(TestCase):
     def test_check_permissions(self):
         """Test the entrypoint method"""
         checker = PermissionsChecker()
-        add_account(self.acc_1, 'foo@bar.com', 'pwd1', commit=False) # random
         self.injector.inject(self.tourn_1, num_players=2)
         t_player_1 = '{}_player_1'.format(self.tourn_1)
 

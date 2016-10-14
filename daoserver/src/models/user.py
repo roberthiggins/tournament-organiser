@@ -7,7 +7,7 @@ import re
 from sqlalchemy.sql.expression import and_
 
 from models.authentication import check_auth
-from models.dao.account import Account, add_account
+from models.dao.account import db, Account, AccountSecurity
 from models.dao.tournament import Tournament as TournDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.permissions import PERMISSIONS
@@ -39,8 +39,12 @@ class User(object):
         """Convenience method to recover DAO"""
         return Account.query.filter_by(username=self.username).first()
 
-    def add_account(self, email, password1, password2):
+    def add_account(self, details):
         """Add an account"""
+        email = details['email']
+        password1 = details['password1']
+        password2 = details['password2']
+
         if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             raise ValueError('This email does not appear valid')
 
@@ -51,7 +55,10 @@ class User(object):
             raise ValueError('A user with the username {} already exists! \
                 Please choose another name'.format(self.username))
 
-        add_account(self.username, email, password1)
+        db.session.add(Account(self.username, email))
+        db.session.add(AccountSecurity(self.username, password1))
+        db.session.commit()
+
         self.exists_in_db = True
 
     @must_exist_in_db
@@ -98,6 +105,11 @@ class User(object):
         # {'text': 'Update my player details',
         #  'action': 'update_details',
         #  'username': self.username},
+
+    @must_exist_in_db
+    def get_display_name(self):
+        """Get the real name of the user"""
+        return self.username
 
     def get_entry_actions(self):
         """Basic user actions for viewing and entering tournaments"""
@@ -233,4 +245,5 @@ class User(object):
     @must_exist_in_db
     def details(self):
         """ username and email for contact and identification"""
-        return {self.username: self.get_dao().contact_email}
+        return {'username': self.username, \
+                'email': self.get_dao().contact_email}
