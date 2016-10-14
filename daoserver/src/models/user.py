@@ -210,38 +210,37 @@ class User(object):
                   'round': x
                  } for x in tourn_rounds]
 
+        submits = [
+            {'text': 'Submit a tournament score for {} entry {}'.\
+                format(next_tourn.name, self.username),
+             'action': 'enter_tournament_score',
+             'tournament': next_tourn.name,
+             'username': self.username} if next_tourn is not None else None,
+            {'text': 'Submit a game score for {} entry {}'.\
+                format(next_tourn.name, self.username),
+             'action': 'enter_game_score',
+             'tournament': next_tourn.name,
+             'username': self.username} if next_tourn is not None else None,
+            {'text': 'See total scores for {}'.format(last_tourn.name),
+             'action': 'get_rankings',
+             'tournament': last_tourn.name} if last_tourn is not None else None,
+        ]
+        # Table layout
+        # {'text': 'Get the table layout',
+        #  'action': 'table_layout'},
+        # Opponent army list
+        # {'text': 'Get an opponent army list',
+        #  'action': 'get_opponent'},
+        # Time remaining
+        # {'text': 'Get the time remaining in the round',
+        #  'action': 'get_clock'},
+        # Previous games
+        # {'text': 'Review previous games',
+        #  'action': 'see_previous_games'}
+
         return {
             'title': 'Play in a Tournament',
-            'actions': strip_none([
-                next_game,
-                # Table layout
-                # {'text': 'Get the table layout',
-                #  'action': 'table_layout'},
-                tuple(draws) if len(draws) > 0 else None,
-                # Opponent army list
-                # {'text': 'Get an opponent army list',
-                #  'action': 'get_opponent'},
-                # Time remaining
-                # {'text': 'Get the time remaining in the round',
-                #  'action': 'get_clock'},
-                {'text': 'Submit a tournament score for {} entry {}'.\
-                    format(next_tourn.name, self.username),
-                 'action': 'enter_tournament_score',
-                 'tournament': next_tourn.name,
-                 'username': self.username} if next_tourn is not None else None,
-                {'text': 'Submit a game score for {} entry {}'.\
-                    format(next_tourn.name, self.username),
-                 'action': 'enter_game_score',
-                 'tournament': next_tourn.name,
-                 'username': self.username} if next_tourn is not None else None,
-                {'text': 'See total scores for {}'.format(last_tourn.name),
-                 'action': 'get_rankings',
-                 'tournament': last_tourn.name} \
-                if last_tourn is not None else None,
-                # Previous games
-                # {'text': 'Review previous games',
-                #  'action': 'see_previous_games'}
-            ])
+            'actions': strip_none([next_game] + draws + submits)
         }
 
     def login(self, password):
