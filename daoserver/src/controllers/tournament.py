@@ -51,6 +51,15 @@ def add_tournament():
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\
         format(inputTournamentName, inputTournamentDate)
 
+@TOURNAMENT.route('/<tournament_id>/start', methods=['POST'])
+@requires_auth
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
+@text_response
+def start_tournament():
+    """Set the tournament to in-progress manually"""
+    g.tournament.set_in_progress()
+    return 'Tournament {} now in progress'.format(g.tournament_id)
+
 @TOURNAMENT.route('/<tournament_id>/missions', methods=['GET'])
 @json_response
 def list_missions():

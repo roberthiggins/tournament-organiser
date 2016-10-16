@@ -20,7 +20,6 @@ describe("Test seeing and registering for a tournament", function () {
                 rounds: Number
             })
         .expectJSON("tournaments", [
-            {date: "2095-07-05", name: "category_test",              rounds: 0},
             {date: "1985-01-27", name: "draw_test",                  rounds: 2},
             {date: "2095-10-10", name: "enter_score_test",           rounds: 1},
             {date: "2095-07-02", name: "entry_info_test",            rounds: 0},
@@ -33,7 +32,8 @@ describe("Test seeing and registering for a tournament", function () {
             {date: "1643-01-27", name: "rank_test",                  rounds: 2},
             {date: "2222-06-01", name: "register_test",              rounds: 0},
             {date: "2095-07-07", name: "round_test",                 rounds: 2},
-            {date: "2163-09-15", name: "schedule_test",              rounds: 2}])
+            {date: "2163-09-15", name: "schedule_test",              rounds: 2},
+            {date: '2063-03-17', name: 'start_test',                 rounds: 1}])
         .toss();
 
     frisby.create("enter a user")
