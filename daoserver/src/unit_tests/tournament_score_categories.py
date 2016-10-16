@@ -26,14 +26,15 @@ class ScoreCategoryTests(TestCase):
     def setUp(self):
         db.create_all()
         self.injector = TournamentInjector()
+        self.injector.inject(self.tourn_1)
+        db.session.flush()
+        db.session.commit()
 
         # Some default categories
         self.cat_1 = cat(self.tourn_1, 'painting', 10, False, 1, 20)
         self.cat_2 = cat(self.tourn_1, 'cat_battle', 80, True, 1, 20)
         self.cat_3 = cat(self.tourn_1, 'cat_sports', 10, True, 1, 5)
 
-        # We will make a tournament with 5 entrants.
-        self.injector.inject(self.tourn_1)
         self.tournament = Tournament(self.tourn_1)
 
     def tearDown(self):
@@ -71,9 +72,8 @@ class ScoreCategoryTests(TestCase):
         self.tournament.set_score_categories([self.cat_2, self.cat_3])
 
         # Double check cat 1 is deleted.
-        c_1 = ScoreCategory.query.\
-            filter_by(name=self.cat_1['name']).first()
-        self.assertTrue(c_1 is None)
+        compare(0, ScoreCategory.query.filter_by(name=self.cat_1['name']).\
+            count())
 
 
     # pylint: disable=unused-variable

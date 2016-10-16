@@ -19,7 +19,7 @@ from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
-from models.permissions import PermissionsChecker, PERMISSIONS
+from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
 from models.score import upsert_tourn_score_cat, validate_score, write_score
 from models.table_strategy import ProtestAvoidanceStrategy
@@ -61,7 +61,6 @@ class Tournament(object):
             else RankingStrategy(tournament_id, self.list_score_categories)
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
-        self.creator_username = None
 
 
     @not_in_progress
@@ -81,11 +80,6 @@ class Tournament(object):
 
         db.session.add(dao)
         db.session.commit()
-
-        PermissionsChecker().add_permission(
-            dao.creator_username,
-            PERMISSIONS['ENTER_SCORE'],
-            dao.protected_object)
 
 
     def get_dao(self):

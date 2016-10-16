@@ -22,8 +22,7 @@ from models.dao.tournament import Tournament
 from models.dao.tournament_entry import TournamentEntry as Entry
 from models.dao.tournament_round import TournamentRound
 
-from models.permissions import PermissionsChecker, PERMISSIONS, \
-set_up_permissions
+from models.permissions import set_up_permissions
 from models.tournament import Tournament as Tourn
 
 class TournamentInjector(object):
@@ -69,7 +68,6 @@ class TournamentInjector(object):
             self.existing_perms = set()
 
         db.session.commit()
-        return
 
     def add_player(self, tournament_name, username, email='foo@bar.com'):
         """Create player account and enter them"""
@@ -96,11 +94,6 @@ class TournamentInjector(object):
         db.session.flush()
         self.tournament_ids.add(tourn.id)
         self.tournament_names.add(tourn.name)
-
-        PermissionsChecker().add_permission(
-            creator_name,
-            PERMISSIONS['ENTER_SCORE'],
-            tourn.protected_object)
 
     def create_players(self, tourn_name, num_players):
         """Create some accounts and enter them in the tournament"""
@@ -164,16 +157,18 @@ class TournamentInjector(object):
             Account.username.in_([t.creator_username for t in tourns.all()]))
 
         tourns.delete(synchronize_session=False)
-        AccountProtectedObjectPermission.query.filter(
-            AccountProtectedObjectPermission.account_username.\
-            in_([c.username for c in creators.all()])).\
-            delete(synchronize_session=False)
-        ProtObjPerm.query.\
-            filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
-            delete(synchronize_session=False)
-        ProtectedObject.query.\
-            filter(ProtectedObject.id.in_(permission_ids)).\
-            delete(synchronize_session=False)
+        if creators.count() > 0:
+            AccountProtectedObjectPermission.query.filter(
+                AccountProtectedObjectPermission.account_username.\
+                in_([c.username for c in creators.all()])).\
+                delete(synchronize_session=False)
+        if len(permission_ids) > 0:
+            ProtObjPerm.query.\
+                filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
+                delete(synchronize_session=False)
+            ProtectedObject.query.\
+                filter(ProtectedObject.id.in_(permission_ids)).\
+                delete(synchronize_session=False)
         creators.delete(synchronize_session=False)
 
         self.tournament_ids = set()

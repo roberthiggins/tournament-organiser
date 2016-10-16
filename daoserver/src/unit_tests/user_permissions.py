@@ -142,19 +142,19 @@ class UserPermissions(TestCase):
 
         checker = PermissionsChecker()
         self.injector.inject(self.tourn_1)
-        creator = '{}_creator'.format(self.tourn_1)
+        player = '{}_player_1'.format(self.tourn_1)
         tourn_prot_obj = Tournament(self.tourn_1).get_dao().protected_object
 
-        prot_objs = len(ProtectedObject.query.all())
-        prot_obj_actions = len(ProtObjAction.query.all())
-        prot_obj_perms = len(ProtObjPerm.query.all())
-        acc_perms = len(AccountProtectedObjectPerm.query.all())
+        checker.add_permission(player, 'modify_application', tourn_prot_obj)
+        prot_objs = ProtectedObject.query.count()
+        prot_obj_actions = ProtObjAction.query.count()
+        prot_obj_perms = ProtObjPerm.query.count()
+        acc_perms = AccountProtectedObjectPerm.query.count()
 
-        self.assertTrue(checker.is_organiser(creator, self.tourn_1))
-        checker.remove_permission(creator, 'enter_score', tourn_prot_obj)
-        self.assertFalse(checker.is_organiser(creator, self.tourn_1))
-        compare(prot_objs, len(ProtectedObject.query.all()))
-        compare(prot_obj_actions, len(ProtObjAction.query.all()))
-        compare(prot_obj_perms, len(ProtObjPerm.query.all()))
+        checker.remove_permission(player, 'modify_application', tourn_prot_obj)
+
+        compare(prot_objs, ProtectedObject.query.count())
+        compare(prot_obj_actions, ProtObjAction.query.count())
+        compare(prot_obj_perms, ProtObjPerm.query.count())
         # the one account should now have lost it's permissions
-        compare(acc_perms - 1, len(AccountProtectedObjectPerm.query.all()))
+        compare(acc_perms - 1, AccountProtectedObjectPerm.query.count())

@@ -9,7 +9,7 @@ from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.account import Account
 from models.dao.permissions import AccountProtectedObjectPermission, \
-ProtObjAction, ProtObjPerm, ProtectedObject
+ProtObjAction, ProtObjPerm
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament import Tournament
 
@@ -142,9 +142,5 @@ class PermissionsChecker(object):
 
     def is_organiser(self, user, tournament):
         """user is an organiser of tournament"""
-        return Tournament.query.join(ProtectedObject).join(ProtObjPerm).\
-            join(AccountProtectedObjectPermission).\
-            filter(and_(
-                Tournament.name == tournament,
-                AccountProtectedObjectPermission.account_username == user
-            )).count() > 0
+        return Tournament.query.\
+            filter_by(name=tournament, creator_username=user).count() > 0
