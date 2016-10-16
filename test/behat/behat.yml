@@ -1,7 +1,8 @@
 default:
     extensions:
         Behat\MinkExtension\Extension:
-                goutte: ~
-                selenium2:
-                    wd_host: http://selenium:4444/wd/hub
-                base_url: http://systemtestnode:8000
+            goutte: ~
+            selenium2:
+                wd_host: http://selenium:4444/wd/hub
+            base_url: http://systemtestnode:8000
+            browser_name: 'chrome'
