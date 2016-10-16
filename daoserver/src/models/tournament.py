@@ -62,28 +62,31 @@ class Tournament(object):
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
         self.creator_username = None
-        self.date = None
 
-    def add_to_db(self):
+
+    @not_in_progress
+    def add_to_db(self, details):
         """
         add a tournament
         Expects:
-            - inputTournamentDate - Tournament Date. YYYY-MM-DD
+            - details - dict of keys to put into the DAO
         """
         if self.exists_in_db:
             raise RuntimeError('A tournament with name {} already exists! \
             Please choose another name'.format(self.tournament_id))
 
         dao = TournamentDAO(self.tournament_id)
-        dao.creator_username = self.creator_username
-        dao.date = self.date
+        dao.creator_username = details['creator_username']
+        dao.date = self.validate_date(details['date'])
+
         db.session.add(dao)
+        db.session.commit()
 
         PermissionsChecker().add_permission(
-            self.creator_username,
+            dao.creator_username,
             PERMISSIONS['ENTER_SCORE'],
             dao.protected_object)
-        db.session.commit()
+
 
     def get_dao(self):
         """Convenience method to recover TournamentDAO"""
@@ -120,15 +123,16 @@ class Tournament(object):
         """The number of rounds in the tournament"""
         return self.get_dao().rounds.count()
 
-    @not_in_progress
-    def set_date(self, date):
-        """Set the date for the tournament"""
+    @staticmethod
+    def validate_date(date):
+        """Validate the date for the tournament"""
         try:
-            self.date = datetime.datetime.strptime(date, "%Y-%m-%d")
-            if self.date.date() < datetime.date.today():
+            date = datetime.datetime.strptime(date, "%Y-%m-%d")
+            if date.date() < datetime.date.today():
                 raise ValueError()
         except ValueError:
             raise ValueError('Enter a valid date')
+        return date
 
     @must_exist_in_db
     @not_in_progress

@@ -62,7 +62,6 @@ class TournamentInProgress(TestCase):
     def test_non_finalised_only_actions(self):
         self.tournament.set_in_progress()
 
-        self.assertRaises(ValueError, self.tournament.set_date, '3099-04-04')
         args = score_cat_args(self.name, 'disallowed_cat', 100, True, 1, 1)
         self.assertRaises(ValueError, self.tournament.set_score_categories,
                           [args])
