@@ -204,6 +204,7 @@ class Tournament(object):
             filter_by(tournament_id=self.tournament_id).all()
 
 
+    @must_exist_in_db
     def set_details(self, details):
         """
         Set details for the tournament. Exceptions will be thrown when
