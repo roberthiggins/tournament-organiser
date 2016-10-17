@@ -176,7 +176,10 @@ class Tournament(object):
         Set details for the tournament. Exceptions will be thrown when
         in_progress, etc.
 
-        details should be a dict with keys corresponding to members.
+        details should be a dict with optional keys:
+            - date
+            - rounds
+            - to_username
         """
         dao = self.get_dao()
 
@@ -190,7 +193,7 @@ class Tournament(object):
 
         rounds = details.get('rounds', dao.rounds.count())
         if rounds != dao.rounds.count():
-            self.set_number_of_rounds(rounds)
+            self._set_rounds(rounds)
 
         db.session.add(dao)
         db.session.commit()
@@ -235,6 +238,24 @@ class Tournament(object):
 
         db.session.commit()
         return 'Missions set: {}'.format(missions)
+
+    @must_exist_in_db
+    @not_in_progress
+    def _set_rounds(self, num_rounds):
+        """Set the number of rounds in a tournament"""
+        num_rounds = int(num_rounds)
+
+        for rnd in self.get_dao().rounds.filter(TR.ordering > num_rounds).\
+        order_by(TR.ordering.desc()).all():
+            self.get_round(rnd.ordering).db_remove(False)
+
+        for rnd in range(self.get_num_rounds(), num_rounds):
+            db.session.add(TR(self.tournament_id, rnd + 1))
+
+        db.session.commit()
+
+        self.make_draws()
+
 
     @must_exist_in_db
     @not_in_progress
@@ -324,23 +345,6 @@ class Tournament(object):
                     self.get_round(rnd + 1).make_draw(self.entries())
                 except DrawException:
                     pass
-
-    @must_exist_in_db
-    @not_in_progress
-    def set_number_of_rounds(self, num_rounds):
-        """Set the number of rounds in a tournament"""
-        num_rounds = int(num_rounds)
-
-        for rnd in self.get_dao().rounds.filter(TR.ordering > num_rounds).\
-        order_by(TR.ordering.desc()).all():
-            self.get_round(rnd.ordering).db_remove(False)
-
-        for rnd in range(self.get_num_rounds(), num_rounds):
-            db.session.add(TR(self.tournament_id, rnd + 1))
-
-        db.session.commit()
-
-        self.make_draws()
 
     @must_exist_in_db
     @not_in_progress

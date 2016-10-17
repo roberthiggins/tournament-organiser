@@ -55,7 +55,7 @@ class TournamentInjector(object):
 
         for tourn in [Tourn(t.name) for t in self.tournaments().all()]:
             tourn.get_dao().in_progress = False
-            tourn.set_number_of_rounds(0)
+            tourn.update({'rounds': 0})
 
         self.delete_accounts()
 

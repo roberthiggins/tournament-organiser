@@ -49,7 +49,7 @@ class TournamentMissionsTests(TestCase):
         compare(self.tourn.get_missions(), ['foo', 'bar'])
 
     def test_round_change(self):
-        self.tourn.set_number_of_rounds(0)
-        self.tourn.set_number_of_rounds(1)
+        self.tourn.update({'rounds': 0})
+        self.tourn.update({'rounds': 1})
 
         compare(self.tourn.get_round(1).get_dao().get_mission(), 'TBA')
