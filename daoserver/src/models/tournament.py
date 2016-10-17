@@ -36,6 +36,8 @@ def must_exist_in_db(func):
         return func(self, *args, **kwargs)
     return wrapped
 
+PROGRESS_EXCEPTION = ValueError('You cannot perform this action on a '\
+                                'tournament that is in progress')
 def not_in_progress(func):
     """
     Decorator to intercept actions that cannot be performed on an in-progress
@@ -43,8 +45,7 @@ def not_in_progress(func):
     """
     def wrapped(self, *args, **kwargs): # pylint: disable=missing-docstring
         if self.get_dao() is not None and self.get_dao().in_progress:
-            raise ValueError('You cannot perform this action on a tournament ' \
-                             'that is in progress')
+            raise PROGRESS_EXCEPTION
         return func(self, *args, **kwargs)
     return wrapped
 
@@ -77,12 +78,12 @@ class Tournament(object):
             Please choose another name'.format(self.tournament_id))
 
         dao = TournamentDAO(self.tournament_id)
-        dao.to_username = details['to_username']
-        dao.date = self.validate_date(details['date'])
-
+        dao.to_username = details.pop('to_username')
+        dao.date = self.validate_date(details.pop('date'))
         db.session.add(dao)
         db.session.commit()
 
+        self.set_details(details)
 
     @must_exist_in_db
     @not_in_progress
@@ -169,6 +170,31 @@ class Tournament(object):
 
         return TournamentRound(self.tournament_id, round_num,
                                self.matching_strategy, self.table_strategy)
+
+    def set_details(self, details):
+        """
+        Set details for the tournament. Exceptions will be thrown when
+        in_progress, etc.
+
+        details should be a dict with keys corresponding to members.
+        """
+        dao = self.get_dao()
+
+        if details.get('to_username', None) is not None and dao.in_progress:
+            raise PROGRESS_EXCEPTION
+        dao.creator_username = details.get('to_username', dao.to_username)
+
+        if details.get('date', None) is not None and dao.in_progress:
+            raise PROGRESS_EXCEPTION
+        dao.date = details.get('date', dao.date)
+
+        rounds = details.get('rounds', dao.rounds.count())
+        if rounds != dao.rounds.count():
+            self.set_number_of_rounds(rounds)
+
+        db.session.add(dao)
+        db.session.commit()
+
 
     @must_exist_in_db
     @not_in_progress
@@ -316,6 +342,11 @@ class Tournament(object):
 
         self.make_draws()
 
+    @must_exist_in_db
+    @not_in_progress
+    def update(self, details):
+        """Update the basic details about a tournament in the db"""
+        self.set_details(details)
 
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""
