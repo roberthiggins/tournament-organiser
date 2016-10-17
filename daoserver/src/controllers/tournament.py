@@ -44,7 +44,7 @@ def add_tournament():
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
     tourn = Tournament(inputTournamentName)
-    tourn.add_to_db({
+    tourn.new({
         'date':             inputTournamentDate,
         'creator_username': request.authorization.username
     })

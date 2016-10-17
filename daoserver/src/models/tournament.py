@@ -64,9 +64,9 @@ class Tournament(object):
 
 
     @not_in_progress
-    def add_to_db(self, details):
+    def new(self, details):
         """
-        add a tournament
+        add a tournament to the db
         Expects:
             - details - dict of keys to put into the DAO
         """
