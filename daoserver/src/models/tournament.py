@@ -28,7 +28,7 @@ from models.tournament_round import TournamentRound, DrawException
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
     def wrapped(self, *args, **kwargs): # pylint: disable=missing-docstring
-        if not self.exists_in_db:
+        if self.get_dao() is None:
             print 'Tournament not found: {}'.format(self.tournament_id)
             raise ValueError(
                 'Tournament {} not found in database'.format(
@@ -54,7 +54,6 @@ class Tournament(object):
 
     def __init__(self, tournament_id=None, ranking_strategy=None):
         self.tournament_id = tournament_id
-        self.exists_in_db = self.get_dao() is not None
         self.ranking_strategy = \
             ranking_strategy(tournament_id, self.list_score_categories) \
             if ranking_strategy \
@@ -75,7 +74,7 @@ class Tournament(object):
         Expects:
             - details - dict of keys to put into the DAO
         """
-        if self.exists_in_db:
+        if self.get_dao() is not None:
             raise RuntimeError('A tournament with name {} already exists! \
             Please choose another name'.format(self.tournament_id))
 
