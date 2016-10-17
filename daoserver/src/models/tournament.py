@@ -58,7 +58,7 @@ class Tournament(object):
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
         self.ranking_strategy = RankingStrategy(tournament_id,
-                                                self.list_score_categories)
+                                                self.get_score_categories)
 
 
     def get_dao(self):
@@ -192,6 +192,18 @@ class Tournament(object):
         return TournamentRound(self.tournament_id, round_num,
                                self.matching_strategy, self.table_strategy)
 
+    @must_exist_in_db
+    def get_score_categories(self):
+        """
+        List all the score categories available to this tournie and their
+        percentages.
+        [{ 'name': 'Painting', 'percentage': 20, 'id': 1,
+           'per_tournament': False }]
+        """
+        return ScoreCategory.query.\
+            filter_by(tournament_id=self.tournament_id).all()
+
+
     def set_details(self, details):
         """
         Set details for the tournament. Exceptions will be thrown when
@@ -240,7 +252,7 @@ class Tournament(object):
             raise ValueError('You need to set the missions')
         if len(self.get_entries()) < 1:
             raise ValueError('You need at least 1 entrant')
-        if len(self.list_score_categories()) < 1:
+        if len(self.get_score_categories()) < 1:
             raise ValueError('You need to set the score categories')
 
         self.get_dao().in_progress = True
@@ -317,17 +329,6 @@ class Tournament(object):
             db.session.rollback()
             raise
 
-
-    @must_exist_in_db
-    def list_score_categories(self):
-        """
-        List all the score categories available to this tournie and their
-        percentages.
-        [{ 'name': 'Painting', 'percentage': 20, 'id': 1,
-           'per_tournament': False }]
-        """
-        return ScoreCategory.query.\
-            filter_by(tournament_id=self.tournament_id).all()
 
     @must_exist_in_db
     def make_draws(self):

@@ -83,7 +83,7 @@ def list_score_categories():
         'max_val':        x.max_val,
         'zero_sum':       x.zero_sum,
         'opponent_score': x.opponent_score
-    } for x in g.tournament.list_score_categories()]
+    } for x in g.tournament.get_score_categories()]
 
 @TOURNAMENT.route('/', methods=['GET'])
 @json_response
