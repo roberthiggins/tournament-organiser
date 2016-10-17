@@ -33,7 +33,7 @@ class DrawStrategyTests(TestCase):
 
         self.injector.inject('dst', num_players=5)
 
-        entries = Tournament('dst').entries()
+        entries = Tournament('dst').get_entries()
         matching_strategy = RoundRobin()
         draw = matching_strategy.match(1, entries)
         compare(draw[0][0].player_id, 'dst_player_1')

@@ -29,7 +29,7 @@ def get_round_info(round_id):
     rnd = g.tournament.get_round(round_id)
 
     if rnd.draw is None:
-        rnd.make_draw(g.tournament.entries())
+        rnd.make_draw(g.tournament.get_entries())
         if rnd.draw is None:
             raise no_draw
 

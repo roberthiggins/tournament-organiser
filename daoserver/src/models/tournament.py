@@ -156,6 +156,27 @@ class Tournament(object):
 
 
     @must_exist_in_db
+    def get_entries(self):
+        """Get a list of Entry"""
+
+        entries = TournamentEntry.query.\
+            filter_by(tournament_id=self.tournament_id).all()
+        for entry in entries:
+            entry.game_history = [x.table_no for x in \
+                TableAllocation.query.filter_by(entry_id=entry.id)]
+            entry.score_info = [
+                {
+                    'score': x.value,
+                    'category': x.score_category.name,
+                    'min_val': x.score_category.min_val,
+                    'max_val': x.score_category.max_val,
+                } for x in entry.scores
+            ]
+
+        return entries
+
+
+    @must_exist_in_db
     def get_missions(self):
         """Get all the missions for the tournament. List ordered by ordering"""
         return [x.get_mission()
@@ -217,7 +238,7 @@ class Tournament(object):
             raise ValueError('You need to add at least 1 round')
         if len([x for x in self.get_missions() if x != 'TBA']) < 1:
             raise ValueError('You need to set the missions')
-        if len(self.entries()) < 1:
+        if len(self.get_entries()) < 1:
             raise ValueError('You need at least 1 entrant')
         if len(self.list_score_categories()) < 1:
             raise ValueError('You need to set the score categories')
@@ -298,26 +319,6 @@ class Tournament(object):
 
 
     @must_exist_in_db
-    def entries(self):
-        """Get a list of Entry"""
-
-        entries = TournamentEntry.query.\
-            filter_by(tournament_id=self.tournament_id).all()
-        for entry in entries:
-            entry.game_history = [x.table_no for x in \
-                TableAllocation.query.filter_by(entry_id=entry.id)]
-            entry.score_info = [
-                {
-                    'score': x.value,
-                    'category': x.score_category.name,
-                    'min_val': x.score_category.min_val,
-                    'max_val': x.score_category.max_val,
-                } for x in entry.scores
-            ]
-
-        return entries
-
-    @must_exist_in_db
     def list_score_categories(self):
         """
         List all the score categories available to this tournie and their
@@ -336,7 +337,7 @@ class Tournament(object):
             for rnd in range(0, self.get_dao().rounds.count()):
                 try:
                     self.get_round(rnd + 1).destroy_draw()
-                    self.get_round(rnd + 1).make_draw(self.entries())
+                    self.get_round(rnd + 1).make_draw(self.get_entries())
                 except DrawException:
                     pass
 
