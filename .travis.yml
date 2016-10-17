@@ -15,13 +15,16 @@ install:
     - cp config/dev/docker-compose.dev.yml ./docker-compose.yml
     - cp config/dev/docker-passwords.dev.yml ./docker-passwords.yml
     - docker-compose build
+    - docker-compose up -d unittestdb
     - docker-compose up -d database daoserver node
     - docker-compose up -d apitestdb apitestdaoserver
     - docker-compose up -d systemtestdb systemtestdaoserver systemtestnode
+    - docker inspect unittestdb
     - docker inspect daoserver
     - docker inspect apitestdaoserver
     - docker inspect systemtestdaoserver
 script:
+
 
     - docker-compose run unittest
 

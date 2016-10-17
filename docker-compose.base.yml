@@ -24,6 +24,11 @@ node:
         - "5005:8000"
 
 # Unit Test Specific
+unittestdb:
+    container_name: unittestdb
+    extends:
+        file: docker-compose.base.yml
+        service: database
 
 unittest:
     build: daoserver

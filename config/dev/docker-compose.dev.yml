@@ -18,9 +18,14 @@ node:
         service: node
 
 # Unit Test Specific
+unittestdb:
+    extends:
+        file: docker-compose.base.yml
+        service: unittestdb
+
 unittest:
     links:
-        - database:database
+        - unittestdb:database
     extends:
         file: docker-compose.base.yml
         service: unittest
