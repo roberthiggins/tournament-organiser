@@ -52,14 +52,12 @@ def not_in_progress(func):
 class Tournament(object):
     """A tournament model"""
 
-    def __init__(self, tournament_id=None, ranking_strategy=None):
+    def __init__(self, tournament_id=None):
         self.tournament_id = tournament_id
-        self.ranking_strategy = \
-            ranking_strategy(tournament_id, self.list_score_categories) \
-            if ranking_strategy \
-            else RankingStrategy(tournament_id, self.list_score_categories)
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
+        self.ranking_strategy = RankingStrategy(tournament_id,
+                                                self.list_score_categories)
 
 
     def get_dao(self):
