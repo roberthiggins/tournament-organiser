@@ -200,7 +200,7 @@ class User(object):
                      'tournament': next_tourn.name} \
             if next_tourn is not None else None
         tourn_rounds = [x for x in \
-                range(1, Tournament(next_tourn.name).get_num_rounds())] \
+                range(1, Tournament(next_tourn.name).get_dao().rounds.count())]\
             if next_tourn is not None else []
 
         draws = [{'text': 'Get the draw for {} round {}'.\

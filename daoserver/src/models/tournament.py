@@ -117,7 +117,7 @@ class Tournament(object):
         return {
             'name': details.name,
             'date': details.date,
-            'rounds': self.get_num_rounds(),
+            'rounds': self.get_dao().rounds.count(),
         }
 
 
@@ -156,15 +156,9 @@ class Tournament(object):
                 for x in self.get_dao().rounds.order_by('ordering')]
 
     @must_exist_in_db
-    def get_num_rounds(self):
-        """The number of rounds in the tournament"""
-        return self.get_dao().rounds.count()
-
-
-    @must_exist_in_db
     def get_round(self, round_num):
         """Get the relevant TournamentRound"""
-        if int(round_num) not in range(1, self.get_num_rounds() + 1):
+        if int(round_num) not in range(1, self.get_dao().rounds.count() + 1):
             raise ValueError('Tournament {} does not have a round {}'.format(
                 self.tournament_id, round_num))
 
@@ -213,7 +207,7 @@ class Tournament(object):
 
         All those features need to have sane values for this to succeed.
         """
-        if self.get_num_rounds() < 1:
+        if self.get_dao().rounds.count() < 1:
             raise ValueError('You need to add at least 1 round')
         if len([x for x in self.get_missions() if x != 'TBA']) < 1:
             raise ValueError('You need to set the missions')
@@ -229,7 +223,7 @@ class Tournament(object):
     @must_exist_in_db
     def _set_missions(self, missions=None):
         """ Set missions for tournament. Must set a mission for each round"""
-        rounds = self.get_num_rounds()
+        rounds = self.get_dao().rounds.count()
 
         if missions is None or len(missions) != rounds:
             raise ValueError('Tournament {} has {} rounds. \
@@ -254,7 +248,7 @@ class Tournament(object):
         order_by(TR.ordering.desc()).all():
             self.get_round(rnd.ordering).db_remove(False)
 
-        for rnd in range(self.get_num_rounds(), num_rounds):
+        for rnd in range(self.get_dao().rounds.count(), num_rounds):
             db.session.add(TR(self.tournament_id, rnd + 1))
 
         db.session.commit()
@@ -344,7 +338,7 @@ class Tournament(object):
         """Makes the draws for all rounds"""
         # If we can we determine all rounds
         if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
-            for rnd in range(0, self.get_num_rounds()):
+            for rnd in range(0, self.get_dao().rounds.count()):
                 try:
                     self.get_round(rnd + 1).destroy_draw()
                     self.get_round(rnd + 1).make_draw(self.entries())
