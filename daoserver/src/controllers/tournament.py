@@ -45,8 +45,8 @@ def add_tournament():
     """
     tourn = Tournament(inputTournamentName)
     tourn.new({
-        'date':             inputTournamentDate,
-        'creator_username': request.authorization.username
+        'date':        inputTournamentDate,
+        'to_username': request.authorization.username
     })
     return '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\

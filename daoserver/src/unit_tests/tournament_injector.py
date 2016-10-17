@@ -83,13 +83,13 @@ class TournamentInjector(object):
 
     def create_tournament(self, name, date):
         """Create a tournament"""
-        creator_name = '{}_creator'.format(name)
-        db.session.add(Account(creator_name, '{}@bar.com'.format(creator_name)))
+        to_username = '{}_creator'.format(name)
+        db.session.add(Account(to_username, '{}@bar.com'.format(to_username)))
         db.session.flush()
 
         tourn = Tournament(name)
         tourn.date = date
-        tourn.creator_username = creator_name
+        tourn.to_username = to_username
         db.session.add(tourn)
         db.session.flush()
         self.tournament_ids.add(tourn.id)
@@ -155,7 +155,7 @@ class TournamentInjector(object):
         tourns = self.tournaments()
         permission_ids = [t.protected_object.id for t in tourns.all()]
         creators = Account.query.filter(
-            Account.username.in_([t.creator_username for t in tourns.all()]))
+            Account.username.in_([t.to_username for t in tourns.all()]))
 
         tourns.delete(synchronize_session=False)
         if creators.count() > 0:

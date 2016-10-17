@@ -142,5 +142,5 @@ class PermissionsChecker(object):
 
     def is_organiser(self, user, tournament):
         """user is an organiser of tournament"""
-        return Tournament.query.\
-            filter_by(name=tournament, creator_username=user).count() > 0
+        return Tournament.query.filter_by(name=tournament, to_username=user).\
+            count() > 0

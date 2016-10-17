@@ -77,7 +77,7 @@ class Tournament(object):
             Please choose another name'.format(self.tournament_id))
 
         dao = TournamentDAO(self.tournament_id)
-        dao.creator_username = details['creator_username']
+        dao.to_username = details['to_username']
         dao.date = self.validate_date(details['date'])
 
         db.session.add(dao)

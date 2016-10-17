@@ -17,7 +17,7 @@ class Tournament(db.Model):
         db.Integer,
         db.ForeignKey(ProtectedObject.id),
         nullable=False)
-    creator_username = db.Column(
+    to_username = db.Column(
         db.String(50),
         db.ForeignKey(Account.username),
         nullable=False)
