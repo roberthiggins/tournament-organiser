@@ -19,7 +19,7 @@ from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtectedObject, ProtObjAction, ProtObjPerm
 from models.dao.registration import TournamentRegistration as TReg
 from models.dao.tournament import Tournament
-from models.dao.tournament_entry import TournamentEntry as Entry
+from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_round import TournamentRound
 
 from models.permissions import set_up_permissions
@@ -73,7 +73,7 @@ class TournamentInjector(object):
         """Create player account and enter them"""
         db.session.add(Account(username, email))
         db.session.flush()
-        db.session.add(Entry(username, tournament_name))
+        db.session.add(TournamentEntry(username, tournament_name))
         db.session.flush()
         self.accounts.add(username)
 
@@ -101,7 +101,7 @@ class TournamentInjector(object):
             play_name = '{}_player_{}'.format(tourn_name, entry_no)
             db.session.add(Account(play_name, '{}@test.com'.format(play_name)))
             db.session.flush()
-            db.session.add(Entry(play_name, tourn_name))
+            db.session.add(TournamentEntry(play_name, tourn_name))
             db.session.flush()
             self.accounts.add(play_name)
 
@@ -116,7 +116,8 @@ class TournamentInjector(object):
             TReg.query.filter(TReg.tournament_id.in_(self.tournament_ids)).\
                 delete(synchronize_session=False)
         if len(self.tournament_names):
-            Entry.query.filter(Entry.tournament_id.in_(self.tournament_names)).\
+            TournamentEntry.query.filter(
+                TournamentEntry.tournament_id.in_(self.tournament_names)).\
                 delete(synchronize_session=False)
 
         # Accounts
