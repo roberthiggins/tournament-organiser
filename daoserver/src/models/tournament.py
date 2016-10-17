@@ -63,6 +63,11 @@ class Tournament(object):
         self.table_strategy = ProtestAvoidanceStrategy()
 
 
+    def get_dao(self):
+        """Convenience method to recover TournamentDAO"""
+        return TournamentDAO.query.filter_by(name=self.tournament_id).first()
+
+
     @not_in_progress
     def new(self, details):
         """
@@ -81,10 +86,6 @@ class Tournament(object):
         db.session.add(dao)
         db.session.commit()
 
-
-    def get_dao(self):
-        """Convenience method to recover TournamentDAO"""
-        return TournamentDAO.query.filter_by(name=self.tournament_id).first()
 
     @must_exist_in_db
     @not_in_progress
@@ -106,6 +107,50 @@ class Tournament(object):
                 pass
         db.session.commit()
 
+
+    @must_exist_in_db
+    def details(self):
+        """
+        Get details about a tournament. This includes entrants and format
+        information
+        """
+        details = self.get_dao()
+
+        return {
+            'name': details.name,
+            'date': details.date,
+            'rounds': self.get_num_rounds(),
+        }
+
+
+    @must_exist_in_db
+    def enter_score(self, entry_id, score_cat, score, game_id=None):
+        """Enter a score for score_cat into self for entry."""
+        entry = TournamentEntry.query.filter_by(id=entry_id).first()
+        if entry is None:
+            raise ValueError('Unknown entrant: {}'.format(entry_id))
+
+        cat = db.session.query(ScoreCategory).filter_by(
+            tournament_id=self.tournament_id, name=score_cat).first()
+        try:
+            game = TournamentGame.query.filter_by(id=game_id).first()
+        except DataError:
+            db.session.rollback()
+            raise TypeError('{} not entered. Game {} cannot be found'.\
+                format(score, game_id))
+        try:
+            validate_score(score, cat, entry, game)
+        except AttributeError:
+            raise TypeError('Unknown category: {}'.format(score_cat))
+
+        if cat.opponent_score:
+            entry = game.entrants.filter(GameEntrant.entrant_id != entry.id).\
+                first().entrant
+
+        write_score(self.get_dao(), entry, cat, score, game)
+        return 'Score entered for {}: {}'.format(entry.player_id, score)
+
+
     @must_exist_in_db
     def get_missions(self):
         """Get all the missions for the tournament. List ordered by ordering"""
@@ -117,16 +162,16 @@ class Tournament(object):
         """The number of rounds in the tournament"""
         return self.get_dao().rounds.count()
 
-    @staticmethod
-    def validate_date(date):
-        """Validate the date for the tournament"""
-        try:
-            date = datetime.datetime.strptime(date, "%Y-%m-%d")
-            if date.date() < datetime.date.today():
-                raise ValueError()
-        except ValueError:
-            raise ValueError('Enter a valid date')
-        return date
+
+    @must_exist_in_db
+    def get_round(self, round_num):
+        """Get the relevant TournamentRound"""
+        if int(round_num) not in range(1, self.get_num_rounds() + 1):
+            raise ValueError('Tournament {} does not have a round {}'.format(
+                self.tournament_id, round_num))
+
+        return TournamentRound(self.tournament_id, round_num,
+                               self.matching_strategy, self.table_strategy)
 
     @must_exist_in_db
     @not_in_progress
@@ -203,47 +248,16 @@ class Tournament(object):
             raise
 
 
-    @must_exist_in_db
-    def details(self):
-        """
-        Get details about a tournament. This includes entrants and format
-        information
-        """
-        details = self.get_dao()
-
-        return {
-            'name': details.name,
-            'date': details.date,
-            'rounds': self.get_num_rounds(),
-        }
-
-    @must_exist_in_db
-    def enter_score(self, entry_id, score_cat, score, game_id=None):
-        """Enter a score for score_cat into self for entry."""
-        entry = TournamentEntry.query.filter_by(id=entry_id).first()
-        if entry is None:
-            raise ValueError('Unknown entrant: {}'.format(entry_id))
-
-        cat = db.session.query(ScoreCategory).filter_by(
-            tournament_id=self.tournament_id, name=score_cat).first()
+    @staticmethod
+    def validate_date(date):
+        """Validate the date for the tournament"""
         try:
-            game = TournamentGame.query.filter_by(id=game_id).first()
-        except DataError:
-            db.session.rollback()
-            raise TypeError('{} not entered. Game {} cannot be found'.\
-                format(score, game_id))
-        try:
-            validate_score(score, cat, entry, game)
-        except AttributeError:
-            raise TypeError('Unknown category: {}'.format(score_cat))
-
-        if cat.opponent_score:
-            entry = game.entrants.filter(GameEntrant.entrant_id != entry.id).\
-                first().entrant
-
-        write_score(self.get_dao(), entry, cat, score, game)
-        return 'Score entered for {}: {}'.format(entry.player_id, score)
-
+            date = datetime.datetime.strptime(date, "%Y-%m-%d")
+            if date.date() < datetime.date.today():
+                raise ValueError()
+        except ValueError:
+            raise ValueError('Enter a valid date')
+        return date
 
     @must_exist_in_db
     def entries(self):
@@ -289,16 +303,6 @@ class Tournament(object):
                     pass
 
     @must_exist_in_db
-    def get_round(self, round_num):
-        """Get the relevant TournamentRound"""
-        if int(round_num) not in range(1, self.get_num_rounds() + 1):
-            raise ValueError('Tournament {} does not have a round {}'.format(
-                self.tournament_id, round_num))
-
-        return TournamentRound(self.tournament_id, round_num,
-                               self.matching_strategy, self.table_strategy)
-
-    @must_exist_in_db
     @not_in_progress
     def set_number_of_rounds(self, num_rounds):
         """Set the number of rounds in a tournament"""
@@ -314,6 +318,7 @@ class Tournament(object):
         db.session.commit()
 
         self.make_draws()
+
 
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""
