@@ -15,7 +15,7 @@ def get_tournament(endpoint, values):
     """Retrieve tournament_id from URL and ensure the tournament exists"""
     g.tournament_id = values.pop('tournament_id', None)
     g.tournament = Tournament(g.tournament_id)
-    if not g.tournament.exists_in_db:
+    if g.tournament.get_dao() is None:
         raise ValueError('Tournament {} not found in database'.\
             format(g.tournament_id))
 
@@ -64,5 +64,5 @@ def set_rounds():
     except ValueError:
         raise ValueError('Set at least 1 round')
 
-    g.tournament.set_number_of_rounds(rounds)
+    g.tournament.update({'rounds': rounds})
     return 'Rounds set: {}'.format(rounds)

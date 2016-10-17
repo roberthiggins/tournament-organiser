@@ -47,12 +47,12 @@ class TournamentInProgress(TestCase):
         self.assertRaises(ValueError, self.tournament.set_in_progress)
 
     def test_no_missions(self):
-        self.tournament.set_number_of_rounds(0)
-        self.tournament.set_number_of_rounds(1)
+        self.tournament.update({'rounds': 0})
+        self.tournament.update({'rounds': 1})
         self.assertRaises(ValueError, self.tournament.set_in_progress)
 
     def test_no_rounds(self):
-        self.tournament.set_number_of_rounds(0)
+        self.tournament.update({'rounds': 0})
         self.assertRaises(ValueError, self.tournament.set_in_progress)
 
     def test_set_in_progress(self):
@@ -62,11 +62,10 @@ class TournamentInProgress(TestCase):
     def test_non_finalised_only_actions(self):
         self.tournament.set_in_progress()
 
-        self.assertRaises(ValueError, self.tournament.set_date, '3099-04-04')
         args = score_cat_args(self.name, 'disallowed_cat', 100, True, 1, 1)
         self.assertRaises(ValueError, self.tournament.set_score_categories,
                           [args])
-        self.assertRaises(ValueError, self.tournament.set_number_of_rounds, 5)
+        self.assertRaises(ValueError, self.tournament.update, {'rounds': 5})
 
         rego = TournamentRegistration(self.player_1, self.name)
         rego.add_to_db()
