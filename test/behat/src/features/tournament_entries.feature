@@ -10,7 +10,7 @@ Feature: List Entries for a tournament
     Scenario: Visit the page from the front page
         Given I am on "/tournament/ranking_test/entries"
         Then I should see "Entries:" appear
-        Then I should see "ranking_test_player_1" appear
+        Then I should see "ranking_test P1" appear
         Then I should see "ranking_test_player_2" appear
         Then I should see "ranking_test_player_3" appear
         Then I should see "ranking_test_player_4" appear

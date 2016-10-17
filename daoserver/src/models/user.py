@@ -44,6 +44,8 @@ class User(object):
         email = details['email']
         password1 = details['password1']
         password2 = details['password2']
+        first_name = details.get('first_name', None)
+        last_name = details.get('last_name', None)
 
         if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             raise ValueError('This email does not appear valid')
@@ -55,7 +57,8 @@ class User(object):
             raise ValueError('A user with the username {} already exists! \
                 Please choose another name'.format(self.username))
 
-        db.session.add(Account(self.username, email))
+        db.session.add(
+            Account(self.username, email, first_name, last_name))
         db.session.add(AccountSecurity(self.username, password1))
         db.session.commit()
 
@@ -109,7 +112,9 @@ class User(object):
     @must_exist_in_db
     def get_display_name(self):
         """Get the real name of the user"""
-        return self.username
+        full_name = '{} {}'.format(self.get_dao().first_name,
+                                   self.get_dao().last_name).strip()
+        return full_name if full_name is not '' else self.username
 
     def get_entry_actions(self):
         """Basic user actions for viewing and entering tournaments"""
@@ -119,6 +124,9 @@ class User(object):
             'actions': strip_none([
                 {'text': 'See a list of tournaments',
                  'action': 'tournament_list'},
+                {'text': 'See your user details',
+                 'action': 'user_details',
+                 'username': self.username},
             ])
         }
         # Get applications to update
@@ -202,38 +210,37 @@ class User(object):
                   'round': x
                  } for x in tourn_rounds]
 
+        submits = [
+            {'text': 'Submit a tournament score for {} entry {}'.\
+                format(next_tourn.name, self.username),
+             'action': 'enter_tournament_score',
+             'tournament': next_tourn.name,
+             'username': self.username} if next_tourn is not None else None,
+            {'text': 'Submit a game score for {} entry {}'.\
+                format(next_tourn.name, self.username),
+             'action': 'enter_game_score',
+             'tournament': next_tourn.name,
+             'username': self.username} if next_tourn is not None else None,
+            {'text': 'See total scores for {}'.format(last_tourn.name),
+             'action': 'get_rankings',
+             'tournament': last_tourn.name} if last_tourn is not None else None,
+        ]
+        # Table layout
+        # {'text': 'Get the table layout',
+        #  'action': 'table_layout'},
+        # Opponent army list
+        # {'text': 'Get an opponent army list',
+        #  'action': 'get_opponent'},
+        # Time remaining
+        # {'text': 'Get the time remaining in the round',
+        #  'action': 'get_clock'},
+        # Previous games
+        # {'text': 'Review previous games',
+        #  'action': 'see_previous_games'}
+
         return {
             'title': 'Play in a Tournament',
-            'actions': strip_none([
-                next_game,
-                # Table layout
-                # {'text': 'Get the table layout',
-                #  'action': 'table_layout'},
-                tuple(draws) if len(draws) > 0 else None,
-                # Opponent army list
-                # {'text': 'Get an opponent army list',
-                #  'action': 'get_opponent'},
-                # Time remaining
-                # {'text': 'Get the time remaining in the round',
-                #  'action': 'get_clock'},
-                {'text': 'Submit a tournament score for {} entry {}'.\
-                    format(next_tourn.name, self.username),
-                 'action': 'enter_tournament_score',
-                 'tournament': next_tourn.name,
-                 'username': self.username} if next_tourn is not None else None,
-                {'text': 'Submit a game score for {} entry {}'.\
-                    format(next_tourn.name, self.username),
-                 'action': 'enter_game_score',
-                 'tournament': next_tourn.name,
-                 'username': self.username} if next_tourn is not None else None,
-                {'text': 'See total scores for {}'.format(last_tourn.name),
-                 'action': 'get_rankings',
-                 'tournament': last_tourn.name} \
-                if last_tourn is not None else None,
-                # Previous games
-                # {'text': 'Review previous games',
-                #  'action': 'see_previous_games'}
-            ])
+            'actions': strip_none([next_game] + draws + submits)
         }
 
     def login(self, password):
@@ -245,5 +252,9 @@ class User(object):
     @must_exist_in_db
     def details(self):
         """ username and email for contact and identification"""
-        return {'username': self.username, \
-                'email': self.get_dao().contact_email}
+        return {
+            'username': self.username,
+            'email': self.get_dao().contact_email,
+            'first_name' : self.get_dao().first_name,
+            'last_name' : self.get_dao().last_name,
+        }

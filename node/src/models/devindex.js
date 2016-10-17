@@ -58,6 +58,9 @@ exports.transform = function(responseFromDAO) {
                 case "tournament_list":
                     act.href = slug(null, null, "tournaments");
                     break;
+                case "user_details":
+                    act.href = slug(null, null, "user/" + act.username);
+                    break;
             }
             delete act.action;
             delete act.tournament;

@@ -15,7 +15,8 @@ module.exports = {
     tournamentList: './src/views/tournament-list.js',
     tournamentMissions: './src/views/tournament-missions.js',
     tournamentRankings: './src/views/tournament-rankings.js',
-    tournamentRounds: './src/views/tournament-rounds.js'
+    tournamentRounds: './src/views/tournament-rounds.js',
+    userDetails: './src/views/user-details.js'
   },
   output: {
     path: './public',

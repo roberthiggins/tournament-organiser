@@ -69,7 +69,7 @@ def ensure_permission(permission):
                 PERMISSIONS.get(permission.get('permission')),
                 user,
                 target,
-                g.tournament_id)
+                getattr(g, 'tournament_id', None))
 
             return func(*args, **kwargs)
         return wrapped

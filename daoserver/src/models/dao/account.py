@@ -12,16 +12,24 @@ class Account(db.Model):
     __tablename__ = 'account'
     username = db.Column(db.String(30), primary_key=True)
     contact_email = db.Column(db.String(100), nullable=False)
+    first_name = db.Column(db.String(100), nullable=False, default='')
+    last_name = db.Column(db.String(100), nullable=False, default='')
     is_superuser = db.Column(db.Boolean, default=False, nullable=False)
 
-    def __init__(self, username, contact_email, is_superuser=False):
+    # pylint: disable=too-many-arguments
+    def __init__(self, username, contact_email, first_name=None, last_name=None,
+                 is_superuser=False):
         self.username = username
         self.contact_email = contact_email
+        self.first_name = first_name
+        self.last_name = last_name
         self.is_superuser = is_superuser
 
     def __repr__(self):
-        return '<Account ({}, {}, {})>'.format(
+        return '<Account ({}, {}, {}, {}, {})>'.format(
             self.username,
+            self.first_name,
+            self.last_name,
             self.contact_email,
             self.is_superuser)
 

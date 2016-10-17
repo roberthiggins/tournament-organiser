@@ -1,8 +1,8 @@
 -- Set up a user to be logged in
-CREATE OR REPLACE FUNCTION create_user(username varchar, superuser boolean DEFAULT FALSE) RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION create_user(username varchar, superuser boolean DEFAULT FALSE, first_name varchar DEFAULT '', last_name varchar DEFAULT '') RETURNS int LANGUAGE plpgsql AS $$
 BEGIN
 
-    INSERT INTO account VALUES (username, username || '@bar.com', superuser);
+    INSERT INTO account VALUES (username, username || '@bar.com', first_name, last_name, superuser);
     INSERT INTO account_security VALUES (username, '$5$rounds=535000$YgBRpraLjej03Wm0$52r5LDk9cx0ioGSI.6rW/d1l2d5wo1Qn7tyTxm8e26D');
 
     RETURN 0;
@@ -64,12 +64,12 @@ BEGIN
 END $$;
 
 -- Create player and enter them in to a tournament
-CREATE OR REPLACE FUNCTION add_player(tourn_name varchar, tourn_id int, player_name varchar) RETURNS int LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION add_player(tourn_name varchar, tourn_id int, player_name varchar, first_name varchar DEFAULT '', last_name varchar DEFAULT '') RETURNS int LANGUAGE plpgsql AS $$
 DECLARE
     entry_id int := 0;
 BEGIN
 
-    PERFORM create_user(player_name);
+    PERFORM create_user(player_name, FALSE, first_name, last_name);
     INSERT INTO registration VALUES(player_name, tourn_id);
     INSERT INTO entry VALUES(default, player_name, tourn_name) RETURNING id INTO entry_id;
 
@@ -162,7 +162,7 @@ BEGIN
     cat_1 = create_score_category(tourn_name, 'Battle', 90, FALSE, 0, 20, TRUE);
     cat_2 = create_score_category(tourn_name, 'Fair Play', 10, FALSE, 1, 5, FALSE);
 
-    ent_1_id := add_player(tourn_name, tourn_id, ent_1_name);
+    ent_1_id := add_player(tourn_name, tourn_id, ent_1_name, tourn_name, 'P1');
     INSERT INTO table_allocation VALUES(ent_1_id, 1, 1);
     INSERT INTO table_allocation VALUES(ent_1_id, 2, 2);
 
