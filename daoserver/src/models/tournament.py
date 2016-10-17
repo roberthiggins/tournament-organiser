@@ -79,7 +79,13 @@ class Tournament(object):
 
         dao = TournamentDAO(self.tournament_id)
         dao.to_username = details.pop('to_username')
-        dao.date = self.validate_date(details.pop('date'))
+        try:
+            date = datetime.datetime.strptime(details.pop('date'), "%Y-%m-%d")
+            if date.date() < datetime.date.today():
+                raise ValueError()
+            dao.date = date
+        except ValueError:
+            raise ValueError('Enter a valid date')
         db.session.add(dao)
         db.session.commit()
 
@@ -290,17 +296,6 @@ class Tournament(object):
             db.session.rollback()
             raise
 
-
-    @staticmethod
-    def validate_date(date):
-        """Validate the date for the tournament"""
-        try:
-            date = datetime.datetime.strptime(date, "%Y-%m-%d")
-            if date.date() < datetime.date.today():
-                raise ValueError()
-        except ValueError:
-            raise ValueError('Enter a valid date')
-        return date
 
     @must_exist_in_db
     def entries(self):
