@@ -34,18 +34,22 @@ class TournamentMissionsTests(TestCase):
         self.injector.delete()
         db.session.remove()
 
+    # pylint: disable=protected-access
     def test_add_missions(self):
-        self.tourn.set_missions(['foo', 'bar'])
-        self.tourn.set_missions(['foo', 'bar'])
+        self.tourn.update({'missions': ['foo', 'bar']})
 
-        self.assertRaises(ValueError, self.tourn.set_missions, [])
-        self.assertRaises(ValueError, self.tourn.set_missions, ['1'])
-        self.assertRaises(ValueError, self.tourn.set_missions, ['1', '2', '3'])
+        self.assertRaises(ValueError, self.tourn._set_missions, [])
+        self.assertRaises(ValueError, self.tourn.update, {'missions': []})
+        self.assertRaises(ValueError, self.tourn._set_missions, ['1'])
+        self.assertRaises(ValueError, self.tourn.update, {'missions': ['1']})
+        self.assertRaises(ValueError, self.tourn._set_missions, ['1', '2', '3'])
+        self.assertRaises(ValueError, self.tourn.update,
+                          {'missions': ['1', '2', '3']})
 
     def test_get_missions(self):
         compare(self.tourn.get_missions(), ['TBA', 'TBA'])
 
-        self.tourn.set_missions(['foo', 'bar'])
+        self.tourn.update({'missions': ['foo', 'bar']})
         compare(self.tourn.get_missions(), ['foo', 'bar'])
 
     def test_round_change(self):

@@ -122,7 +122,9 @@ def register():
 def set_missions():
     """POST to set the missions for a tournament. A list of strings expected"""
     # pylint: disable=undefined-variable
-    return g.tournament.set_missions(load_json(missions))
+    g.tournament.update({'missions': load_json(missions)})
+
+    return 'Missions set: {}'.format(missions)
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response

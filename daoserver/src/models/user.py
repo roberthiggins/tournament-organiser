@@ -168,7 +168,7 @@ class User(object):
         } for x in modifiable_tournaments]
 
         # Find all tournaments that can have their missions set
-        set_missions = [{
+        set_mission_actions = [{
             'text': 'Set missions for {}'.format(x),
             'action': 'set_missions',
             'tournament': x
@@ -183,7 +183,7 @@ class User(object):
 
         actions = \
             [{'text': 'Create a Tournament', 'action': 'create_tournament'}] \
-            + set_rounds + set_cats + set_missions
+            + set_rounds + set_cats + set_mission_actions
 
         return {
             'title': 'Organise a Tournament',

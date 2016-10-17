@@ -178,6 +178,7 @@ class Tournament(object):
 
         details should be a dict with optional keys:
             - date
+            - missions
             - rounds
             - to_username
         """
@@ -194,6 +195,10 @@ class Tournament(object):
         rounds = details.get('rounds', dao.rounds.count())
         if rounds != dao.rounds.count():
             self._set_rounds(rounds)
+
+        missions = details.get('missions', self.get_missions())
+        if missions != self.get_missions():
+            self._set_missions(missions)
 
         db.session.add(dao)
         db.session.commit()
@@ -222,7 +227,7 @@ class Tournament(object):
         db.session.commit()
 
     @must_exist_in_db
-    def set_missions(self, missions=None):
+    def _set_missions(self, missions=None):
         """ Set missions for tournament. Must set a mission for each round"""
         rounds = self.get_num_rounds()
 
@@ -237,7 +242,7 @@ class Tournament(object):
             db.session.add(rnd)
 
         db.session.commit()
-        return 'Missions set: {}'.format(missions)
+
 
     @must_exist_in_db
     @not_in_progress
