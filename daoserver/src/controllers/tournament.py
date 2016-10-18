@@ -147,7 +147,7 @@ def set_score_categories():
             cat = request.get_json().get(json_cat)
         new_categories.append(cat)
 
-    g.tournament.set_score_categories(new_categories)
+    g.tournament.update({'score_categories': new_categories})
 
     return 'Score categories set: {}'.\
         format(', '.join([str(cat['name']) for cat in new_categories]))

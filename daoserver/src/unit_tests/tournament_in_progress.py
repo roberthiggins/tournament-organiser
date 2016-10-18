@@ -29,7 +29,7 @@ class TournamentInProgress(TestCase):
         self.tournament = Tournament(self.name)
 
         args = score_cat_args(self.name, 'cat', 100, True, 1, 1, False)
-        self.tournament.set_score_categories([args])
+        self.tournament.update({'score_categories': [args]})
 
     def tearDown(self):
         self.injector.delete()
@@ -63,8 +63,8 @@ class TournamentInProgress(TestCase):
         self.tournament.set_in_progress()
 
         args = score_cat_args(self.name, 'disallowed_cat', 100, True, 1, 1)
-        self.assertRaises(ValueError, self.tournament.set_score_categories,
-                          [args])
+        self.assertRaises(ValueError, self.tournament.update,
+                          {'score_categories': [args]})
         self.assertRaises(ValueError, self.tournament.update, {'rounds': 5})
 
         rego = TournamentRegistration(self.player_1, self.name)

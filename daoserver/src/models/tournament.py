@@ -214,6 +214,7 @@ class Tournament(object):
             - date
             - missions
             - rounds
+            - score_categories
             - to_username
         """
         dao = self.get_dao()
@@ -225,6 +226,11 @@ class Tournament(object):
         if details.get('date', None) is not None and dao.in_progress:
             raise PROGRESS_EXCEPTION
         dao.date = details.get('date', dao.date)
+
+        # TODO we should add an equality check here
+        score_cats = details.get('score_categories', None)
+        if score_cats is not None:
+            self._set_score_categories(score_cats)
 
         rounds = details.get('rounds', dao.rounds.count())
         if rounds != dao.rounds.count():
@@ -298,7 +304,7 @@ class Tournament(object):
 
     @must_exist_in_db
     @not_in_progress
-    def set_score_categories(self, new_categories):
+    def _set_score_categories(self, new_categories):
         """
         Replace the existing score categories with those from the list. The list
         should contain a ScoreCategorys
