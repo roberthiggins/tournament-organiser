@@ -1,7 +1,7 @@
 /* Helper methods to inject data via the daoserver */
 var frisby = require("frisby");
 
-var auth = function(user, pass) {
+exports.auth = function(user, pass) {
         return "Basic " + new Buffer(user + ":" + pass).toString("base64");
     };
 
@@ -19,7 +19,7 @@ exports.createTournament = function(tournament, date) {
 
     frisby.create("Insert tournament: " + tournament)
         .post(API, postData, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", auth(to, "password"))
+        .addHeader("Authorization", exports.auth(to, "password"))
         .expectStatus(200)
         .toss();
 };
@@ -48,9 +48,26 @@ exports.enterTournament = function(tournament, username) {
                 username;
     frisby.create("Add user " + username + " to " + tournament)
         .post(API, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", auth(username, "password"))
+        .addHeader("Authorization", exports.auth(username, "password"))
         .expectStatus(200)
         .toss();
+};
+
+// A json blob for a single score category
+exports.jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
+    var cat = {
+        "name": name,
+        "percentage": pct,
+        "per_tournament": per_tourn,
+        "min_val": min,
+        "max_val": max,
+        "zero_sum": z_sum,
+        "opponent_score": opp
+        };
+    if (id) {
+        cat.id = id;
+    }
+    return cat;
 };
 
 // Set the score categories
@@ -74,7 +91,7 @@ exports.setCategories = function(tourn, categories){
 
     frisby.create("set the score categories for " + tourn)
         .post(API, postData, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", auth("superuser", "password"))
+        .addHeader("Authorization", exports.auth("superuser", "password"))
         .expectStatus(200)
         .toss();
 };
@@ -86,7 +103,7 @@ exports.setMissions = function(tourn, missions){
 
     frisby.create("POST " + missions.length + " missions to setup")
         .post(API, {missions: missions}, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", auth("superuser", "password"))
+        .addHeader("Authorization", exports.auth("superuser", "password"))
         .expectStatus(200)
         .toss();
 };
@@ -98,7 +115,7 @@ exports.postRounds = function(tourn, rounds) {
     var API = process.env.API_ADDR + "tournament/" + tourn + "/rounds";
     frisby.create("POST " + rounds + " rounds to setup")
         .post(API, {numRounds: rounds}, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", auth("superuser", "password"))
+        .addHeader("Authorization", exports.auth("superuser", "password"))
         .expectStatus(200)
         .toss();
 };
