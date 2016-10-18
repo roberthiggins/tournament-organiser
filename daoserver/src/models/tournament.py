@@ -332,10 +332,15 @@ class Tournament(object):
         # pylint: disable=broad-except
         try:
             # Delete the ones no longer needed
-            ScoreCategory.query.filter(and_(
-                ScoreCategory.tournament_id == self.tournament_id,
-                ~ScoreCategory.name.in_(keys)
-            )).delete(synchronize_session='fetch')
+            score_cats = self.get_dao().score_categories
+            if len(keys) > 0: # we must keep some
+                score_cats = score_cats.filter(~ScoreCategory.name.in_(keys))
+            for cat in score_cats.all():
+                for score in cat.scores:
+                    score.game_scores.delete()
+                    score.tournament_scores.delete()
+                cat.scores.delete()
+            score_cats.delete(synchronize_session='fetch')
 
             for cat in new_categories:
                 upsert_tourn_score_cat(self.tournament_id, cat)

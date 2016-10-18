@@ -188,7 +188,8 @@ class TournamentScore(db.Model):
         backref=db.backref('tournament_scores', lazy='dynamic'))
     tournament = db.relationship(Tournament, \
         backref=db.backref('tournament_scores', lazy='dynamic'))
-    score = db.relationship(Score)
+    score = db.relationship(Score, \
+        backref=db.backref('tournament_scores', lazy='dynamic'))
 
     def __init__(self, entry_id, tournament_id, score_id):
         self.entry_id = entry_id

@@ -42,7 +42,7 @@ class TournamentInProgress(TestCase):
         self.assertFalse(self.tournament.get_dao().in_progress)
 
     def test_no_categories(self):
-        self.injector.delete_scores()
+        self.tournament.update({'score_categories': []})
         self.assertRaises(ValueError, self.tournament.set_in_progress)
 
     def test_no_entries(self):

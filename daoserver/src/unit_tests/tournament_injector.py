@@ -49,11 +49,13 @@ class TournamentInjector(object):
     def delete(self):
         """Remove all tournaments we have injected"""
 
-        self.delete_scores()
-
         for tourn in self.tournaments:
-            tourn.get_dao().in_progress = False
-            tourn.update({'rounds': 0})
+            dao = tourn.get_dao()
+            dao.in_progress = False
+            tourn.update({
+                'rounds': 0,
+                'score_categories': []
+            })
 
         self.delete_accounts()
 
@@ -132,23 +134,6 @@ class TournamentInjector(object):
             delete(synchronize_session=False)
 
         self.accounts = set()
-
-    def delete_scores(self):
-        """Delete all scores for all tournaments injected"""
-
-        for tourn in [t.get_dao() for t in self.tournaments]:
-
-            if tourn is None:
-                return
-
-            tourn.tournament_scores.delete()
-
-            for cat in tourn.score_categories:
-                for score in cat.scores:
-                    score.game_scores.delete()
-                cat.scores.delete()
-            tourn.score_categories.delete()
-        db.session.commit()
 
     def delete_tournaments(self):
         """Delete tournaments and their rounds"""
