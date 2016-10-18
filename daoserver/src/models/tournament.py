@@ -89,7 +89,7 @@ class Tournament(object):
         db.session.add(dao)
         db.session.commit()
 
-        self.set_details(details)
+        self._set_details(details)
 
     @must_exist_in_db
     @not_in_progress
@@ -218,7 +218,7 @@ class Tournament(object):
 
 
     @must_exist_in_db
-    def set_details(self, details):
+    def _set_details(self, details):
         """
         Set details for the tournament. Exceptions will be thrown when
         in_progress, etc.
@@ -353,7 +353,7 @@ class Tournament(object):
     @not_in_progress
     def update(self, details):
         """Update the basic details about a tournament in the db"""
-        self.set_details(details)
+        self._set_details(details)
 
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""
