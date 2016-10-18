@@ -3,7 +3,7 @@ Model of a tournament
 
 It holds a tournament object for housing of scoring strategies, etc.
 """
-import datetime
+from datetime import date, datetime
 
 from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
@@ -53,6 +53,8 @@ def not_in_progress(func):
 class Tournament(object):
     """A tournament model"""
 
+    DATE_FORMAT = "%Y-%m-%d"
+
     def __init__(self, tournament_id=None):
         self.tournament_id = tournament_id
         self.matching_strategy = RoundRobin()
@@ -80,10 +82,9 @@ class Tournament(object):
         dao = TournamentDAO(self.tournament_id)
         dao.to_username = details.pop('to_username')
         try:
-            date = datetime.datetime.strptime(details.pop('date'), "%Y-%m-%d")
-            if date.date() < datetime.date.today():
+            dao.date = datetime.strptime(details.pop('date'), self.DATE_FORMAT)
+            if dao.date.date() < date.today():
                 raise ValueError()
-            dao.date = date
         except ValueError:
             raise ValueError('Enter a valid date')
         db.session.add(dao)
@@ -358,7 +359,7 @@ class Tournament(object):
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""
     all_tournaments = TournamentDAO.query.\
-        filter(TournamentDAO.date >= datetime.date.today()).\
+        filter(TournamentDAO.date >= date.today()).\
         order_by(TournamentDAO.date.asc()).all()
     checker = PermissionsChecker()
     modifiable_tournaments = []
