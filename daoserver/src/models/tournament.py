@@ -11,6 +11,8 @@ from sqlalchemy.sql.expression import and_
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
+from models.dao.permissions import AccountProtectedObjectPermission, \
+ProtectedObject, ProtObjPerm
 from models.dao.registration import TournamentRegistration as Reg
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
@@ -66,6 +68,27 @@ class Tournament(object):
     def get_dao(self):
         """Convenience method to recover TournamentDAO"""
         return TournamentDAO.query.filter_by(name=self.tournament_id).first()
+
+
+    @not_in_progress
+    def delete(self):
+        """Delete a tournament"""
+        dao = self.get_dao()
+        self.update({
+            'rounds': 0,
+            'score_categories': []
+        })
+        Reg.query.filter_by(tournament_id=dao.id).delete()
+        TournamentEntry.query.filter_by(tournament_id=dao.name).delete()
+        db.session.delete(dao)
+        db.session.flush()
+        AccountProtectedObjectPermission.query.\
+            filter_by(account_username=dao.to_username).delete()
+        ProtObjPerm.query.\
+            filter_by(protected_object_id=dao.protected_object.id).delete()
+        ProtectedObject.query.filter_by(id=dao.protected_object.id).\
+            delete()
+        db.session.commit()
 
 
     @not_in_progress

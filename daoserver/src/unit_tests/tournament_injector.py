@@ -16,8 +16,7 @@ from datetime import datetime, timedelta
 from models.dao.account import Account, AccountSecurity
 from models.dao.db_connection import db
 from models.dao.permissions import AccountProtectedObjectPermission, \
-ProtectedObject, ProtObjAction, ProtObjPerm
-from models.dao.registration import TournamentRegistration as TReg
+ProtObjAction
 from models.dao.tournament import Tournament
 from models.dao.tournament_entry import TournamentEntry
 
@@ -49,17 +48,16 @@ class TournamentInjector(object):
     def delete(self):
         """Remove all tournaments we have injected"""
 
-        for tourn in self.tournaments:
-            dao = tourn.get_dao()
+        for tournament in self.tournaments:
+            dao = tournament.get_dao()
             dao.in_progress = False
-            tourn.update({
-                'rounds': 0,
-                'score_categories': []
-            })
+            db.session.flush()
+            tournament.delete()
+            Account.query.filter_by(username=dao.to_username).delete()
+            db.session.commit()
+        self.tournaments = set()
 
         self.delete_accounts()
-
-        self.delete_tournaments()
 
         if len(self.existing_perms):
             ProtObjAction.query.\
@@ -115,17 +113,6 @@ class TournamentInjector(object):
         if not len(self.accounts):
             return
 
-        # Some relations can't be deleted via relationship for some reason
-        # registrations and entries
-        if len(self.tournaments):
-            ids = [t.get_dao().id for t in self.tournaments]
-            TReg.query.filter(TReg.tournament_id.in_(ids)).\
-                delete(synchronize_session=False)
-            names = [t.get_dao().name for t in self.tournaments]
-            TournamentEntry.query.filter(
-                TournamentEntry.tournament_id.in_(names)).\
-                delete(synchronize_session=False)
-
         # Accounts
         AccountProtectedObjectPermission.query.filter(
             AccountProtectedObjectPermission.account_username.\
@@ -136,34 +123,6 @@ class TournamentInjector(object):
             delete(synchronize_session=False)
 
         self.accounts = set()
-
-    def delete_tournaments(self):
-        """Delete tournaments and their rounds"""
-
-        if not len(self.tournaments):
-            return
-
-        tourns = [t.get_dao() for t in self.tournaments]
-        permission_ids = [t.protected_object.id for t in tourns]
-        creators = Account.query.filter(
-            Account.username.in_([t.to_username for t in tourns]))
-        Tournament.query.filter(Tournament.id.in_([t.id for t in tourns])).\
-            delete(synchronize_session=False)
-        if creators.count() > 0:
-            AccountProtectedObjectPermission.query.filter(
-                AccountProtectedObjectPermission.account_username.\
-                in_([c.username for c in creators.all()])).\
-                delete(synchronize_session=False)
-        if len(permission_ids) > 0:
-            ProtObjPerm.query.\
-                filter(ProtObjPerm.protected_object_id.in_(permission_ids)).\
-                delete(synchronize_session=False)
-            ProtectedObject.query.\
-                filter(ProtectedObject.id.in_(permission_ids)).\
-                delete(synchronize_session=False)
-        creators.delete(synchronize_session=False)
-
-        self.tournaments = set()
 
 # pylint: disable=too-many-arguments
 def score_cat_args(name, pct, per_tourn, min_val, max_val, zero_sum=False):

@@ -42,9 +42,8 @@ class TournamentRound(object):
             ProtObjPerm.query.filter_by(
                 protected_object_id=game.protected_object.id,
                 protected_object_action_id=act_id).delete()
-            prot_obj = game.protected_object
             db.session.delete(game)
-            db.session.delete(prot_obj)
+            db.session.delete(game.protected_object)
 
         db.session.delete(self.get_dao())
         if commit:
