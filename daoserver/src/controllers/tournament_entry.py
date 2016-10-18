@@ -177,6 +177,6 @@ def rank_entries():
             'scores' : x.score_info,
             'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
             'ranking': x.ranking
-        } for x in \
-        g.tournament.ranking_strategy.overall_ranking(g.tournament.entries())
+        } for x in g.tournament.ranking_strategy.overall_ranking(
+            g.tournament.get_entries())
     ]

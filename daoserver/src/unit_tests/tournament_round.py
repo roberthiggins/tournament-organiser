@@ -1,30 +1,15 @@
 """
 Setting the number of rounds in a tournament
 """
-from flask_testing import TestCase
 from testfixtures import compare
 
-from app import create_app
-from models.dao.tournament import db
 from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
 
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.db_simulating_test import DbSimulatingTest
 
-# pylint: disable=no-member,no-init,invalid-name,missing-docstring,protected-access
-class SetRounds(TestCase):
-
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
-    def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
+# pylint: disable=no-member,missing-docstring,protected-access
+class SetRounds(DbSimulatingTest):
 
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""
@@ -58,11 +43,13 @@ class SetRounds(TestCase):
         """get missions for the rounds"""
         name = 'test_get_missions'
         self.injector.inject(name)
-        self.injector.add_round(name, 1, 'mission_1')
-        self.injector.add_round(name, 2, 'mission_2')
-        self.injector.add_round(name, 3, 'mission_3')
-
         tourn = Tournament(name)
+        tourn.update({
+            'rounds': 3,
+            'missions': ['mission_1', 'mission_2', 'mission_3']
+        })
+
+
         tourn.update({'rounds': 4})
         compare(tourn.get_round(1).get_dao().mission, 'mission_1')
         compare(tourn.get_round(4).get_dao().mission, None)

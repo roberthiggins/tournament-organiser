@@ -2,12 +2,9 @@
 Test entering scores for games in a tournament
 """
 
-from flask_testing import TestCase
 from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
-from app import create_app
-from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.score import ScoreCategory
 from models.dao.tournament_entry import TournamentEntry
@@ -16,30 +13,24 @@ from models.dao.tournament_round import TournamentRound
 
 from models.score import is_score_entered
 from models.tournament import Tournament
-from unit_tests.tournament_injector import score_cat_args, TournamentInjector
+from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.tournament_injector import score_cat_args
 
-# pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
-class TestScoreEntered(TestCase):
-    """Comes from a range of files"""
+# pylint: disable=no-member,missing-docstring
+class TestScoreEntered(DbSimulatingTest):
 
     tournament_1 = 'score_entered_tournament'
 
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
-        self.injector.inject(self.tournament_1, num_players=5)
-        self.injector.add_round(self.tournament_1, 1, 'foo_mission_1')
-        self.injector.add_round(self.tournament_1, 2, 'foo_mission_2')
-        db.session.flush()
-        Tournament(self.tournament_1).make_draws()
+        super(TestScoreEntered, self).setUp()
 
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
+        self.injector.inject(self.tournament_1, num_players=5)
+        tourn = Tournament(self.tournament_1)
+        tourn.update({
+            'rounds': 2,
+            'missions': ['foo_mission_1', 'foo_mission_2']
+        })
+        tourn.make_draws()
 
     def test_get_game_from_score(self):
         """
@@ -94,8 +85,8 @@ class TestScoreEntered(TestCase):
         # Add a score category
         args = score_cat_args(self.tournament_1, 'per_round', 50, False, 0, 100)
         category_1 = ScoreCategory(**args)
-        db.session.add(category_1)
-        db.session.flush()
+        self.db.session.add(category_1)
+        self.db.session.flush()
 
         tourn = Tournament(self.tournament_1)
 
@@ -133,8 +124,8 @@ class TestScoreEntered(TestCase):
         # will force a full check. entry_5's score hasn't been entered.
         game = self.get_game_by_round(entry_4_id, 2)
         game.score_entered = False
-        db.session.add(game)
-        db.session.flush()
+        self.db.session.add(game)
+        self.db.session.flush()
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]

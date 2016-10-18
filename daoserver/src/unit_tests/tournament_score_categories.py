@@ -2,33 +2,25 @@
 Test entering scores for games in a tournament
 """
 
-from flask_testing import TestCase
 from testfixtures import compare
 
-from app import create_app
-from models.dao.db_connection import db
 from models.dao.score import ScoreCategory
-
 from models.tournament import Tournament
-from unit_tests.tournament_injector import score_cat_args as cat, \
-TournamentInjector
 
-# pylint: disable=no-member,invalid-name,missing-docstring
-class ScoreCategoryTests(TestCase):
-    """Comes from a range of files"""
+from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.tournament_injector import score_cat_args as cat
+
+# pylint: disable=no-member,missing-docstring
+class ScoreCategoryTests(DbSimulatingTest):
 
     tourn_1 = 'test_score_categories'
 
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
+        super(ScoreCategoryTests, self).setUp()
+
         self.injector.inject(self.tourn_1)
-        db.session.flush()
-        db.session.commit()
+        self.db.session.flush()
+        self.db.session.commit()
 
         # Some default categories
         self.cat_1 = cat(self.tourn_1, 'painting', 10, False, 1, 20)
@@ -37,13 +29,9 @@ class ScoreCategoryTests(TestCase):
 
         self.tournament = Tournament(self.tourn_1)
 
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
-
     def test_categories_created(self):
         # Enter a cat
-        self.tournament.set_score_categories([self.cat_1])
+        self.tournament.update({'score_categories': [self.cat_1]})
         c_1 = ScoreCategory.query.\
             filter_by(name=self.cat_1['name']).first()
         compare(c_1.percentage, self.cat_1['percentage'])
@@ -52,7 +40,7 @@ class ScoreCategoryTests(TestCase):
         compare(c_1.max_val, self.cat_1['max_val'])
 
         # Enter multiple cats
-        self.tournament.set_score_categories([self.cat_2, self.cat_3])
+        self.tournament.update({'score_categories': [self.cat_2, self.cat_3]})
         c_2 = ScoreCategory.query.\
             filter_by(name=self.cat_2['name']).first()
         compare(c_2.percentage, self.cat_2['percentage'])
@@ -68,8 +56,8 @@ class ScoreCategoryTests(TestCase):
         compare(c_3.max_val, self.cat_3['max_val'])
 
     def test_old_categories_deleted(self):
-        self.tournament.set_score_categories([self.cat_1])
-        self.tournament.set_score_categories([self.cat_2, self.cat_3])
+        self.tournament.update({'score_categories': [self.cat_1]})
+        self.tournament.update({'score_categories': [self.cat_2, self.cat_3]})
 
         # Double check cat 1 is deleted.
         compare(0, ScoreCategory.query.filter_by(name=self.cat_1['name']).\
@@ -91,17 +79,17 @@ class ScoreCategoryTests(TestCase):
         char_min = cat(self.tourn_1, 'painting', '1', False, 'a', 1)
         char_max = cat(self.tourn_1, 'painting', '1', False, 1, 'a')
 
-        set_cats_func = self.tournament.set_score_categories
-        self.assertRaises(ValueError, set_cats_func, [neg_min])
-        self.assertRaises(ValueError, set_cats_func, [neg_max])
-        self.assertRaises(ValueError, set_cats_func, [zero_max])
-        self.assertRaises(ValueError, set_cats_func, [min_high])
-        self.assertRaises(ValueError, set_cats_func, [no_min])
-        self.assertRaises(ValueError, set_cats_func, [no_max])
-        self.assertRaises(ValueError, set_cats_func, [none_min])
-        self.assertRaises(ValueError, set_cats_func, [none_max])
-        self.assertRaises(ValueError, set_cats_func, [char_min])
-        self.assertRaises(ValueError, set_cats_func, [char_max])
+        func = self.tournament.update
+        self.assertRaises(ValueError, func, {'score_categories': [neg_min]})
+        self.assertRaises(ValueError, func, {'score_categories': [neg_max]})
+        self.assertRaises(ValueError, func, {'score_categories': [zero_max]})
+        self.assertRaises(ValueError, func, {'score_categories': [min_high]})
+        self.assertRaises(ValueError, func, {'score_categories': [no_min]})
+        self.assertRaises(ValueError, func, {'score_categories': [no_max]})
+        self.assertRaises(ValueError, func, {'score_categories': [none_min]})
+        self.assertRaises(ValueError, func, {'score_categories': [none_max]})
+        self.assertRaises(ValueError, func, {'score_categories': [char_min]})
+        self.assertRaises(ValueError, func, {'score_categories': [char_max]})
 
 
     def test_broken_categories(self):
@@ -114,11 +102,12 @@ class ScoreCategoryTests(TestCase):
         no_name = cat(self.tourn_1, '', 10, False, 1, 20)
         none_name = cat(self.tourn_1, None, 10, False, 1, 20)
 
-        set_cats_func = self.tournament.set_score_categories
-        self.assertRaises(ValueError, set_cats_func, [neg_pct])
-        self.assertRaises(ValueError, set_cats_func, [zero_pct])
-        self.assertRaises(ValueError, set_cats_func, [lge_pct])
-        self.assertRaises(ValueError, set_cats_func, [char_pct])
-        self.assertRaises(ValueError, set_cats_func, [no_name])
-        self.assertRaises(ValueError, set_cats_func, [none_name])
-        self.assertRaises(ValueError, set_cats_func, [fifty_one, fifty_one])
+        func = self.tournament.update
+        self.assertRaises(ValueError, func, {'score_categories': [neg_pct]})
+        self.assertRaises(ValueError, func, {'score_categories': [zero_pct]})
+        self.assertRaises(ValueError, func, {'score_categories': [lge_pct]})
+        self.assertRaises(ValueError, func, {'score_categories': [char_pct]})
+        self.assertRaises(ValueError, func, {'score_categories': [no_name]})
+        self.assertRaises(ValueError, func, {'score_categories': [none_name]})
+        self.assertRaises(ValueError, func,
+                          {'score_categories': [fifty_one, fifty_one]})

@@ -83,7 +83,7 @@ def list_score_categories():
         'max_val':        x.max_val,
         'zero_sum':       x.zero_sum,
         'opponent_score': x.opponent_score
-    } for x in g.tournament.list_score_categories()]
+    } for x in g.tournament.get_score_categories()]
 
 @TOURNAMENT.route('/', methods=['GET'])
 @json_response
@@ -122,7 +122,9 @@ def register():
 def set_missions():
     """POST to set the missions for a tournament. A list of strings expected"""
     # pylint: disable=undefined-variable
-    return g.tournament.set_missions(load_json(missions))
+    g.tournament.update({'missions': load_json(missions)})
+
+    return 'Missions set: {}'.format(missions)
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
@@ -145,7 +147,7 @@ def set_score_categories():
             cat = request.get_json().get(json_cat)
         new_categories.append(cat)
 
-    g.tournament.set_score_categories(new_categories)
+    g.tournament.update({'score_categories': new_categories})
 
     return 'Score categories set: {}'.\
         format(', '.join([str(cat['name']) for cat in new_categories]))

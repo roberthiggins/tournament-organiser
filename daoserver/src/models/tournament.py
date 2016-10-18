@@ -3,7 +3,7 @@ Model of a tournament
 
 It holds a tournament object for housing of scoring strategies, etc.
 """
-import datetime
+from datetime import date, datetime
 
 from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
@@ -11,7 +11,7 @@ from sqlalchemy.sql.expression import and_
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
-from models.dao.registration import TournamentRegistration
+from models.dao.registration import TournamentRegistration as Reg
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDAO
@@ -53,12 +53,14 @@ def not_in_progress(func):
 class Tournament(object):
     """A tournament model"""
 
+    DATE_FORMAT = "%Y-%m-%d"
+
     def __init__(self, tournament_id=None):
         self.tournament_id = tournament_id
         self.matching_strategy = RoundRobin()
         self.table_strategy = ProtestAvoidanceStrategy()
         self.ranking_strategy = RankingStrategy(tournament_id,
-                                                self.list_score_categories)
+                                                self.get_score_categories)
 
 
     def get_dao(self):
@@ -79,11 +81,17 @@ class Tournament(object):
 
         dao = TournamentDAO(self.tournament_id)
         dao.to_username = details.pop('to_username')
-        dao.date = self.validate_date(details.pop('date'))
+        try:
+            dao.date = datetime.strptime(details.pop('date'), self.DATE_FORMAT)
+            if dao.date.date() < date.today():
+                raise ValueError()
+        except ValueError:
+            raise ValueError('Enter a valid date')
         db.session.add(dao)
         db.session.commit()
 
-        self.set_details(details)
+        self._set_details(details)
+        return self
 
     @must_exist_in_db
     @not_in_progress
@@ -93,9 +101,9 @@ class Tournament(object):
         entries = [x.player_id for x in TournamentEntry.query.\
             filter_by(tournament_id=self.tournament_id).all()]
 
-        pending_applications = TournamentRegistration.query.filter(and_(
-            TournamentRegistration.tournament_id == self.get_dao().id,
-            ~TournamentRegistration.player_id.in_(entries))).all()
+        pending_applications = Reg.query.filter(and_(
+            Reg.tournament_id == self.get_dao().id,
+            ~Reg.player_id.in_(entries))).all()
 
         for app in pending_applications:
             try:
@@ -117,7 +125,7 @@ class Tournament(object):
         return {
             'name': details.name,
             'date': details.date,
-            'rounds': self.get_num_rounds(),
+            'rounds': self.get_dao().rounds.count(),
         }
 
 
@@ -150,161 +158,7 @@ class Tournament(object):
 
 
     @must_exist_in_db
-    def get_missions(self):
-        """Get all the missions for the tournament. List ordered by ordering"""
-        return [x.get_mission()
-                for x in self.get_dao().rounds.order_by('ordering')]
-
-    @must_exist_in_db
-    def get_num_rounds(self):
-        """The number of rounds in the tournament"""
-        return self.get_dao().rounds.count()
-
-
-    @must_exist_in_db
-    def get_round(self, round_num):
-        """Get the relevant TournamentRound"""
-        if int(round_num) not in range(1, self.get_num_rounds() + 1):
-            raise ValueError('Tournament {} does not have a round {}'.format(
-                self.tournament_id, round_num))
-
-        return TournamentRound(self.tournament_id, round_num,
-                               self.matching_strategy, self.table_strategy)
-
-    def set_details(self, details):
-        """
-        Set details for the tournament. Exceptions will be thrown when
-        in_progress, etc.
-
-        details should be a dict with optional keys:
-            - date
-            - rounds
-            - to_username
-        """
-        dao = self.get_dao()
-
-        if details.get('to_username', None) is not None and dao.in_progress:
-            raise PROGRESS_EXCEPTION
-        dao.creator_username = details.get('to_username', dao.to_username)
-
-        if details.get('date', None) is not None and dao.in_progress:
-            raise PROGRESS_EXCEPTION
-        dao.date = details.get('date', dao.date)
-
-        rounds = details.get('rounds', dao.rounds.count())
-        if rounds != dao.rounds.count():
-            self._set_rounds(rounds)
-
-        db.session.add(dao)
-        db.session.commit()
-
-
-    @must_exist_in_db
-    @not_in_progress
-    def set_in_progress(self):
-        """
-        Attempt to mark the tournament as 'in progress'. After this point you
-        are unable to set rounds, missions, score_categories, entries, etc.
-
-        All those features need to have sane values for this to succeed.
-        """
-        if self.get_num_rounds() < 1:
-            raise ValueError('You need to add at least 1 round')
-        if len([x for x in self.get_missions() if x != 'TBA']) < 1:
-            raise ValueError('You need to set the missions')
-        if len(self.entries()) < 1:
-            raise ValueError('You need at least 1 entrant')
-        if len(self.list_score_categories()) < 1:
-            raise ValueError('You need to set the score categories')
-
-        self.get_dao().in_progress = True
-        db.session.add(self.get_dao())
-        db.session.commit()
-
-    @must_exist_in_db
-    def set_missions(self, missions=None):
-        """ Set missions for tournament. Must set a mission for each round"""
-        rounds = self.get_num_rounds()
-
-        if missions is None or len(missions) != rounds:
-            raise ValueError('Tournament {} has {} rounds. \
-                You submitted missions {}'.\
-                format(self.tournament_id, rounds, missions))
-
-        for i, mission in enumerate(missions):
-            rnd = self.get_round(i + 1).get_dao()
-            rnd.mission = mission if mission is not None else rnd.get_mission()
-            db.session.add(rnd)
-
-        db.session.commit()
-        return 'Missions set: {}'.format(missions)
-
-    @must_exist_in_db
-    @not_in_progress
-    def _set_rounds(self, num_rounds):
-        """Set the number of rounds in a tournament"""
-        num_rounds = int(num_rounds)
-
-        for rnd in self.get_dao().rounds.filter(TR.ordering > num_rounds).\
-        order_by(TR.ordering.desc()).all():
-            self.get_round(rnd.ordering).db_remove(False)
-
-        for rnd in range(self.get_num_rounds(), num_rounds):
-            db.session.add(TR(self.tournament_id, rnd + 1))
-
-        db.session.commit()
-
-        self.make_draws()
-
-
-    @must_exist_in_db
-    @not_in_progress
-    def set_score_categories(self, new_categories):
-        """
-        Replace the existing score categories with those from the list. The list
-        should contain a ScoreCategorys
-        """
-        # check for duplicates
-        keys = [cat['name'] for cat in new_categories]
-        if len(keys) != len(set(keys)):
-            raise ValueError("You cannot set multiple keys with the same name")
-
-        # pylint: disable=broad-except
-        try:
-            # Delete the ones no longer needed
-            ScoreCategory.query.filter(and_(
-                ScoreCategory.tournament_id == self.tournament_id,
-                ~ScoreCategory.name.in_(keys)
-            )).delete(synchronize_session='fetch')
-
-            for cat in new_categories:
-                upsert_tourn_score_cat(self.tournament_id, cat)
-                ScoreCategory.query.\
-                    filter_by(tournament_id=self.tournament_id,
-                              name=cat['name']).first().clashes()
-
-            db.session.commit()
-        except ValueError:
-            db.session.rollback()
-            raise
-        except Exception:
-            db.session.rollback()
-            raise
-
-
-    @staticmethod
-    def validate_date(date):
-        """Validate the date for the tournament"""
-        try:
-            date = datetime.datetime.strptime(date, "%Y-%m-%d")
-            if date.date() < datetime.date.today():
-                raise ValueError()
-        except ValueError:
-            raise ValueError('Enter a valid date')
-        return date
-
-    @must_exist_in_db
-    def entries(self):
+    def get_entries(self):
         """Get a list of Entry"""
 
         entries = TournamentEntry.query.\
@@ -323,8 +177,25 @@ class Tournament(object):
 
         return entries
 
+
     @must_exist_in_db
-    def list_score_categories(self):
+    def get_missions(self):
+        """Get all the missions for the tournament. List ordered by ordering"""
+        return [x.get_mission()
+                for x in self.get_dao().rounds.order_by('ordering')]
+
+    @must_exist_in_db
+    def get_round(self, round_num):
+        """Get the relevant TournamentRound"""
+        if int(round_num) not in range(1, self.get_dao().rounds.count() + 1):
+            raise ValueError('Tournament {} does not have a round {}'.format(
+                self.tournament_id, round_num))
+
+        return TournamentRound(self.tournament_id, round_num,
+                               self.matching_strategy, self.table_strategy)
+
+    @must_exist_in_db
+    def get_score_categories(self):
         """
         List all the score categories available to this tournie and their
         percentages.
@@ -334,28 +205,167 @@ class Tournament(object):
         return ScoreCategory.query.\
             filter_by(tournament_id=self.tournament_id).all()
 
+
     @must_exist_in_db
     def make_draws(self):
         """Makes the draws for all rounds"""
         # If we can we determine all rounds
         if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
-            for rnd in range(0, self.get_num_rounds()):
+            for rnd in range(0, self.get_dao().rounds.count()):
                 try:
                     self.get_round(rnd + 1).destroy_draw()
-                    self.get_round(rnd + 1).make_draw(self.entries())
+                    self.get_round(rnd + 1).make_draw(self.get_entries())
                 except DrawException:
                     pass
+
+
+    @must_exist_in_db
+    def _set_details(self, details):
+        """
+        Set details for the tournament. Exceptions will be thrown when
+        in_progress, etc.
+
+        details should be a dict with optional keys:
+            - date
+            - missions
+            - rounds
+            - score_categories
+            - to_username
+        """
+        dao = self.get_dao()
+
+        if details.get('to_username', None) is not None and dao.in_progress:
+            raise PROGRESS_EXCEPTION
+        dao.creator_username = details.get('to_username', dao.to_username)
+
+        if details.get('date', None) is not None and dao.in_progress:
+            raise PROGRESS_EXCEPTION
+        dao.date = details.get('date', dao.date)
+
+        # TODO we should add an equality check here
+        score_cats = details.get('score_categories', None)
+        if score_cats is not None:
+            self._set_score_categories(score_cats)
+
+        rounds = details.get('rounds', dao.rounds.count())
+        if rounds != dao.rounds.count():
+            self._set_rounds(rounds)
+
+        missions = details.get('missions', self.get_missions())
+        if missions != self.get_missions():
+            self._set_missions(missions)
+
+        db.session.add(dao)
+        db.session.commit()
+
+
+    @must_exist_in_db
+    @not_in_progress
+    def set_in_progress(self):
+        """
+        Attempt to mark the tournament as 'in progress'. After this point you
+        are unable to set rounds, missions, score_categories, entries, etc.
+
+        All those features need to have sane values for this to succeed.
+        """
+        if self.get_dao().rounds.count() < 1:
+            raise ValueError('You need to add at least 1 round')
+        if len([x for x in self.get_missions() if x != 'TBA']) < 1:
+            raise ValueError('You need to set the missions')
+        if len(self.get_entries()) < 1:
+            raise ValueError('You need at least 1 entrant')
+        if len(self.get_score_categories()) < 1:
+            raise ValueError('You need to set the score categories')
+
+        self.get_dao().in_progress = True
+        db.session.add(self.get_dao())
+        db.session.commit()
+
+    @must_exist_in_db
+    def _set_missions(self, missions=None):
+        """ Set missions for tournament. Must set a mission for each round"""
+        rounds = self.get_dao().rounds.count()
+
+        if missions is None or len(missions) != rounds:
+            raise ValueError('Tournament {} has {} rounds. \
+                You submitted missions {}'.\
+                format(self.tournament_id, rounds, missions))
+
+        for i, mission in enumerate(missions):
+            rnd = self.get_round(i + 1).get_dao()
+            rnd.mission = mission if mission is not None else rnd.get_mission()
+            db.session.add(rnd)
+
+        db.session.commit()
+
+
+    @must_exist_in_db
+    @not_in_progress
+    def _set_rounds(self, num_rounds):
+        """Set the number of rounds in a tournament"""
+        num_rounds = int(num_rounds)
+
+        for rnd in self.get_dao().rounds.filter(TR.ordering > num_rounds).\
+        order_by(TR.ordering.desc()).all():
+            self.get_round(rnd.ordering).db_remove(False)
+
+        for rnd in range(self.get_dao().rounds.count(), num_rounds):
+            db.session.add(TR(self.tournament_id, rnd + 1))
+
+        db.session.commit()
+
+        self.make_draws()
+
+
+    @must_exist_in_db
+    @not_in_progress
+    def _set_score_categories(self, new_categories):
+        """
+        Replace the existing score categories with those from the list. The list
+        should contain a ScoreCategorys
+        """
+        # check for duplicates
+        keys = [cat['name'] for cat in new_categories]
+        if len(keys) != len(set(keys)):
+            raise ValueError("You cannot set multiple keys with the same name")
+
+        # pylint: disable=broad-except
+        try:
+            # Delete the ones no longer needed
+            score_cats = self.get_dao().score_categories
+            if len(keys) > 0: # we must keep some
+                score_cats = score_cats.filter(~ScoreCategory.name.in_(keys))
+            for cat in score_cats.all():
+                for score in cat.scores:
+                    score.game_scores.delete()
+                    score.tournament_scores.delete()
+                cat.scores.delete()
+            score_cats.delete(synchronize_session='fetch')
+
+            for cat in new_categories:
+                upsert_tourn_score_cat(self.tournament_id, cat)
+                ScoreCategory.query.\
+                    filter_by(tournament_id=self.tournament_id,
+                              name=cat['name']).first().clashes()
+
+            db.session.commit()
+        except ValueError:
+            db.session.rollback()
+            raise
+        except Exception:
+            db.session.rollback()
+            raise
 
     @must_exist_in_db
     @not_in_progress
     def update(self, details):
         """Update the basic details about a tournament in the db"""
-        self.set_details(details)
+        self._set_details(details)
 
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""
     all_tournaments = TournamentDAO.query.\
-        filter(TournamentDAO.date >= datetime.date.today()).\
+        filter(TournamentDAO.date >= date.today()).\
         order_by(TournamentDAO.date.asc()).all()
     checker = PermissionsChecker()
     modifiable_tournaments = []
