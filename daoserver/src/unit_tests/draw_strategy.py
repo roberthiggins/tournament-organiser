@@ -3,30 +3,15 @@ Draw strategy unit tests
 """
 # pylint: disable=invalid-name,missing-docstring
 
-from flask_testing import TestCase
 from testfixtures import compare
 
-from app import create_app
 from models.matching_strategy import RoundRobin
-from models.dao.db_connection import db
 from models.tournament import Tournament
 
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.db_simulating_test import DbSimulatingTest
 
-class DrawStrategyTests(TestCase):
+class DrawStrategyTests(DbSimulatingTest):
     """Tests for `matching_strategy.py`."""
-
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
-    def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
 
     def test_get_draw(self):
         """Test get_draw"""

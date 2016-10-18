@@ -2,36 +2,23 @@
 Test entering scores for games in a tournament
 """
 
-from flask_testing import TestCase
 from testfixtures import compare
 
-from app import create_app
-from models.dao.db_connection import db
-
 from models.tournament import Tournament
-from unit_tests.tournament_injector import TournamentInjector
 
-# pylint: disable=no-member,invalid-name,missing-docstring
-class TournamentMissionsTests(TestCase):
-    """Comes from a range of files"""
+from unit_tests.db_simulating_test import DbSimulatingTest
+
+# pylint: disable=no-member,missing-docstring
+class TournamentMissionsTests(DbSimulatingTest):
 
     tourn_1 = 'test_missions'
 
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
+        super(TournamentMissionsTests, self).setUp()
 
         self.injector.inject(self.tourn_1)
         self.tourn = Tournament(self.tourn_1)
         self.tourn.update({'rounds': 2})
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
 
     # pylint: disable=protected-access
     def test_add_missions(self):

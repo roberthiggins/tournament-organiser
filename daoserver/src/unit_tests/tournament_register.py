@@ -2,34 +2,27 @@
 Players registering for tournaments
 """
 import datetime
-from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
 
-from app import create_app
 from models.dao.account import Account
-from models.dao.db_connection import db
 from models.dao.registration import TournamentRegistration as TReg
 
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.db_simulating_test import DbSimulatingTest
 
-# pylint: disable=no-member,invalid-name,missing-docstring
-class TournamentRegistrations(TestCase):
-
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
+# pylint: disable=no-member,missing-docstring
+class TournamentRegistrations(DbSimulatingTest):
 
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
+        super(TournamentRegistrations, self).setUp()
+
         self.applicant = 'test_register_applicant_1'
-        db.session.add(Account(self.applicant, 'spy@strahotski.com'))
+        self.db.session.add(Account(self.applicant, 'spy@strahotski.com'))
 
     def tearDown(self):
         TReg.query.filter_by(player_id=self.applicant).delete()
         Account.query.filter_by(username=self.applicant).delete()
-        self.injector.delete()
-        db.session.remove()
+
+        super(TournamentRegistrations, self).tearDown()
 
     def test_clashes(self):
         """Register a user for a tournament"""
@@ -42,9 +35,9 @@ class TournamentRegistrations(TestCase):
         t_4 = 'test_register_4'
         self.injector.inject(t_4, num_players=0)
 
-        db.session.add(TReg(self.applicant, t_1))
-        db.session.add(TReg(self.applicant, t_2))
-        db.session.flush()
+        self.db.session.add(TReg(self.applicant, t_1))
+        self.db.session.add(TReg(self.applicant, t_2))
+        self.db.session.flush()
 
         self.assertFalse(TReg(self.applicant, t_4).clashes())
 
@@ -65,19 +58,19 @@ class TournamentRegistrations(TestCase):
         t_4 = 'test_register_4'
         self.injector.inject(t_4, num_players=0)
 
-        db.session.add(TReg(self.applicant, t_1))
-        db.session.add(TReg(self.applicant, t_2))
-        db.session.commit()
+        self.db.session.add(TReg(self.applicant, t_1))
+        self.db.session.add(TReg(self.applicant, t_2))
+        self.db.session.commit()
 
         # Repeat bad
-        db.session.add(TReg(self.applicant, t_1))
-        self.assertRaises(IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(TReg(self.applicant, t_1))
+        self.assertRaises(IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
-        db.session.add(TReg(self.applicant, t_2))
-        self.assertRaises(IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(TReg(self.applicant, t_2))
+        self.assertRaises(IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
         # Same day bad, but that needs to be caught by clashes
-        db.session.add(TReg(self.applicant, t_3))
-        db.session.commit()
+        self.db.session.add(TReg(self.applicant, t_3))
+        self.db.session.commit()

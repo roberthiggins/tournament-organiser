@@ -2,42 +2,31 @@
 Checking whether users are players in tournaments, admins, organisers, etc.
 """
 
-from flask_testing import TestCase
 from testfixtures import compare
 
-from app import create_app
 from models.authentication import PermissionDeniedException
 from models.dao.account import Account, AccountSecurity
-from models.dao.db_connection import db
 from models.dao.permissions import ProtectedObject, ProtObjAction, \
 ProtObjPerm, AccountProtectedObjectPermission as AccountProtectedObjectPerm
 from models.permissions import PermissionsChecker
 from models.tournament import Tournament
 
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.db_simulating_test import DbSimulatingTest
 
-# pylint: disable=no-member,no-init,invalid-name,missing-docstring
-class UserPermissions(TestCase):
+# pylint: disable=no-member,missing-docstring
+class UserPermissions(DbSimulatingTest):
 
     acc_1 = 'test_add_account_creator'
     tourn_1 = 'test_user_permissions_tournament_1'
 
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
+    # pylint: disable=invalid-name
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
+        super(UserPermissions, self).setUp()
 
-        db.session.add(Account(self.acc_1, 'foo@bar.com'))
-        db.session.add(AccountSecurity(self.acc_1, 'pwd1'))
-        db.session.commit()
+        self.db.session.add(Account(self.acc_1, 'foo@bar.com'))
+        self.db.session.add(AccountSecurity(self.acc_1, 'pwd1'))
+        self.db.session.commit()
         self.injector.accounts.add(self.acc_1)
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
 
     def test_add_account(self):
         self.assertFalse(Account.query.\

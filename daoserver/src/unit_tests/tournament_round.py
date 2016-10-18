@@ -1,30 +1,15 @@
 """
 Setting the number of rounds in a tournament
 """
-from flask_testing import TestCase
 from testfixtures import compare
 
-from app import create_app
-from models.dao.tournament import db
 from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
 
-from unit_tests.tournament_injector import TournamentInjector
+from unit_tests.db_simulating_test import DbSimulatingTest
 
-# pylint: disable=no-member,no-init,invalid-name,missing-docstring,protected-access
-class SetRounds(TestCase):
-
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
-    def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
+# pylint: disable=no-member,missing-docstring,protected-access
+class SetRounds(DbSimulatingTest):
 
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""

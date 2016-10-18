@@ -2,33 +2,25 @@
 Test entering scores for games in a tournament
 """
 
-from flask_testing import TestCase
 from testfixtures import compare
 
-from app import create_app
-from models.dao.db_connection import db
 from models.dao.score import ScoreCategory
-
 from models.tournament import Tournament
-from unit_tests.tournament_injector import score_cat_args as cat, \
-TournamentInjector
 
-# pylint: disable=no-member,invalid-name,missing-docstring
-class ScoreCategoryTests(TestCase):
-    """Comes from a range of files"""
+from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.tournament_injector import score_cat_args as cat
+
+# pylint: disable=no-member,missing-docstring
+class ScoreCategoryTests(DbSimulatingTest):
 
     tourn_1 = 'test_score_categories'
 
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
+        super(ScoreCategoryTests, self).setUp()
+
         self.injector.inject(self.tourn_1)
-        db.session.flush()
-        db.session.commit()
+        self.db.session.flush()
+        self.db.session.commit()
 
         # Some default categories
         self.cat_1 = cat(self.tourn_1, 'painting', 10, False, 1, 20)
@@ -36,10 +28,6 @@ class ScoreCategoryTests(TestCase):
         self.cat_3 = cat(self.tourn_1, 'cat_sports', 10, True, 1, 5)
 
         self.tournament = Tournament(self.tourn_1)
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
 
     def test_categories_created(self):
         # Enter a cat

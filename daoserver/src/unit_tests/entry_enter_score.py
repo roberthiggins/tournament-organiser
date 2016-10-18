@@ -2,12 +2,9 @@
 Test entering scores for games in a tournament
 """
 
-from flask_testing import TestCase
 from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
-from app import create_app
-from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
 from models.dao.score import ScoreCategory, TournamentScore, GameScore, Score
 from models.dao.tournament_entry import TournamentEntry
@@ -16,22 +13,18 @@ from models.dao.tournament_round import TournamentRound
 
 from models.score import is_score_entered
 from models.tournament import Tournament
-from unit_tests.tournament_injector import score_cat_args as cat, \
-TournamentInjector
 
-# pylint: disable=no-member,invalid-name,missing-docstring,undefined-variable
-class TestScoreEntered(TestCase):
+from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.tournament_injector import score_cat_args as cat
+
+# pylint: disable=no-member,missing-docstring
+class TestScoreEntered(DbSimulatingTest):
     """Comes from a range of files"""
 
     tournament_1 = 'score_entered_tournament'
 
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
+        super(TestScoreEntered, self).setUp()
         self.injector.inject(self.tournament_1, num_players=5)
         tourn = Tournament(self.tournament_1)
         tourn.update({
@@ -39,10 +32,6 @@ class TestScoreEntered(TestCase):
             'missions': ['foo_mission_1', 'foo_mission_2']
         })
         tourn.make_draws()
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
 
     def test_get_game_from_score(self):
         """
@@ -98,8 +87,8 @@ class TestScoreEntered(TestCase):
 
         score_args = cat(self.tournament_1, 'per_round', 50, False, 0, 100)
         category_1 = ScoreCategory(**score_args)
-        db.session.add(category_1)
-        db.session.flush()
+        self.db.session.add(category_1)
+        self.db.session.flush()
 
         entry_2_id = TournamentEntry.query.filter_by(
             player_id='{}_player_{}'.format(self.tournament_1, 2),
@@ -135,8 +124,8 @@ class TestScoreEntered(TestCase):
         # will force a full check. entry_5's score hasn't been entered.
         game = self.get_game_by_round(entry_4_id, 2)
         game.score_entered = False
-        db.session.add(game)
-        db.session.flush()
+        self.db.session.add(game)
+        self.db.session.flush()
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
@@ -168,18 +157,13 @@ class TestScoreEntered(TestCase):
                 and_(TournamentGame.tournament_round_id == round_dao.id,
                      TournamentEntry.id == entry_id)).first()
 
-class EnterScore(TestCase):
+class EnterScore(DbSimulatingTest):
 
     player = 'enter_score_account'
     tournament_1 = 'enter_score_tournament'
 
-    def create_app(self):
-        # pass in test configuration
-        return create_app()
-
     def setUp(self):
-        db.create_all()
-        self.injector = TournamentInjector()
+        super(EnterScore, self).setUp()
         self.injector.inject(self.tournament_1, num_players=5)
         tourn = Tournament(self.tournament_1)
         tourn.update({
@@ -191,18 +175,14 @@ class EnterScore(TestCase):
 
         # per tournament category
         self.category_1 = ScoreCategory(**score_args)
-        db.session.add(self.category_1)
+        self.db.session.add(self.category_1)
 
         # per round category
         score_args['name'] = 'per_round'
         score_args['per_tournament'] = False
         self.category_2 = ScoreCategory(**score_args)
-        db.session.add(self.category_2)
-        db.session.commit()
-
-    def tearDown(self):
-        self.injector.delete()
-        db.session.remove()
+        self.db.session.add(self.category_2)
+        self.db.session.commit()
 
     def test_enter_score_bad_games(self):
         """These should all fail for one reason or another"""
