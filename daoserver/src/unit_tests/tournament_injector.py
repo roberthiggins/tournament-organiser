@@ -28,7 +28,7 @@ class TournamentInjector(object):
     """Insert a tournament using the ORM. You can delete them as well"""
 
     def __init__(self):
-        self.tournament_ids = set()
+        self.tournaments = set()
         self.accounts = set()
         self.existing_perms = set([o.id for o in ProtObjAction.query.all()])
         set_up_permissions()
@@ -38,7 +38,7 @@ class TournamentInjector(object):
 
         # To avoid clashes we shift default tournament into the future
         if date is None:
-            date = datetime.now() + timedelta(weeks=len(self.tournament_ids))
+            date = datetime.now() + timedelta(weeks=len(self.tournaments))
 
         self.create_tournament(name, date, past_event)
 
@@ -51,7 +51,7 @@ class TournamentInjector(object):
 
         self.delete_scores()
 
-        for tourn in [Tourn(t.name) for t in self.tournaments().all()]:
+        for tourn in self.tournaments:
             tourn.get_dao().in_progress = False
             tourn.update({'rounds': 0})
 
@@ -96,7 +96,7 @@ class TournamentInjector(object):
                 'to_username': to_username
             })
 
-        self.tournament_ids.add(tourn.get_dao().id)
+        self.tournaments.add(tourn)
 
     def create_players(self, tourn_name, num_players):
         """Create some accounts and enter them in the tournament"""
@@ -115,10 +115,11 @@ class TournamentInjector(object):
 
         # Some relations can't be deleted via relationship for some reason
         # registrations and entries
-        if len(self.tournament_ids):
-            TReg.query.filter(TReg.tournament_id.in_(self.tournament_ids)).\
+        if len(self.tournaments):
+            ids = [t.get_dao().id for t in self.tournaments]
+            TReg.query.filter(TReg.tournament_id.in_(ids)).\
                 delete(synchronize_session=False)
-            names = [t.name for t in self.tournaments()]
+            names = [t.get_dao().name for t in self.tournaments]
             TournamentEntry.query.filter(
                 TournamentEntry.tournament_id.in_(names)).\
                 delete(synchronize_session=False)
@@ -135,7 +136,7 @@ class TournamentInjector(object):
     def delete_scores(self):
         """Delete all scores for all tournaments injected"""
 
-        for tourn in self.tournaments().all():
+        for tourn in [t.get_dao() for t in self.tournaments]:
 
             if tourn is None:
                 return
@@ -152,15 +153,15 @@ class TournamentInjector(object):
     def delete_tournaments(self):
         """Delete tournaments and their rounds"""
 
-        if not len(self.tournament_ids):
+        if not len(self.tournaments):
             return
 
-        tourns = self.tournaments()
-        permission_ids = [t.protected_object.id for t in tourns.all()]
+        tourns = [t.get_dao() for t in self.tournaments]
+        permission_ids = [t.protected_object.id for t in tourns]
         creators = Account.query.filter(
-            Account.username.in_([t.to_username for t in tourns.all()]))
-
-        tourns.delete(synchronize_session=False)
+            Account.username.in_([t.to_username for t in tourns]))
+        Tournament.query.filter(Tournament.id.in_([t.id for t in tourns])).\
+            delete(synchronize_session=False)
         if creators.count() > 0:
             AccountProtectedObjectPermission.query.filter(
                 AccountProtectedObjectPermission.account_username.\
@@ -175,13 +176,7 @@ class TournamentInjector(object):
                 delete(synchronize_session=False)
         creators.delete(synchronize_session=False)
 
-        self.tournament_ids = set()
-
-    def tournaments(self):
-        """query the tournaments. Call all to get list"""
-        from sqlalchemy.sql import false
-        return Tournament.query.filter(Tournament.id.in_(self.tournament_ids)) \
-        if len(self.tournament_ids) else Tournament.query.filter(false())
+        self.tournaments = set()
 
 # pylint: disable=too-many-arguments
 def score_cat_args(tourn_id, name, pct, per_tourn, min_val, max_val,
