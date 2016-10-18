@@ -91,6 +91,7 @@ class Tournament(object):
         db.session.commit()
 
         self._set_details(details)
+        return self
 
     @must_exist_in_db
     @not_in_progress

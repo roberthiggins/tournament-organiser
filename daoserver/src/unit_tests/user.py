@@ -22,12 +22,14 @@ class UserTests(TestCase):
 
     def setUp(self):
         self.player = 'player_1'
+        today = date.today()
 
         db.create_all()
         self.injector = TournamentInjector()
-        self.injector.inject('yesterday', date=date.today() - timedelta(days=1))
-        self.injector.inject('today', date=date.today())
-        self.injector.inject('tomorrow', date=date.today() + timedelta(days=1))
+        self.injector.inject('yesterday', date=today - timedelta(days=1),
+                             past_event=True)
+        self.injector.inject('today', date=today)
+        self.injector.inject('tomorrow', date=today + timedelta(days=1))
         db.session.add(Account(self.player, '{}@bar.com'.format(self.player)))
         db.session.add(Entry(self.player, 'yesterday'))
         db.session.add(Entry(self.player, 'today'))

@@ -35,14 +35,14 @@ class TournamentInjector(object):
         self.existing_perms = set([o.id for o in ProtObjAction.query.all()])
         set_up_permissions()
 
-    def inject(self, name, num_players=6, date=None):
+    def inject(self, name, num_players=6, date=None, past_event=False):
         """Create a tournament and inkect it into the db."""
 
         # To avoid clashes we shift default tournament into the future
         if date is None:
             date = datetime.now() + timedelta(weeks=len(self.tournament_ids))
 
-        self.create_tournament(name, date)
+        self.create_tournament(name, date, past_event)
 
         self.create_players(name, num_players)
 
@@ -81,19 +81,29 @@ class TournamentInjector(object):
         """Add a TournamentRound. Caller's job to ensure clash avoidance"""
         db.session.add(TournamentRound(tourn_name, int(round_num), mission))
 
-    def create_tournament(self, name, date):
+    def create_tournament(self, name, date, past_event=False):
         """Create a tournament"""
         to_username = '{}_creator'.format(name)
         db.session.add(Account(to_username, '{}@bar.com'.format(to_username)))
         db.session.flush()
 
-        tourn = Tournament(name)
-        tourn.date = date
-        tourn.to_username = to_username
-        db.session.add(tourn)
-        db.session.flush()
-        self.tournament_ids.add(tourn.id)
-        self.tournament_names.add(tourn.name)
+        if past_event:
+            """We need to do this by hand with the daos"""
+            dao = Tournament(name)
+            dao.date = date
+            dao.to_username = to_username
+            db.session.add(dao)
+            db.session.commit()
+
+            tourn = Tourn(name)
+        else:
+            tourn = Tourn(name).new({
+                'date': date.strftime(Tourn.DATE_FORMAT),
+                'to_username': to_username
+            })
+
+        self.tournament_ids.add(tourn.get_dao().id)
+        self.tournament_names.add(tourn.get_dao().name)
 
     def create_players(self, tourn_name, num_players):
         """Create some accounts and enter them in the tournament"""
