@@ -34,10 +34,9 @@ class UserTests(TestCase):
         db.session.add(Entry(self.player, 'yesterday'))
         db.session.add(Entry(self.player, 'today'))
         db.session.add(Entry(self.player, 'tomorrow'))
+        self.injector.accounts.add(self.player)
 
     def tearDown(self):
-        Entry.query.filter_by(player_id=self.player).delete()
-        Account.query.filter_by(username=self.player).delete()
         self.injector.delete()
         db.session.remove()
 

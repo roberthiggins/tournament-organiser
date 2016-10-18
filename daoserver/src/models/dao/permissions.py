@@ -46,6 +46,12 @@ class ProtObjPerm(db.Model):
         db.Integer,
         db.ForeignKey(ProtObjAction.id),
         nullable=False)
+    protected_object = db.relationship(ProtectedObject, \
+        backref=db.backref('protected_object_permissions', \
+        cascade='all,delete'))
+    protected_object_action = db.relationship(ProtObjAction, \
+        backref=db.backref('protected_object_permissions', \
+        cascade='all,delete'))
 
     def __init__(self, prot_obj_id, action_id):
         self.protected_object_id = prot_obj_id

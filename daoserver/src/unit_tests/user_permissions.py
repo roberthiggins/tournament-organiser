@@ -7,7 +7,8 @@ from testfixtures import compare
 
 from app import create_app
 from models.authentication import PermissionDeniedException
-from models.dao.account import db, Account, AccountSecurity
+from models.dao.account import Account, AccountSecurity
+from models.dao.db_connection import db
 from models.dao.permissions import ProtectedObject, ProtObjAction, \
 ProtObjPerm, AccountProtectedObjectPermission as AccountProtectedObjectPerm
 from models.permissions import PermissionsChecker
@@ -32,17 +33,9 @@ class UserPermissions(TestCase):
         db.session.add(Account(self.acc_1, 'foo@bar.com'))
         db.session.add(AccountSecurity(self.acc_1, 'pwd1'))
         db.session.commit()
+        self.injector.accounts.add(self.acc_1)
 
     def tearDown(self):
-        AccountProtectedObjectPerm.query.\
-            filter(AccountProtectedObjectPerm.account_username == self.acc_1).\
-            delete(synchronize_session=False)
-        AccountSecurity.query.filter_by(id=self.acc_1).\
-            delete(synchronize_session=False)
-        Account.query.filter_by(username=self.acc_1).\
-            delete(synchronize_session=False)
-        db.session.commit()
-
         self.injector.delete()
         db.session.remove()
 

@@ -13,7 +13,7 @@ or something similar to:
 
 from datetime import datetime, timedelta
 
-from models.dao.account import Account
+from models.dao.account import Account, AccountSecurity
 from models.dao.db_connection import db
 from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtectedObject, ProtObjAction, ProtObjPerm
@@ -130,6 +130,8 @@ class TournamentInjector(object):
         AccountProtectedObjectPermission.query.filter(
             AccountProtectedObjectPermission.account_username.\
             in_(self.accounts)).delete(synchronize_session=False)
+        AccountSecurity.query.filter(AccountSecurity.id.in_(self.accounts)).\
+            delete(synchronize_session=False)
         Account.query.filter(Account.username.in_(self.accounts)).\
             delete(synchronize_session=False)
 
