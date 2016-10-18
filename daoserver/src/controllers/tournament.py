@@ -130,27 +130,17 @@ def set_missions():
 @text_response
 @requires_auth
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('categories')
+@enforce_request_variables('score_categories')
 def set_score_categories():
     """
     POST to set tournament categories en masse
     """
-
-    new_categories = []
     # pylint: disable=undefined-variable
-    cats = load_json(categories)
-
-    for json_cat in cats:
-        try:
-            cat = json.loads(request.values.get(json_cat, []))
-        except TypeError:
-            cat = request.get_json().get(json_cat)
-        new_categories.append(cat)
-
-    g.tournament.update({'score_categories': new_categories})
+    cats = load_json(score_categories)
+    g.tournament.update({'score_categories': cats})
 
     return 'Score categories set: {}'.\
-        format(', '.join([str(cat['name']) for cat in new_categories]))
+        format(', '.join([cat['name'] for cat in cats]))
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response

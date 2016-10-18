@@ -58,12 +58,10 @@ exports.setCategories = function(tourn, categories){
     "use strict";
 
     var API = process.env.API_ADDR + "tournament/" + tourn + "/score_categories",
-        postData = {categories: []};
+        postData = {score_categories: []};
 
-    categories.forEach(function(cat, idx){
-        var key = "categories_" + idx;
-        postData.categories.push(key);
-        postData[key] = {
+    categories.forEach(function(cat){
+        postData.score_categories.push({
             "name": cat[0],
             "percentage": cat[1],
             "per_tournament": cat[2],
@@ -71,7 +69,7 @@ exports.setCategories = function(tourn, categories){
             "max_val": cat[4],
             "zero_sum": cat[5] || false,
             "opponent_score": cat[6] || false
-            };
+            });
     });
 
     frisby.create("set the score categories for " + tourn)

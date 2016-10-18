@@ -179,23 +179,11 @@ router.route("/tournament/:tournament/categories")
         users.injectUserIntoRequest,
         users.ensureAuthenticated,
         function(req, res){
-            var categories  = req.body.categories || [],
-                postData    = {},
-                catKeys     = [];
-
-            categories.forEach(function(cat, idx) {
-                var catName = "categories_" + idx;
-
-                catKeys.push(catName);
-                postData[catName] = JSON.stringify(cat);
-            });
-            postData.categories = JSON.stringify(catKeys);
-
             DAOAmbassador.postToDAORequest(
                 req,
                 res,
                 "/tournament/" + req.params.tournament + "/score_categories",
-                postData,
+                {score_categories: JSON.stringify(req.body.categories || [])},
                 undefined,
                 function(responseBody) {
                     res.status(400).json({error: responseBody});
