@@ -205,6 +205,19 @@ class Tournament(object):
 
 
     @must_exist_in_db
+    def make_draws(self):
+        """Makes the draws for all rounds"""
+        # If we can we determine all rounds
+        if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
+            for rnd in range(0, self.get_dao().rounds.count()):
+                try:
+                    self.get_round(rnd + 1).destroy_draw()
+                    self.get_round(rnd + 1).make_draw(self.get_entries())
+                except DrawException:
+                    pass
+
+
+    @must_exist_in_db
     def set_details(self, details):
         """
         Set details for the tournament. Exceptions will be thrown when
@@ -335,19 +348,6 @@ class Tournament(object):
         except Exception:
             db.session.rollback()
             raise
-
-
-    @must_exist_in_db
-    def make_draws(self):
-        """Makes the draws for all rounds"""
-        # If we can we determine all rounds
-        if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
-            for rnd in range(0, self.get_dao().rounds.count()):
-                try:
-                    self.get_round(rnd + 1).destroy_draw()
-                    self.get_round(rnd + 1).make_draw(self.get_entries())
-                except DrawException:
-                    pass
 
     @must_exist_in_db
     @not_in_progress
