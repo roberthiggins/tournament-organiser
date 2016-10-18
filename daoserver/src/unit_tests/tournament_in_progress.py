@@ -25,11 +25,14 @@ class TournamentInProgress(TestCase):
 
         self.injector.inject(self.name, num_players=0)
         self.injector.add_player(self.name, self.player_1)
-        self.injector.add_round(self.name, 1, 'mission01')
         self.tournament = Tournament(self.name)
-
-        args = score_cat_args(self.name, 'cat', 100, True, 1, 1, False)
-        self.tournament.update({'score_categories': [args]})
+        self.tournament.update({
+            'rounds': 1,
+            'missions': ['mission01'],
+            'score_categories': [
+                score_cat_args(self.name, 'cat', 100, True, 1, 1, False)
+            ]
+        })
 
     def tearDown(self):
         self.injector.delete()
@@ -43,6 +46,7 @@ class TournamentInProgress(TestCase):
         self.assertRaises(ValueError, self.tournament.set_in_progress)
 
     def test_no_entries(self):
+        self.tournament.update({'rounds': 0})
         self.injector.delete_accounts()
         self.assertRaises(ValueError, self.tournament.set_in_progress)
 

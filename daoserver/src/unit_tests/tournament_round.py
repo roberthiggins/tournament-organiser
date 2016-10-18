@@ -58,11 +58,13 @@ class SetRounds(TestCase):
         """get missions for the rounds"""
         name = 'test_get_missions'
         self.injector.inject(name)
-        self.injector.add_round(name, 1, 'mission_1')
-        self.injector.add_round(name, 2, 'mission_2')
-        self.injector.add_round(name, 3, 'mission_3')
-
         tourn = Tournament(name)
+        tourn.update({
+            'rounds': 3,
+            'missions': ['mission_1', 'mission_2', 'mission_3']
+        })
+
+
         tourn.update({'rounds': 4})
         compare(tourn.get_round(1).get_dao().mission, 'mission_1')
         compare(tourn.get_round(4).get_dao().mission, None)

@@ -20,7 +20,6 @@ ProtectedObject, ProtObjAction, ProtObjPerm
 from models.dao.registration import TournamentRegistration as TReg
 from models.dao.tournament import Tournament
 from models.dao.tournament_entry import TournamentEntry
-from models.dao.tournament_round import TournamentRound
 
 from models.permissions import set_up_permissions
 from models.tournament import Tournament as Tourn
@@ -77,10 +76,6 @@ class TournamentInjector(object):
         db.session.flush()
         self.accounts.add(username)
 
-    def add_round(self, tourn_name, round_num, mission):
-        """Add a TournamentRound. Caller's job to ensure clash avoidance"""
-        db.session.add(TournamentRound(tourn_name, int(round_num), mission))
-
     def create_tournament(self, name, date, past_event=False):
         """Create a tournament"""
         to_username = '{}_creator'.format(name)
@@ -88,7 +83,7 @@ class TournamentInjector(object):
         db.session.flush()
 
         if past_event:
-            """We need to do this by hand with the daos"""
+            # We need to do this by hand with the daos
             dao = Tournament(name)
             dao.date = date
             dao.to_username = to_username

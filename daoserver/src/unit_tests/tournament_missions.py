@@ -26,9 +26,8 @@ class TournamentMissionsTests(TestCase):
         self.injector = TournamentInjector()
 
         self.injector.inject(self.tourn_1)
-        self.injector.add_round(self.tourn_1, 1, None)
-        self.injector.add_round(self.tourn_1, 2, None)
         self.tourn = Tournament(self.tourn_1)
+        self.tourn.update({'rounds': 2})
 
     def tearDown(self):
         self.injector.delete()
