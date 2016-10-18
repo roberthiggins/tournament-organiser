@@ -11,7 +11,7 @@ from sqlalchemy.sql.expression import and_
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
-from models.dao.registration import TournamentRegistration
+from models.dao.registration import TournamentRegistration as Reg
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDAO
@@ -101,9 +101,9 @@ class Tournament(object):
         entries = [x.player_id for x in TournamentEntry.query.\
             filter_by(tournament_id=self.tournament_id).all()]
 
-        pending_applications = TournamentRegistration.query.filter(and_(
-            TournamentRegistration.tournament_id == self.get_dao().id,
-            ~TournamentRegistration.player_id.in_(entries))).all()
+        pending_applications = Reg.query.filter(and_(
+            Reg.tournament_id == self.get_dao().id,
+            ~Reg.player_id.in_(entries))).all()
 
         for app in pending_applications:
             try:
