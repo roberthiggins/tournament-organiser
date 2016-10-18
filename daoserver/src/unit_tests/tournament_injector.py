@@ -29,7 +29,6 @@ class TournamentInjector(object):
 
     def __init__(self):
         self.tournament_ids = set()
-        self.tournament_names = set()
         self.accounts = set()
         self.existing_perms = set([o.id for o in ProtObjAction.query.all()])
         set_up_permissions()
@@ -98,7 +97,6 @@ class TournamentInjector(object):
             })
 
         self.tournament_ids.add(tourn.get_dao().id)
-        self.tournament_names.add(tourn.get_dao().name)
 
     def create_players(self, tourn_name, num_players):
         """Create some accounts and enter them in the tournament"""
@@ -120,9 +118,9 @@ class TournamentInjector(object):
         if len(self.tournament_ids):
             TReg.query.filter(TReg.tournament_id.in_(self.tournament_ids)).\
                 delete(synchronize_session=False)
-        if len(self.tournament_names):
+            names = [t.name for t in self.tournaments()]
             TournamentEntry.query.filter(
-                TournamentEntry.tournament_id.in_(self.tournament_names)).\
+                TournamentEntry.tournament_id.in_(names)).\
                 delete(synchronize_session=False)
 
         # Accounts
@@ -178,7 +176,6 @@ class TournamentInjector(object):
         creators.delete(synchronize_session=False)
 
         self.tournament_ids = set()
-        self.tournament_names = set()
 
     def tournaments(self):
         """query the tournaments. Call all to get list"""
