@@ -86,8 +86,8 @@ class TestScoreEntered(DbSimulatingTest):
         tourn = Tournament(self.tourn_1)
 
         score_args = cat('per_round', 50, False, 0, 100)
-        category_1 = ScoreCategory(tournament_id=self.tourn_1, **score_args)
-        self.db.session.add(category_1)
+        cat_1 = ScoreCategory(tournament_id=self.tourn_1, **score_args)
+        self.db.session.add(cat_1)
         self.db.session.flush()
 
         entry_2_id = TournamentEntry.query.filter_by(
@@ -105,8 +105,8 @@ class TestScoreEntered(DbSimulatingTest):
 
         # A completed game
         game = self.get_game_by_round(entry_4_id, 1)
-        tourn.enter_score(entry_2_id, category_1.name, 2, game.id)
-        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
+        tourn.enter_score(entry_2_id, cat_1.name, 2, game.id)
+        tourn.enter_score(entry_4_id, cat_1.name, 4, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
         self.assertTrue(entry_4_id in entrants)
@@ -114,7 +114,7 @@ class TestScoreEntered(DbSimulatingTest):
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
-        tourn.enter_score(entry_3_id, category_1.name, 3, game.id)
+        tourn.enter_score(entry_3_id, cat_1.name, 3, game.id)
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
         self.assertTrue(entry_3_id in entrants)
@@ -129,14 +129,14 @@ class TestScoreEntered(DbSimulatingTest):
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
-        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
+        tourn.enter_score(entry_4_id, cat_1.name, 4, game.id)
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
         self.assertFalse(is_score_entered(game))
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tourn_1)
-        tourn.enter_score(entry_5_id, category_1.name, 5, game.id)
+        tourn.enter_score(entry_5_id, cat_1.name, 5, game.id)
         self.assertTrue(is_score_entered(game))
 
     @staticmethod
@@ -174,9 +174,8 @@ class EnterScore(DbSimulatingTest):
         score_args = cat('per_tournament', 50, True, 0, 100)
 
         # per tournament category
-        self.category_1 = ScoreCategory(tournament_id=self.tourn_1,
-                                        **score_args)
-        self.db.session.add(self.category_1)
+        self.cat_1 = ScoreCategory(tournament_id=self.tourn_1, **score_args)
+        self.db.session.add(self.cat_1)
 
         # per round category
         score_args['name'] = 'per_round'
@@ -223,7 +222,7 @@ class EnterScore(DbSimulatingTest):
             ValueError,
             Tournament(self.tourn_1).enter_score,
             10000000,
-            self.category_1.name,
+            self.cat_1.name,
             5)
         # bad key
         self.assertRaises(
@@ -237,21 +236,21 @@ class EnterScore(DbSimulatingTest):
             ValueError,
             Tournament(self.tourn_1).enter_score,
             entry.id,
-            self.category_1.name,
+            self.cat_1.name,
             -1)
         # bad score - high
         self.assertRaises(
             ValueError,
             Tournament(self.tourn_1).enter_score,
             entry.id,
-            self.category_1.name,
+            self.cat_1.name,
             101)
         # bad score - character
         self.assertRaises(
             ValueError,
             Tournament(self.tourn_1).enter_score,
             entry.id,
-            self.category_1.name,
+            self.cat_1.name,
             'a')
 
     def test_enter_score(self):
@@ -263,7 +262,7 @@ class EnterScore(DbSimulatingTest):
         tourn = Tournament(self.tourn_1)
 
         # a one-off score
-        tourn.enter_score(entry.id, self.category_1.name, 0)
+        tourn.enter_score(entry.id, self.cat_1.name, 0)
         scores = TournamentScore.query.\
             filter_by(entry_id=entry.id, tournament_id=tourn.get_dao().id).all()
         compare(len(scores), 1)
@@ -289,7 +288,7 @@ class EnterScore(DbSimulatingTest):
             ValueError,
             Tournament(self.tourn_1).enter_score,
             entry.id,
-            self.category_1.name,
+            self.cat_1.name,
             100)
 
         self.assertRaises(
