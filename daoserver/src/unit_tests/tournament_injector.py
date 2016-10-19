@@ -91,7 +91,7 @@ class TournamentInjector(object):
 
             tourn = Tourn(name)
         else:
-            tourn = Tourn(name).new({
+            tourn = Tourn(name).new(**{
                 'date': date.strftime(Tourn.DATE_FORMAT),
                 'to_username': to_username
             })

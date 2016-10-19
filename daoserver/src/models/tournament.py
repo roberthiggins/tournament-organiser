@@ -92,7 +92,7 @@ class Tournament(object):
 
 
     @not_in_progress
-    def new(self, details):
+    def new(self, **details):
         """
         add a tournament to the db
         Expects:

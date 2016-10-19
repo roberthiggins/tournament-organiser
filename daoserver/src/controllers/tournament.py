@@ -44,10 +44,9 @@ def add_tournament():
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
     tourn = Tournament(inputTournamentName)
-    tourn.new({
-        'date':        inputTournamentDate,
-        'to_username': request.authorization.username
-    })
+    tourn.new(date=inputTournamentDate,
+              to_username=request.authorization.username,
+              **(request.get_json()))
     return '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\
         format(inputTournamentName, inputTournamentDate)
