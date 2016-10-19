@@ -6,14 +6,33 @@ exports.auth = function(user, password) {
         return "Basic " + new Buffer(user + ":" + pass).toString("base64");
     };
 
+var postCategory = function(cat){
+    return {
+        "name": cat[0],
+        "percentage": cat[1],
+        "per_tournament": cat[2],
+        "min_val": cat[3],
+        "max_val": cat[4],
+        "zero_sum": cat[5] || false,
+        "opponent_score": cat[6] || false
+        };
+};
+
 // Inserts a new tournament
-exports.createTournament = function(tournament, date) {
+exports.createTournament = function(tournament, date, rounds, missions,
+    scoreCategories) {
     "use strict";
     var API = process.env.API_ADDR + "tournament",
         to = tournament + "_to",
+        categories = (scoreCategories || []).map(function(cat){
+            return postCategory(cat);
+            }),
         postData = {
             inputTournamentName: tournament,
-            inputTournamentDate: date
+            inputTournamentDate: date,
+            rounds: rounds || 0,
+            missions: missions || [],
+            score_categories: categories
         };
 
     exports.createUser(to);
@@ -79,15 +98,7 @@ exports.setCategories = function(tourn, categories){
         postData = {score_categories: []};
 
     categories.forEach(function(cat){
-        postData.score_categories.push({
-            "name": cat[0],
-            "percentage": cat[1],
-            "per_tournament": cat[2],
-            "min_val": cat[3],
-            "max_val": cat[4],
-            "zero_sum": cat[5] || false,
-            "opponent_score": cat[6] || false
-            });
+        postData.score_categories.push(postCategory(cat));
     });
 
     frisby.create("set the score categories for " + tourn)

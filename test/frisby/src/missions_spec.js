@@ -5,12 +5,10 @@ var frisby = require("frisby"),
     API = process.env.API_ADDR;
 
 (function setup() {
-    injector.createTournament(tournament, "2095-07-01");
+    injector.createTournament(tournament, "2095-07-01", 3,
+        ["Mission the First", "Missions the Second", "Mission the Third"]);
     injector.createUser(p1);
     injector.enterTournament(tournament, p1);
-    injector.postRounds(tournament, 3);
-    injector.setMissions(tournament,
-        ["Mission the First", "Missions the Second", "Mission the Third"]);
 })();
 
 describe("Normal behaviour", function () {

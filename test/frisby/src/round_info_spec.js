@@ -3,12 +3,10 @@ var frisby = require("frisby"),
     API = process.env.API_ADDR + "tournament/" + tournament + "/rounds",
     injector = require("./data_injector");
 
-injector.createTournament("round_test", "2095-07-07");
+injector.createTournament("round_test", "2095-07-07", 2, ["miss_1", "miss_2"]);
 
 describe("Set Rounds normally", function () {
     "use strict";
-    injector.postRounds(tournament, 2);
-    injector.setMissions(tournament, ["mission_1", "mission_2"]);
     frisby.create("Check those missions exist")
         .get(API + "/1")
         .expectStatus(200)
@@ -18,7 +16,7 @@ describe("Set Rounds normally", function () {
         })
         .expectJSON({
             draw: Array,
-            mission: "mission_1"
+            mission: "miss_1"
         })
         .toss();
     frisby.create("Check those missions exist")
@@ -30,7 +28,7 @@ describe("Set Rounds normally", function () {
         })
         .expectJSON({
             draw: Array,
-            mission: "mission_2"
+            mission: "miss_2"
         })
         .toss();
 });

@@ -6,10 +6,9 @@ var frisby = require("frisby"),
 describe("Set categories normal function", function () {
     "use strict";
 
-    injector.createTournament("category_test", "2095-07-05");
-    injector.setCategories("category_test", [
-        ["cat_t_one", 8, true, 4, 12, false, false],
-        ["cat_t_two", 13, false, 3, 11, true, true]]);
+    injector.createTournament("category_test", "2095-07-05", null, null,
+        [["cat_t_one", 8, true, 4, 12, false, false],
+         ["cat_t_two", 13, false, 3, 11, true, true]]);
     frisby.create("GET a list of tournament categories")
         .get(API)
         .expectStatus(200)

@@ -27,13 +27,14 @@ describe("Test seeing and registering for a tournament", function () {
             {date: "2095-07-04", name: "entry_list_test_no_entries", rounds: 0},
             {date: "2095-07-01", name: "mission_test",               rounds: 3},
             {date: "2095-08-12", name: "next_game_test",             rounds: 2},
+            {date: "2432-03-17", name: "no_rounds_test",             rounds: 0},
             {date: "2095-06-01", name: "northcon_2095",              rounds: 0},
             {date: "2095-07-06", name: "permission_test",            rounds: 0},
             {date: "1643-01-27", name: "rank_test",                  rounds: 2},
             {date: "2222-06-01", name: "register_test",              rounds: 0},
             {date: "2095-07-07", name: "round_test",                 rounds: 2},
             {date: "2163-09-15", name: "schedule_test",              rounds: 2},
-            {date: '2063-03-17', name: 'start_test',                 rounds: 1}])
+            {date: "2063-03-17", name: "start_test",                 rounds: 1}])
         .toss();
 
     frisby.create("enter a user")

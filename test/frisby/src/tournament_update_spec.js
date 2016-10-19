@@ -11,10 +11,9 @@ describe("Update a tournament", function () {
             false, false),
         newMissions = ["one", "two", "three"];
 
-    injector.createTournament(tournament, "2135-12-08");
-    injector.setCategories(tournament, [
-        ["cat_t_one", 8, true, 4, 12, false, false],
-        ["cat_t_two", 13, false, 3, 11, true, true]]);
+    injector.createTournament(tournament, "2135-12-08", null, null,
+        [["cat_t_one", 8, true, 4, 12, false, false],
+         ["cat_t_two", 13, false, 3, 11, true, true]]);
 
     frisby.create("update the tournament")
         .post(API, {
