@@ -150,3 +150,12 @@ def tournament_details():
     information
     """
     return g.tournament.details()
+
+@TOURNAMENT.route('/<tournament_id>', methods=['POST'])
+@text_response
+@requires_auth
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
+def update():
+    """POST to update Tournament"""
+    g.tournament.update(request.get_json())
+    return 'Tournament {} updated'.format(g.tournament_id)
