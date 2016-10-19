@@ -1,15 +1,14 @@
 var React = require("react"),
     ReactDOM = require("react-dom"),
-    $ = require("jquery");
+    $ = require("jquery"),
+    Round = require("./component-set-rounds.js");
 
-var InputWidget = React.createClass({
+var RoundsForm = React.createClass({
     getInitialState: function() {
-        return {rounds: 5};
+        return {rounds: 5, tournament: ""};
     },
     propTypes: {
-        rounds: React.PropTypes.number,
-        submitHandler: React.PropTypes.func.isRequired,
-        tourn: React.PropTypes.string.isRequired
+        submitHandler: React.PropTypes.func.isRequired
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
@@ -20,26 +19,19 @@ var InputWidget = React.createClass({
     componentWillUnmount: function() {
         this.serverRequest.abort();
     },
-    handleChange: function(event) {
+    handleRoundChange: function(event) {
         this.setState({rounds: event.target.value});
     },
     render: function() {
-        var tournText = this.props.tourn ?
-                "for " + this.props.tourn + " here:"
-                : "for a tournament on this page";
+        var tournText = this.state.tournament ?
+                " for " + this.state.tournament + " here:"
+                : " here:";
 
         return (
             <form onSubmit={this.props.submitHandler}>
-                <p>Set the number of rounds {tournText}</p>
-                
-                <p>
-                    <label htmlFor="rounds">Number of rounds:</label>
-                    <input type="text"
-                           value={this.state.rounds}
-                           onChange={this.handleChange}
-                           name="rounds"
-                           id="rounds" />
-                </p>
+                <p>Set the number of rounds{tournText}</p>
+                <Round.roundsWidget rounds={this.state.rounds}
+                                    changeHandler={this.handleRoundChange}/>
                 <button type="submit">Set</button>
             </form>
         );
@@ -48,7 +40,7 @@ var InputWidget = React.createClass({
 
 var TournamentRoundsPage = React.createClass({
     getInitialState: function () {
-        return ({error: "", successText: "", tournament: "", rounds: 5});
+        return ({error: "", successText: ""});
     },
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
@@ -57,10 +49,7 @@ var TournamentRoundsPage = React.createClass({
             numRounds = $("input#rounds").val();
 
         $.post(window.location,
-            {
-                rounds: numRounds,
-                tournament: this.state.tournament
-            },
+            {rounds: numRounds},
             function success(res) {
                 _this.setState({successText: res.message, error: ""});
             })
@@ -76,9 +65,7 @@ var TournamentRoundsPage = React.createClass({
                 {
                     this.state.successText ?
                         null
-                        : <InputWidget submitHandler={this.handleSubmit}
-                                       tourn={this.state.tournament}
-                                       rounds={this.state.rounds} />
+                        : <RoundsForm submitHandler={this.handleSubmit} />
                 }
             </div>
         );

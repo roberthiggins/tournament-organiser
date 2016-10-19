@@ -98,4 +98,3 @@ class FeatureContext extends MinkContext
         $this->fillField($pos.'_max_val', $max);
     }
 }
-
