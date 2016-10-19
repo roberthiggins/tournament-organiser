@@ -79,25 +79,47 @@ exports.enterTournament = function(tournament, username) {
 };
 
 // Enter a score. You can specify a response code and message
-exports.enterScore = function(per_tourn, tourn, api, player, gameId, user, msg,
-    scoreKey, score, code, resp){
+exports.enterScore = function(per_tourn, tourn, player, user, msg, scoreKey,
+    score, code, resp, gameId){
 
     var append = per_tourn ? "_per_tourn_1" : "_per_game_1",
-        category = scoreKey ? scoreKey : tourn + append;
-    frisby.create("POST score: " + msg)
-        .post(api + player + "/score",
-            {
-            scores: [{
-                game_id: gameId,
-                category: category,
-                score: score
-                }]
-            },
-            {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", exports.auth(user))
-        .expectStatus(code)
-        .expectBodyContains(resp)
-        .toss();
+        category = scoreKey ? scoreKey : tourn + append,
+        API = process.env.API_ADDR + "tournament/" + tourn + "/entry/" +
+            player,
+        postScore = function (gameId){
+            var req = frisby.create("POST score: " + msg)
+                .post(API + "/score",
+                    {
+                    scores: [{
+                        game_id: gameId,
+                        category: category,
+                        score: score
+                        }]
+                    },
+                    {json: true, inspectOnFailure: true})
+                .expectStatus(code)
+                .expectBodyContains(resp);
+
+                if (user) {
+                    req.addHeader("Authorization", exports.auth(user));
+                }
+
+                req.toss();
+            };
+
+    if (per_tourn) {
+        postScore();
+    }
+    else if (gameId) {
+        postScore(gameId);
+    }
+    else {
+        frisby.create("get game_id of next game for " + user)
+            .get(API + "/nextgame")
+            .expectStatus(200)
+            .afterJSON(function (body) { postScore(body.game_id); })
+            .toss();
+    }
 };
 
 // A json blob for a single score category
