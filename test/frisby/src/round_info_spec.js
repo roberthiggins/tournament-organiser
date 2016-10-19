@@ -1,8 +1,5 @@
 var frisby = require("frisby"),
     API = process.env.API_ADDR,
-    auth = function(user, pass){
-        return "Basic " + new Buffer(user + ":" + pass).toString("base64");
-    },
     injector = require("./data_injector"),
     tournament = "round_test";
 
@@ -45,7 +42,7 @@ describe("Set Rounds auth", function () {
         .post(API + "tournament/round_test/rounds", {
             numRounds: 2
         }, {json: true})
-        .addHeader("Authorization", auth("round_test_to", "password"))
+        .addHeader("Authorization", injector.auth("round_test_to"))
         .expectStatus(200)
         .toss();
     frisby.create("No auth")
@@ -59,7 +56,7 @@ describe("Set Rounds auth", function () {
         .post(API + "tournament/round_test/rounds", {
             numRounds: 2
         }, {json: true})
-        .addHeader("Authorization", auth("enter_score_entry_1", "password"))
+        .addHeader("Authorization", injector.auth("enter_score_entry_1"))
         .expectStatus(401)
         .expectBodyContains("Could not verify your access level")
         .toss();
