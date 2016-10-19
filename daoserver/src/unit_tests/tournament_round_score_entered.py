@@ -83,8 +83,8 @@ class TestScoreEntered(DbSimulatingTest):
 
     def test_score_entered(self):
         # Add a score category
-        args = score_cat_args(self.tournament_1, 'per_round', 50, False, 0, 100)
-        category_1 = ScoreCategory(**args)
+        args = score_cat_args('per_round', 50, False, 0, 100)
+        category_1 = ScoreCategory(tournament_id=self.tournament_1, **args)
         self.db.session.add(category_1)
         self.db.session.flush()
 

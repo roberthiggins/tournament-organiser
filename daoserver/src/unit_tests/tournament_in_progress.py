@@ -22,9 +22,7 @@ class TournamentInProgress(DbSimulatingTest):
         self.tournament.update({
             'rounds': 1,
             'missions': ['mission01'],
-            'score_categories': [
-                score_cat_args(self.name, 'cat', 100, True, 1, 1, False)
-            ]
+            'score_categories': [score_cat_args('cat', 100, True, 1, 1, False)]
         })
 
     def test_default_state(self):
@@ -55,7 +53,7 @@ class TournamentInProgress(DbSimulatingTest):
     def test_non_finalised_only_actions(self):
         self.tournament.set_in_progress()
 
-        args = score_cat_args(self.name, 'disallowed_cat', 100, True, 1, 1)
+        args = score_cat_args('disallowed_cat', 100, True, 1, 1)
         self.assertRaises(ValueError, self.tournament.update,
                           {'score_categories': [args]})
         self.assertRaises(ValueError, self.tournament.update, {'rounds': 5})

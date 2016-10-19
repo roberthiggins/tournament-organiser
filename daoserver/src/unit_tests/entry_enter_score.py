@@ -85,8 +85,8 @@ class TestScoreEntered(DbSimulatingTest):
     def test_score_entered(self):
         tourn = Tournament(self.tourn_1)
 
-        score_args = cat(self.tourn_1, 'per_round', 50, False, 0, 100)
-        category_1 = ScoreCategory(**score_args)
+        score_args = cat('per_round', 50, False, 0, 100)
+        category_1 = ScoreCategory(tournament_id=self.tourn_1, **score_args)
         self.db.session.add(category_1)
         self.db.session.flush()
 
@@ -171,16 +171,18 @@ class EnterScore(DbSimulatingTest):
             'missions': ['foo_mission_1', 'foo_mission_2']
         })
         self.injector.add_player(self.tourn_1, self.player)
-        score_args = cat(self.tourn_1, 'per_tournament', 50, True, 0, 100)
+        score_args = cat('per_tournament', 50, True, 0, 100)
 
         # per tournament category
-        self.category_1 = ScoreCategory(**score_args)
+        self.category_1 = ScoreCategory(tournament_id=self.tourn_1,
+                                        **score_args)
         self.db.session.add(self.category_1)
 
         # per round category
         score_args['name'] = 'per_round'
         score_args['per_tournament'] = False
-        self.category_2 = ScoreCategory(**score_args)
+        self.category_2 = ScoreCategory(tournament_id=self.tourn_1,
+                                        **score_args)
         self.db.session.add(self.category_2)
         self.db.session.commit()
 

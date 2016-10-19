@@ -23,9 +23,9 @@ class ScoreCategoryTests(DbSimulatingTest):
         self.db.session.commit()
 
         # Some default categories
-        self.cat_1 = cat(self.tourn_1, 'painting', 10, False, 1, 20)
-        self.cat_2 = cat(self.tourn_1, 'cat_battle', 80, True, 1, 20)
-        self.cat_3 = cat(self.tourn_1, 'cat_sports', 10, True, 1, 5)
+        self.cat_1 = cat('painting', 10, False, 1, 20)
+        self.cat_2 = cat('cat_battle', 80, True, 1, 20)
+        self.cat_3 = cat('cat_sports', 10, True, 1, 5)
 
         self.tournament = Tournament(self.tourn_1)
 
@@ -66,18 +66,18 @@ class ScoreCategoryTests(DbSimulatingTest):
 
     # pylint: disable=unused-variable
     def test_broken_min_max(self):
-        neg_min = cat(self.tourn_1, 'painting', 10, False, -1, 20)
-        neg_max = cat(self.tourn_1, 'painting', 10, False, 1, -1)
-        zero_max = cat(self.tourn_1, 'painting', 10, False, 0, 0)
-        min_high = cat(self.tourn_1, 'painting', 10, False, 10, 9)
-        zero_min = cat(self.tourn_1, 'painting', 10, False, 0, 20)
-        equal = cat(self.tourn_1, 'painting', 10, False, 1, 1)
-        no_min = cat(self.tourn_1, 'painting', '10', False, '', 20)
-        no_max = cat(self.tourn_1, 'painting', '10', False, 1, '')
-        none_min = cat(self.tourn_1, 'painting', '1', False, None, 1)
-        none_max = cat(self.tourn_1, 'painting', '1', False, 1, None)
-        char_min = cat(self.tourn_1, 'painting', '1', False, 'a', 1)
-        char_max = cat(self.tourn_1, 'painting', '1', False, 1, 'a')
+        neg_min = cat('painting', 10, False, -1, 20)
+        neg_max = cat('painting', 10, False, 1, -1)
+        zero_max = cat('painting', 10, False, 0, 0)
+        min_high = cat('painting', 10, False, 10, 9)
+        zero_min = cat('painting', 10, False, 0, 20)
+        equal = cat('painting', 10, False, 1, 1)
+        no_min = cat('painting', '10', False, '', 20)
+        no_max = cat('painting', '10', False, 1, '')
+        none_min = cat('painting', '1', False, None, 1)
+        none_max = cat('painting', '1', False, 1, None)
+        char_min = cat('painting', '1', False, 'a', 1)
+        char_max = cat('painting', '1', False, 1, 'a')
 
         func = self.tournament.update
         self.assertRaises(ValueError, func, {'score_categories': [neg_min]})
@@ -94,13 +94,13 @@ class ScoreCategoryTests(DbSimulatingTest):
 
     def test_broken_categories(self):
         # cat should perform input validation only
-        fifty_one = cat(self.tourn_1, 'painting', 51, False, 1, 20)
-        neg_pct = cat(self.tourn_1, 'painting', -1, False, 1, 20)
-        zero_pct = cat(self.tourn_1, 'painting', 0, False, 1, 20)
-        lge_pct = cat(self.tourn_1, 'painting', 101, False, 1, 20)
-        char_pct = cat(self.tourn_1, 'painting', 'a', False, 1, 20)
-        no_name = cat(self.tourn_1, '', 10, False, 1, 20)
-        none_name = cat(self.tourn_1, None, 10, False, 1, 20)
+        fifty_one = cat('painting', 51, False, 1, 20)
+        neg_pct = cat('painting', -1, False, 1, 20)
+        zero_pct = cat('painting', 0, False, 1, 20)
+        lge_pct = cat('painting', 101, False, 1, 20)
+        char_pct = cat('painting', 'a', False, 1, 20)
+        no_name = cat('', 10, False, 1, 20)
+        none_name = cat(None, 10, False, 1, 20)
 
         func = self.tournament.update
         self.assertRaises(ValueError, func, {'score_categories': [neg_pct]})

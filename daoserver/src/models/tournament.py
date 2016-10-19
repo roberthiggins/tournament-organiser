@@ -242,17 +242,18 @@ class Tournament(object):
             raise PROGRESS_EXCEPTION
         dao.date = details.get('date', dao.date)
 
-        # TODO we should add an equality check here
-        score_cats = details.get('score_categories', None)
-        if score_cats is not None:
-            self._set_score_categories(score_cats)
+        cats = details.get('score_categories', None)
+        deserialised = [ScoreCategory(tournament_id=self.tournament_id, **x) \
+            for x in cats] if cats is not None else None
+        if cats is not None and self.get_score_categories() != deserialised:
+            self._set_score_categories(cats)
 
-        rounds = details.get('rounds', dao.rounds.count())
-        if rounds != dao.rounds.count():
+        rounds = details.get('rounds')
+        if rounds is not None and rounds != dao.rounds.count():
             self._set_rounds(rounds)
 
-        missions = details.get('missions', self.get_missions())
-        if missions != self.get_missions():
+        missions = details.get('missions')
+        if missions is not None and missions != self.get_missions():
             self._set_missions(missions)
 
         db.session.add(dao)
