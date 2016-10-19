@@ -1,7 +1,7 @@
 var frisby = require("frisby"),
-    API = process.env.API_ADDR,
-    injector = require("./data_injector"),
-    tournament = "round_test";
+    tournament = "round_test",
+    API = process.env.API_ADDR + "tournament/" + tournament + "/rounds",
+    injector = require("./data_injector");
 
 injector.createTournament("round_test", "2095-07-07");
 
@@ -10,7 +10,7 @@ describe("Set Rounds normally", function () {
     injector.postRounds(tournament, 2);
     injector.setMissions(tournament, ["mission_1", "mission_2"]);
     frisby.create("Check those missions exist")
-        .get(API + "tournament/round_test/rounds/1")
+        .get(API + "/1")
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,
@@ -22,7 +22,7 @@ describe("Set Rounds normally", function () {
         })
         .toss();
     frisby.create("Check those missions exist")
-        .get(API + "tournament/round_test/rounds/2")
+        .get(API + "/2")
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,
@@ -39,21 +39,21 @@ describe("Set Rounds auth", function () {
     "use strict";
 
     frisby.create("TO auth")
-        .post(API + "tournament/round_test/rounds", {
+        .post(API, {
             numRounds: 2
         }, {json: true})
         .addHeader("Authorization", injector.auth("round_test_to"))
         .expectStatus(200)
         .toss();
     frisby.create("No auth")
-        .post(API + "tournament/round_test/rounds", {
+        .post(API, {
             numRounds: 2
         }, {json: true})
         .expectStatus(401)
         .expectBodyContains("Could not verify your access level")
         .toss();
     frisby.create("Bad auth")
-        .post(API + "tournament/round_test/rounds", {
+        .post(API, {
             numRounds: 2
         }, {json: true})
         .addHeader("Authorization", injector.auth("enter_score_entry_1"))
@@ -65,9 +65,9 @@ describe("Set Rounds auth", function () {
 describe("Set malformed rounds", function () {
     "use strict";
 
-    var malformedRounds = function(msg, tourn, path, code){
+    var malformedRounds = function(msg, trn, pth, code){
         frisby.create("GET incorrect rounds: " + msg)
-            .get(API + "tournament/" + tourn + "/rounds/" + path)
+            .get(process.env.API_ADDR + "tournament/" + trn + "/rounds/" + pth)
             .expectStatus(code)
             .toss();
     };
