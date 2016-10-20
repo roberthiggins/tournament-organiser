@@ -37,7 +37,8 @@ router.route("/tournament/create")
                 "/tournament",
                 {
                     inputTournamentName: req.body.name,
-                    inputTournamentDate: req.body.date
+                    inputTournamentDate: req.body.date,
+                    rounds: req.body.rounds || 0
                 },
                 undefined,
                 function(responseBody) {

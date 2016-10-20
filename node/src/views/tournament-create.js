@@ -1,25 +1,37 @@
 var React = require("react"),
     ReactDOM = require("react-dom"),
-    $ = require("jquery");
+    $ = require("jquery"),
+    Inputs = require("./component-inputs.js");
 
 var TournamentDetailsWidget = React.createClass({
+    getInitialState: function() {
+        return {rounds: 5};
+    },
     propTypes: { handleSubmit: React.PropTypes.func.isRequired },
+    handleRoundChange: function(event){
+        this.setState({rounds: event.target.value});
+    },
     render: function() {
         return (
-            <div>
-                <form onSubmit={this.props.handleSubmit}>
-                    <p>
-                        <label htmlFor="name">Tournament Name:</label>
-                        <input type="text" name="name" id="name" />
-                    </p>
+            <form onSubmit={this.props.handleSubmit}>
+                <p>
+                    <label htmlFor="name">Tournament Name:</label>
+                    <input type="text" name="name" id="name" />
+                </p>
 
-                    <p>
-                        <label htmlFor="date">Tournament Date:</label>
-                        <input type="text" name="date" id="date" />
-                    </p>
-                    <button type="submit">Create</button>
-                </form>
-            </div>
+                <p>
+                    <label htmlFor="date">Tournament Date:</label>
+                    <input type="text" name="date" id="date" />
+                </p>
+                <p>
+                    <Inputs.textField value={this.state.rounds}
+                                      id="rounds"
+                                      name="Number of rounds"
+                                      changeHandler={this.handleRoundChange}/>
+                </p>
+
+                <button type="submit">Create</button>
+            </form>
         );
     }
 });
@@ -28,6 +40,7 @@ var SuccessWidget = React.createClass({
     propTypes: {
         name: React.PropTypes.string.isRequired,
         date: React.PropTypes.string.isRequired,
+        rounds: React.PropTypes.number,
     },
     render: function() {
         return (
@@ -36,6 +49,9 @@ var SuccessWidget = React.createClass({
                 <ul>
                     <li>Name: {this.props.name}</li>
                     <li>Date: {this.props.date}</li>
+                    {this.props.rounds ?
+                        <li>Rounds: {this.props.rounds}</li> :
+                        null}
                 </ul>
             </div>
         );
@@ -51,14 +67,21 @@ var TournamentCreatePage = React.createClass({
         e.preventDefault();
         var _this = this,
             name = $("input#name").val(),
-            date = $("input#date").val();
+            date = $("input#date").val(),
+            rounds = $("input#rounds").val();
 
-        $.post("/tournament/create", {name: name, date: date},
+        $.post("/tournament/create",
+            {
+                name: name,
+                date: date,
+                rounds: rounds
+            },
             function success() {
                 _this.setState({
                     success: true,
                     date: date,
-                    name: name
+                    name: name,
+                    rounds: rounds
                 });
             })
             .fail(function (res) {
@@ -73,7 +96,8 @@ var TournamentCreatePage = React.createClass({
             <div>
                 {this.state.success ?
                     <SuccessWidget date={this.state.date}
-                                   name={this.state.name} />
+                                   name={this.state.name}
+                                   rounds={this.state.rounds} />
                     : null
                 }
                 {this.state.success ?
