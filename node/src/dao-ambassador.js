@@ -1,6 +1,5 @@
 /* Ambassador-like module for interacting with the DAO */
-const winston = require("winston"),
-      querystring = require("querystring");
+const winston = require("winston");
 
 // Make a request to the DAO server
 var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
@@ -81,9 +80,9 @@ exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
 exports.postToDAORequest = function(req, res, path, JSONData, onSuccess,
                                     onFail) {
 
-    var postData = querystring.stringify(JSONData),
+    var postData = JSON.stringify(JSONData),
         headers  = {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
             "Content-Length": Buffer.byteLength(postData),
             "Authorization": makeAuth(req)
         },
