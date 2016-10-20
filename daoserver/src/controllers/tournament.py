@@ -1,7 +1,6 @@
 """
 All tournament interactions.
 """
-import json
 from flask import Blueprint, g, request
 
 from controllers.request_helpers import enforce_request_variables, \
@@ -21,14 +20,6 @@ def get_tournament(endpoint, values):
         g.tournament = Tournament(g.tournament_id)
 
     g.username = values.pop('username', None)
-
-def load_json(val):
-    """Attempt to load a json argument from request"""
-    # pylint: disable=undefined-variable
-    try:
-        return json.loads(val)
-    except TypeError:
-        return val
 
 @TOURNAMENT.route('', methods=['POST'])
 @requires_auth
