@@ -52,7 +52,7 @@ Feature: DEMO TOURNAMENT
         When I fill in "missions_4" with "mission_05"
         When I fill in "missions_5" with "mission_06"
         When I press "Set"   
-        Then I should see "Missions set" appear
+        Then I should see "Tournament demo updated" appear
 
         Given I visit category page for "demo"
         Given I fill category 0 with "Battle" "100" "1" "20"

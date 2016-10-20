@@ -226,7 +226,7 @@ router.route("/tournament/:tournament/missions")
         users.ensureAuthenticated,
         function(req, res){
 
-            var url = "/tournament/" + req.params.tournament + "/missions",
+            var url = "/tournament/" + req.params.tournament,
                 missionList = function(postData) {
 
                     var idx = 0,
@@ -244,7 +244,7 @@ router.route("/tournament/:tournament/missions")
                         }
                     }
 
-                    return JSON.stringify(missions);
+                    return missions;
                 },
                 postData = {missions: missionList(req.body)};
 

@@ -111,7 +111,7 @@ exports.setCategories = function(tourn, categories){
 // Set missions
 exports.setMissions = function(tourn, missions){
     "use strict";
-    var API = process.env.API_ADDR + "tournament/" + tourn + "/missions";
+    var API = process.env.API_ADDR + "tournament/" + tourn;
 
     frisby.create("POST " + missions.length + " missions to setup")
         .post(API, {missions: missions}, {json: true, inspectOnFailure: true})

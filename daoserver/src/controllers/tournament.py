@@ -114,17 +114,6 @@ def register():
 
     return 'Application Submitted'
 
-@TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])
-@text_response
-@requires_auth
-@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('missions')
-def set_missions():
-    """POST to set the missions for a tournament. A list of strings expected"""
-    # pylint: disable=undefined-variable
-    g.tournament.update({'missions': load_json(missions)})
-
-    return 'Missions set: {}'.format(missions)
 
 @TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
 @text_response
