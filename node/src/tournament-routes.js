@@ -182,8 +182,8 @@ router.route("/tournament/:tournament/categories")
             DAOAmbassador.postToDAORequest(
                 req,
                 res,
-                "/tournament/" + req.params.tournament + "/score_categories",
-                {score_categories: JSON.stringify(req.body.categories || [])},
+                "/tournament/" + req.params.tournament,
+                {score_categories: req.body.categories || []},
                 undefined,
                 function(responseBody) {
                     res.status(400).json({error: responseBody});

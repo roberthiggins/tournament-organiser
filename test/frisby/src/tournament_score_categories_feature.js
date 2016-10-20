@@ -1,7 +1,6 @@
 var frisby = require("frisby"),
     injector = require("./data_injector.js"),
-    API = process.env.API_ADDR +
-            "tournament/category_test/score_categories";
+    API = process.env.API_ADDR + "tournament/category_test";
 
 describe("Set categories normal function", function () {
     "use strict";
@@ -10,7 +9,7 @@ describe("Set categories normal function", function () {
         [["cat_t_one", 8, true, 4, 12, false, false],
          ["cat_t_two", 13, false, 3, 11, true, true]]);
     frisby.create("GET a list of tournament categories")
-        .get(API)
+        .get(API + "/score_categories")
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
         .expectJSONTypes("0", {
@@ -43,7 +42,7 @@ describe("Set categories normal function", function () {
         .expectStatus(200)
         .after(function() {
             frisby.create("GET a list of tournament categories")
-                .get(API)
+                .get(API + "/score_categories")
                 .expectStatus(200)
                 .expectHeaderContains("content-type", "application/json")
                 .expectJSON([injector.jsonCat(Number, "cat_t_three", 99, true,
@@ -85,7 +84,7 @@ describe("Set categories malformed", function () {
         .expectStatus(200)
         .toss();
     frisby.create("GET categories from now empty tournament")
-        .get(API)
+        .get(API + "/score_categories")
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
         .expectJSON([])

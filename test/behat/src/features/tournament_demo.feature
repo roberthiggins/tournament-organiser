@@ -57,7 +57,7 @@ Feature: DEMO TOURNAMENT
         Given I visit category page for "demo"
         Given I fill category 0 with "Battle" "100" "1" "20"
         Then I press "Set"
-        Then I should see "Score categories set" appear
+        Then I should see "Tournament demo updated" appear
 
     @javascript
     Scenario Outline: Players enter

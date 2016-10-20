@@ -115,22 +115,6 @@ def register():
     return 'Application Submitted'
 
 
-@TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
-@text_response
-@requires_auth
-@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('score_categories')
-def set_score_categories():
-    """
-    POST to set tournament categories en masse
-    """
-    # pylint: disable=undefined-variable
-    cats = load_json(score_categories)
-    g.tournament.update({'score_categories': cats})
-
-    return 'Score categories set: {}'.\
-        format(', '.join([cat['name'] for cat in cats]))
-
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response
 def tournament_details():

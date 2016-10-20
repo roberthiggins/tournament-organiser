@@ -94,7 +94,7 @@ exports.jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
 exports.setCategories = function(tourn, categories){
     "use strict";
 
-    var API = process.env.API_ADDR + "tournament/" + tourn + "/score_categories",
+    var API = process.env.API_ADDR + "tournament/" + tourn,
         postData = {score_categories: []};
 
     categories.forEach(function(cat){
