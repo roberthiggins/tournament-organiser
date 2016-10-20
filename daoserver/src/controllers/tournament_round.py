@@ -3,8 +3,7 @@ Individual rounds in a tournament
 """
 from flask import Blueprint, g
 
-from controllers.request_helpers import enforce_request_variables, \
-json_response, requires_auth, text_response, ensure_permission
+from controllers.request_helpers import json_response
 from models.tournament import Tournament
 
 TOURNAMENT_ROUND = Blueprint('TOURNAMENT_ROUND', __name__)
@@ -47,15 +46,3 @@ def get_round_info(round_id):
         'draw': draw_info,
         'mission': rnd.get_dao().get_mission()
     }
-
-@TOURNAMENT_ROUND.route('', methods=['POST'])
-@requires_auth
-@text_response
-@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('rounds')
-def set_rounds():
-    """Set the number of rounds for a tournament"""
-
-    # pylint: disable=undefined-variable
-    g.tournament.update({'rounds': rounds})
-    return 'Rounds set: {}'.format(rounds)

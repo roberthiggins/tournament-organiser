@@ -41,7 +41,7 @@ Feature: DEMO TOURNAMENT
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "6"
         When I press "Set"
-        Then I should see "Rounds set: 6" appear
+        Then I should see "Tournament demo updated" appear
 
         Given I am on "/tournament/demo/missions"
         Then I wait for "Set the missions for demo here" to appear

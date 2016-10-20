@@ -117,7 +117,7 @@ router.route("/tournament/:tournament/rounds")
             DAOAmbassador.postToDAORequest(
                 req,
                 res,
-                "/tournament/" + req.params.tournament + "/rounds",
+                "/tournament/" + req.params.tournament,
                 {rounds: req.body.rounds});
         });
 router.route("/tournament/:tournament/rounds/content")

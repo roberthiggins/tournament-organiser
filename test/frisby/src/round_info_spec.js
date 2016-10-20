@@ -1,6 +1,6 @@
 var frisby = require("frisby"),
     tournament = "round_test",
-    API = process.env.API_ADDR + "tournament/" + tournament + "/rounds",
+    API = process.env.API_ADDR + "tournament/" + tournament,
     injector = require("./data_injector");
 
 injector.createTournament("round_test", "2095-07-07", 2, ["miss_1", "miss_2"]);
@@ -8,7 +8,7 @@ injector.createTournament("round_test", "2095-07-07", 2, ["miss_1", "miss_2"]);
 describe("Set Rounds normally", function () {
     "use strict";
     frisby.create("Check those missions exist")
-        .get(API + "/1")
+        .get(API + "/rounds/1")
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,
@@ -20,7 +20,7 @@ describe("Set Rounds normally", function () {
         })
         .toss();
     frisby.create("Check those missions exist")
-        .get(API + "/2")
+        .get(API + "/rounds/2")
         .expectStatus(200)
         .expectJSONTypes({
             draw: Array,

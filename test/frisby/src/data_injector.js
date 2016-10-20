@@ -124,7 +124,7 @@ exports.setMissions = function(tourn, missions){
 exports.postRounds = function(tourn, rounds) {
     "use strict";
 
-    var API = process.env.API_ADDR + "tournament/" + tourn + "/rounds";
+    var API = process.env.API_ADDR + "tournament/" + tourn;
     frisby.create("POST " + rounds + " rounds to setup")
         .post(API, {rounds: rounds}, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", exports.auth("superuser"))
