@@ -1,7 +1,8 @@
 """
 Setting the number of rounds in a tournament
 """
-from models.dao.registration import TournamentRegistration
+from models.dao.registration import TournamentRegistration as Reg
+from models.dao.tournament_entry import TournamentEntry
 from models.tournament import Tournament
 
 from unit_tests.db_simulating_test import DbSimulatingTest
@@ -22,9 +23,7 @@ class TournamentInProgress(DbSimulatingTest):
         self.tournament.update({
             'rounds': 1,
             'missions': ['mission01'],
-            'score_categories': [
-                score_cat_args(self.name, 'cat', 100, True, 1, 1, False)
-            ]
+            'score_categories': [score_cat_args('cat', 100, True, 1, 1, False)]
         })
 
     def test_default_state(self):
@@ -36,7 +35,9 @@ class TournamentInProgress(DbSimulatingTest):
 
     def test_no_entries(self):
         self.tournament.update({'rounds': 0})
-        self.injector.delete_accounts()
+        dao = self.tournament.get_dao()
+        Reg.query.filter_by(tournament_id=dao.id).delete()
+        TournamentEntry.query.filter_by(tournament_id=dao.name).delete()
         self.assertRaises(ValueError, self.tournament.set_in_progress)
 
     def test_no_missions(self):
@@ -55,11 +56,11 @@ class TournamentInProgress(DbSimulatingTest):
     def test_non_finalised_only_actions(self):
         self.tournament.set_in_progress()
 
-        args = score_cat_args(self.name, 'disallowed_cat', 100, True, 1, 1)
+        args = score_cat_args('disallowed_cat', 100, True, 1, 1)
         self.assertRaises(ValueError, self.tournament.update,
                           {'score_categories': [args]})
         self.assertRaises(ValueError, self.tournament.update, {'rounds': 5})
 
-        rego = TournamentRegistration(self.player_1, self.name)
+        rego = Reg(self.player_1, self.name)
         rego.add_to_db()
         self.assertRaises(ValueError, self.tournament.confirm_entries)

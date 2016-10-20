@@ -11,6 +11,8 @@ from sqlalchemy.sql.expression import and_
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
+from models.dao.permissions import AccountProtectedObjectPermission, \
+ProtectedObject, ProtObjPerm
 from models.dao.registration import TournamentRegistration as Reg
 from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
@@ -21,7 +23,7 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
-from models.score import upsert_tourn_score_cat, validate_score, write_score
+from models.score import validate_score, write_score
 from models.table_strategy import ProtestAvoidanceStrategy
 from models.tournament_round import TournamentRound, DrawException
 
@@ -69,7 +71,28 @@ class Tournament(object):
 
 
     @not_in_progress
-    def new(self, details):
+    def delete(self):
+        """Delete a tournament"""
+        dao = self.get_dao()
+        self.update({
+            'rounds': 0,
+            'score_categories': []
+        })
+        Reg.query.filter_by(tournament_id=dao.id).delete()
+        TournamentEntry.query.filter_by(tournament_id=dao.name).delete()
+        db.session.delete(dao)
+        db.session.flush()
+        AccountProtectedObjectPermission.query.\
+            filter_by(account_username=dao.to_username).delete()
+        ProtObjPerm.query.\
+            filter_by(protected_object_id=dao.protected_object.id).delete()
+        ProtectedObject.query.filter_by(id=dao.protected_object.id).\
+            delete()
+        db.session.commit()
+
+
+    @not_in_progress
+    def new(self, **details):
         """
         add a tournament to the db
         Expects:
@@ -242,17 +265,18 @@ class Tournament(object):
             raise PROGRESS_EXCEPTION
         dao.date = details.get('date', dao.date)
 
-        # TODO we should add an equality check here
-        score_cats = details.get('score_categories', None)
-        if score_cats is not None:
-            self._set_score_categories(score_cats)
+        cats = details.get('score_categories', None)
+        deserialised = [ScoreCategory(tournament_id=self.tournament_id, **x) \
+            for x in cats] if cats is not None else None
+        if cats is not None and self.get_score_categories() != deserialised:
+            self._set_score_categories(cats)
 
-        rounds = details.get('rounds', dao.rounds.count())
-        if rounds != dao.rounds.count():
+        rounds = details.get('rounds')
+        if rounds is not None and rounds != dao.rounds.count():
             self._set_rounds(rounds)
 
-        missions = details.get('missions', self.get_missions())
-        if missions != self.get_missions():
+        missions = details.get('missions')
+        if missions is not None and missions != self.get_missions():
             self._set_missions(missions)
 
         db.session.add(dao)
@@ -343,7 +367,17 @@ class Tournament(object):
             score_cats.delete(synchronize_session='fetch')
 
             for cat in new_categories:
-                upsert_tourn_score_cat(self.tournament_id, cat)
+                dao = ScoreCategory.query.\
+                    filter_by(tournament_id=self.tournament_id,
+                              name=cat['name']).first()
+                if dao is None:
+                    dao = ScoreCategory(tournament_id=self.tournament_id, **cat)
+                else:
+                    dao.update(tournament_id=self.tournament_id, **cat)
+
+                db.session.add(dao)
+                db.session.flush()
+
                 ScoreCategory.query.\
                     filter_by(tournament_id=self.tournament_id,
                               name=cat['name']).first().clashes()

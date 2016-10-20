@@ -1,16 +1,19 @@
-describe("HTTP Method Test Suite", function () {
-    "use strict";
-    var frisby = require("frisby"),
-        injector = require("./data_injector"),
-        API = process.env.API_ADDR,
-        tourn = "start_test";
+var frisby = require("frisby"),
+    injector = require("./data_injector"),
+    API = process.env.API_ADDR;
 
-    injector.createTournament(tourn, "2063-03-17");
+describe("Test get draw", function () {
+    "use strict";
+    var tourn = "no_rounds_test";
+
+    injector.createTournament(tourn, "2432-03-17", null, null,
+        [["cat_1", 8, true, 4, 12, false, false]]);
+
 
     frisby.create("Check draw for tournament with no rounds")
         .get(API + "tournament/" + tourn + "/rounds/1")
         .expectStatus(400)
-        .expectBodyContains("Tournament start_test does not have a round 1")
+        .expectBodyContains("Tournament " + tourn + " does not have a round 1")
         .toss();
 
     frisby.create("Check the draw")
@@ -21,7 +24,15 @@ describe("HTTP Method Test Suite", function () {
             mission: String
         })
         .toss();
+});
 
+
+describe("Start the tournament", function () {
+    "use strict";
+    var tourn = "start_test";
+
+    injector.createTournament(tourn, "2063-03-17", 1, ["Mission the First"],
+        [["cat_1", 8, true, 4, 12, false, false]]);
 
     // Test people forcing a draw manually
     injector.createUser("start_test_player_1");
@@ -30,10 +41,6 @@ describe("HTTP Method Test Suite", function () {
     injector.createUser("start_test_non_player");
     injector.enterTournament(tourn, "start_test_player_1");
     injector.enterTournament(tourn, "start_test_player_2");
-
-    injector.setCategories(tourn, [["cat_1", 8, true, 4, 12, false, false]]);
-    injector.postRounds(tourn, 1);
-    injector.setMissions(tourn, ["Mission the First"]);
 
     frisby.create("Begin tournament as player")
         .post(API + "tournament/" + tourn + "/start")

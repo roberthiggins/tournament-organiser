@@ -43,11 +43,11 @@ def add_tournament():
         - inputTournamentName - Tournament name. Must be unique.
         - inputTournamentDate - Tournament Date. YYYY-MM-DD
     """
+    opt_args = request.get_json() if request.get_json() is not None else {}
     tourn = Tournament(inputTournamentName)
-    tourn.new({
-        'date':        inputTournamentDate,
-        'to_username': request.authorization.username
-    })
+    tourn.new(date=inputTournamentDate,
+              to_username=request.authorization.username,
+              **opt_args)
     return '<p>Tournament Created! You submitted the following fields:</p> \
         <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\
         format(inputTournamentName, inputTournamentDate)
@@ -130,27 +130,17 @@ def set_missions():
 @text_response
 @requires_auth
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('categories')
+@enforce_request_variables('score_categories')
 def set_score_categories():
     """
     POST to set tournament categories en masse
     """
-
-    new_categories = []
     # pylint: disable=undefined-variable
-    cats = load_json(categories)
-
-    for json_cat in cats:
-        try:
-            cat = json.loads(request.values.get(json_cat, []))
-        except TypeError:
-            cat = request.get_json().get(json_cat)
-        new_categories.append(cat)
-
-    g.tournament.update({'score_categories': new_categories})
+    cats = load_json(score_categories)
+    g.tournament.update({'score_categories': cats})
 
     return 'Score categories set: {}'.\
-        format(', '.join([str(cat['name']) for cat in new_categories]))
+        format(', '.join([cat['name'] for cat in cats]))
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response
@@ -160,3 +150,12 @@ def tournament_details():
     information
     """
     return g.tournament.details()
+
+@TOURNAMENT.route('/<tournament_id>', methods=['POST'])
+@text_response
+@requires_auth
+@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
+def update():
+    """POST to update Tournament"""
+    g.tournament.update(request.get_json())
+    return 'Tournament {} updated'.format(g.tournament_id)

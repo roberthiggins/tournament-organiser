@@ -84,7 +84,6 @@ class SetRounds(DbSimulatingTest):
         self.assertRaises(ValueError, tourn._set_rounds, '')
         self.assertRaises(ValueError, tourn.update, {'rounds': ''})
         self.assertRaises(TypeError, tourn._set_rounds, None)
-        self.assertRaises(TypeError, tourn.update, {'rounds': None})
 
         name_2 = 'test_errors_2'
         self.injector.inject(name_2)
@@ -94,4 +93,3 @@ class SetRounds(DbSimulatingTest):
         self.assertRaises(ValueError, tourn._set_rounds, '')
         self.assertRaises(ValueError, tourn.update, {'rounds': ''})
         self.assertRaises(TypeError, tourn._set_rounds, None)
-        self.assertRaises(TypeError, tourn.update, {'rounds': None})
