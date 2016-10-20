@@ -57,9 +57,5 @@ def set_rounds():
     """Set the number of rounds for a tournament"""
 
     # pylint: disable=undefined-variable
-    new_rounds = int(rounds)
-    if new_rounds < 1:
-        raise ValueError('Set at least 1 round')
-
-    g.tournament.update({'rounds': new_rounds})
-    return 'Rounds set: {}'.format(new_rounds)
+    g.tournament.update({'rounds': rounds})
+    return 'Rounds set: {}'.format(rounds)
