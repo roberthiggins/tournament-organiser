@@ -38,21 +38,21 @@ describe("Set Rounds auth", function () {
 
     frisby.create("TO auth")
         .post(API, {
-            numRounds: 2
+            rounds: 2
         }, {json: true})
         .addHeader("Authorization", injector.auth("round_test_to"))
         .expectStatus(200)
         .toss();
     frisby.create("No auth")
         .post(API, {
-            numRounds: 2
+            rounds: 2
         }, {json: true})
         .expectStatus(401)
         .expectBodyContains("Could not verify your access level")
         .toss();
     frisby.create("Bad auth")
         .post(API, {
-            numRounds: 2
+            rounds: 2
         }, {json: true})
         .addHeader("Authorization", injector.auth("enter_score_entry_1"))
         .expectStatus(401)

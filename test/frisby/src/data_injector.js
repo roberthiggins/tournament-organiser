@@ -126,7 +126,7 @@ exports.postRounds = function(tourn, rounds) {
 
     var API = process.env.API_ADDR + "tournament/" + tourn + "/rounds";
     frisby.create("POST " + rounds + " rounds to setup")
-        .post(API, {numRounds: rounds}, {json: true, inspectOnFailure: true})
+        .post(API, {rounds: rounds}, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", exports.auth("superuser"))
         .expectStatus(200)
         .toss();

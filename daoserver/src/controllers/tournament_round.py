@@ -52,17 +52,14 @@ def get_round_info(round_id):
 @requires_auth
 @text_response
 @ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('numRounds')
+@enforce_request_variables('rounds')
 def set_rounds():
     """Set the number of rounds for a tournament"""
 
     # pylint: disable=undefined-variable
-    try:
-        rounds = int(numRounds)
-        if rounds < 1:
-            raise ValueError()
-    except ValueError:
+    new_rounds = int(rounds)
+    if new_rounds < 1:
         raise ValueError('Set at least 1 round')
 
-    g.tournament.update({'rounds': rounds})
-    return 'Rounds set: {}'.format(rounds)
+    g.tournament.update({'rounds': new_rounds})
+    return 'Rounds set: {}'.format(new_rounds)

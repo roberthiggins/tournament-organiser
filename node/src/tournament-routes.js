@@ -118,7 +118,7 @@ router.route("/tournament/:tournament/rounds")
                 req,
                 res,
                 "/tournament/" + req.params.tournament + "/rounds",
-                {numRounds: req.body.rounds});
+                {rounds: req.body.rounds});
         });
 router.route("/tournament/:tournament/rounds/content")
     .get(function(req, res) {
