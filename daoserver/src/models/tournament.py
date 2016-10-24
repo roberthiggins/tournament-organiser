@@ -273,9 +273,12 @@ class Tournament(object):
 
         rounds = details.get('rounds')
         if rounds is not None:
-            rounds = int(rounds)
-            if rounds < 0:
-                raise ValueError('Cannot set rounds: {}'.format(rounds))
+            try:
+                rounds = float(rounds)
+            except ValueError:
+                raise ValueError('Natural number required')
+            if not rounds.is_integer() or rounds < 0:
+                raise ValueError('Natural number required')
             if rounds != dao.rounds.count():
                 self._set_rounds(rounds)
 
