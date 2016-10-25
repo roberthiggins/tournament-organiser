@@ -183,16 +183,11 @@ router.route("/tournament/:tournament/categories")
                 req,
                 res,
                 "/tournament/" + req.params.tournament,
-                {score_categories: req.body.categories || []},
-                undefined,
-                function(responseBody) {
-                    res.status(400).json({error: responseBody});
-                });
+                {score_categories: req.body.categories || []});
         });
 router.route("/tournament/:tournament/categories/content")
     .get(function(req, res) {
-        var url = "/tournament/" + req.params.tournament
-                    + "/score_categories";
+        var url = "/tournament/" + req.params.tournament + "/score_categories";
 
         DAOAmbassador.getFromDAORequest(
             req,
@@ -205,9 +200,6 @@ router.route("/tournament/:tournament/categories/content")
                     + req.params.tournament
                     + " here. For example, \"Battle\", \"Sports\", etc.";
                 res.status(200).json(responseDict);
-            },
-            function(responseBody) {
-                res.status(200).json({error: responseBody});
             });
     });
 

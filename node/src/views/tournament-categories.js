@@ -110,9 +110,13 @@ var category = function(idx, name, pct, per_tournament, min_val, max_val,
         );
 };
 
-var TournamentCategoriesPage = React.createClass({
+
+var CategoriesForm = React.createClass({
+    propTypes: {
+        submitHandler: React.PropTypes.func.isRequired
+    },
     getInitialState: function () {
-        return ({error: "", successText: "", tournament: "", categories: []});
+        return ({message: "", categories: []});
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
@@ -142,6 +146,21 @@ var TournamentCategoriesPage = React.createClass({
     componentWillUnmount: function() {
         this.serverRequest.abort();
     },
+    render: function() {
+        return (
+            <form onSubmit={this.props.submitHandler}>
+                {this.state.message ? <div>{this.state.message}</div> : null}
+                {this.state.categories}
+                <button type="submit">Set</button>
+            </form>
+        );
+    }
+});
+
+var TournamentCategoriesPage = React.createClass({
+    getInitialState: function () {
+        return ({error: "", message: ""});
+    },
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
@@ -164,25 +183,19 @@ var TournamentCategoriesPage = React.createClass({
         $.post(window.location,
             {categories: categories},
             function success(res) {
-                _this.setState(
-                    {successText: res.message, error: "", message: ""});
+                _this.setState(res);
             })
             .fail(function (res) {
-                _this.setState({error: res.responseJSON.error});
+                _this.setState(res);
             });
     },
     render: function() {
         return (
             <div>
-
-                <p>{this.state.successText}</p>
-                <p>{this.state.error}</p>
-                <p>{this.state.message}</p>
-                {this.state.successText ? null:
-                    <form onSubmit={this.handleSubmit}>
-                        {this.state.categories}
-                        <button type="submit">Set</button>
-                    </form>}
+                {this.state.error ? <div>{this.state.error}</div> : null}
+                {this.state.message ?
+                    <div>{this.state.message}</div> :
+                    <CategoriesForm submitHandler={this.handleSubmit} />}
             </div>
         );
     }
