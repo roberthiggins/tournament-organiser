@@ -94,7 +94,7 @@ exports.jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
 exports.setCategories = function(tourn, categories){
     "use strict";
 
-    var API = process.env.API_ADDR + "tournament/" + tourn + "/score_categories",
+    var API = process.env.API_ADDR + "tournament/" + tourn,
         postData = {score_categories: []};
 
     categories.forEach(function(cat){
@@ -111,7 +111,7 @@ exports.setCategories = function(tourn, categories){
 // Set missions
 exports.setMissions = function(tourn, missions){
     "use strict";
-    var API = process.env.API_ADDR + "tournament/" + tourn + "/missions";
+    var API = process.env.API_ADDR + "tournament/" + tourn;
 
     frisby.create("POST " + missions.length + " missions to setup")
         .post(API, {missions: missions}, {json: true, inspectOnFailure: true})
@@ -124,9 +124,9 @@ exports.setMissions = function(tourn, missions){
 exports.postRounds = function(tourn, rounds) {
     "use strict";
 
-    var API = process.env.API_ADDR + "tournament/" + tourn + "/rounds";
+    var API = process.env.API_ADDR + "tournament/" + tourn;
     frisby.create("POST " + rounds + " rounds to setup")
-        .post(API, {numRounds: rounds}, {json: true, inspectOnFailure: true})
+        .post(API, {rounds: rounds}, {json: true, inspectOnFailure: true})
         .addHeader("Authorization", exports.auth("superuser"))
         .expectStatus(200)
         .toss();

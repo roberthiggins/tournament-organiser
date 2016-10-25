@@ -22,11 +22,7 @@ def enforce_request_variables(*vars_to_enforce):
             old_values = {}
 
             for var in vars_to_enforce:
-                value = request.form[var] if var in request.form \
-                    else request.values.get(var, None)
-
-                if value is None and request.get_json() is not None:
-                    value = request.get_json().get(var, None)
+                value = request.get_json().get(var, None)
 
                 if value is None:
                     raise ValueError('Enter the required fields')

@@ -41,7 +41,7 @@ Feature: DEMO TOURNAMENT
         Then I should see "Number of rounds" appear
         When I fill in "rounds" with "6"
         When I press "Set"
-        Then I should see "Rounds set: 6" appear
+        Then I should see "Tournament demo updated" appear
 
         Given I am on "/tournament/demo/missions"
         Then I wait for "Set the missions for demo here" to appear
@@ -52,12 +52,12 @@ Feature: DEMO TOURNAMENT
         When I fill in "missions_4" with "mission_05"
         When I fill in "missions_5" with "mission_06"
         When I press "Set"   
-        Then I should see "Missions set" appear
+        Then I should see "Tournament demo updated" appear
 
         Given I visit category page for "demo"
         Given I fill category 0 with "Battle" "100" "1" "20"
         Then I press "Set"
-        Then I should see "Score categories set" appear
+        Then I should see "Tournament demo updated" appear
 
     @javascript
     Scenario Outline: Players enter

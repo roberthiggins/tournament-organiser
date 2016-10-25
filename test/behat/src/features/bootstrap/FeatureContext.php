@@ -69,6 +69,29 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @When /^I wait for "([^"]*)" to appear in field "([^"]*)"$/
+     * @Then /^I should see "([^"]*)" appear in field "([^"]*)"$/
+     * @param $text
+     * @param $el
+     * @throws \Exception
+     */
+    public function iWaitForTextToAppearInField($text, $el)
+    {
+        $this->spin($text, function(FeatureContext $context) use ($text, $el) {
+
+            try {
+                $context->assertFieldContains($el, $text);
+                return true;
+            }
+            catch(ResponseTextException $e) {
+                // NOOP
+            }
+
+            return false;
+        });
+    }
+
+    /**
     * @Given /^I am authenticated as "([^"]*)" using "([^"]*)"$/
     */
     public function iAmAuthenticatedAs($username, $password) {
@@ -98,4 +121,3 @@ class FeatureContext extends MinkContext
         $this->fillField($pos.'_max_val', $max);
     }
 }
-

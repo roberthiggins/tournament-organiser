@@ -31,12 +31,11 @@ Feature: Create a Tournament
         Then I should see "<response>" appear
 
         Examples:
-            | name              | date          | response                      |
-            |                   |               | Enter a valid                 |
-            | Red Harvest       |               | Enter a valid date            |
-            |                   | 2095-01-01    | Enter a valid name            |
-            | Red Harvest       | 2095-13-01    | Enter a valid date            |
-            | Red Harvest       | Red Harvest   | Enter a valid date            |
-            | Red Harvest       | 2095-01-01    | Tournament created            |
-            | Red Harvest       | 2096-01-01    | A tournament with name Red Harvest already exists     |
-
+            | name | date        | response            |
+            |      |             | Enter a valid       |
+            | red  |             | Enter a valid date  |
+            |      | 2095-01-01  | Enter a valid name  |
+            | red  | 2095-13-01  | Enter a valid date  |
+            | red  | red         | Enter a valid date  |
+            | red  | 2095-01-01  | Tournament created  |
+            | red  | 2096-01-01  | A tournament with name red already exists |

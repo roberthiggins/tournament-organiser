@@ -1,7 +1,6 @@
 """
 All tournament interactions.
 """
-import json
 from flask import Blueprint, g, request
 
 from controllers.request_helpers import enforce_request_variables, \
@@ -21,14 +20,6 @@ def get_tournament(endpoint, values):
         g.tournament = Tournament(g.tournament_id)
 
     g.username = values.pop('username', None)
-
-def load_json(val):
-    """Attempt to load a json argument from request"""
-    # pylint: disable=undefined-variable
-    try:
-        return json.loads(val)
-    except TypeError:
-        return val
 
 @TOURNAMENT.route('', methods=['POST'])
 @requires_auth
@@ -114,33 +105,6 @@ def register():
 
     return 'Application Submitted'
 
-@TOURNAMENT.route('/<tournament_id>/missions', methods=['POST'])
-@text_response
-@requires_auth
-@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('missions')
-def set_missions():
-    """POST to set the missions for a tournament. A list of strings expected"""
-    # pylint: disable=undefined-variable
-    g.tournament.update({'missions': load_json(missions)})
-
-    return 'Missions set: {}'.format(missions)
-
-@TOURNAMENT.route('/<tournament_id>/score_categories', methods=['POST'])
-@text_response
-@requires_auth
-@ensure_permission({'permission': 'MODIFY_TOURNAMENT'})
-@enforce_request_variables('score_categories')
-def set_score_categories():
-    """
-    POST to set tournament categories en masse
-    """
-    # pylint: disable=undefined-variable
-    cats = load_json(score_categories)
-    g.tournament.update({'score_categories': cats})
-
-    return 'Score categories set: {}'.\
-        format(', '.join([cat['name'] for cat in cats]))
 
 @TOURNAMENT.route('/<tournament_id>', methods=['GET'])
 @json_response

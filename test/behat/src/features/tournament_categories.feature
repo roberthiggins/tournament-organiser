@@ -9,7 +9,7 @@ Feature: Modify the scoring categories for a tournament
         Given I fill category 0 with "foo" "10" "10" "10"
         Given I fill category 1 with "bar" "10" "10" "10"
         Then I press "Set"
-        Then I should see "Score categories set: foo, bar" appear
+        Then I should see "Tournament category_test updated" appear
         Given I visit category page for "category_test"
 
     @javascript
@@ -18,7 +18,7 @@ Feature: Modify the scoring categories for a tournament
         Given I fill category 0 with "foo" "10" "10" "10"
         Given I fill category 1 with "another_cat" "10" "10" "10"
         Then I press "Set"
-        Then I should see "Score categories set: foo, another_cat" appear
+        Then I should see "Tournament category_test updated" appear
         # Confirm
         Given I visit category page for "category_test"
         Then the "0_name" field should contain "foo"
@@ -26,7 +26,7 @@ Feature: Modify the scoring categories for a tournament
         Then the "2_name" field should contain ""
         # Re-submit
         Then I press "Set"
-        Then I should see "Score categories set: foo, another_cat" appear
+        Then I should see "Tournament category_test updated" appear
         Given I visit category page for "category_test"
         Then the "0_name" field should contain "foo"
         Then the "1_name" field should contain "another_cat"
@@ -36,7 +36,7 @@ Feature: Modify the scoring categories for a tournament
     Scenario: I replace a category with another
         Given I fill category 0 with "baz" "10" "10" "10"
         Then I press "Set"
-        Then I should see "Score categories set" appear
+        Then I should see "Tournament category_test updated" appear
         Given I visit category page for "category_test"
         Then the "0_name" field should contain "baz"
         Then the "1_name" field should contain "bar"
@@ -47,7 +47,7 @@ Feature: Modify the scoring categories for a tournament
         Given I fill category 0 with "" "" "" ""
         Given I fill category 1 with "" "" "" ""
         Then I press "Set"
-        Then I should see "Score categories set" appear
+        Then I should see "Tournament category_test updated" appear
         Given I visit category page for "category_test"
         Then the "0_name" field should contain ""
         Then the "1_name" field should contain ""
@@ -57,10 +57,10 @@ Feature: Modify the scoring categories for a tournament
         Given I fill category 0 with "<cat>" "<val>" "1" "1"
         Then I press "Set"
         Given I visit category page for "category_test"
-        Then the "0_name" field should contain "foo"
-        Then the "0_percentage" field should contain "10"
-        Then the "1_name" field should contain "bar"
-        Then the "1_percentage" field should contain "10"
+        Then I should see "foo" appear in field "0_name"
+        Then I should see "10" appear in field "0_percentage"
+        Then I should see "bar" appear in field "1_name"
+        Then I should see "10" appear in field "1_percentage"
 
         Examples:
             | cat       | val   |
@@ -96,8 +96,8 @@ Feature: Modify the scoring categories for a tournament
             | cat | 3   | -1  | Max Score must be positive             |
             | cat | 0   | 0   | Max Score must be positive             |
             |     | 1   | 1   | Please fill in all fields              |
-            | cat | 1   | 1   | Score categories set                   |
-            | cat | 1   | 2   | Score categories set                   |
+            | cat | 1   | 1   | Tournament category_test updated       |
+            | cat | 1   | 2   | Tournament category_test updated       |
 
     @javascript
     Scenario Outline: I fill in some incorrect percentages

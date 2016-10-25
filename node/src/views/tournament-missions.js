@@ -30,22 +30,34 @@ var MissionField = React.createClass({
 });
 
 var MissionForm = React.createClass({
+    getInitialState: function () {
+        return ({message: "", missions: []});
+    },
     propTypes: {
-        missions: React.PropTypes.array.isRequired,
         submitHandler: React.PropTypes.func.isRequired
     },
+    componentDidMount: function() {
+        this.serverRequest = $.get(window.location + "/content",
+            function (result) {
+                this.setState(result);
+            }.bind(this));
+    },
+    componentWillUnmount: function() {
+        this.serverRequest.abort();
+    },
     render: function() {
-        var missions = this.props.missions.map(function(mission, idx){
+        var missions = this.state.missions.map(function(mission, idx){
                 return (
                     <MissionField name={"Round " + (idx + 1)}
                                   id={"missions_" + idx}
                                   val={mission}
                                   key={idx} />);
             });
-
+        if (!missions.length) {return null;}
 
         return (
             <form onSubmit={this.props.submitHandler}>
+                {this.state.message ? <div>{this.state.message}</div> : null}
                 {missions}
                 <button type="submit">Set</button>
             </form>
@@ -55,20 +67,7 @@ var MissionForm = React.createClass({
 
 var TournamentMissionsPage = React.createClass({
     getInitialState: function () {
-        return ({error: "", successText: "", tournament: "", missions: []});
-    },
-    componentDidMount: function() {
-        this.serverRequest = $.get(window.location + "/content",
-            function (result) {
-                this.setState(result);
-                this.setState({
-                    missionForm: <MissionForm submitHandler={this.handleSubmit}
-                                 missions={this.state.missions} />
-                });
-            }.bind(this));
-    },
-    componentWillUnmount: function() {
-        this.serverRequest.abort();
+        return ({message: ""});
     },
     handleSubmit: function (e) {
         e.preventDefault();
@@ -77,26 +76,19 @@ var TournamentMissionsPage = React.createClass({
         $.post(window.location,
             $("form").serialize(),
             function success(res) {
-                _this.setState(
-                    {successText: res.message, error: "", message: ""});
-            })
-            .fail(function (res) {
-                _this.setState({error: res.responseJSON.message});
+                _this.setState(res);
             });
     },
     render: function() {
         return (
             <div>
-
-                <div>{this.state.successText}</div>
-                <div>{this.state.error}</div>
-                <div>{this.state.message}</div>
-                {this.state.successText ? null : this.state.missionForm}
+                {this.state.message ?
+                    <div>{this.state.message}</div> :
+                    <MissionForm submitHandler={this.handleSubmit} />}
             </div>
         );
     }
 });
-
 
 
 ReactDOM.render(

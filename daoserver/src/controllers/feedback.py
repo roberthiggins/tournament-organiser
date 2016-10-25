@@ -22,7 +22,7 @@ def place_feedback():
     Expects:
         - inputFeedback - A string
     """
-    _feedback = request.form['inputFeedback'].strip('\n\r\t+')
+    _feedback = request.get_json().get('inputFeedback', '').strip('\n\r\t+')
     if re.match(r'^[\+\s]*$', _feedback) is not None:
         raise ValueError('Please fill in the required fields')
     try:

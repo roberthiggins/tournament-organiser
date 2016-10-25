@@ -272,8 +272,15 @@ class Tournament(object):
             self._set_score_categories(cats)
 
         rounds = details.get('rounds')
-        if rounds is not None and rounds != dao.rounds.count():
-            self._set_rounds(rounds)
+        if rounds is not None:
+            try:
+                rounds = float(rounds)
+            except ValueError:
+                raise ValueError('Natural number required')
+            if not rounds.is_integer() or rounds < 0:
+                raise ValueError('Natural number required')
+            if rounds != dao.rounds.count():
+                self._set_rounds(rounds)
 
         missions = details.get('missions')
         if missions is not None and missions != self.get_missions():

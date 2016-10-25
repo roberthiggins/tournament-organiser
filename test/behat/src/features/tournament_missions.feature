@@ -11,6 +11,7 @@ Feature: Set the missions through the web front end.
         When I fill in "missions_1" with "boo"
         When I fill in "missions_2" with "random"
         When I press "Set"   
+        Then I should see "Tournament mission_test updated" appear
 
     @javascript
     Scenario: I view the missions for a tournament
@@ -28,7 +29,7 @@ Feature: Set the missions through the web front end.
         When I fill in "missions_1" with "foo"
         When I fill in "missions_2" with "baz"
         When I press "Set"
-        Then I should see "Missions set" appear
+        Then I should see "Tournament mission_test updated" appear
         Given I am on "/tournament/mission_test/missions"
         Then I wait for "Set the missions for mission_test here" to appear
         Then the "missions_0" field should contain "foo"

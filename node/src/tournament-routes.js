@@ -117,8 +117,8 @@ router.route("/tournament/:tournament/rounds")
             DAOAmbassador.postToDAORequest(
                 req,
                 res,
-                "/tournament/" + req.params.tournament + "/rounds",
-                {numRounds: req.body.rounds});
+                "/tournament/" + req.params.tournament,
+                {rounds: req.body.rounds});
         });
 router.route("/tournament/:tournament/rounds/content")
     .get(function(req, res) {
@@ -182,17 +182,12 @@ router.route("/tournament/:tournament/categories")
             DAOAmbassador.postToDAORequest(
                 req,
                 res,
-                "/tournament/" + req.params.tournament + "/score_categories",
-                {score_categories: JSON.stringify(req.body.categories || [])},
-                undefined,
-                function(responseBody) {
-                    res.status(400).json({error: responseBody});
-                });
+                "/tournament/" + req.params.tournament,
+                {score_categories: req.body.categories || []});
         });
 router.route("/tournament/:tournament/categories/content")
     .get(function(req, res) {
-        var url = "/tournament/" + req.params.tournament
-                    + "/score_categories";
+        var url = "/tournament/" + req.params.tournament + "/score_categories";
 
         DAOAmbassador.getFromDAORequest(
             req,
@@ -205,9 +200,6 @@ router.route("/tournament/:tournament/categories/content")
                     + req.params.tournament
                     + " here. For example, \"Battle\", \"Sports\", etc.";
                 res.status(200).json(responseDict);
-            },
-            function(responseBody) {
-                res.status(200).json({error: responseBody});
             });
     });
 
@@ -226,7 +218,7 @@ router.route("/tournament/:tournament/missions")
         users.ensureAuthenticated,
         function(req, res){
 
-            var url = "/tournament/" + req.params.tournament + "/missions",
+            var url = "/tournament/" + req.params.tournament,
                 missionList = function(postData) {
 
                     var idx = 0,
@@ -244,7 +236,7 @@ router.route("/tournament/:tournament/missions")
                         }
                     }
 
-                    return JSON.stringify(missions);
+                    return missions;
                 },
                 postData = {missions: missionList(req.body)};
 
