@@ -57,10 +57,10 @@ Feature: Modify the scoring categories for a tournament
         Given I fill category 0 with "<cat>" "<val>" "1" "1"
         Then I press "Set"
         Given I visit category page for "category_test"
-        Then the "0_name" field should contain "foo"
-        Then the "0_percentage" field should contain "10"
-        Then the "1_name" field should contain "bar"
-        Then the "1_percentage" field should contain "10"
+        Then I should see "foo" appear in field "0_name"
+        Then I should see "10" appear in field "0_percentage"
+        Then I should see "bar" appear in field "1_name"
+        Then I should see "10" appear in field "1_percentage"
 
         Examples:
             | cat       | val   |
