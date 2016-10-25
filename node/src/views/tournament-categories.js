@@ -159,7 +159,7 @@ var CategoriesForm = React.createClass({
 
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
-        return ({error: "", message: ""});
+        return ({error: "", successMsg: ""});
     },
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
@@ -183,7 +183,7 @@ var TournamentCategoriesPage = React.createClass({
         $.post(window.location,
             {categories: categories},
             function success(res) {
-                _this.setState(res);
+                _this.setState({successMsg: res.message});
             })
             .fail(function (res) {
                 _this.setState(res);
@@ -193,8 +193,8 @@ var TournamentCategoriesPage = React.createClass({
         return (
             <div>
                 {this.state.error ? <div>{this.state.error}</div> : null}
-                {this.state.message ?
-                    <div>{this.state.message}</div> :
+                {this.state.successMsg ?
+                    <div>{this.state.successMsg}</div> :
                     <CategoriesForm submitHandler={this.handleSubmit} />}
             </div>
         );
