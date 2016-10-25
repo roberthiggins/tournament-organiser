@@ -1,5 +1,17 @@
 var React = require("react");
 
+var EmptyCategory = function() {
+    return {
+        "name": "",
+        "percentage": "",
+        "per_tournament": false,
+        "min_val": "",
+        "max_val": "",
+        "zero_sum": false,
+        "opponent_score": false
+    };
+};
+
 var getCategories = function(categories, perTournamentScores) {
     if (!categories) {
         return [];
@@ -37,5 +49,6 @@ var ScoreCategories = React.createClass({
     }
 });
 
+exports.emptyCategory = EmptyCategory;
 exports.getCategories = getCategories;
 exports.scoreCategoryWidget = ScoreCategories;

@@ -1,6 +1,7 @@
 var React = require("react"),
     ReactDOM = require("react-dom"),
-    $ = require("jquery");
+    $ = require("jquery"),
+    Category = require("./component-tournament-categories.js");
 
 var ScoreField = React.createClass({
     getInitialState: function() {
@@ -99,15 +100,7 @@ var CategoriesForm = React.createClass({
                 var numLines = 5,
                 widgets = result.categories || [];
                 while (result.categories.length < numLines) {
-                    result.categories.push({
-                        "name": "",
-                        "percentage": "",
-                        "per_tournament": false,
-                        "min_val": "",
-                        "max_val": "",
-                        "zero_sum": false,
-                        "opponent_score": false
-                    });
+                    result.categories.push(Category.emptyCategory());
                 }
 
                 widgets = widgets.map(function(cat, idx) {
