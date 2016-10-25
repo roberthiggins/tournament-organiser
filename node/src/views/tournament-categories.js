@@ -86,31 +86,6 @@ var serializeCategory = function($categoryDiv) {
     return category;
 };
 
-var category = function(idx, name, pct, per_tournament, min_val, max_val,
-                        zero_sum, opp_score) {
-    return (
-        <div className="category" key={idx + "_category"}>
-            <ScoreField name="Category" id={idx + "_name"} val={name}
-                        key={idx + "_name"} />
-            <ScoreField name="Percentage" id={idx + "_percentage"} val={pct}
-                        key={idx + "_percentage"} />
-            <ScoreCheckbox name="Once per tournament?"
-                           id={idx + "_per_tournament"}
-                           checked={per_tournament}
-                           key={idx + "_per_tournament"} />
-            <ScoreField name="Min Score" id={idx + "_min_val"} val={min_val}
-                        key={idx + "_min_val"} />
-            <ScoreField name="Max Score"id={idx + "_max_val"} val={max_val}
-                        key={idx + "_max_val"} />
-            <ScoreCheckbox id={idx + "_zero_sum"} checked={zero_sum}
-                           name="Zero Sum (score must be shared between game entrants)" />
-            <ScoreCheckbox id={idx + "_opponent_score"} checked={opp_score}
-                           name="Opponent enters score" />
-        </div>
-        );
-};
-
-
 var CategoriesForm = React.createClass({
     propTypes: {
         submitHandler: React.PropTypes.func.isRequired
@@ -122,22 +97,46 @@ var CategoriesForm = React.createClass({
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
                 var numLines = 5,
-                    lastIdx = -1,
-                    widgets = [];
-
-                if (result.categories) {
-                    widgets = result.categories.map(function(cat, idx) {
-                        lastIdx = idx;
-                        return category(idx, cat.name, cat.percentage,
-                            cat.per_tournament, cat.min_val, cat.max_val,
-                            cat.zero_sum, cat.opponent_score);
+                widgets = result.categories || [];
+                while (result.categories.length < numLines) {
+                    result.categories.push({
+                        "name": "",
+                        "percentage": "",
+                        "per_tournament": false,
+                        "min_val": "",
+                        "max_val": "",
+                        "zero_sum": false,
+                        "opponent_score": false
                     });
                 }
-                while (widgets.length < numLines) {
-                    lastIdx = lastIdx + 1;
-                    widgets.push(
-                        category(lastIdx, "", "", false, "", "", false, false));
-                }
+
+                widgets = widgets.map(function(cat, idx) {
+                    return(<div className="category" key={idx + "_category"}>
+                        <ScoreField name="Category" id={idx + "_name"}
+                                    val={cat.name }
+                                    key={idx + "_name"} />
+                        <ScoreField name="Percentage" id={idx + "_percentage"}
+                                    val={cat.percentage }
+                                    key={idx + "_percentage"} />
+                        <ScoreCheckbox name="Once per tournament?"
+                                       id={idx + "_per_tournament"}
+                                       checked={cat.per_tournament }
+                                       key={idx + "_per_tournament"} />
+                        <ScoreField name="Min Score" id={idx + "_min_val"}
+                                    val={cat.min_val }
+                                    key={idx + "_min_val"} />
+                        <ScoreField name="Max Score"id={idx + "_max_val"}
+                                    val={cat.max_val }
+                                    key={idx + "_max_val"} />
+                        <ScoreCheckbox id={idx + "_zero_sum"}
+                                       checked={cat.zero_sum }
+                                       name="Zero Sum (score must be shared between game entrants)" />
+                        <ScoreCheckbox id={idx + "_opponent_score"}
+                                       checked={cat.opponent_score }
+                                       name="Opponent enters score" />
+                    </div>);
+                });
+
 
                 result.categories = widgets;
                 this.setState(result);
