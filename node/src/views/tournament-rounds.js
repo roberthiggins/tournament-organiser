@@ -1,7 +1,7 @@
 var React = require("react"),
     ReactDOM = require("react-dom"),
     $ = require("jquery"),
-    Round = require("./component-set-rounds.js");
+    Inputs = require("./component-inputs.js");
 
 var RoundsForm = React.createClass({
     getInitialState: function() {
@@ -30,8 +30,12 @@ var RoundsForm = React.createClass({
         return (
             <form onSubmit={this.props.submitHandler}>
                 <p>Set the number of rounds{tournText}</p>
-                <Round.roundsWidget rounds={this.state.rounds}
-                                    changeHandler={this.handleRoundChange}/>
+                <p>
+                    <Inputs.textField value={this.state.rounds}
+                                      id="rounds"
+                                      name="Number of rounds"
+                                      changeHandler={this.handleRoundChange}/>
+                </p>
                 <button type="submit">Set</button>
             </form>
         );
