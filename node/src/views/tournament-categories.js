@@ -1,34 +1,8 @@
 var React = require("react"),
     ReactDOM = require("react-dom"),
     $ = require("jquery"),
+    Inputs = require("./component-inputs.js"),
     Category = require("./component-tournament-categories.js");
-
-var ScoreField = React.createClass({
-    getInitialState: function() {
-        return {value: this.props.val};
-    },
-    handleChange: function(event) {
-        this.setState({value: event.target.value});
-    },
-    propTypes: {
-        id: React.PropTypes.string.isRequired,
-        name: React.PropTypes.string.isRequired,
-        val: React.PropTypes.oneOfType(
-                [React.PropTypes.string, React.PropTypes.number])
-    },
-    render: function() {
-        return (
-            <span>
-                <label htmlFor={this.props.id}>{this.props.name}:</label>
-                <input  type="text"
-                        name={this.props.id}
-                        id={this.props.id}
-                        onChange={this.handleChange}
-                        value={this.state.value } />
-            </span>
-        );
-    }
-});
 
 var ScoreCheckbox = React.createClass({
     getInitialState: function() {
@@ -89,6 +63,7 @@ var serializeCategory = function($categoryDiv) {
 
 var CategoriesForm = React.createClass({
     propTypes: {
+        changeHandler: React.PropTypes.func.isRequired,
         submitHandler: React.PropTypes.func.isRequired
     },
     getInitialState: function () {
@@ -105,22 +80,27 @@ var CategoriesForm = React.createClass({
 
                 widgets = widgets.map(function(cat, idx) {
                     return(<div className="category" key={idx + "_category"}>
-                        <ScoreField name="Category" id={idx + "_name"}
-                                    val={cat.name }
-                                    key={idx + "_name"} />
-                        <ScoreField name="Percentage" id={idx + "_percentage"}
-                                    val={cat.percentage }
-                                    key={idx + "_percentage"} />
+                        <Inputs.textField name="Category" id={idx + "_name"}
+                              changeHandler={this.props.changeHandler}
+                              val={cat.name }
+                              key={idx + "_name"} />
+                        <Inputs.textField name="Percentage"
+                              changeHandler={this.props.changeHandler}
+                              id={idx + "_percentage"}
+                              val={cat.percentage }
+                              key={idx + "_percentage"} />
                         <ScoreCheckbox name="Once per tournament?"
                                        id={idx + "_per_tournament"}
                                        checked={cat.per_tournament }
                                        key={idx + "_per_tournament"} />
-                        <ScoreField name="Min Score" id={idx + "_min_val"}
-                                    val={cat.min_val }
-                                    key={idx + "_min_val"} />
-                        <ScoreField name="Max Score"id={idx + "_max_val"}
-                                    val={cat.max_val }
-                                    key={idx + "_max_val"} />
+                        <Inputs.textField name="Min Score" id={idx + "_min_val"}
+                              changeHandler={this.props.changeHandler}
+                              val={cat.min_val }
+                              key={idx + "_min_val"} />
+                        <Inputs.textField name="Max Score"id={idx + "_max_val"}
+                              changeHandler={this.props.changeHandler}
+                              val={cat.max_val }
+                              key={idx + "_max_val"} />
                         <ScoreCheckbox id={idx + "_zero_sum"}
                                        checked={cat.zero_sum }
                                        name="Zero Sum (score must be shared between game entrants)" />
@@ -128,7 +108,7 @@ var CategoriesForm = React.createClass({
                                        checked={cat.opponent_score }
                                        name="Opponent enters score" />
                     </div>);
-                });
+                }.bind(this));
 
 
                 result.categories = widgets;
@@ -152,6 +132,15 @@ var CategoriesForm = React.createClass({
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
         return ({error: "", successMsg: ""});
+    },
+    handleChange: function(event) {
+        var cats = this.state.categories,
+            idx = event.target.id.substr(0, 1),
+            key = event.target.id.substr(2),
+            chkbx = key.match(/per_tournament|zero_sum|opponent_score/);
+
+        cats[idx][key] = chkbx ? event.target.checked : event.target.value;
+        this.setState({categories: cats});
     },
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
@@ -186,7 +175,8 @@ var TournamentCategoriesPage = React.createClass({
                 {this.state.error ? <div>{this.state.error}</div> : null}
                 {this.state.successMsg ?
                     <div>{this.state.successMsg}</div> :
-                    <CategoriesForm submitHandler={this.handleSubmit} />}
+                    <CategoriesForm changeHandler={this.handleChange}
+                                    submitHandler={this.handleSubmit} />}
             </div>
         );
     }
