@@ -58,7 +58,7 @@ var TournamentRoundsPage = React.createClass({
                 _this.setState({successText: res.message, error: ""});
             })
             .fail(function (res) {
-                _this.setState({error: res.responseJSON.message});
+                _this.setState(res.responseJSON);
             });
     },
     render: function() {
