@@ -163,8 +163,7 @@ var TournamentCategoriesPage = React.createClass({
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
-        var _this = this,
-            categories = [];
+        var categories = [];
 
         try {
             $("form div.category").each(function() {
@@ -175,18 +174,18 @@ var TournamentCategoriesPage = React.createClass({
             });
         }
         catch (err) {
-            _this.setState({error: err});
+            this.setState({error: err});
             return;
         }
 
         $.post(window.location,
             {categories: categories},
             function success(res) {
-                _this.setState({successMsg: res.message});
-            })
+                this.setState({successMsg: res.message});
+            }.bind(this))
             .fail(function (res) {
-                _this.setState(res);
-            });
+                this.setState(res);
+            }.bind(this));
     },
     render: function() {
         return (
