@@ -1,5 +1,26 @@
 var React = require("react");
 
+var Checkbox = React.createClass({
+    propTypes: {
+        changeHandler: React.PropTypes.func.isRequired,
+        checked: React.PropTypes.bool.isRequired,
+        id: React.PropTypes.string.isRequired,
+        name: React.PropTypes.string.isRequired,
+    },
+    render: function() {
+        return (
+            <span>
+                <label htmlFor={this.props.id}>{this.props.name}:</label>
+                <input  type="checkbox"
+                        name={this.props.id}
+                        id={this.props.id}
+                        checked={this.props.checked}
+                        onChange={this.props.changeHandler} />
+            </span>
+        );
+    }
+});
+
 var TextField = React.createClass({
     propTypes: {
         changeHandler: React.PropTypes.func.isRequired,
@@ -23,4 +44,5 @@ var TextField = React.createClass({
 });
 
 
+exports.checkbox = Checkbox;
 exports.textField = TextField;
