@@ -34,6 +34,15 @@ var serializeCategory = function($categoryDiv) {
     return category;
 };
 
+var handleCategoryStateChange = function(cats, event) {
+    var idx = event.target.id.substr(0, 1),
+        key = event.target.id.substr(2),
+        chkbx = key.match(/per_tournament|zero_sum|opponent_score/);
+
+    cats[idx][key] = chkbx ? event.target.checked : event.target.value;
+    return cats;
+};
+
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
         return ({error: "", instructions: "", successMsg: "", categories: []});
@@ -51,13 +60,9 @@ var TournamentCategoriesPage = React.createClass({
         this.serverRequest.abort();
     },
     handleChange: function(event) {
-        var cats = this.state.categories,
-            idx = event.target.id.substr(0, 1),
-            key = event.target.id.substr(2),
-            chkbx = key.match(/per_tournament|zero_sum|opponent_score/);
-
-        cats[idx][key] = chkbx ? event.target.checked : event.target.value;
-        this.setState({categories: cats});
+        this.setState({
+            categories: handleCategoryStateChange(this.state.categories, event)
+            });
     },
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
@@ -112,3 +117,5 @@ ReactDOM.render(
     <TournamentCategoriesPage />,
     document.getElementById("content")
 );
+
+exports.categoriesHandleStateChange = handleCategoryStateChange;
