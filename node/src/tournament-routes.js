@@ -195,11 +195,33 @@ router.route("/tournament/:tournament/categories/content")
             res,
             url,
             function(responseBody) {
-                var responseDict = {categories: JSON.parse(responseBody)};
-                responseDict.tournament = req.params.tournament,
-                responseDict.message = "Set the score categories for "
-                    + req.params.tournament
-                    + " here. For example, \"Battle\", \"Sports\", etc.";
+                var responseDict = {
+                        message: "Set the score categories for "
+                            + req.params.tournament
+                            + " here. For example, \"Battle\", \"Sports\", etc.",
+                        tournament: req.params.tournament
+                    },
+                    categories = JSON.parse(responseBody) || [],
+                    numLines = 5,
+                    paddedCats = [];
+
+                // We want a minimum of 5 categories to be displayed
+                for (var i = 0; i < numLines; i++) {
+                    paddedCats.push({
+                        "name": "",
+                        "percentage": "",
+                        "per_tournament": false,
+                        "min_val": "",
+                        "max_val": "",
+                        "zero_sum": false,
+                        "opponent_score": false
+                    });
+                }
+                categories.forEach(function(cat, idx) {
+                    paddedCats[idx] = cat;
+                });
+                responseDict.categories = paddedCats;
+
                 res.status(200).json(responseDict);
             });
     });
