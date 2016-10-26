@@ -184,7 +184,11 @@ router.route("/tournament/:tournament/categories")
                 req,
                 res,
                 "/tournament/" + req.params.tournament,
-                {score_categories: req.body.categories || []});
+                {score_categories: req.body.categories || []},
+                undefined,
+                function(responseBody) {
+                    res.status(400).json({error: responseBody});
+                });
         });
 router.route("/tournament/:tournament/categories/content")
     .get(function(req, res) {
