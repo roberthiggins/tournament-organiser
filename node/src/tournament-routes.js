@@ -1,5 +1,6 @@
 // Tournament information
-var DAOAmbassador = require("./dao-ambassador"),
+var Category      = require("./models/score-categories"),
+    DAOAmbassador = require("./dao-ambassador"),
     express       = require('express'),
     router        = express.Router(),
     users         = require("./users");
@@ -162,18 +163,6 @@ router.route("/tournament/:tournament/round/:round/draw/content")
             });
     });
 
-var emptyCategory = function() {
-    return {
-        "name": "",
-        "percentage": "",
-        "per_tournament": false,
-        "min_val": "",
-        "max_val": "",
-        "zero_sum": false,
-        "opponent_score": false
-        };
-};
-
 router.route("/tournament/:tournament/categories")
     .get(
         users.injectUserIntoRequest,
@@ -207,7 +196,7 @@ router.route("/tournament/:tournament/categories")
                     })
                 .map(function stripUnusedFields(cat) {
                     var result = {},
-                        proto = emptyCategory();
+                        proto = Category.emptyScoreCategory();
 
                     for (var key in proto) {
                         result[key] = cat[key];
@@ -215,7 +204,7 @@ router.route("/tournament/:tournament/categories")
                     return result;
                     })
                 .filter(function stripEmptyCats(cat) {
-                    var empty = emptyCategory();
+                    var empty = Category.emptyScoreCategory();
                     for (var key in empty) {
                         if (cat[key] !== empty[key]) {
                             return true;
@@ -267,7 +256,7 @@ router.route("/tournament/:tournament/categories/content")
 
                 // We want a minimum of 5 categories to be displayed
                 for (var i = 0; i < numLines; i++) {
-                    paddedCats.push(emptyCategory());
+                    paddedCats.push(Category.emptyScoreCategory());
                 }
                 categories.forEach(function(cat, idx) {
                     paddedCats[idx] = cat;
