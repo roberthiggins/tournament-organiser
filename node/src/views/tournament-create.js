@@ -40,7 +40,8 @@ var SuccessWidget = React.createClass({
     propTypes: {
         name: React.PropTypes.string.isRequired,
         date: React.PropTypes.string.isRequired,
-        rounds: React.PropTypes.number,
+        rounds: React.PropTypes.oneOfType(
+            [React.PropTypes.number, React.PropTypes.string])
     },
     render: function() {
         return (
