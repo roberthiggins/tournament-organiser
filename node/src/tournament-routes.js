@@ -162,6 +162,18 @@ router.route("/tournament/:tournament/round/:round/draw/content")
             });
     });
 
+var emptyCategory = function() {
+    return {
+        "name": "",
+        "percentage": "",
+        "per_tournament": false,
+        "min_val": "",
+        "max_val": "",
+        "zero_sum": false,
+        "opponent_score": false
+        };
+};
+
 router.route("/tournament/:tournament/categories")
     .get(
         users.injectUserIntoRequest,
@@ -176,11 +188,63 @@ router.route("/tournament/:tournament/categories")
         users.injectUserIntoRequest,
         users.ensureAuthenticated,
         function(req, res){
+
+            var cleanedCategories = (req.body.categories || [])
+                .map(function booleanConversion(cat) {
+                    var result = {};
+                    for (var key in cat) {
+                        if (cat[key] === "false") {
+                            result[key] = false;
+                        }
+                        else if (cat[key] === 'true') {
+                            result[key] = true;
+                        }
+                        else {
+                            result[key] = cat[key];
+                        }
+                    }
+                    return result;
+                    })
+                .map(function stripUnusedFields(cat) {
+                    var result = {},
+                        proto = emptyCategory();
+
+                    for (var key in proto) {
+                        result[key] = cat[key];
+                    }
+                    return result;
+                    })
+                .filter(function stripEmptyCats(cat) {
+                    var empty = emptyCategory();
+                    for (var key in empty) {
+                        if (cat[key] !== empty[key]) {
+                            return true;
+                        }
+                    }
+                    return false;
+                    });
+
+            try {
+                var reqFields = ["name", "percentage", "min_val", "max_val"];
+                cleanedCategories
+                    .forEach(function checkRequired(cat) {
+                        reqFields.forEach(function(key) {
+                            if ((cat[key] || "") === "") {
+                                throw "Please fill in all fields";
+                            }
+                        });
+                    });
+            }
+            catch (err) {
+                res.status(400).json({error: err});
+                return;
+            }
+
             DAOAmbassador.postToDAORequest(
                 req,
                 res,
                 "/tournament/" + req.params.tournament,
-                {score_categories: req.body.categories || []});
+                {score_categories: cleanedCategories});
         });
 router.route("/tournament/:tournament/categories/content")
     .get(function(req, res) {
@@ -192,7 +256,7 @@ router.route("/tournament/:tournament/categories/content")
             url,
             function(responseBody) {
                 var responseDict = {
-                        message: "Set the score categories for "
+                        instructions: "Set the score categories for "
                             + req.params.tournament
                             + " here. For example, \"Battle\", \"Sports\", etc.",
                         tournament: req.params.tournament
@@ -203,20 +267,26 @@ router.route("/tournament/:tournament/categories/content")
 
                 // We want a minimum of 5 categories to be displayed
                 for (var i = 0; i < numLines; i++) {
-                    paddedCats.push({
-                        "name": "",
-                        "percentage": "",
-                        "per_tournament": false,
-                        "min_val": "",
-                        "max_val": "",
-                        "zero_sum": false,
-                        "opponent_score": false
-                    });
+                    paddedCats.push(emptyCategory());
                 }
                 categories.forEach(function(cat, idx) {
                     paddedCats[idx] = cat;
                 });
-                responseDict.categories = paddedCats;
+                responseDict.categories = paddedCats.sort(function(a, b){
+                    var nameA = a.name.toUpperCase(),
+                        nameB = b.name.toUpperCase();
+
+                    if (nameA < nameB || nameB === "") {
+                      return -1;
+                    }
+                    else if (nameA > nameB || nameA === "") {
+                      return 1;
+                    }
+                    else {
+                        return 0;
+                    }
+
+                    });
 
                 res.status(200).json(responseDict);
             });

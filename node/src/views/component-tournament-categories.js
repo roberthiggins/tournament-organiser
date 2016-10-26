@@ -71,12 +71,13 @@ var InputList = React.createClass({
         changeHandler: React.PropTypes.func.isRequired
     },
     render: function() {
-        var widgets = this.props.categories.map(function(cat, idx) {
-            return(<InputCategory category={cat}
-                                  changeHandler={this.props.changeHandler}
-                                  idx={idx}
-                                  key={idx} />);
-        }, this);
+        var widgets = this.props.categories
+            .map(function(cat, idx) {
+                return(<InputCategory category={cat}
+                                      changeHandler={this.props.changeHandler}
+                                      idx={idx}
+                                      key={idx} />);
+                }, this);
 
         return (
             <div className="categories">
