@@ -32,15 +32,24 @@ router.route("/tournament/create")
         users.injectUserIntoRequest,
         users.ensureAuthenticated,
         function(req, res){
-            DAOAmbassador.postToDAORequest(
-                req,
-                res,
-                "/tournament",
-                {
-                    inputTournamentName: req.body.name,
-                    inputTournamentDate: req.body.date,
-                    rounds: req.body.rounds || 0
-                });
+
+            try {
+                var cleanCats = Category.cleanCategories(req.body.categories);
+                DAOAmbassador.postToDAORequest(
+                    req,
+                    res,
+                    "/tournament",
+                    {
+                        inputTournamentName: req.body.name,
+                        inputTournamentDate: req.body.date,
+                        rounds: req.body.rounds || 0,
+                        score_categories: cleanCats
+                    });
+            }
+            catch (err) {
+                res.status(400).json({error: err});
+                return;
+            }
         });
 
 router.route("/tournament/:tournament")

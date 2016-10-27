@@ -29,11 +29,14 @@ Feature: Create a Tournament
         When I fill in "name" with "test_tournament_creation"
         When I fill in "date" with "9999-12-31"
         When I fill in "rounds" with "1"
+        When I fill category 0 with "foo" "10" "10" "10"
+        When I fill category 1 with "bar" "10" "10" "10"
         When I press "Create"
         Then I should see "Tournament created!" appear
         Then I should see "Name: test_tournament_creation" appear
         Then I should see "Date: 9999-12-31" appear
         Then I should see "Rounds: 1" appear
+        Then I should see "Score Categories: foo, bar" appear
 
     @javascript
     Scenario: I make a tournament using the minimum values
@@ -42,6 +45,7 @@ Feature: Create a Tournament
         When I fill in "name" with "test_tournament_creation_2"
         When I fill in "date" with "9999-12-31"
         When I fill in "rounds" with ""
+        When I fill category 0 with "" "" "" ""
         When I press "Create"
         Then I should see "Tournament created!" appear
         Then I should see "Name: test_tournament_creation" appear

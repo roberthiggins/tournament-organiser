@@ -1,11 +1,14 @@
 var React = require("react"),
     ReactDOM = require("react-dom"),
     $ = require("jquery"),
+    CategoryComponent = require("./component-tournament-categories.js"),
+    CategoryModel = require("../models/score-categories.js"),
     Inputs = require("./component-inputs.js");
 
 var TournamentDetailsWidget = React.createClass({
     propTypes: {
         details: React.PropTypes.object.isRequired,
+        handleCategoryChange: React.PropTypes.func.isRequired,
         handleRoundChange: React.PropTypes.func.isRequired,
         handleSubmit: React.PropTypes.func.isRequired
     },
@@ -24,10 +27,13 @@ var TournamentDetailsWidget = React.createClass({
                 <p>
                     <Inputs.textField value={this.props.details.rounds}
                         id="rounds"
-                        name="Number of rounds"
+                        name="(Optional) Number of rounds"
                         changeHandler={this.props.handleRoundChange}/>
                 </p>
-
+                <p>(Optional) Add Score Categories:</p>
+                <CategoryComponent.inputCategoryList
+                    changeHandler={this.props.handleCategoryChange}
+                    categories={this.props.details.categories}/>
                 <button type="submit">Create</button>
             </form>
         );
@@ -39,6 +45,9 @@ var SuccessWidget = React.createClass({
         details: React.PropTypes.object.isRequired
     },
     render: function() {
+        var categories = this.props.details.categories ?
+            this.props.details.categories.map(function(cat){return cat.name})
+            : null;
         return (
             <div>
                 <p>Tournament created! You submitted the following fields:</p>
@@ -48,6 +57,9 @@ var SuccessWidget = React.createClass({
                     {this.props.details.rounds ?
                         <li>Rounds: {this.props.details.rounds}</li> :
                         null}
+                    {this.props.details.categories ?
+                        <li>Score Categories: {categories.join(", ")}</li>
+                        : null}
                 </ul>
             </div>
         );
@@ -58,6 +70,9 @@ var TournamentCreatePage = React.createClass({
     getInitialState: function () {
         return ({
             details: {
+                categories: [CategoryModel.emptyScoreCategory(),
+                             CategoryModel.emptyScoreCategory(),
+                             CategoryModel.emptyScoreCategory()],
                 date: null,
                 name: null,
                 rounds: 5
@@ -65,6 +80,12 @@ var TournamentCreatePage = React.createClass({
             error: "",
             success: false
             });
+    },
+    handleCategoryChange: function(event) {
+        var details = this.state.details;
+        details.categories = CategoryComponent.handleStateChange(
+            this.state.details.categories, event)
+        this.setState({details: details});
     },
     handleRoundChange: function(event){
         var details = this.state.details;
@@ -75,6 +96,7 @@ var TournamentCreatePage = React.createClass({
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
         var details = {
+            categories: this.state.details.categories,
             name: $("input#name").val(),
             date: $("input#date").val(),
             rounds: this.state.details.rounds
@@ -110,6 +132,7 @@ var TournamentCreatePage = React.createClass({
                 {this.state.success ?
                     null :
                     <TournamentDetailsWidget details={this.state.details}
+                        handleCategoryChange={this.handleCategoryChange}
                         handleRoundChange={this.handleRoundChange}
                         handleSubmit={this.handleSubmit}/>}
             </div>
