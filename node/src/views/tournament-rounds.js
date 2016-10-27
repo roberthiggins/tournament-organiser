@@ -27,20 +27,18 @@ var RoundsForm = React.createClass({
                 " for " + this.state.tournament + " here:"
                 : " here:";
 
-        return (
-            {this.state.rounds !== null ?
-                <form onSubmit={this.props.submitHandler}>
-                    <p>Set the number of rounds{tournText}</p>
-                    <p>
-                        <Inputs.textField value={this.state.rounds}
-                                          id="rounds"
-                                          name="Number of rounds"
-                                          changeHandler={this.handleRoundChange}/>
-                    </p>
-                    <button type="submit">Set</button>
-                </form> :
-                null}
-        );
+        return (this.state.rounds !== null ?
+            <form onSubmit={this.props.submitHandler}>
+                <p>Set the number of rounds{tournText}</p>
+                <p>
+                    <Inputs.textField value={this.state.rounds}
+                                      id="rounds"
+                                      name="Number of rounds"
+                                      changeHandler={this.handleRoundChange}/>
+                </p>
+                <button type="submit">Set</button>
+            </form> :
+            null);
     }
 });
 
