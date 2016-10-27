@@ -20,6 +20,15 @@ var getCategories = function(categories, perTournamentScores) {
         });
 };
 
+var handleCategoryStateChange = function(cats, event) {
+    var idx = event.target.id.substr(0, 1),
+        key = event.target.id.substr(2),
+        chkbx = key.match(/per_tournament|zero_sum|opponent_score/);
+
+    cats[idx][key] = chkbx ? event.target.checked : event.target.value;
+    return cats;
+};
+
 // Input fields for defining a category in a form
 var InputCategory = React.createClass({
     propTypes: {
@@ -106,5 +115,6 @@ var ScoreCategories = React.createClass({
 });
 
 exports.getCategories = getCategories;
+exports.handleStateChange = handleCategoryStateChange;
 exports.inputCategoryList = InputList;
 exports.scoreCategoryWidget = ScoreCategories;

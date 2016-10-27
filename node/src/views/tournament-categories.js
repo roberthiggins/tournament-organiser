@@ -3,15 +3,6 @@ var React = require("react"),
     $ = require("jquery"),
     Category = require("./component-tournament-categories.js");
 
-var handleCategoryStateChange = function(cats, event) {
-    var idx = event.target.id.substr(0, 1),
-        key = event.target.id.substr(2),
-        chkbx = key.match(/per_tournament|zero_sum|opponent_score/);
-
-    cats[idx][key] = chkbx ? event.target.checked : event.target.value;
-    return cats;
-};
-
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {
         return ({error: "", instructions: "", successMsg: "", categories: []});
@@ -25,7 +16,7 @@ var TournamentCategoriesPage = React.createClass({
     },
     handleChange: function(event) {
         this.setState({
-            categories: handleCategoryStateChange(this.state.categories, event)
+            categories: Category.handleStateChange(this.state.categories, event)
             });
     },
     handleSubmit: function (e) {
@@ -66,5 +57,3 @@ ReactDOM.render(
     <TournamentCategoriesPage />,
     document.getElementById("content")
 );
-
-exports.categoriesHandleStateChange = handleCategoryStateChange;
