@@ -2,7 +2,7 @@
 
 exports.placeFeedback = function(req, res) {
 
-    var DAOAmbassador = require("./dao-ambassador");
+    var DAOAmbassador = require("../lib/dao-ambassador");
 
     DAOAmbassador.postToDAORequest(
         req,

@@ -35,10 +35,10 @@ app.use(expressSession({
 }));
 
 // Routing
-app.use("/", require("./src/entry-routes"));
-app.use("/", require("./src/member-only-routes"));
-app.use("/", require("./src/public-routes"));
-app.use("/", require("./src/tournament-routes"));
+app.use("/", require("./src/controllers/entry-routes"));
+app.use("/", require("./src/controllers/member-only-routes"));
+app.use("/", require("./src/controllers/public-routes"));
+app.use("/", require("./src/controllers/tournament-routes"));
 
 // Passport user auth
 app.use(passport.initialize());
