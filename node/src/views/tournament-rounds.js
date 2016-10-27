@@ -5,7 +5,7 @@ var React = require("react"),
 
 var RoundsForm = React.createClass({
     getInitialState: function() {
-        return {rounds: 5, tournament: ""};
+        return {rounds: null, tournament: ""};
     },
     propTypes: {
         submitHandler: React.PropTypes.func.isRequired
@@ -28,16 +28,18 @@ var RoundsForm = React.createClass({
                 : " here:";
 
         return (
-            <form onSubmit={this.props.submitHandler}>
-                <p>Set the number of rounds{tournText}</p>
-                <p>
-                    <Inputs.textField value={this.state.rounds}
-                                      id="rounds"
-                                      name="Number of rounds"
-                                      changeHandler={this.handleRoundChange}/>
-                </p>
-                <button type="submit">Set</button>
-            </form>
+            {this.state.rounds !== null ?
+                <form onSubmit={this.props.submitHandler}>
+                    <p>Set the number of rounds{tournText}</p>
+                    <p>
+                        <Inputs.textField value={this.state.rounds}
+                                          id="rounds"
+                                          name="Number of rounds"
+                                          changeHandler={this.handleRoundChange}/>
+                    </p>
+                    <button type="submit">Set</button>
+                </form> :
+                null}
         );
     }
 });
