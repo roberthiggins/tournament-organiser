@@ -36,20 +36,17 @@ var TournamentDetailsWidget = React.createClass({
 
 var SuccessWidget = React.createClass({
     propTypes: {
-        name: React.PropTypes.string.isRequired,
-        date: React.PropTypes.string.isRequired,
-        rounds: React.PropTypes.oneOfType(
-            [React.PropTypes.number, React.PropTypes.string])
+        details: React.PropTypes.object.isRequired
     },
     render: function() {
         return (
             <div>
                 <p>Tournament created! You submitted the following fields:</p>
                 <ul>
-                    <li>Name: {this.props.name}</li>
-                    <li>Date: {this.props.date}</li>
-                    {this.props.rounds ?
-                        <li>Rounds: {this.props.rounds}</li> :
+                    <li>Name: {this.props.details.name}</li>
+                    <li>Date: {this.props.details.date}</li>
+                    {this.props.details.rounds ?
+                        <li>Rounds: {this.props.details.rounds}</li> :
                         null}
                 </ul>
             </div>
@@ -102,11 +99,8 @@ var TournamentCreatePage = React.createClass({
         return (
             <div>
                 {this.state.success ?
-                    <SuccessWidget date={this.state.details.date}
-                                   name={this.state.details.name}
-                                   rounds={this.state.details.rounds} />
-                    : null
-                }
+                    <SuccessWidget details={this.state.details} />
+                    : null}
                 {this.state.success ?
                     null :
                     <p>You can add a tournament here</p>}
