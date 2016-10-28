@@ -8,7 +8,9 @@ module.exports = {
     index: './src/views/index.js',
     login: './src/views/login.js',
     signup: './src/views/signup.js',
-    tournamentCategories: './src/views/tournament-categories.js',
+    // brackets are some batshit webpack workaround. An entrypoint can't be used
+    // as a dependency unless in a list.
+    tournamentCategories: ['./src/views/tournament-categories.js'],
     tournamentCreate: './src/views/tournament-create.js',
     tournamentDraw: './src/views/tournament-draw.js',
     tournamentInfo: './src/views/tournament-info.js',

@@ -19,7 +19,7 @@ var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
             res.status(200).json({message: responseBody});
         },
         defaultOnFail = function(responseBody) {
-            res.status(200).json({message: responseBody});
+            res.status(400).json({error: responseBody});
         };
     onSuccess = typeof onSuccess === "function" ? onSuccess : defaultOnSuccess;
     onFail = typeof onFail === "function" ? onFail : defaultOnFail;

@@ -1,6 +1,6 @@
 // Only members can see these routes
 
-var DAOAmbassador = require("./dao-ambassador"),
+var DAOAmbassador = require("../lib/dao-ambassador"),
     express       = require('express'),
     feedback      = require("./feedback"),
     router        = express.Router(),
@@ -21,7 +21,7 @@ router.route("/devindex/content")
             res,
             url,
             function(responseBody) {
-                var transformer = require("./models/devindex.js");
+                var transformer = require("../models/devindex");
                 res.status(200).json(transformer.transform(responseBody));
             });
     });

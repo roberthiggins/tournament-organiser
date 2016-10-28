@@ -23,7 +23,7 @@ def get_tournament(endpoint, values):
 
 @TOURNAMENT.route('', methods=['POST'])
 @requires_auth
-@text_response
+@json_response
 @enforce_request_variables('inputTournamentName', 'inputTournamentDate')
 def add_tournament():
     # pylint: disable=undefined-variable
@@ -39,9 +39,7 @@ def add_tournament():
     tourn.new(date=inputTournamentDate,
               to_username=request.authorization.username,
               **opt_args)
-    return '<p>Tournament Created! You submitted the following fields:</p> \
-        <ul><li>Name: {}</li><li>Date: {}</li></ul>'.\
-        format(inputTournamentName, inputTournamentDate)
+    return tourn.details()
 
 @TOURNAMENT.route('/<tournament_id>/start', methods=['POST'])
 @requires_auth

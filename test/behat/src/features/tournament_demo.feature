@@ -34,14 +34,9 @@ Feature: DEMO TOURNAMENT
         Then I should see "You can add a tournament here" appear
         When I fill in "name" with "demo"
         When I fill in "date" with "2056-07-07"
+        When I fill in "rounds" with "6"
         When I press "Create"
         Then I should see "Tournament created" appear
-
-        Given I am on "/tournament/demo/rounds"
-        Then I should see "Number of rounds" appear
-        When I fill in "rounds" with "6"
-        When I press "Set"
-        Then I should see "Tournament demo updated" appear
 
         Given I am on "/tournament/demo/missions"
         Then I wait for "Set the missions for demo here" to appear

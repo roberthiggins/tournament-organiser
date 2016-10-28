@@ -1,5 +1,5 @@
 // Tournament information
-var DAOAmbassador = require("./dao-ambassador"),
+var DAOAmbassador = require("../lib/dao-ambassador"),
     express       = require('express'),
     router        = express.Router(),
     users         = require("./users");

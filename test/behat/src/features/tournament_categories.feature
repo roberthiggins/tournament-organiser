@@ -21,15 +21,15 @@ Feature: Modify the scoring categories for a tournament
         Then I should see "Tournament category_test updated" appear
         # Confirm
         Given I visit category page for "category_test"
-        Then the "0_name" field should contain "foo"
-        Then the "1_name" field should contain "another_cat"
+        Then the "0_name" field should contain "another_cat"
+        Then the "1_name" field should contain "foo"
         Then the "2_name" field should contain ""
         # Re-submit
         Then I press "Set"
         Then I should see "Tournament category_test updated" appear
         Given I visit category page for "category_test"
-        Then the "0_name" field should contain "foo"
-        Then the "1_name" field should contain "another_cat"
+        Then the "0_name" field should contain "another_cat"
+        Then the "1_name" field should contain "foo"
         Then the "2_name" field should contain ""
 
     @javascript
@@ -39,7 +39,7 @@ Feature: Modify the scoring categories for a tournament
         Then I should see "Tournament category_test updated" appear
         Given I visit category page for "category_test"
         Then the "0_name" field should contain "baz"
-        Then the "1_name" field should contain "bar"
+        Then the "1_name" field should contain "foo"
         Then the "2_name" field should contain ""
 
     @javascript
@@ -57,10 +57,9 @@ Feature: Modify the scoring categories for a tournament
         Given I fill category 0 with "<cat>" "<val>" "1" "1"
         Then I press "Set"
         Given I visit category page for "category_test"
-        Then I should see "foo" appear in field "0_name"
-        Then I should see "10" appear in field "0_percentage"
-        Then I should see "bar" appear in field "1_name"
-        Then I should see "10" appear in field "1_percentage"
+        Then the "0_name" field should contain "bar"
+        Then the "1_name" field should contain "foo"
+        Then the "2_name" field should contain ""
 
         Examples:
             | cat       | val   |
@@ -73,7 +72,7 @@ Feature: Modify the scoring categories for a tournament
 
     @javascript
     Scenario: I try to add the same category multiple times
-        Given I fill category 1 with "foo" "10" "10" "10"
+        Given I fill category 1 with "bar" "10" "10" "10"
         Then I press "Set"
         Then I should see "multiple" appear
 

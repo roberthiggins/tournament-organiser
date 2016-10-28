@@ -1,5 +1,6 @@
 // Tournament information
-var DAOAmbassador = require("./dao-ambassador"),
+var Category      = require("../models/score-categories"),
+    DAOAmbassador = require("../lib/dao-ambassador"),
     express       = require('express'),
     router        = express.Router(),
     users         = require("./users");
@@ -31,18 +32,24 @@ router.route("/tournament/create")
         users.injectUserIntoRequest,
         users.ensureAuthenticated,
         function(req, res){
-            DAOAmbassador.postToDAORequest(
-                req,
-                res,
-                "/tournament",
-                {
-                    inputTournamentName: req.body.name,
-                    inputTournamentDate: req.body.date
-                },
-                undefined,
-                function(responseBody) {
-                    res.status(400).json({error: responseBody});
-                });
+
+            try {
+                var cleanCats = Category.cleanCategories(req.body.categories);
+                DAOAmbassador.postToDAORequest(
+                    req,
+                    res,
+                    "/tournament",
+                    {
+                        inputTournamentName: req.body.name,
+                        inputTournamentDate: req.body.date,
+                        rounds: req.body.rounds || 0,
+                        score_categories: cleanCats
+                    });
+            }
+            catch (err) {
+                res.status(400).json({error: err});
+                return;
+            }
         });
 
 router.route("/tournament/:tournament")
@@ -179,11 +186,19 @@ router.route("/tournament/:tournament/categories")
         users.injectUserIntoRequest,
         users.ensureAuthenticated,
         function(req, res){
-            DAOAmbassador.postToDAORequest(
-                req,
-                res,
-                "/tournament/" + req.params.tournament,
-                {score_categories: req.body.categories || []});
+
+            try {
+                var cleanCats = Category.cleanCategories(req.body.categories);
+                DAOAmbassador.postToDAORequest(
+                    req,
+                    res,
+                    "/tournament/" + req.params.tournament,
+                    {score_categories: cleanCats});
+            }
+            catch (err) {
+                res.status(400).json({error: err});
+                return;
+            }
         });
 router.route("/tournament/:tournament/categories/content")
     .get(function(req, res) {
@@ -194,11 +209,39 @@ router.route("/tournament/:tournament/categories/content")
             res,
             url,
             function(responseBody) {
-                var responseDict = {categories: JSON.parse(responseBody)};
-                responseDict.tournament = req.params.tournament,
-                responseDict.message = "Set the score categories for "
-                    + req.params.tournament
-                    + " here. For example, \"Battle\", \"Sports\", etc.";
+                var responseDict = {
+                        instructions: "Set the score categories for "
+                            + req.params.tournament
+                            + " here. For example, \"Battle\", \"Sports\", etc.",
+                        tournament: req.params.tournament
+                    },
+                    categories = JSON.parse(responseBody) || [],
+                    numLines = 5,
+                    paddedCats = [];
+
+                // We want a minimum of 5 categories to be displayed
+                for (var i = 0; i < numLines; i++) {
+                    paddedCats.push(Category.emptyScoreCategory());
+                }
+                categories.forEach(function(cat, idx) {
+                    paddedCats[idx] = cat;
+                });
+                responseDict.categories = paddedCats.sort(function(a, b){
+                    var nameA = a.name.toUpperCase(),
+                        nameB = b.name.toUpperCase();
+
+                    if (nameA < nameB || nameB === "") {
+                      return -1;
+                    }
+                    else if (nameA > nameB || nameA === "") {
+                      return 1;
+                    }
+                    else {
+                        return 0;
+                    }
+
+                    });
+
                 res.status(200).json(responseDict);
             });
     });

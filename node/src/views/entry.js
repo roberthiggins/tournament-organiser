@@ -29,6 +29,9 @@ var TournamentEntriesPage = React.createClass({
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
                 this.setState(result);
+            }.bind(this))
+            .fail(function(res){
+                this.setState({message: res.responseJSON.error});
             }.bind(this));
     },
     componentWillUnmount: function() {
