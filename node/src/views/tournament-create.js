@@ -4,12 +4,10 @@ var React = require("react"),
     Inputs = require("./component-inputs.js");
 
 var TournamentDetailsWidget = React.createClass({
-    getInitialState: function() {
-        return {rounds: 5};
-    },
-    propTypes: { handleSubmit: React.PropTypes.func.isRequired },
-    handleRoundChange: function(event){
-        this.setState({rounds: event.target.value});
+    propTypes: {
+        details: React.PropTypes.object.isRequired,
+        handleRoundChange: React.PropTypes.func.isRequired,
+        handleSubmit: React.PropTypes.func.isRequired
     },
     render: function() {
         return (
@@ -24,10 +22,10 @@ var TournamentDetailsWidget = React.createClass({
                     <input type="text" name="date" id="date" />
                 </p>
                 <p>
-                    <Inputs.textField value={this.state.rounds}
-                                      id="rounds"
-                                      name="Number of rounds"
-                                      changeHandler={this.handleRoundChange}/>
+                    <Inputs.textField value={this.props.details.rounds}
+                        id="rounds"
+                        name="Number of rounds"
+                        changeHandler={this.props.handleRoundChange}/>
                 </p>
 
                 <button type="submit">Create</button>
@@ -61,44 +59,52 @@ var SuccessWidget = React.createClass({
 
 var TournamentCreatePage = React.createClass({
     getInitialState: function () {
-        return ({error: "", success: false});
+        return ({
+            details: {
+                date: null,
+                name: null,
+                rounds: 5
+                },
+            error: "",
+            success: false
+            });
+    },
+    handleRoundChange: function(event){
+        var details = this.state.details;
+        details.rounds = event.target.value;
+        this.setState({details: details});
     },
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
-        var _this = this,
-            name = $("input#name").val(),
-            date = $("input#date").val(),
-            rounds = $("input#rounds").val();
+        var details = {
+            name: $("input#name").val(),
+            date: $("input#date").val(),
+            rounds: this.state.details.rounds
+            };
 
         $.post("/tournament/create",
-            {
-                name: name,
-                date: date,
-                rounds: rounds
-            },
+            details,
             function success() {
-                _this.setState({
+                this.setState({
                     success: true,
-                    date: date,
-                    name: name,
-                    rounds: rounds
+                    details: details
                 });
-            })
+            }.bind(this))
             .fail(function (res) {
-                _this.setState({
+                this.setState({
                     success: false,
                     error: res.responseJSON.error
                 });
-            });
+            }.bind(this));
     },
     render: function() {
         return (
             <div>
                 {this.state.success ?
-                    <SuccessWidget date={this.state.date}
-                                   name={this.state.name}
-                                   rounds={this.state.rounds} />
+                    <SuccessWidget date={this.state.details.date}
+                                   name={this.state.details.name}
+                                   rounds={this.state.details.rounds} />
                     : null
                 }
                 {this.state.success ?
@@ -109,7 +115,9 @@ var TournamentCreatePage = React.createClass({
                     <p>{this.state.error}</p>}
                 {this.state.success ?
                     null :
-                    <TournamentDetailsWidget handleSubmit={this.handleSubmit}/>}
+                    <TournamentDetailsWidget details={this.state.details}
+                        handleRoundChange={this.handleRoundChange}
+                        handleSubmit={this.handleSubmit}/>}
             </div>
         );
     }
