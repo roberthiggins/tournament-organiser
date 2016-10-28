@@ -9,7 +9,7 @@ var Entries = React.createClass({
         });
         return (
             <div>
-                <p>Entries:</p>
+                <div>Entries:</div>
                 <ol>
                     {entries}
                 </ol>
@@ -38,13 +38,13 @@ var TournamentEntriesPage = React.createClass({
         var registerURL = "/tournament/" + this.state.tournament + "/register";
         return (
             <div>
-                <p>{this.state.message}</p>
+                <div>{this.state.message}</div>
                 {this.state.tournament && !this.state.entries.length ?
-                    <p>
+                    <div>
                         There are no entries yet.
                         { " " }
                         <a href={registerURL}>Be the first!</a>
-                    </p>
+                    </div>
                     : null
                 }
                 {this.state.entries.length ?

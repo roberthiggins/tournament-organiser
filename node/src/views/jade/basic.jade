@@ -7,6 +7,12 @@ html(lang=en)
             |  
             = ' ' + subtitle? subtitle : ''
     body
-        div#content
+        div#container
+            div#main_content_top
+            div#main_content
+                div#content.content
+                div#menu.menu
+                div#clear
+            div#main_content_bottom
         if src_loc
             script(type='text/javascript', src=src_loc, charset=utf-8)

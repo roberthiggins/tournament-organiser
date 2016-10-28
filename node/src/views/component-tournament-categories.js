@@ -104,7 +104,7 @@ var ScoreCategories = React.createClass({
     render: function() {
 
         var displayElement = this.props.categories.length === 0 ?
-            <p>No score categories available</p>
+            <div>No score categories available</div>
             : <div>
                 <label htmlFor="key">Select a score category:</label>
                 <select name="key" id="key">{this.props.categories}</select>

@@ -10,10 +10,10 @@ var EnterScoreForm = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.props.submitHandler}>
-                <p>
+                <div>
                     <label htmlFor="value">Score:</label>
                     <input type="text" name="value" id="value" />
-                </p>
+                </div>
                 <scores.scoreCategoryWidget
                     categories={this.props.categories} />
                 <input type="hidden" name="gameId" defaultValue={this.props.gameId} />

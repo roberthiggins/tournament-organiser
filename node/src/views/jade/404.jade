@@ -5,7 +5,13 @@ html(lang=en)
         title
             | Tournament Organiser: Page Not Found
     body
-        div#content
-            | Page Not Found
-            | 
-            = ' ' + url ? url : ''
+        div#container
+            div#main_content_top
+            div#main_content
+                div#content.content
+                    | Page Not Found
+                    | 
+                    = ' ' + url ? url : ''
+                div#menu.menu
+                div#clear
+            div#main_content_bottom

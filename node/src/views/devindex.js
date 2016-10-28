@@ -1,12 +1,4 @@
 /* global $ React ReactDOM:true */
-var Description = React.createClass({
-    propTypes: {
-        desc: React.PropTypes.string.isRequired
-    },
-    render: function() {
-        return (<p>{this.props.desc}</p>);
-    }
-});
 
 var UserTask = React.createClass({
     propTypes: {
@@ -75,8 +67,9 @@ var UserTaskList = React.createClass({
 
         return (
             <div className="userTaskList">
-                <Description desc="Basic behaviour for players as per documentation in the roles section."
-                />
+                <h2>
+                    Basic behaviour for players as per documentation in the roles section.
+                </h2>
                 {namedLists}
            </div>
         );
@@ -85,5 +78,5 @@ var UserTaskList = React.createClass({
 
 ReactDOM.render(
     <UserTaskList />,
-    document.getElementById('content')
+    document.getElementById("content")
 );
