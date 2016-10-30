@@ -1,4 +1,5 @@
-var webpack = require("webpack");
+var ExtractTextPlugin = require("extract-text-webpack-plugin"),
+    webpack = require("webpack");
 
 module.exports = {
   entry: {
@@ -20,7 +21,9 @@ module.exports = {
     tournamentMissions: './src/views/tournament-missions.js',
     tournamentRankings: './src/views/tournament-rankings.js',
     tournamentRounds: './src/views/tournament-rounds.js',
-    userDetails: './src/views/user-details.js'
+    userDetails: './src/views/user-details.js',
+    // STYLES
+    style: './src/static/style.css'
   },
   output: {
     path: './public',
@@ -35,10 +38,19 @@ module.exports = {
         query: {
            presets: ['es2016', 'react']
         }
+      },
+      {
+        test: /\.css$/,
+        loader: ExtractTextPlugin.extract("style-loader", "css-loader")
+      },
+      {
+        test: /\.gif$|\.png$/, //|\.svg$|\.woff$|\.ttf$|\.wav$|\.jpe?g$|\.mp3$/,
+        loader: 'file'
       }
     ]
   },
   plugins: [
+    new ExtractTextPlugin("style.css", {allChunks: true}),
     new webpack.ProvidePlugin({
         $: "jquery",
         React: "react",
