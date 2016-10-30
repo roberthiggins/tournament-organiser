@@ -1,7 +1,4 @@
-var React = require("react"),
-    ReactDOM = require("react-dom"),
-    $ = require("jquery");
-
+/* global $ React ReactDOM:true */
 var Entries = React.createClass({
     propTypes: {
         entries: React.PropTypes.array.isRequired

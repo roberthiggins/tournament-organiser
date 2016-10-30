@@ -1,7 +1,4 @@
-var React = require("react"),
-    ReactDOM = require("react-dom"),
-    $ = require("jquery");
-
+/* global $ React ReactDOM:true */
 var TournamentList = React.createClass({
     getInitialState: function() {return ({tournaments: []});},
     componentDidMount: function() {

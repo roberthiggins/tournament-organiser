@@ -1,3 +1,5 @@
+var webpack = require("webpack");
+
 module.exports = {
   entry: {
     devindex: './src/views/devindex.js',
@@ -36,6 +38,13 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+        $: "jquery",
+        React: "react",
+        ReactDOM: "react-dom"
+    })
+  ],
   resolve: {
     extensions: ['', '.js', '.json']
   }

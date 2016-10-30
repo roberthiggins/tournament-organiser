@@ -1,7 +1,4 @@
-var React = require("react"),
-    ReactDOM = require("react-dom"),
-    $ = require("jquery");
-
+/* global $ React ReactDOM:true */
 var InputWidget = React.createClass({
     propTypes: {
         submitHandler: React.PropTypes.func,

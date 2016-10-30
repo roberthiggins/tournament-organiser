@@ -1,7 +1,5 @@
-var React = require("react"),
-    ReactDOM = require("react-dom"),
-    $ = require("jquery"),
-    Category = require("./component-tournament-categories.js");
+/* global $ React ReactDOM:true */
+var Category = require("./component-tournament-categories.js");
 
 var TournamentCategoriesPage = React.createClass({
     getInitialState: function () {

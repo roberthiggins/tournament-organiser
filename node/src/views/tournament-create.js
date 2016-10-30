@@ -1,7 +1,4 @@
-var React = require("react"),
-    ReactDOM = require("react-dom"),
-    $ = require("jquery"),
-    CategoryComponent = require("./component-tournament-categories.js"),
+var CategoryComponent = require("./component-tournament-categories.js"),
     CategoryModel = require("../models/score-categories.js"),
     Inputs = require("./component-inputs.js");
 

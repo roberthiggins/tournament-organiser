@@ -1,6 +1,4 @@
-var React = require('react'),
-    ReactDOM = require('react-dom');
-
+/* global React ReactDOM:true */
 var UserTaskList = React.createClass({
     render: function() {
         return (
