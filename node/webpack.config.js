@@ -3,6 +3,11 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin"),
 
 module.exports = {
   entry: {
+    // GLOBAL COMPONENTS
+    style: './src/static/style.css',
+    menu: './src/views/component-menu.js',
+
+    // CONTROLLER ROUTES
     devindex: './src/views/devindex.js',
     entry: './src/views/entry.js',
     entryNextGame: './src/views/entry-next-game.js',
@@ -22,8 +27,6 @@ module.exports = {
     tournamentRankings: './src/views/tournament-rankings.js',
     tournamentRounds: './src/views/tournament-rounds.js',
     userDetails: './src/views/user-details.js',
-    // STYLES
-    style: './src/static/style.css'
   },
   output: {
     path: './public',

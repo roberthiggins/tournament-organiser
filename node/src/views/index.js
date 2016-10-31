@@ -1,7 +1,5 @@
 /* global React ReactDOM:true */
 
-require("./component-menu");
-
 var IntroPage = React.createClass({
     render: function() {
         return (
