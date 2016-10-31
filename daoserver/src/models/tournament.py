@@ -218,15 +218,27 @@ class Tournament(object):
                                self.matching_strategy, self.table_strategy)
 
     @must_exist_in_db
-    def get_score_categories(self):
+    def get_score_categories(self, serialized=False):
         """
         List all the score categories available to this tournie and their
         percentages.
+
+        If 'serialized' returns list of dicts rather than sqlalchemy objects:
         [{ 'name': 'Painting', 'percentage': 20, 'id': 1,
            'per_tournament': False }]
         """
-        return ScoreCategory.query.\
+        cats = ScoreCategory.query.\
             filter_by(tournament_id=self.tournament_id).all()
+        return [{
+            'id':             x.id,
+            'name':           x.name,
+            'percentage':     x.percentage,
+            'per_tournament': x.per_tournament,
+            'min_val':        x.min_val,
+            'max_val':        x.max_val,
+            'zero_sum':       x.zero_sum,
+            'opponent_score': x.opponent_score
+        } for x in cats] if serialized else cats
 
 
     @must_exist_in_db
