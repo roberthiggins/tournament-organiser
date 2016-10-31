@@ -76,13 +76,13 @@ exports.enterTournament = function(tournament, username) {
 // A json blob for a single score category
 exports.jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
     var cat = {
-        "name": name,
-        "percentage": pct,
-        "per_tournament": per_tourn,
-        "min_val": min,
-        "max_val": max,
-        "zero_sum": z_sum,
-        "opponent_score": opp
+        name: name,
+        percentage: pct,
+        per_tournament: per_tourn,
+        min_val: min,
+        max_val: max,
+        zero_sum: z_sum,
+        opponent_score: opp
         };
     if (id) {
         cat.id = id;
