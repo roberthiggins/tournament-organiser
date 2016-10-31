@@ -149,6 +149,7 @@ class Tournament(object):
             'name': details.name,
             'date': details.date,
             'rounds': self.get_dao().rounds.count(),
+            'score_categories': self.get_score_categories(serialized=True)
         }
 
 
