@@ -1,3 +1,23 @@
+exports.defaultMenu = function() {
+    var defaultActions = [
+        {
+            title: "Account",
+            actions: [
+                {text: "Sign up", action: "sign_up"},
+                {text: "Login", action: "login"}
+            ]
+        },
+        {
+            title: "Play",
+            actions: [
+                {text: "See a list of tournaments", action: "tournament_list"}
+            ]
+        },
+    ];
+
+    return exports.transform(defaultActions);
+};
+
 exports.transform = function(asJSON) {
     var slug = function(tournament, entry, suffix) {
             var slug = "";
@@ -36,6 +56,9 @@ exports.transform = function(asJSON) {
                 case "get_tournament_entries":
                     act.href = slug(act.tournament, null, "entries");
                     break;
+                case "login":
+                    act.href = slug(null, null, "login");
+                    break;
                 case "next_game":
                     act.href = slug(act.tournament, act.username, "nextgame");
                     break;
@@ -53,6 +76,9 @@ exports.transform = function(asJSON) {
                     break;
                 case "set_score_categories":
                     act.href = slug(act.tournament, null, "categories");
+                    break;
+                case "sign_up":
+                    act.href = slug(null, null, "signup");
                     break;
                 case "tournament_list":
                     act.href = slug(null, null, "tournaments");

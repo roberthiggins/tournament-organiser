@@ -39,6 +39,7 @@ app.use("/", require("./src/controllers/entry-routes"));
 app.use("/", require("./src/controllers/member-only-routes"));
 app.use("/", require("./src/controllers/public-routes"));
 app.use("/", require("./src/controllers/tournament-routes"));
+app.use("/menu", require("./src/controllers/menu"));
 
 // Passport user auth
 app.use(passport.initialize());
