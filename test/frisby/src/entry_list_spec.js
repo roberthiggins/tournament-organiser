@@ -9,7 +9,7 @@ describe("Get a list of entries from a tournament", function () {
     injector.createUser("entry_list_test_player_2");
     injector.enterTournament("entry_list_test", "entry_list_test_player_1");
     injector.enterTournament("entry_list_test", "entry_list_test_player_2");
-    injector.createTournament("entry_list_test_no_entries", '2095-07-04');
+    injector.createTournament("entry_list_test_empty", '2095-07-04');
 
     frisby.create("Details for existing tournament")
         .get(API + "tournament/entry_list_test/entry/")
@@ -23,7 +23,7 @@ describe("Get a list of entries from a tournament", function () {
         .toss();
 
     frisby.create("Tournament with no entries")
-        .get(API + "tournament/entry_list_test_no_entries/entry/")
+        .get(API + "tournament/entry_list_test_empty/entry/")
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")
         .expectJSON([])

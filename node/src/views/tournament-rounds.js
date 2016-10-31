@@ -1,7 +1,5 @@
-var React = require("react"),
-    ReactDOM = require("react-dom"),
-    $ = require("jquery"),
-    Inputs = require("./component-inputs.js");
+/* global $ React ReactDOM:true */
+var Inputs = require("./component-inputs.js");
 
 var RoundsForm = React.createClass({
     getInitialState: function() {

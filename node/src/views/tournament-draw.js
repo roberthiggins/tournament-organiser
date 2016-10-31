@@ -1,7 +1,4 @@
-var React    = require("react"),
-    ReactDOM = require("react-dom"),
-    $        = require("jquery");
-
+/* global $ React ReactDOM:true */
 var borderStyle = {border: "1px solid"};
 
 var GameRow = React.createClass({

@@ -44,6 +44,9 @@ router.route("/tournament/create")
                         inputTournamentDate: req.body.date,
                         rounds: req.body.rounds || 0,
                         score_categories: cleanCats
+                    },
+                    function success(result) {
+                        res.status(200).json(JSON.parse(result));
                     });
             }
             catch (err) {

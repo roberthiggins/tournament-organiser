@@ -1,8 +1,4 @@
-var React = require("react"),
-    ReactDOM = require("react-dom"),
-    $ = require("jquery");
-
-
+/* global $ React ReactDOM:true */
 var MissionField = React.createClass({
     getInitialState: function(){
         return {value: this.props.val};
