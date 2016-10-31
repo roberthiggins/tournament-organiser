@@ -45,7 +45,7 @@ var SuccessWidget = React.createClass({
     render: function() {
         var categories = this.props.details.categories ?
             this.props.details.categories.map(function(cat){return cat.name})
-            : null;
+            : [];
         return (
             <div>
                 <p>Tournament created! You submitted the following fields:</p>
@@ -55,7 +55,7 @@ var SuccessWidget = React.createClass({
                     {this.props.details.rounds ?
                         <li>Rounds: {this.props.details.rounds}</li> :
                         null}
-                    {this.props.details.categories ?
+                    {categories.length ?
                         <li>Score Categories: {categories.join(", ")}</li>
                         : null}
                 </ul>
@@ -93,16 +93,20 @@ var TournamentCreatePage = React.createClass({
     handleSubmit: function (e) {
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
-        var details = {
-            categories: this.state.details.categories,
-            name: $("input#name").val(),
-            date: $("input#date").val(),
-            rounds: this.state.details.rounds
-            };
 
         $.post("/tournament/create",
-            details,
-            function success() {
+            {
+                categories: this.state.details.categories,
+                name: $("input#name").val(),
+                date: $("input#date").val(),
+                rounds: this.state.details.rounds
+            },
+            function success(res) {
+                var details = res;
+                if (res.score_categories) {
+                    res.categories = res.score_categories;
+                    delete res.score_categories;
+                }
                 this.setState({
                     success: true,
                     details: details
