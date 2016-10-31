@@ -1,3 +1,4 @@
+/* global $ React ReactDOM:true */
 var CategoryComponent = require("./component-tournament-categories.js"),
     CategoryModel = require("../models/score-categories.js"),
     Inputs = require("./component-inputs.js");

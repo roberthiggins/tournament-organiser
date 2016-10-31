@@ -34,7 +34,8 @@ describe("Test seeing and registering for a tournament", function () {
             {date: "2222-06-01", name: "register_test",         rounds: 0},
             {date: "2095-07-07", name: "round_test",            rounds: 2},
             {date: "2163-09-15", name: "schedule_test",         rounds: 2},
-            {date: "2063-03-17", name: "start_test",            rounds: 1}])
+            {date: "2063-03-17", name: "start_test",            rounds: 1},
+            {date: "9999-12-31", name: "t_create_test",         rounds: 3}])
         .toss();
 
     frisby.create("enter a user")
