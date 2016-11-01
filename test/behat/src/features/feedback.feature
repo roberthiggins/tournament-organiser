@@ -8,7 +8,7 @@ Feature: Place feedback to improve the sight
 
     @javascript
     Scenario: I navigate to the feedback section
-        Given I am on "/devindex"
+        Given I am on "/"
         Then I should see "Place Feedback" appear
         When I follow "Place Feedback"
         Then I should see "Please give us feedback on your experience on the site" appear

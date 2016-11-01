@@ -8,7 +8,7 @@ Feature: Register for a Tournament
 
     @javascript
     Scenario: I visit the register page from the front page
-        Given I am on "/devindex"
+        Given I am on "/"
         When I wait for "See a list of tournaments" to appear
         When I follow "See a list of tournaments"
         Then I should see "register_test_1 - 2222-06-01" appear

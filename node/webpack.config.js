@@ -8,7 +8,6 @@ module.exports = {
     menu: './src/views/component-menu.js',
 
     // CONTROLLER ROUTES
-    devindex: './src/views/devindex.js',
     entry: './src/views/entry.js',
     entryNextGame: './src/views/entry-next-game.js',
     entryScore: './src/views/entry-score.js',

@@ -100,7 +100,7 @@ class FeatureContext extends MinkContext
         $this->fillField('username', $username);
         $this->fillField('password', $password);
         $this->pressButton('Login');
-        $this->iWaitForTextToAppear('Basic behaviour');
+        $this->iWaitForTextToAppear('Welcome to the Tournament Organiser');
     }
 
     /**

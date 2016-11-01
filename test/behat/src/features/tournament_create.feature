@@ -8,7 +8,7 @@ Feature: Create a Tournament
 
     @javascript
     Scenario: I try to navigate to the page via the front page
-        Given I am on "/devindex"
+        Given I am on "/"
         When I wait for "Create a Tournament" to appear
         When I follow "Create a Tournament"
         Then I should see "add a tournament here" appear
