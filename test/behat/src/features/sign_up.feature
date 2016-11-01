@@ -14,7 +14,7 @@ Feature: Sign up
         Then I should see "Password confirmation" appear
         Examples:
             | base  |button         |
-            |       |Sign Up        |
+            |       |Sign up        |
             | login |Create Account |
 
     @javascript

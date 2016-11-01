@@ -50,8 +50,8 @@ Feature: Create a Tournament
         Then I should see "Tournament created!" appear
         Then I should see "Name: test_tournament_creation" appear
         Then I should see "Date: 9999-12-31" appear
-        Then I should not see "Rounds"
-        Then I should not see "Score Categories"
+        Then I should not see "Rounds:"
+        Then I should not see "Score Categories:"
 
     @javascript
     Scenario Outline: Valid and invalid values

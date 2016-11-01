@@ -55,5 +55,5 @@ Feature: Login
         When I fill in "username" with "charlie_murphy"
         When I fill in "password" with "password"
         When I press "Login"
-        When I wait for "Enter a Tournament" to appear
+        When I wait for "Basic behaviour" to appear
         Then I should be on "/devindex"
