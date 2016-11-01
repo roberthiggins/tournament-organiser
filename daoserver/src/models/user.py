@@ -211,7 +211,7 @@ class User(object):
                  } for x in tourn_rounds]
 
         submits = [
-            {'text': 'See a list of tournaments',
+            {'text': 'See upcoming tournaments',
              'action': 'tournament_list'},
             {'text': 'Submit a tournament score for {}'.format(next_tourn.name),
              'action': 'enter_tournament_score',

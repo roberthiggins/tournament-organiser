@@ -73,7 +73,7 @@ describe("Test tournament creation", function () {
             score_categories: [category]
             })
         .after(function() {
-            frisby.create("See a list of tournaments")
+            frisby.create("See upcoming tournaments")
                 .get(API, {inspectOnFailure: true})
                 .expectStatus(200)
                 .expectHeaderContains("content-type", "application/json")

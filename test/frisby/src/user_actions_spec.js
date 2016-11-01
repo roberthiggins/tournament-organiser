@@ -18,7 +18,7 @@ describe("Enter score for single game for an entry", function () {
             action: String
         })
         .expectJSON("0.actions.0", {
-            text: "See a list of tournaments",
+            text: "See upcoming tournaments",
             action: "tournament_list"
         })
         .toss();

@@ -10,7 +10,7 @@ exports.defaultMenu = function() {
         {
             title: "Play",
             actions: [
-                {text: "See a list of tournaments", action: "tournament_list"}
+                {text: "See upcoming tournaments", action: "tournament_list"}
             ]
         },
     ];

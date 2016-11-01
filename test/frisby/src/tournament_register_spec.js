@@ -8,7 +8,7 @@ describe("Test seeing and registering for a tournament", function () {
     injector.createUser("register_test_player_1");
     injector.createUser("register_test_player_2");
 
-    frisby.create("See a list of tournaments")
+    frisby.create("See upcoming tournaments")
         .get(API, {inspectOnFailure: true})
         .expectStatus(200)
         .expectHeaderContains("content-type", "application/json")

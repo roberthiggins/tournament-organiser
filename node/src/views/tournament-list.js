@@ -24,7 +24,7 @@ var TournamentList = React.createClass({
 
         return (
             <div>
-                <h2>See available tournaments below:</h2>
+                <h2>Upcoming Tournaments:</h2>
                 <ul>
                     {tournList}
                 </ul>
