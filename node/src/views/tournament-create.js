@@ -130,7 +130,7 @@ var TournamentCreatePage = React.createClass({
                 {this.state.success ?
                     null :
                     <div>
-                        <h2>You can add a tournament here</h2>
+                        <h2>Create Tournament</h2>
                     </div>}
                 {this.state.success ?
                     null :

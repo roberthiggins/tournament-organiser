@@ -30,8 +30,7 @@ Feature: DEMO TOURNAMENT
     @javascript
     Scenario: TO sets up
         Given I am authenticated as "demo_to" using "demo_to_password"
-        Given I am on "/tournament/create"
-        Then I should see "You can add a tournament here" appear
+        Given I visit the tournament creation page
         When I fill in "name" with "demo"
         When I fill in "date" with "2056-07-07"
         When I fill in "rounds" with "6"

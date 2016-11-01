@@ -120,4 +120,16 @@ class FeatureContext extends MinkContext
         $this->fillField($pos.'_min_val', $min);
         $this->fillField($pos.'_max_val', $max);
     }
+
+    /**
+    * @Given /^I visit the tournament creation page$/
+    */
+    public function iVisitTournamentCreationPage() {
+        $this->visit('/tournament/create');
+        $this->iWaitForTextToAppear('Create Tournament');
+        $this->iWaitForTextToAppear('Tournament Name:');
+        $this->iWaitForTextToAppear('Tournament Date:');
+        $this->iWaitForTextToAppear('(Optional) Number of Rounds:');
+        $this->iWaitForTextToAppear('(Optional) Add Score Categories:');
+    }
 }
