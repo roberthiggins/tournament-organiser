@@ -89,15 +89,15 @@ class User(object):
             self.get_play_actions(),
             self.get_account_actions(),
             self.get_organiser_actions(),
-            self.get_admin_actions()
+            self.get_feedback_actions()
         ]
 
         return [x for x in strip_none(categories) if len(x['actions']) > 0]
 
-    def get_admin_actions(self):
+    def get_feedback_actions(self):
         """Get the admin actions the user can perform"""
         return {
-            'title': 'Administrivia',
+            'title': 'Feedback',
             'actions': strip_none([
                 {'text': 'Place Feedback', 'action': 'place_feedback'},
             ])
