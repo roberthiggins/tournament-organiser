@@ -59,6 +59,9 @@ exports.transform = function(asJSON) {
                 case "login":
                     act.href = slug(null, null, "login");
                     break;
+                case "logout":
+                    act.href = slug(null, null, "logout");
+                    break;
                 case "next_game":
                     act.href = slug(act.tournament, act.username, "nextgame");
                     break;

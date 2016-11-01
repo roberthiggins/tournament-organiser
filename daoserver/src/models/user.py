@@ -125,6 +125,8 @@ class User(object):
                 {'text': 'See your user details',
                  'action': 'user_details',
                  'username': self.username},
+                {'text': 'Logout',
+                 'action': 'logout'},
             ])
         }
         # Get applications to update
