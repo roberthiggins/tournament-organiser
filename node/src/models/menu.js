@@ -1,6 +1,5 @@
-exports.transform = function(responseFromDAO) {
-    var asJSON = JSON.parse(responseFromDAO),
-        slug = function(tournament, entry, suffix) {
+exports.transform = function(asJSON) {
+    var slug = function(tournament, entry, suffix) {
             var slug = "";
             if (tournament) {
                 slug = slug + "/tournament/" + tournament;

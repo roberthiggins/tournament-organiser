@@ -20,9 +20,9 @@ router.route("/devindex/content")
             req,
             res,
             url,
-            function(responseBody) {
+            function(body) {
                 var transformer = require("../models/menu");
-                res.status(200).json(transformer.transform(responseBody));
+                res.status(200).json(transformer.transform(JSON.parse(body)));
             });
     });
 
