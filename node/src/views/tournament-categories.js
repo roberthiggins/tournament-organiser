@@ -33,6 +33,7 @@ var TournamentCategoriesPage = React.createClass({
     render: function() {
         return (
             <div>
+                <h2>Score Categories</h2>
                 {this.state.error ? <div>{this.state.error}</div> : null}
                 {this.state.successMsg ?
                     <div>{this.state.successMsg}</div> :
