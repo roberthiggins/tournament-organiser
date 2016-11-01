@@ -71,11 +71,7 @@ Feature: DEMO TOURNAMENT
     @javascript
     Scenario Outline: Players play and enter scores for round 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I am on "/tournament/demo/entry/<username>/entergamescore"
-        When I wait for "Battle" to appear
-        Then I fill in "value" with "<score>"
-        Then I press "Enter Score"
-        Then I should see "Score entered for <username>: <score>" appear
+        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p1  | 15    |
@@ -95,11 +91,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Players play and enter scores for round 2
         # P6 moved to pos 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I am on "/tournament/demo/entry/<username>/entergamescore"
-        When I wait for "Battle" to appear
-        Then I fill in "value" with "<score>"
-        Then I press "Enter Score"
-        Then I should see "Score entered for <username>: <score>" appear
+        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p6  | 15    |
@@ -119,11 +111,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Players play and enter scores for round 3
         # P6 moved to pos 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I am on "/tournament/demo/entry/<username>/entergamescore"
-        When I wait for "Battle" to appear
-        Then I fill in "value" with "<score>"
-        Then I press "Enter Score"
-        Then I should see "Score entered for <username>: <score>" appear
+        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p5  | 15    |
@@ -143,11 +131,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Players play and enter scores for round 4
         # P6 moved to pos 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I am on "/tournament/demo/entry/<username>/entergamescore"
-        When I wait for "Battle" to appear
-        Then I fill in "value" with "<score>"
-        Then I press "Enter Score"
-        Then I should see "Score entered for <username>: <score>" appear
+        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p4  | 15    |
@@ -167,11 +151,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Players play and enter scores for round 5
         # P6 moved to pos 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I am on "/tournament/demo/entry/<username>/entergamescore"
-        When I wait for "Battle" to appear
-        Then I fill in "value" with "<score>"
-        Then I press "Enter Score"
-        Then I should see "Score entered for <username>: <score>" appear
+        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p3  | 15    |
@@ -191,11 +171,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Players play and enter scores for round 6
         # P6 moved to pos 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I am on "/tournament/demo/entry/<username>/entergamescore"
-        When I wait for "Battle" to appear
-        Then I fill in "value" with "<score>"
-        Then I press "Enter Score"
-        Then I should see "Score entered for <username>: <score>" appear
+        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p2  | 11    |
