@@ -87,7 +87,7 @@ class User(object):
         """
         categories = [
             self.get_play_actions(),
-            self.get_entry_actions(),
+            self.get_account_actions(),
             self.get_organiser_actions(),
             self.get_admin_actions()
         ]
@@ -116,14 +116,12 @@ class User(object):
                                    self.get_dao().last_name).strip()
         return full_name if full_name is not '' else self.username
 
-    def get_entry_actions(self):
+    def get_account_actions(self):
         """Basic user actions for viewing and entering tournaments"""
 
         return {
-            'title': 'Enter a Tournament',
+            'title': 'Account',
             'actions': strip_none([
-                {'text': 'See a list of tournaments',
-                 'action': 'tournament_list'},
                 {'text': 'See your user details',
                  'action': 'user_details',
                  'username': self.username},
@@ -211,6 +209,8 @@ class User(object):
                  } for x in tourn_rounds]
 
         submits = [
+            {'text': 'See a list of tournaments',
+             'action': 'tournament_list'},
             {'text': 'Submit a tournament score for {}'.format(next_tourn.name),
              'action': 'enter_tournament_score',
              'tournament': next_tourn.name,
