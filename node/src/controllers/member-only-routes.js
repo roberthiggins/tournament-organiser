@@ -21,7 +21,7 @@ router.route("/devindex/content")
             res,
             url,
             function(responseBody) {
-                var transformer = require("../models/devindex");
+                var transformer = require("../models/menu");
                 res.status(200).json(transformer.transform(responseBody));
             });
     });
