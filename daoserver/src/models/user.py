@@ -186,7 +186,7 @@ class User(object):
             + set_rounds + set_cats + set_mission_actions
 
         return {
-            'title': 'Organise a Tournament',
+            'title': 'Organise',
             'actions': strip_none(actions)
         }
 
