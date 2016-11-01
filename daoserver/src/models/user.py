@@ -195,7 +195,7 @@ class User(object):
 
         last_tourn = self.get_last_tournament()
         next_tourn = self.get_next_tournament()
-        next_game = {'text': 'Get next game for {}'.format(self.username),
+        next_game = {'text': 'Get next game',
                      'action': 'next_game',
                      'tournament': next_tourn.name} \
             if next_tourn is not None else None
@@ -211,13 +211,11 @@ class User(object):
                  } for x in tourn_rounds]
 
         submits = [
-            {'text': 'Submit a tournament score for {} entry {}'.\
-                format(next_tourn.name, self.username),
+            {'text': 'Submit a tournament score for {}'.format(next_tourn.name),
              'action': 'enter_tournament_score',
              'tournament': next_tourn.name,
              'username': self.username} if next_tourn is not None else None,
-            {'text': 'Submit a game score for {} entry {}'.\
-                format(next_tourn.name, self.username),
+            {'text': 'Submit a game score for {}'.format(next_tourn.name),
              'action': 'enter_game_score',
              'tournament': next_tourn.name,
              'username': self.username} if next_tourn is not None else None,
@@ -239,7 +237,7 @@ class User(object):
         #  'action': 'see_previous_games'}
 
         return {
-            'title': 'Play in a Tournament',
+            'title': 'Play',
             'actions': strip_none([next_game] + draws + submits)
         }
 
