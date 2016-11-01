@@ -27,13 +27,13 @@ var RoundsForm = React.createClass({
 
         return (this.state.rounds !== null ?
             <form onSubmit={this.props.submitHandler}>
-                <p>Set the number of rounds{tournText}</p>
-                <p>
+                <h2>Set the number of rounds{tournText}</h2>
+                <div>
                     <Inputs.textField value={this.state.rounds}
                                       id="rounds"
                                       name="Number of rounds"
                                       changeHandler={this.handleRoundChange}/>
-                </p>
+                </div>
                 <button type="submit">Set</button>
             </form> :
             null);

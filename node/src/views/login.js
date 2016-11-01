@@ -30,26 +30,26 @@ var LoginWidget = React.createClass({
         return (
             <div>
                 <form onSubmit={this.handleSubmit}>
-                    <p>Login to your account</p>
+                    <h2>Login to your account</h2>
 
                     <div>{this.state.error}</div>
-                    <p>
+                    <div>
                         <label htmlFor="username">Username:</label>
                         <input type="text" name="username" id="username" />
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         <label htmlFor="password">Password:</label>
                         <input type="password" name="password" id="password" />
-                    </p>
+                    </div>
                     <button type="submit">Login</button>
                 </form>
-                <p>
+                <span>
                     <a href="/resetpassword">Forgot Password</a>
-                </p>
-                <p>
+                </span>
+                <span>
                     <a href="/signup">Create Account</a>
-                </p>
+                </span>
             </div>
         );
     }

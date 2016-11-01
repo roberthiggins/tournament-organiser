@@ -10,14 +10,14 @@ var InputWidget = React.createClass({
                 <p>Please give us feedback on your experience on the site</p>
 
                 <div>{this.props.error}</div>
-                <p>
+                <div>
                     <label htmlFor="feedback">Feedback:</label>
                     <textarea name="feedback"
                               id="feedback"
                               rows="10"
                               cols="40"
                               maxLength="500"/>
-                </p>
+                </div>
 
                 <button type="submit">Submit</button>
             </form>

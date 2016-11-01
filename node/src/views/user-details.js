@@ -8,7 +8,7 @@ var DetailsWidget = React.createClass({
 
         return (
             <div>
-                <p>User details for {user.username}:</p>
+                <h2>User details for {user.username}:</h2>
                 <ul>
                     <li>Username: {user.username}</li>
                     <li>Email: {user.email}</li>

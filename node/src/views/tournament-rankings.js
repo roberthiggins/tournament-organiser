@@ -51,7 +51,7 @@ var RankingsTable = React.createClass({
 
         return (
             <div>
-                <p>Placings for {this.props.tournament}:</p>
+                <h2>Placings for {this.props.tournament}:</h2>
     
                 <table style={borderStyle}>
 
@@ -101,7 +101,7 @@ var TournamentRankingsPage = React.createClass({
 
         return (
             <div>
-                <p>{this.state.error}</p>
+                <div>{this.state.error}</div>
                 {this.state.entries.length ? rankingsTable : null}
             </div>
         );

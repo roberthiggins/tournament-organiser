@@ -31,8 +31,8 @@ var Draw = React.createClass({
             });
         return (
             <div>
-                <p>Draw for Round {this.props.round}, {this.props.tourn}</p>
-                <p>Mission: {this.props.mission}</p>
+                <h2>Draw for Round {this.props.round}, {this.props.tourn}</h2>
+                <div>Mission: {this.props.mission}</div>
                 <table style={borderStyle}>
                     <thead>
                         <tr>
@@ -77,7 +77,7 @@ var TournamentDrawPagePage = React.createClass({
                       mission={this.state.mission}
                       round={this.state.round}
                       tourn={this.state.tournament} />
-            : <p>{msg}</p>;
+            : <div>{msg}</div>;
 
         return (
             <div>{widget}</div>

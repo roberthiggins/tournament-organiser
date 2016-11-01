@@ -13,25 +13,27 @@ var TournamentDetailsWidget = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.props.handleSubmit}>
-                <p>
+                <div>
                     <label htmlFor="name">Tournament Name:</label>
                     <input type="text" name="name" id="name" />
-                </p>
+                </div>
 
-                <p>
+                <div>
                     <label htmlFor="date">Tournament Date:</label>
                     <input type="text" name="date" id="date" />
-                </p>
-                <p>
+                </div>
+                <div>
                     <Inputs.textField value={this.props.details.rounds}
                         id="rounds"
                         name="(Optional) Number of rounds"
                         changeHandler={this.props.handleRoundChange}/>
-                </p>
-                <p>(Optional) Add Score Categories:</p>
-                <CategoryComponent.inputCategoryList
-                    changeHandler={this.props.handleCategoryChange}
-                    categories={this.props.details.categories}/>
+                </div>
+                <div>
+                    <div>(Optional) Add Score Categories:</div>
+                    <CategoryComponent.inputCategoryList
+                        changeHandler={this.props.handleCategoryChange}
+                        categories={this.props.details.categories}/>
+                </div>
                 <button type="submit">Create</button>
             </form>
         );
@@ -48,7 +50,7 @@ var SuccessWidget = React.createClass({
             : [];
         return (
             <div>
-                <p>Tournament created! You submitted the following fields:</p>
+                <div>Tournament created! You submitted the following fields:</div>
                 <ul>
                     <li>Name: {this.props.details.name}</li>
                     <li>Date: {this.props.details.date}</li>
@@ -127,10 +129,12 @@ var TournamentCreatePage = React.createClass({
                     : null}
                 {this.state.success ?
                     null :
-                    <p>You can add a tournament here</p>}
+                    <div>
+                        <h2>You can add a tournament here</h2>
+                    </div>}
                 {this.state.success ?
                     null :
-                    <p>{this.state.error}</p>}
+                    <div>{this.state.error}</div>}
                 {this.state.success ?
                     null :
                     <TournamentDetailsWidget details={this.state.details}

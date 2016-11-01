@@ -14,14 +14,14 @@ var MissionField = React.createClass({
     },
     render: function() {
         return (
-            <p>
+            <div>
                 <label htmlFor={this.props.id}>{this.props.name}:</label>
                 <input  type="text"
                         name={this.props.id}
                         id={this.props.id}
                         onChange={this.handleChange}
                         value={this.state.value} />
-            </p>);
+            </div>);
     }
 });
 

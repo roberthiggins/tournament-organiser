@@ -7,32 +7,32 @@ var SignupForm = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.props.submitHandler}>
-                <p>You can add/change your details here:</p>
+                <h2>You can add/change your details here:</h2>
 
                 <div>{this.props.error}</div>
 
-                <p>
+                <div>
                     <label htmlFor="username">Username:</label>
                     <input type="text" name="username" maxLength="30"
                            id="username" />
                     <span className="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.</span>
-                </p>
+                </div>
 
-                <p>
+                <div>
                     <label htmlFor="email">Email:</label>
                     <input type="email" name="email" id="email" />
-                </p>
+                </div>
 
-                <p>
+                <div>
                     <label htmlFor="password1">Password:</label>
                     <input type="password" name="password1" id="password1" />
-                </p>
+                </div>
 
-                <p>
+                <div>
                     <label htmlFor="password2">Password confirmation:</label>
                     <input type="password" name="password2" id="password2" />
                     <span className="helptext">Enter the same password as before, for verification.</span>
-                </p>
+                </div>
 
                 <button type="submit">Sign Up</button>
             </form>
