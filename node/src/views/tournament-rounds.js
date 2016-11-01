@@ -62,6 +62,7 @@ var TournamentRoundsPage = React.createClass({
     render: function() {
         return (
             <div>
+                <h2>Tournament Length</h2>
                 <div>{this.state.successText}</div>
                 <div>{this.state.error}</div>
                 {
