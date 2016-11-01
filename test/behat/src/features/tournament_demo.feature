@@ -7,15 +7,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Create TO and players
 
         # Create a TO and some players
-        Given I am on "/signup"
-        When I wait for "Username" to appear
-        When I wait for "Username" to appear
-        When I fill in "username" with "<username>"
-        When I fill in "email" with "<username>@demo.com"
-        When I fill in "password1" with "<username>_password"
-        When I fill in "password2" with "<username>_password"
-        When I press "Sign Up"
-        Then I should see "Account created" appear
+        Given I sign up "<username>"
 
         Examples:
             | username |

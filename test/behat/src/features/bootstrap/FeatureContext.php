@@ -122,6 +122,20 @@ class FeatureContext extends MinkContext
     }
 
     /**
+    * @Given /^I sign up "([^"]*)"$/
+    */
+    public function iSignUp($name) {
+        $this->visit('/signup');
+        $this->iWaitForTextToAppear('Username');
+        $this->fillField('username', $name);
+        $this->fillField('email', $name.'@foobar.com');
+        $this->fillField('password1', $name.'_password');
+        $this->fillField('password2', $name.'_password');
+        $this->pressButton('Sign Up');
+        $this->iWaitForTextToAppear('Account created');
+    }
+
+    /**
     * @Given /^I visit the tournament creation page$/
     */
     public function iVisitTournamentCreationPage() {
