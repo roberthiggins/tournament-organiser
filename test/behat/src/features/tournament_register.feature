@@ -11,13 +11,15 @@ Feature: Register for a Tournament
         Given I am on "/"
         When I wait for "See upcoming tournaments" to appear
         When I follow "See upcoming tournaments"
-        Then I should see "register_test_1 - 2222-06-01" appear
-        When I follow "register_test_1 - 2222-06-01"
+        Then I should see "register_test_1" appear
+        When I follow "register_test_1"
         Then I should see "Apply to play in register_test_1" appear
 
     @javascript
     Scenario: I visit the register page via the URL
         Given I am on "/tournament/register_test_1"
+        Then I should see "Date: 2222-06-01" appear
+        Then I should see "Confirmed Entries: 0" appear
         Then I should see "Apply to play in register_test_1" appear
 
     @javascript
