@@ -44,9 +44,6 @@ var LoginWidget = React.createClass({
                     </div>
                     <button type="submit">Login</button>
                 </form>
-                <span>
-                    <a href="/resetpassword">Forgot Password</a>
-                </span>
             </div>
         );
     }
