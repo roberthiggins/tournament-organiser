@@ -33,12 +33,12 @@ var LoginWidget = React.createClass({
                     <h2>Login to your account</h2>
 
                     <div>{this.state.error}</div>
-                    <div>
+                    <div className="form_field">
                         <label htmlFor="username">Username:</label>
                         <input type="text" name="username" id="username" />
                     </div>
 
-                    <div>
+                    <div className="form_field">
                         <label htmlFor="password">Password:</label>
                         <input type="password" name="password" id="password" />
                     </div>

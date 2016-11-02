@@ -11,24 +11,24 @@ var SignupForm = React.createClass({
 
                 <div>{this.props.error}</div>
 
-                <div>
+                <div className="form_field">
                     <label htmlFor="username">Username:</label>
                     <input type="text" name="username" maxLength="30"
                            id="username" />
                     <div className="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.</div>
                 </div>
 
-                <div>
+                <div className="form_field">
                     <label htmlFor="email">Email:</label>
                     <input type="email" name="email" id="email" />
                 </div>
 
-                <div>
+                <div className="form_field">
                     <label htmlFor="password1">Password:</label>
                     <input type="password" name="password1" id="password1" />
                 </div>
 
-                <div>
+                <div className="form_field">
                     <label htmlFor="password2">Password confirmation:</label>
                     <input type="password" name="password2" id="password2" />
                     <div className="helptext">Enter the same password as before, for verification.</div>
