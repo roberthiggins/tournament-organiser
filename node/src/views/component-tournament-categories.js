@@ -38,7 +38,7 @@ var InputCategory = React.createClass({
     },
     render: function() {
         return(<div className="category" key={this.props.idx + "_category"}>
-            <Inputs.textField name="Category"
+            <Inputs.textField name={"Category " + (this.props.idx + 1)}
                               id={this.props.idx + "_name"}
                               changeHandler={this.props.changeHandler}
                               value={this.props.category.name }
