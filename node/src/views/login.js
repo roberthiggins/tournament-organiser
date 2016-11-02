@@ -47,9 +47,6 @@ var LoginWidget = React.createClass({
                 <span>
                     <a href="/resetpassword">Forgot Password</a>
                 </span>
-                <span>
-                    <a href="/signup">Create Account</a>
-                </span>
             </div>
         );
     }
