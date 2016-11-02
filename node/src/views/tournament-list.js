@@ -18,6 +18,7 @@ var TournamentList = React.createClass({
                     <a href={"/tournament/" + tourn.name}>
                         {tourn.name}
                     </a>
+                    {tourn.user_entered ? <strong> Entered </strong> : null}
                      - Date: {tourn.date}, Confirmed Entries: {tourn.entries}
                 </li>
             );

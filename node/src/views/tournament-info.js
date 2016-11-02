@@ -71,7 +71,7 @@ var TournamentInfoPage = React.createClass({
                                  entries={this.state.entries}
                                  date={this.state.date} />
                  : null,
-            applyWidget = this.state.name && !this.state.successText ?
+            applyWidget = infoWidget && !this.state.user_entered ?
                 <form onSubmit={this.handleSubmit}>
                     <input type="hidden" value={this.state.name}
                            name="tournament" />
@@ -88,6 +88,8 @@ var TournamentInfoPage = React.createClass({
                 <p>{this.state.error}</p>
                 {infoWidget}
                 {applyWidget}
+                {this.state.user_entered ?
+                    <p>You have entered this tournament</p> : null}
             </div>
         );
     }
