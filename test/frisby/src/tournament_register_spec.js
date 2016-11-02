@@ -10,11 +10,14 @@ describe("Test seeing and registering for a tournament", function () {
                 name: name,
                 rounds: rounds
             };
-        };
+        },
+        tourn_1 = "register_test",
+        player_1 = "register_test_player_1",
+        player_2 = "register_test_player_2";
 
-    injector.createTournament("register_test", "2222-06-01");
-    injector.createUser("register_test_player_1");
-    injector.createUser("register_test_player_2");
+    injector.createTournament(tourn_1, "2222-06-01");
+    injector.createUser(player_1);
+    injector.createUser(player_2);
 
     frisby.create("See upcoming tournaments")
         .get(API, {inspectOnFailure: true})
@@ -40,7 +43,7 @@ describe("Test seeing and registering for a tournament", function () {
             asJSON("2095-06-01", 0, "northcon_2095",         0),
             asJSON("2095-07-06", 1, "permission_test",       0),
             asJSON("1643-01-27", 5, "rank_test",             2),
-            asJSON("2222-06-01", 0, "register_test",         0),
+            asJSON("2222-06-01", 0, tourn_1,                 0),
             asJSON("2095-07-07", 0, "round_test",            2),
             asJSON("2163-09-15", 5, "schedule_test",         2),
             asJSON("2063-03-17", 3, "start_test",            1),
@@ -48,57 +51,57 @@ describe("Test seeing and registering for a tournament", function () {
         .toss();
 
     frisby.create("enter a user")
-        .post(API + "register_test/register/register_test_player_1")
-        .addHeader("Authorization", injector.auth("register_test_player_1"))
+        .post(API + tourn_1 + "/register/" + player_1)
+        .addHeader("Authorization", injector.auth(player_1))
         .expectStatus(200)
         .expectBodyContains("Application Submitted")
         .after(function(){
             frisby.create("check they are entered")
-                .get(API + "register_test/entry/")
+                .get(API + tourn_1 + "/entry/")
                 .expectStatus(200)
-                .expectJSON(["register_test_player_1"])
+                .expectJSON([player_1])
                 .toss();
         })
         .toss();
 
     frisby.create("enter a user a second time")
-        .post(API + "register_test/register/register_test_player_1")
-        .addHeader("Authorization", injector.auth("register_test_player_1"))
+        .post(API + tourn_1 + "/register/" + player_1)
+        .addHeader("Authorization", injector.auth(player_1))
         .expectStatus(400)
-        .expectBodyContains("You've already applied to register_test")
+        .expectBodyContains("You've already applied to " + tourn_1)
         .toss();
 
     frisby.create("enter a user as someone else")
-        .post(API + "register_test/register/register_test_player_2")
-        .addHeader("Authorization", injector.auth("register_test_player_1"))
+        .post(API + tourn_1 + "/register/" + player_2)
+        .addHeader("Authorization", injector.auth(player_1))
         .expectStatus(403)
         .expectBodyContains("Permission denied")
         .toss();
 
     frisby.create("enter user as superuser")
-        .post(API + "register_test/register/register_test_player_2")
+        .post(API + tourn_1 + "/register/" + player_2)
         .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(200)
         .expectBodyContains("Application Submitted")
         .after(function(){
             frisby.create("check they are entered")
-                .get(API + "register_test/entry/")
+                .get(API + tourn_1 + "/entry/")
                 .expectStatus(200)
                 .expectJSON(
-                    ["register_test_player_1", "register_test_player_2"])
+                    [player_1, player_2])
                 .toss();
         })
         .toss();
 
     frisby.create("enter a non-user")
-        .post(API + "register_test/register/noone")
+        .post(API + tourn_1 + "/register/noone")
         .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(400)
         .expectBodyContains("Check username and tournament")
         .toss();
 
     frisby.create("malformed")
-        .post(API + "register_test/register")
+        .post(API + tourn_1 + "/register")
         .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(404)
         .toss();
