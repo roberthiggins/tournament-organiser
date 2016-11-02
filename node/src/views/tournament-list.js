@@ -12,12 +12,13 @@ var TournamentList = React.createClass({
     },
     render: function() {
 
-        var tournList = this.state.tournaments.map(function(tournament, idx) {
+        var tournList = this.state.tournaments.map(function(tourn, idx) {
             return (
                 <li key={idx}>
-                    <a href={"/tournament/" + tournament.name}>
-                        {tournament.name} - {tournament.date}
+                    <a href={"/tournament/" + tourn.name}>
+                        {tourn.name}
                     </a>
+                     - Date: {tourn.date}, Confirmed Entries: {tourn.entries}
                 </li>
             );
         });
