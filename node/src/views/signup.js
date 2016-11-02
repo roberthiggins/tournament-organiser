@@ -15,7 +15,7 @@ var SignupForm = React.createClass({
                     <label htmlFor="username">Username:</label>
                     <input type="text" name="username" maxLength="30"
                            id="username" />
-                    <span className="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.</span>
+                    <div className="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.</div>
                 </div>
 
                 <div>
@@ -31,7 +31,7 @@ var SignupForm = React.createClass({
                 <div>
                     <label htmlFor="password2">Password confirmation:</label>
                     <input type="password" name="password2" id="password2" />
-                    <span className="helptext">Enter the same password as before, for verification.</span>
+                    <div className="helptext">Enter the same password as before, for verification.</div>
                 </div>
 
                 <button type="submit">Sign Up</button>
