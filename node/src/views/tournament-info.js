@@ -83,6 +83,7 @@ var TournamentInfoPage = React.createClass({
 
         return (
             <div>
+                <h2>Tournament Information</h2>
                 <p>{this.state.successText}</p>
                 <p>{this.state.error}</p>
                 {infoWidget}
