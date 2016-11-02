@@ -2,7 +2,14 @@ describe("Test seeing and registering for a tournament", function () {
     "use strict";
     var frisby = require("frisby"),
         API = process.env.API_ADDR + "tournament/",
-        injector = require("./data_injector");
+        injector = require("./data_injector"),
+        asJSON = function(date, name, rounds) {
+            return {
+                date: date,
+                name: name,
+                rounds: rounds
+            };
+        };
 
     injector.createTournament("register_test", "2222-06-01");
     injector.createUser("register_test_player_1");
@@ -20,22 +27,22 @@ describe("Test seeing and registering for a tournament", function () {
                 rounds: Number
             })
         .expectJSON("tournaments", [
-            {date: "1985-01-27", name: "draw_test",             rounds: 2},
-            {date: "2095-10-10", name: "enter_score_test",      rounds: 1},
-            {date: "2095-07-02", name: "entry_info_test",       rounds: 0},
-            {date: "2095-07-03", name: "entry_list_test",       rounds: 0},
-            {date: "2095-07-04", name: "entry_list_test_empty", rounds: 0},
-            {date: "2095-07-01", name: "mission_test",          rounds: 3},
-            {date: "2095-08-12", name: "next_game_test",        rounds: 2},
-            {date: "2432-03-17", name: "no_rounds_test",        rounds: 0},
-            {date: "2095-06-01", name: "northcon_2095",         rounds: 0},
-            {date: "2095-07-06", name: "permission_test",       rounds: 0},
-            {date: "1643-01-27", name: "rank_test",             rounds: 2},
-            {date: "2222-06-01", name: "register_test",         rounds: 0},
-            {date: "2095-07-07", name: "round_test",            rounds: 2},
-            {date: "2163-09-15", name: "schedule_test",         rounds: 2},
-            {date: "2063-03-17", name: "start_test",            rounds: 1},
-            {date: "9999-12-31", name: "t_create_test",         rounds: 3}])
+            asJSON("1985-01-27", "draw_test",             2),
+            asJSON("2095-10-10", "enter_score_test",      1),
+            asJSON("2095-07-02", "entry_info_test",       0),
+            asJSON("2095-07-03", "entry_list_test",       0),
+            asJSON("2095-07-04", "entry_list_test_empty", 0),
+            asJSON("2095-07-01", "mission_test",          3),
+            asJSON("2095-08-12", "next_game_test",        2),
+            asJSON("2432-03-17", "no_rounds_test",        0),
+            asJSON("2095-06-01", "northcon_2095",         0),
+            asJSON("2095-07-06", "permission_test",       0),
+            asJSON("1643-01-27", "rank_test",             2),
+            asJSON("2222-06-01", "register_test",         0),
+            asJSON("2095-07-07", "round_test",            2),
+            asJSON("2163-09-15", "schedule_test",         2),
+            asJSON("2063-03-17", "start_test",            1),
+            asJSON("9999-12-31", "t_create_test",         3)])
         .toss();
 
     frisby.create("enter a user")
