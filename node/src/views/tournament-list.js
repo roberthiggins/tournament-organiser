@@ -4,7 +4,7 @@ var TournamentList = React.createClass({
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
-                this.setState({tournaments: JSON.parse(result).tournaments});
+                this.setState(result);
             }.bind(this));
     },
     componentWillUnmount: function() {
