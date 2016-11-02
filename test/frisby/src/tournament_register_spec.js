@@ -49,8 +49,7 @@ describe("Test seeing and registering for a tournament", function () {
 
     frisby.create("enter a user")
         .post(API + "register_test/register/register_test_player_1")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("register_test_player_1:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("register_test_player_1"))
         .expectStatus(200)
         .expectBodyContains("Application Submitted")
         .after(function(){
@@ -64,24 +63,21 @@ describe("Test seeing and registering for a tournament", function () {
 
     frisby.create("enter a user a second time")
         .post(API + "register_test/register/register_test_player_1")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("register_test_player_1:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("register_test_player_1"))
         .expectStatus(400)
         .expectBodyContains("You've already applied to register_test")
         .toss();
 
     frisby.create("enter a user as someone else")
         .post(API + "register_test/register/register_test_player_2")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("register_test_player_1:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("register_test_player_1"))
         .expectStatus(403)
         .expectBodyContains("Permission denied")
         .toss();
 
     frisby.create("enter user as superuser")
         .post(API + "register_test/register/register_test_player_2")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("superuser:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(200)
         .expectBodyContains("Application Submitted")
         .after(function(){
@@ -96,16 +92,14 @@ describe("Test seeing and registering for a tournament", function () {
 
     frisby.create("enter a non-user")
         .post(API + "register_test/register/noone")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("superuser:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(400)
         .expectBodyContains("Check username and tournament")
         .toss();
 
     frisby.create("malformed")
         .post(API + "register_test/register")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("superuser:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(404)
         .toss();
 });
