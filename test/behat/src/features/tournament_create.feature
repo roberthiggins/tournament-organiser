@@ -8,24 +8,19 @@ Feature: Create a Tournament
 
     @javascript
     Scenario: I try to navigate to the page via the front page
-        Given I am on "/devindex"
+        Given I am on "/"
         When I wait for "Create a Tournament" to appear
         When I follow "Create a Tournament"
-        Then I should see "add a tournament here" appear
+        Then I should see "Create Tournament" appear
         Then I should see "Name" appear
 
     @javascript
     Scenario: I try to navigate to the page via the URL
-        Given I am on "/tournament/create"
-        Then I should see "You can add a tournament here" appear
-        Then I should see "Tournament Name:" appear
-        Then I should see "Tournament Date:" appear
-        Then I should see "Number of Rounds:" appear
+        Given I visit the tournament creation page
 
     @javascript
     Scenario: I make a tournament using all the values
-        Given I am on "/tournament/create"
-        Then I should see "You can add a tournament here" appear
+        Given I visit the tournament creation page
         When I fill in "name" with "test_tournament_creation"
         When I fill in "date" with "9999-12-31"
         When I fill in "rounds" with "1"
@@ -40,8 +35,7 @@ Feature: Create a Tournament
 
     @javascript
     Scenario: I make a tournament using the minimum values
-        Given I am on "/tournament/create"
-        Then I should see "You can add a tournament here" appear
+        Given I visit the tournament creation page
         When I fill in "name" with "test_tournament_creation_2"
         When I fill in "date" with "9999-12-31"
         When I fill in "rounds" with ""
@@ -50,13 +44,12 @@ Feature: Create a Tournament
         Then I should see "Tournament created!" appear
         Then I should see "Name: test_tournament_creation" appear
         Then I should see "Date: 9999-12-31" appear
-        Then I should not see "Rounds"
-        Then I should not see "Score Categories"
+        Then I should not see "Rounds:"
+        Then I should not see "Score Categories:"
 
     @javascript
     Scenario Outline: Valid and invalid values
-        Given I am on "/tournament/create"
-        When I wait for "You can add a tournament here" to appear
+        Given I visit the tournament creation page
         When I fill in "name" with "<name>"
         When I fill in "date" with "<date>"
         When I press "Create"

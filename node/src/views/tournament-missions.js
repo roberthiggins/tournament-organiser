@@ -78,6 +78,7 @@ var TournamentMissionsPage = React.createClass({
     render: function() {
         return (
             <div>
+                <h2>Missions</h2>
                 {this.state.message ?
                     <div>{this.state.message}</div> :
                     <MissionForm submitHandler={this.handleSubmit} />}

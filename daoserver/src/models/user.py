@@ -87,17 +87,17 @@ class User(object):
         """
         categories = [
             self.get_play_actions(),
-            self.get_entry_actions(),
+            self.get_account_actions(),
             self.get_organiser_actions(),
-            self.get_admin_actions()
+            self.get_feedback_actions()
         ]
 
         return [x for x in strip_none(categories) if len(x['actions']) > 0]
 
-    def get_admin_actions(self):
+    def get_feedback_actions(self):
         """Get the admin actions the user can perform"""
         return {
-            'title': 'Administrivia',
+            'title': 'Feedback',
             'actions': strip_none([
                 {'text': 'Place Feedback', 'action': 'place_feedback'},
             ])
@@ -116,17 +116,17 @@ class User(object):
                                    self.get_dao().last_name).strip()
         return full_name if full_name is not '' else self.username
 
-    def get_entry_actions(self):
+    def get_account_actions(self):
         """Basic user actions for viewing and entering tournaments"""
 
         return {
-            'title': 'Enter a Tournament',
+            'title': 'Account',
             'actions': strip_none([
-                {'text': 'See a list of tournaments',
-                 'action': 'tournament_list'},
                 {'text': 'See your user details',
                  'action': 'user_details',
                  'username': self.username},
+                {'text': 'Logout',
+                 'action': 'logout'},
             ])
         }
         # Get applications to update
@@ -186,7 +186,7 @@ class User(object):
             + set_rounds + set_cats + set_mission_actions
 
         return {
-            'title': 'Organise a Tournament',
+            'title': 'Organise',
             'actions': strip_none(actions)
         }
 
@@ -195,7 +195,7 @@ class User(object):
 
         last_tourn = self.get_last_tournament()
         next_tourn = self.get_next_tournament()
-        next_game = {'text': 'Get next game for {}'.format(self.username),
+        next_game = {'text': 'Get next game',
                      'action': 'next_game',
                      'tournament': next_tourn.name} \
             if next_tourn is not None else None
@@ -211,13 +211,13 @@ class User(object):
                  } for x in tourn_rounds]
 
         submits = [
-            {'text': 'Submit a tournament score for {} entry {}'.\
-                format(next_tourn.name, self.username),
+            {'text': 'See upcoming tournaments',
+             'action': 'tournament_list'},
+            {'text': 'Submit a tournament score for {}'.format(next_tourn.name),
              'action': 'enter_tournament_score',
              'tournament': next_tourn.name,
              'username': self.username} if next_tourn is not None else None,
-            {'text': 'Submit a game score for {} entry {}'.\
-                format(next_tourn.name, self.username),
+            {'text': 'Submit a game score for {}'.format(next_tourn.name),
              'action': 'enter_game_score',
              'tournament': next_tourn.name,
              'username': self.username} if next_tourn is not None else None,
@@ -239,7 +239,7 @@ class User(object):
         #  'action': 'see_previous_games'}
 
         return {
-            'title': 'Play in a Tournament',
+            'title': 'Play',
             'actions': strip_none([next_game] + draws + submits)
         }
 

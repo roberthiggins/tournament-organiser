@@ -11,7 +11,6 @@ var InputWidget = React.createClass({
 
                 <div>{this.props.error}</div>
                 <div>
-                    <label htmlFor="feedback">Feedback:</label>
                     <textarea name="feedback"
                               id="feedback"
                               rows="10"
@@ -47,6 +46,7 @@ var FeedbackWidget = React.createClass({
     render: function() {
         return (
             <div>
+                <h2>Feedback</h2>
                 {
                     this.state.successText ?
                         <div>{this.state.successText}</div>

@@ -100,7 +100,7 @@ class FeatureContext extends MinkContext
         $this->fillField('username', $username);
         $this->fillField('password', $password);
         $this->pressButton('Login');
-        $this->iWaitForTextToAppear('Basic behaviour');
+        $this->iWaitForTextToAppear('Welcome to the Tournament Organiser');
     }
 
     /**
@@ -112,6 +112,17 @@ class FeatureContext extends MinkContext
     }
 
     /**
+    * @Given /^I enter game score "([^"]*)" for entry "([^"]*)" in tournament "([^"]*)"$/
+    */
+    public function iEnterGameScore($score, $user, $tourn) {
+        $this->visit('/tournament/'.$tourn.'/entry/'.$user.'/entergamescore');
+        $this->iWaitForTextToAppear('Enter Score');
+        $this->fillField('value', $score);
+        $this->pressButton('Enter Score');
+        $this->iWaitForTextToAppear('Score entered for '.$user.': '.$score);
+    }
+
+    /**
     * @Given /^I fill category (\d+) with "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)"$/
     */
     public function iSetDefaultCategories($pos, $name, $per, $min, $max) {
@@ -119,5 +130,31 @@ class FeatureContext extends MinkContext
         $this->fillField($pos.'_percentage', $per);
         $this->fillField($pos.'_min_val', $min);
         $this->fillField($pos.'_max_val', $max);
+    }
+
+    /**
+    * @Given /^I sign up "([^"]*)"$/
+    */
+    public function iSignUp($name) {
+        $this->visit('/signup');
+        $this->iWaitForTextToAppear('Username');
+        $this->fillField('username', $name);
+        $this->fillField('email', $name.'@foobar.com');
+        $this->fillField('password1', $name.'_password');
+        $this->fillField('password2', $name.'_password');
+        $this->pressButton('Sign Up');
+        $this->iWaitForTextToAppear('Account created');
+    }
+
+    /**
+    * @Given /^I visit the tournament creation page$/
+    */
+    public function iVisitTournamentCreationPage() {
+        $this->visit('/tournament/create');
+        $this->iWaitForTextToAppear('Create Tournament');
+        $this->iWaitForTextToAppear('Tournament Name:');
+        $this->iWaitForTextToAppear('Tournament Date:');
+        $this->iWaitForTextToAppear('(Optional) Number of Rounds:');
+        $this->iWaitForTextToAppear('(Optional) Add Score Categories:');
     }
 }

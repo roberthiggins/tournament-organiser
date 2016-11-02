@@ -8,9 +8,9 @@ Feature: Register for a Tournament
 
     @javascript
     Scenario: I visit the register page from the front page
-        Given I am on "/devindex"
-        When I wait for "See a list of tournaments" to appear
-        When I follow "See a list of tournaments"
+        Given I am on "/"
+        When I wait for "See upcoming tournaments" to appear
+        When I follow "See upcoming tournaments"
         Then I should see "register_test_1 - 2222-06-01" appear
         When I follow "register_test_1 - 2222-06-01"
         Then I should see "Apply to play in register_test_1" appear

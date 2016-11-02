@@ -6,6 +6,7 @@ html(lang=en)
             | Tournament Organiser
             |  
             = ' ' + subtitle? subtitle : ''
+        link(href='/style.css', rel='stylesheet', type='text/css')
     body
         div#container
             div#header
@@ -18,5 +19,17 @@ html(lang=en)
                 div#menu.menu
                 div#clear
             div#main_content_bottom
+            div#footer
+                strong
+                    | Copyright &copy; 2016
+                |  | 
+                a(href='www.kingsofwar.co.nz')
+                    | www.kingsofwar.co.nz
+                |  | 
+                b
+                    | Design by 
+                a(href='http://www.pikanai.com')
+                    | Pikanai.com
         if src_loc
             script(type='text/javascript', src=src_loc, charset=utf-8)
+        script(type='text/javascript', src='/menu.js', charset=utf-8)

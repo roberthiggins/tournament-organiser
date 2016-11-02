@@ -11,7 +11,7 @@ var UserTask = React.createClass({
 
         return (
             <li>
-                <a href={this.props.userAction.href}>
+                <a className="menu_link" href={this.props.userAction.href}>
                     {this.props.userAction.text}
                 </a>
             </li>
@@ -31,25 +31,21 @@ var NamedList = React.createClass({
                 );
             });
 
-        return (
-            <div className="userAction">
-                <h2 className="actionGroup">
-                    {this.props.title}
-                </h2>
-                <ul>
-                    {listItems}
-                </ul>
-            </div>
-        );
+        return (<div>
+            <div className="menu_title">{this.props.title}</div>
+            <ul>
+                {listItems}
+            </ul>
+        </div>);
     }
 });
 
-var UserTaskList = React.createClass({
+var UserActionList = React.createClass({
     getInitialState: function() {
         return {lists: []};
     },
     componentDidMount: function() {
-        this.serverRequest = $.get(window.location + "/content",
+        this.serverRequest = $.get("/menu/content",
             function (result) {
                 this.setState({lists: result});
             }.bind(this));
@@ -64,19 +60,11 @@ var UserTaskList = React.createClass({
                            key={idx} />
             );
         });
-
-        return (
-            <div className="userTaskList">
-                <h2>
-                    Basic behaviour for players as per documentation in the roles section.
-                </h2>
-                {namedLists}
-           </div>
-        );
+        return (<div>{namedLists}</div>);
     }
 });
 
 ReactDOM.render(
-    <UserTaskList />,
-    document.getElementById("content")
+    <UserActionList />,
+    document.getElementById("menu")
 );

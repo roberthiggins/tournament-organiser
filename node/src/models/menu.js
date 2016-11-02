@@ -1,6 +1,25 @@
-exports.transform = function(responseFromDAO) {
-    var asJSON = JSON.parse(responseFromDAO),
-        slug = function(tournament, entry, suffix) {
+exports.defaultMenu = function() {
+    var defaultActions = [
+        {
+            title: "Account",
+            actions: [
+                {text: "Sign up", action: "sign_up"},
+                {text: "Login", action: "login"}
+            ]
+        },
+        {
+            title: "Play",
+            actions: [
+                {text: "See upcoming tournaments", action: "tournament_list"}
+            ]
+        },
+    ];
+
+    return exports.transform(defaultActions);
+};
+
+exports.transform = function(asJSON) {
+    var slug = function(tournament, entry, suffix) {
             var slug = "";
             if (tournament) {
                 slug = slug + "/tournament/" + tournament;
@@ -37,6 +56,12 @@ exports.transform = function(responseFromDAO) {
                 case "get_tournament_entries":
                     act.href = slug(act.tournament, null, "entries");
                     break;
+                case "login":
+                    act.href = slug(null, null, "login");
+                    break;
+                case "logout":
+                    act.href = slug(null, null, "logout");
+                    break;
                 case "next_game":
                     act.href = slug(act.tournament, act.username, "nextgame");
                     break;
@@ -54,6 +79,9 @@ exports.transform = function(responseFromDAO) {
                     break;
                 case "set_score_categories":
                     act.href = slug(act.tournament, null, "categories");
+                    break;
+                case "sign_up":
+                    act.href = slug(null, null, "signup");
                     break;
                 case "tournament_list":
                     act.href = slug(null, null, "tournaments");

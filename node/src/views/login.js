@@ -19,7 +19,7 @@ var LoginWidget = React.createClass({
             password: password
             },
             function success() {
-                window.location.replace(getNext() || "/devindex");
+                window.location.replace(getNext() || "/");
                 return false;
             })
             .fail(function (res) {

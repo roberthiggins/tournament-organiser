@@ -27,7 +27,7 @@ Feature: Login
         When I fill in "username" with "charlie_murphy"
         When I fill in "password" with "password"
         When I press "Login"
-        Then I should see "Basic behaviour for players as per" appear
+        Then I should see "Welcome to the Tournament Organiser" appear
 
     @javascript
     Scenario Outline: I try to log in
@@ -55,5 +55,5 @@ Feature: Login
         When I fill in "username" with "charlie_murphy"
         When I fill in "password" with "password"
         When I press "Login"
-        When I wait for "Enter a Tournament" to appear
-        Then I should be on "/devindex"
+        When I wait for "Welcome to the Tournament Organiser" to appear
+        Then I should be on "/"
