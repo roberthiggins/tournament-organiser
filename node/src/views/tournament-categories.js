@@ -7,7 +7,12 @@ var TournamentCategoriesPage = React.createClass({
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
-            function (res) { this.setState(res); }.bind(this));
+            function(res) {
+                this.setState(res);
+                }.bind(this))
+            .fail(function(res) {
+                this.setState(res.responseJSON);
+                }.bind(this));
     },
     componentWillUnmount: function() {
         this.serverRequest.abort();
@@ -31,21 +36,22 @@ var TournamentCategoriesPage = React.createClass({
             }.bind(this));
     },
     render: function() {
+
+        var widget = this.state.successMsg ?
+            <div>{this.state.successMsg}</div> :
+            <form onSubmit={this.handleSubmit}>
+                <div>{this.state.instructions}</div>
+                {this.state.categories.length ?
+                    <Category.inputCategoryList
+                        changeHandler={this.handleChange}
+                        categories={this.state.categories}/> :
+                    null}
+                <button type="submit">Set</button>
+            </form>;
         return (
             <div>
                 <h2>Score Categories</h2>
-                {this.state.error ? <div>{this.state.error}</div> : null}
-                {this.state.successMsg ?
-                    <div>{this.state.successMsg}</div> :
-                    <form onSubmit={this.handleSubmit}>
-                        <div>{this.state.instructions}</div>
-                        {this.state.categories.length ?
-                            <Category.inputCategoryList
-                                changeHandler={this.handleChange}
-                                categories={this.state.categories}/> :
-                            null}
-                        <button type="submit">Set</button>
-                    </form>}
+                {this.state.error ? <div>{this.state.error}</div> : widget}
             </div>
         );
     }

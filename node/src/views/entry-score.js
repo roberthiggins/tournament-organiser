@@ -10,7 +10,7 @@ var EnterScoreForm = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.props.submitHandler}>
-                <div>
+                <div className="form_field">
                     <label htmlFor="value">Score:</label>
                     <input type="text" name="value" id="value" />
                 </div>

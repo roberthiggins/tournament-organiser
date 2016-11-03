@@ -21,7 +21,8 @@ class TournamentEntry(db.Model):
     player_id = db.Column(db.String(30), db.ForeignKey(Account.username))
     tournament_id = db.Column(db.String(50), db.ForeignKey(Tournament.name))
 
-    tournament = db.relationship(Tournament, backref='entries')
+    tournament = db.relationship(Tournament,
+                                 backref=db.backref('entries', lazy='dynamic'))
     account = db.relationship(Account, backref='entries')
 
     def __init__(self, player_id, tournament_id, game_history=None):

@@ -2,6 +2,7 @@
 var TournamentInfo = React.createClass({
     propTypes: {
         name: React.PropTypes.string.isRequired,
+        entries: React.PropTypes.Number,
         date: React.PropTypes.string
     },
     render: function() {
@@ -10,6 +11,7 @@ var TournamentInfo = React.createClass({
                 <ul>
                     <li>Name: {this.props.name}</li>
                     <li>Date: {this.props.date || "N/A"}</li>
+                    <li>Confirmed Entries: {this.props.entries || 0}</li>
                 </ul>
             </div>
         );
@@ -66,9 +68,10 @@ var TournamentInfoPage = React.createClass({
 
         var infoWidget = this.state.name && !this.state.successText ?
                  <TournamentInfo name={this.state.name}
+                                 entries={this.state.entries}
                                  date={this.state.date} />
                  : null,
-            applyWidget = this.state.name && !this.state.successText ?
+            applyWidget = infoWidget && !this.state.user_entered ?
                 <form onSubmit={this.handleSubmit}>
                     <input type="hidden" value={this.state.name}
                            name="tournament" />
@@ -80,10 +83,13 @@ var TournamentInfoPage = React.createClass({
 
         return (
             <div>
+                <h2>Tournament Information</h2>
                 <p>{this.state.successText}</p>
                 <p>{this.state.error}</p>
                 {infoWidget}
                 {applyWidget}
+                {this.state.user_entered ?
+                    <p>You have entered this tournament</p> : null}
             </div>
         );
     }

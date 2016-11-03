@@ -13,22 +13,22 @@ var TournamentDetailsWidget = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.props.handleSubmit}>
-                <div>
+                <div className="form_field">
                     <label htmlFor="name">Tournament Name:</label>
                     <input type="text" name="name" id="name" />
                 </div>
 
-                <div>
+                <div className="form_field">
                     <label htmlFor="date">Tournament Date:</label>
                     <input type="text" name="date" id="date" />
                 </div>
-                <div>
+                <div className="form_field">
                     <Inputs.textField value={this.props.details.rounds}
                         id="rounds"
                         name="(Optional) Number of rounds"
                         changeHandler={this.props.handleRoundChange}/>
                 </div>
-                <div>
+                <div className="form_field">
                     <div>(Optional) Add Score Categories:</div>
                     <CategoryComponent.inputCategoryList
                         changeHandler={this.props.handleCategoryChange}

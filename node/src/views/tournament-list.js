@@ -4,7 +4,7 @@ var TournamentList = React.createClass({
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
-                this.setState({tournaments: JSON.parse(result).tournaments});
+                this.setState(result);
             }.bind(this));
     },
     componentWillUnmount: function() {
@@ -12,12 +12,14 @@ var TournamentList = React.createClass({
     },
     render: function() {
 
-        var tournList = this.state.tournaments.map(function(tournament, idx) {
+        var tournList = this.state.tournaments.map(function(tourn, idx) {
             return (
                 <li key={idx}>
-                    <a href={"/tournament/" + tournament.name}>
-                        {tournament.name} - {tournament.date}
+                    <a href={"/tournament/" + tourn.name}>
+                        {tourn.name}
                     </a>
+                    {tourn.user_entered ? <strong> Entered </strong> : null}
+                     - Date: {tourn.date}, Confirmed Entries: {tourn.entries}
                 </li>
             );
         });

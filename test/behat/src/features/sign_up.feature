@@ -12,7 +12,6 @@ Feature: Sign up
         Examples:
             | base  |button         |
             |       |Sign up        |
-            | login |Create Account |
 
     @javascript
     Scenario Outline: I sign up with some new usernames

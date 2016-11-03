@@ -11,13 +11,15 @@ Feature: Register for a Tournament
         Given I am on "/"
         When I wait for "See upcoming tournaments" to appear
         When I follow "See upcoming tournaments"
-        Then I should see "register_test_1 - 2222-06-01" appear
-        When I follow "register_test_1 - 2222-06-01"
+        Then I should see "register_test_1" appear
+        When I follow "register_test_1"
         Then I should see "Apply to play in register_test_1" appear
 
     @javascript
     Scenario: I visit the register page via the URL
         Given I am on "/tournament/register_test_1"
+        Then I should see "Date: 2222-06-01" appear
+        Then I should see "Confirmed Entries: 0" appear
         Then I should see "Apply to play in register_test_1" appear
 
     @javascript
@@ -33,7 +35,11 @@ Feature: Register for a Tournament
             | tournament      | response                                     |
             | register_test_1 | Application submitted                        |
             | register_test_2 | Application submitted                        |
-            | register_test_1 | You've already applied to register_test_1    |
+
+    @javascript
+    Scenario: I try to apply to a tournament twice
+        Given I am on "/tournament/register_test_1"
+        Then I should see "You have entered this tournament" appear
 
     @javascript
     Scenario: I try to apply to a clashing tournament
@@ -41,3 +47,8 @@ Feature: Register for a Tournament
         When I wait for "Apply to play in register_test_3" to appear
         When I press "Apply to play in register_test_3"
         Then I should see "register_test_3 clashes with register_test_2" appear
+
+    @javascript
+    Scenario: I check the number of entries
+        Given I am on "/tournament/register_test_1"
+        Then I should see "Confirmed Entries: 1" appear

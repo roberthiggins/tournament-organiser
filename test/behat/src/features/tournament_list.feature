@@ -11,11 +11,15 @@ Feature: See upcoming tournaments
         When I follow "See upcoming tournaments"
         Then I should be on "/tournaments"
         Then I should see "Upcoming Tournaments" appear
-        Then I should see "northcon_2095 - 2095-06-01" appear
+        Then I should see "northcon_2095" appear
+        Then I should see "Date: 2095-06-01" appear
+        Then I should see "Entries: 0" appear
 
     @javascript
     Scenario: I visit the page via the URL
         Given I am on "/tournaments"
         Then I should be on "/tournaments"
         Then I should see "Upcoming Tournaments" appear
-        Then I should see "northcon_2095 - 2095-06-01" appear
+        Then I should see "northcon_2095" appear
+        Then I should see "Date: 2095-06-01" appear
+        Then I should see "Entries: 0" appear

@@ -117,3 +117,13 @@ a.menu_link:hover {
     font-weight: bold;
     font-style: italic
 }
+
+/* FORMS */
+form div.form_field {
+    padding-bottom: 5px;
+}
+
+form div.category {
+    border-bottom: 1px solid #8c8484;
+    padding-top: 5px;
+}

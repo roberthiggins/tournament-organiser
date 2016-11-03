@@ -14,7 +14,7 @@ router.route("/tournaments/content")
     .get(function(req, res) {
         DAOAmbassador.getFromDAORequest(req, res, "/tournament/",
             function(result) {
-                res.status(200).json(result);
+                res.status(200).json(JSON.parse(result));
             });
     });
 

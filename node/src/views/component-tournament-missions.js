@@ -11,7 +11,7 @@ var MissionField = React.createClass({
     },
     render: function() {
         return (
-            <div>
+            <div className="form_field">
                 <label htmlFor={this.props.id}>{this.props.name}:</label>
                 <input  type="text"
                         name={this.props.id}

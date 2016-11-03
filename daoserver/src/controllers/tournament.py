@@ -73,9 +73,15 @@ def list_tournaments():
     Returns json. The only key is 'tournaments' and the value is a list of
     dicts - {name: '', date, 'YY-MM-DD', rounds: 1}
     """
+    user = getattr(request.authorization, 'username', None)
     # pylint: disable=no-member
-    details = [{'name': x.name, 'date': x.date, 'rounds': x.rounds.count()}
-               for x in TournamentDAO.query.all()]
+    details = [{
+        'name': x.name,
+        'date': x.date,
+        'rounds': x.rounds.count(),
+        'entries': x.entries.count(),
+        'user_entered': x.entries.filter_by(player_id=user).count() == 1
+    } for x in TournamentDAO.query.all()]
 
     return {'tournaments' : sorted(details, key=lambda to: to['name'])}
 
@@ -102,7 +108,11 @@ def tournament_details():
     GET to get details about a tournament. This includes entrants and format
     information
     """
-    return g.tournament.details()
+    user = getattr(request.authorization, 'username', None)
+    details = g.tournament.details()
+    details['user_entered'] = g.tournament.get_dao().entries.\
+        filter_by(player_id=user).count() == 1
+    return details
 
 @TOURNAMENT.route('/<tournament_id>', methods=['POST'])
 @text_response

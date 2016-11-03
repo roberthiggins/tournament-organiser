@@ -9,14 +9,14 @@ var Checkbox = React.createClass({
     },
     render: function() {
         return (
-            <span>
+            <div className="form_field">
                 <label htmlFor={this.props.id}>{this.props.name}:</label>
                 <input  type="checkbox"
                         name={this.props.id}
                         id={this.props.id}
                         checked={this.props.checked}
                         onChange={this.props.changeHandler} />
-            </span>
+            </div>
         );
     }
 });
@@ -31,14 +31,14 @@ var TextField = React.createClass({
     },
     render: function() {
         return (
-            <span>
+            <div className="form_field">
                 <label htmlFor={this.props.id}>{this.props.name}:</label>
                 <input  type="text"
                         name={this.props.id}
                         id={this.props.id}
                         onChange={this.props.changeHandler}
                         value={this.props.value } />
-            </span>
+            </div>
         );
     }
 });

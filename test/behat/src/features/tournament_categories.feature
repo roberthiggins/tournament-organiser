@@ -112,3 +112,8 @@ Feature: Modify the scoring categories for a tournament
             | None       | Percentage must be an integer (1-100)  |
             | 101        | Percentage must be an integer (1-100)  |
             | 0          | Percentage must be an integer (1-100)  |
+
+    @javascript
+    Scenario: I visit a page for a tournament that doesn't exist
+        Given I am on "/tournament/nonsense/categories"
+        Then I should see "Tournament nonsense not found in database" appear

@@ -13,12 +13,10 @@ Feature: Login
         When I follow "Login"
         Then I should see "Username" appear
         Then I should see "Password" appear
-        Then I should see "Forgot Password" appear
 
         Given I am on "/login"
         Then I should see "Username" appear
         Then I should see "Password" appear
-        Then I should see "Forgot Password" appear
 
     @javascript
     Scenario: I log in with correct details
