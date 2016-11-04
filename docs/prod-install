@@ -64,4 +64,4 @@ This is a guide to how to install everything, form the ground up, in a prod envi
     ./scripts/install_prod
     # Be patient - there can be a bunch of hidden install crap
     sudo service apache2 restart
-    curl http://172.81.179.42:5000/
+    curl http://172.81.179.42/

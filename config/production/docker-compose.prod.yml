@@ -5,25 +5,27 @@ database:
 
 daoserver:
     links:
-        - database
+        - database:database
 #    volumes_from: dbstore
     extends:
         file: docker-compose.base.yml
         service: daoserver
 
+unittestdb:
+    extends:
+        file: docker-compose.base.yml
+        service: unittestdb
+
 unittest:
     links:
-        - database
+        - unittestdb:database
     extends:
         file: docker-compose.base.yml
         service: unittest
 
-webserver:
+node:
     links:
-        - daoserver
-    environment:
-        DEBUG: "False"
-        TEMPLATE_DEBUG: "False"
+        - daoserver:daoserver
     extends:
         file: docker-compose.base.yml
-        service: webserver
+        service: node
