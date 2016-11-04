@@ -2,8 +2,8 @@
 
 SYSTEMS="apitestdb apitestdaoserver apitest"
 # Build all containers and run all tests
-cp config/dev/docker-compose.dev.yml docker-compose.yml
-cp config/dev/docker-passwords.dev.yml docker-passwords.yml
+cp config/dev/docker-compose.yml docker-compose.yml
+cp config/dev/docker-passwords.yml docker-passwords.yml
 docker-compose kill     &> /dev/null
 docker-compose rm -f    &> /dev/null
 

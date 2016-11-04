@@ -12,8 +12,8 @@ services:
 install:
     - pip install pylint
 
-    - cp config/dev/docker-compose.dev.yml ./docker-compose.yml
-    - cp config/dev/docker-passwords.dev.yml ./docker-passwords.yml
+    - cp config/dev/docker-compose.yml ./docker-compose.yml
+    - cp config/dev/docker-passwords.yml ./docker-passwords.yml
     - docker-compose build unittestdb
     - docker-compose up -d unittestdb
     - docker-compose build database daoserver node
