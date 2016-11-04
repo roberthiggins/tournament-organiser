@@ -55,11 +55,9 @@ This is a guide to how to install everything, form the ground up, in a prod envi
     # MAKE/GET THE PROD CONFIG FILES
     # You should do this on your own machine and then scp the file across
     #   - You need to create a passwords file (You can find a starting point in config/dev/docker-passwords.yml )
-    #   - scp config/production/docker-passwords.yml ubuntu@to-prod:~/docker-passwords.yml
-    #   ssh ubuntu@to-prod
-    #   sudo cp docker-passwords.yml /var/www/tournament-organiser/
-
+    scp config/production/docker-passwords.yml ubuntu@to-prod:~/docker-passwords.yml
     ssh ubuntu@to-prod
+    sudo mv docker-passwords.yml /var/www/tournament-organiser/
     cd /var/www/tournament-organiser
     ./scripts/install_prod
     # Be patient - there can be a bunch of hidden install crap

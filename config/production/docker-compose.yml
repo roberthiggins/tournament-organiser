@@ -1,4 +1,5 @@
 database:
+    volumes_from: dbstore
     extends:
         file: docker-compose.base.yml
         service: database
@@ -6,7 +7,6 @@ database:
 daoserver:
     links:
         - database:database
-#    volumes_from: dbstore
     extends:
         file: docker-compose.base.yml
         service: daoserver
