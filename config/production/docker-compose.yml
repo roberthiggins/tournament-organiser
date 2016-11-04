@@ -1,5 +1,6 @@
 database:
-    volumes_from: dbstore
+    volumes_from:
+        - dbstore
     extends:
         file: docker-compose.base.yml
         service: database
