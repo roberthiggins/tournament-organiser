@@ -18,6 +18,15 @@
 
 #! /bin/bash
 
+# Get the latest master
+git fetch -a origin
+git checkout master
+reslog=$(git log HEAD..origin/master --oneline)
+if [[ "${reslog}" != "" ]]
+then
+    git reset --hard origin/master
+fi
+
 # Check if there is an available db store. If not then we make one for
 # persistent volumes.
 EXISTING_DB_STORE=$(docker ps -a | grep "dbstore$" | awk '{print $1}')
