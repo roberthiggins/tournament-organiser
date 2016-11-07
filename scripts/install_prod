@@ -18,6 +18,15 @@
 
 #! /bin/bash
 
+# Get the latest master
+git fetch -a origin
+git checkout master
+reslog=$(git log HEAD..origin/master --oneline)
+if [[ "${reslog}" != "" ]]
+then
+    git reset --hard origin/master
+fi
+
 # Check if there is an available db store. If not then we make one for
 # persistent volumes.
 EXISTING_DB_STORE=$(docker ps -a | grep "dbstore$" | awk '{print $1}')
@@ -26,10 +35,10 @@ then
     docker create -v /dbdata --name dbstore postgres:9.3 bin/true
 fi
 
-cp config/produciton/docker-compose.prod_template.yml docker-compose.yml
+cp config/production/docker-compose.yml docker-compose.yml
 
 ./scripts/install
 
-
 # Non-destructive tests
+docker-compose up -d unittestdb &> /dev/null
 docker-compose run unittest

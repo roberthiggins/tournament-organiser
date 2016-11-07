@@ -3,16 +3,23 @@
 FROM node:4
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
+# Create a nonroot user named app
+RUN useradd --user-group --create-home --shell /bin/false appuser &&\
+  npm install --global npm
+ENV HOME=/home/appuser
+
 # Prepare app directory
-RUN mkdir -p /usr/src/app
-ADD package.json /usr/src/app/
+RUN mkdir -p $HOME/app
+ADD package.json $HOME/app
+RUN chown -R appuser:appuser $HOME/*
+USER appuser
 
 # Install dependencies
-WORKDIR /usr/src/app
+WORKDIR $HOME/app
 RUN npm install
 
 # Build the app
-ADD . /usr/src/app
+ADD . $HOME/app
 RUN npm build
 
 # Expose the app port
