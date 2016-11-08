@@ -6,11 +6,23 @@ if [ ! -f docker-compose.yml ]; then
 fi
 
 # Remove all containers and get a basic install up
+# Where should build output be funnelled?
+ENV=${1:-"prod"}
+if [ "$ENV" == 'dev' ]; then
+    docker-compose kill &> /dev/null
+    docker-compose rm -f &> /dev/null
 
-docker-compose kill     &> /dev/null
-docker-compose rm -f    &> /dev/null
+    docker-compose pull  &> /dev/null
+    docker-compose build &> /dev/null
 
-docker-compose pull     &> /dev/null
-docker-compose build    &> /dev/null
+    docker-compose up -d database daoserver node &> /dev/null
+else
 
-docker-compose up -d database daoserver node &> /dev/null
+    docker-compose kill
+    docker-compose rm -f
+
+    docker-compose pull
+    docker-compose build
+
+    docker-compose up -d database daoserver node
+fi
