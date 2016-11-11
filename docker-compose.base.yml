@@ -77,8 +77,8 @@ systemtestdaoserver:
         service: dbpasswords
 
 systemtest:
-    build: test/behat
-    container_name: behat
+    build: test/web/usability
+    container_name: web_usability
 
 systemtestnode:
     build: node
