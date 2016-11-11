@@ -9,10 +9,10 @@ from models.dao.account import Account as Acc
 from models.dao.tournament_entry import TournamentEntry as Entry
 from models.user import User
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 
 # pylint: disable=no-member,missing-docstring
-class UserTests(DbSimulatingTest):
+class UserTests(AppSimulatingTest):
 
     def setUp(self):
         super(UserTests, self).setUp()

@@ -8,9 +8,9 @@ from testfixtures import compare
 from models.matching_strategy import RoundRobin
 from models.tournament import Tournament
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 
-class DrawStrategyTests(DbSimulatingTest):
+class DrawStrategyTests(AppSimulatingTest):
     """Tests for `matching_strategy.py`."""
 
     def test_get_draw(self):

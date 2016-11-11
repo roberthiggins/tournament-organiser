@@ -7,10 +7,10 @@ from sqlalchemy.exc import IntegrityError
 from models.dao.account import Account
 from models.dao.registration import TournamentRegistration as TReg
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 
 # pylint: disable=no-member,missing-docstring
-class TournamentRegistrations(DbSimulatingTest):
+class TournamentRegistrations(AppSimulatingTest):
 
     def setUp(self):
         super(TournamentRegistrations, self).setUp()

@@ -6,10 +6,10 @@ from testfixtures import compare
 from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 
 # pylint: disable=no-member,missing-docstring,protected-access
-class SetRounds(DbSimulatingTest):
+class SetRounds(AppSimulatingTest):
 
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""

@@ -8,7 +8,7 @@ from models.dao.db_connection import db
 from unit_tests.tournament_injector import TournamentInjector
 
 # pylint: disable=invalid-name,missing-docstring
-class DbSimulatingTest(TestCase):
+class AppSimulatingTest(TestCase):
 
     def create_app(self):
         # pass in test configuration

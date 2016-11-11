@@ -6,10 +6,10 @@ from testfixtures import compare
 
 from models.tournament import Tournament
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 
 # pylint: disable=no-member,missing-docstring
-class TournamentMissionsTests(DbSimulatingTest):
+class TournamentMissionsTests(AppSimulatingTest):
 
     tourn_1 = 'test_missions'
 

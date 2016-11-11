@@ -7,11 +7,11 @@ from testfixtures import compare
 from models.dao.score import ScoreCategory
 from models.tournament import Tournament
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args as cat
 
 # pylint: disable=no-member,missing-docstring
-class ScoreCategoryTests(DbSimulatingTest):
+class ScoreCategoryTests(AppSimulatingTest):
 
     tourn_1 = 'test_score_categories'
 

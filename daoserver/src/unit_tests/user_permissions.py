@@ -11,10 +11,10 @@ ProtObjPerm, AccountProtectedObjectPermission as AccountProtectedObjectPerm
 from models.permissions import PermissionsChecker
 from models.tournament import Tournament
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 
 # pylint: disable=no-member,missing-docstring
-class UserPermissions(DbSimulatingTest):
+class UserPermissions(AppSimulatingTest):
 
     acc_1 = 'test_add_account_creator'
     tourn_1 = 'test_user_permissions_tournament_1'

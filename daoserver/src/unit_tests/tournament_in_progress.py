@@ -5,11 +5,11 @@ from models.dao.registration import TournamentRegistration as Reg
 from models.dao.tournament_entry import TournamentEntry
 from models.tournament import Tournament
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args
 
 # pylint: disable=no-member,missing-docstring
-class TournamentInProgress(DbSimulatingTest):
+class TournamentInProgress(AppSimulatingTest):
 
     def setUp(self):
         super(TournamentInProgress, self).setUp()

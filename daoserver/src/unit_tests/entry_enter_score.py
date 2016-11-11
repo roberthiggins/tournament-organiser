@@ -14,11 +14,11 @@ from models.dao.tournament_round import TournamentRound
 from models.score import is_score_entered
 from models.tournament import Tournament
 
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args as cat
 
 # pylint: disable=no-member,missing-docstring
-class TestScoreEntered(DbSimulatingTest):
+class TestScoreEntered(AppSimulatingTest):
     """Comes from a range of files"""
 
     tourn_1 = 'score_entered_tournament'
@@ -157,7 +157,7 @@ class TestScoreEntered(DbSimulatingTest):
                 and_(TournamentGame.tournament_round_id == round_dao.id,
                      TournamentEntry.id == entry_id)).first()
 
-class EnterScore(DbSimulatingTest):
+class EnterScore(AppSimulatingTest):
 
     player = 'enter_score_account'
     tourn_1 = 'enter_score_tournament'

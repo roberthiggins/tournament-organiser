@@ -13,11 +13,11 @@ from models.dao.tournament_round import TournamentRound
 
 from models.score import is_score_entered
 from models.tournament import Tournament
-from unit_tests.db_simulating_test import DbSimulatingTest
+from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args
 
 # pylint: disable=no-member,missing-docstring
-class TestScoreEntered(DbSimulatingTest):
+class TestScoreEntered(AppSimulatingTest):
 
     tournament_1 = 'score_entered_tournament'
 
