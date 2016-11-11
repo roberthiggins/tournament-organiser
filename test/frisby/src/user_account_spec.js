@@ -1,7 +1,9 @@
+var frisby = require("frisby"),
+    API = process.env.API_ADDR;
+
+
 describe("Signing up and seeing user details", function () {
     "use strict";
-    var frisby = require("frisby"),
-        API = process.env.API_ADDR;
 
     frisby.create("See user details")
         .post(API + "user/sign_up_user", {
@@ -64,7 +66,10 @@ describe("Signing up and seeing user details", function () {
                 .toss();
         })
         .toss();
+});
 
+describe("User Accounts - unhappy path", function () {
+    "use strict";
 
     frisby.create("Malformed")
         .get(API + "user/")
