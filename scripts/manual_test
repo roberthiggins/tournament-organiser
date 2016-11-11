@@ -1,6 +1,6 @@
 #! /bin/bash
 pylint $(find . -iname "*.py")
-eslint node test/frisby
+eslint node test/dao/functionality
 
 # Build all containers and run all tests
 cp config/dev/docker-compose.yml docker-compose.yml
