@@ -7,12 +7,12 @@ cp config/dev/docker-passwords.yml docker-passwords.yml
 docker-compose kill     &> /dev/null
 docker-compose rm -f    &> /dev/null
 
-docker-compose pull $SYSTEMS systemtest  &> /dev/null
-docker-compose build $SYSTEMS systemtest &> /dev/null
-docker-compose up -d $SYSTEMS            &> /dev/null
+docker-compose pull $SYSTEMS systemtest_usability  &> /dev/null
+docker-compose build $SYSTEMS systemtest_usability &> /dev/null
+docker-compose up -d $SYSTEMS                      &> /dev/null
 
 docker exec systemtestdaoserver bash -c '/webapp/wait-for-postgres.sh systemtestdb bash'
 bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
 
-docker-compose run systemtest
+docker-compose run systemtest_usability

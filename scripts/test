@@ -25,4 +25,4 @@ docker-compose run apitest
 # System Tests
 bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
-docker-compose run systemtest
+docker-compose run systemtest_usability

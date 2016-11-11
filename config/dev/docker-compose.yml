@@ -70,10 +70,10 @@ systemtestnode:
         file: docker-compose.base.yml
         service: systemtestnode
 
-systemtest:
+systemtest_usability:
     extends:
         file: docker-compose.base.yml
-        service: systemtest
+        service: systemtest_usability
     links:
         - selenium
         - systemtestdaoserver
