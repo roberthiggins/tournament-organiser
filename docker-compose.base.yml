@@ -56,8 +56,8 @@ apitestdaoserver:
         service: dbpasswords
 
 apitest:
-    build: test/frisby
-    container_name: frisby
+    build: test/dao/functionality
+    container_name: dao_func
 
 # System Test Specific
 systemtestdb:
