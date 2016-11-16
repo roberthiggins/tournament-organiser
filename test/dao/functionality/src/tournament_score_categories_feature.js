@@ -115,6 +115,20 @@ describe("Set categories malformed", function () {
         }, {json: true, inspectOnFailure: true})
         .expectStatus(400)
         .toss();
+
+    frisby.create("Incorrect: duplicate")
+        .post(API, {
+            categories: ["categories_0", "categories_1"],
+            categories_0:
+                injector.jsonCat(null, "cat_t_zero", 10, true, 1, 2, false,
+                    false)
+            categories_1:
+                injector.jsonCat(null, "cat_t_one", 10, true, 1, 2, false,
+                    false)
+            }, {json: true, inspectOnFailure: true})
+        .expectStatus(400)
+        .expectJSON({error: "multiple"})
+        .toss();
 });
 
 describe("Set categories permissions", function () {
