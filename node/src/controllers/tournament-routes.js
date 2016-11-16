@@ -74,7 +74,7 @@ router.route("/tournament/:tournament/content")
                 res.status(200).json(JSON.parse(result));
             },
             function(responseBody) {
-                res.status(200).json({error: responseBody});
+                res.status(400).json({error: responseBody});
             });
     });
 
@@ -183,8 +183,7 @@ router.route("/tournament/:tournament/categories")
         });
 router.route("/tournament/:tournament/categories/content")
     .get(authUser, function(req, res) {
-        var url = "/tournament/" + req.params.tournament +
-            "/score_categories";
+        var url = "/tournament/" + req.params.tournament + "/score_categories";
 
         DAOAmbassador.getFromDAORequest(
             req,
@@ -192,10 +191,9 @@ router.route("/tournament/:tournament/categories/content")
             url,
             function(responseBody) {
                 var responseDict = {
-                        instructions: "Set the score categories for "
-                            + req.params.tournament
-                            + " here. For example, \"Battle\", "
-                            + "\"Sports\", etc.",
+                        instructions: "Set the score categories for " +
+                            req.params.tournament +
+                            " here. For example, \"Battle\", \"Sports\", etc.",
                         tournament: req.params.tournament
                     },
                     categories = JSON.parse(responseBody) || [],
@@ -259,7 +257,15 @@ router.route("/tournament/:tournament/missions")
             },
             postData = {missions: missionList(req.body)};
 
-        DAOAmbassador.postToDAORequest(req, res, url, postData);
+        DAOAmbassador.postToDAORequest(
+            req,
+            res,
+            url,
+            postData,
+            null,
+            function(responseBody) {
+                res.status(400).json({error: responseBody});
+            });
         });
 router.route("/tournament/:tournament/missions/content")
     .get(authUser, function(req, res) {
@@ -277,9 +283,6 @@ router.route("/tournament/:tournament/missions/content")
                                 + " here:"
                 };
                 res.status(200).json(responseDict);
-            },
-            function(responseBody) {
-                res.status(200).json({error: responseBody});
             });
     });
 

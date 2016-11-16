@@ -4,27 +4,14 @@ Feature: Sign up
     I need to be able to sign up
 
     @javascript
-    Scenario Outline: I try to navigate to the sign up page via a button
-        Given I am on "/<base>"
-        When I wait for "<button>" to appear
-        When I follow "<button>"
+    Scenario: I try to navigate to the sign up page via a button
+        Given I am on "/"
+        When I wait for "Sign up" to appear
+        When I follow "Sign up"
         Then I should be on "/signup"
-        Examples:
-            | base  |button         |
-            |       |Sign up        |
 
     @javascript
-    Scenario Outline: I sign up with some new usernames
-        Given I sign up "<username>"
-
-        Examples:
-            | username                       |
-            | Jerry                          |
-            | jerry                          |
-            | longymclongersone_who9foaiss8n |
-
-    @javascript
-    Scenario Outline: I sign up incorrectly
+    Scenario Outline: I see some messages when I try to sign up
         Given I am on "/signup"
         When I wait for "Username" to appear
         When I fill in "username" with "<user>"
@@ -35,13 +22,6 @@ Feature: Sign up
         Then I should see "<response>" appear
 
         Examples:
-            | user  |email  | pword    | confirm   | response                                      |
-            | jerry |a@b.c  | pword123 | pword123  | A user with the username jerry already exists |
-            | jerry |       | pword123 | pword123  | This email does not appear valid              |
-            |       |       |          |           | Please enter a username                       |
-            |       |a@b.c  |          |           | Please enter a username                       |
-            | good  |a@b.c  |          |           | Please enter two matching passwords           |
-            | good  |a@b.c  | pword123 |           | Please enter two matching passwords           |
-            | good  |a@b.c  |          | pword123  | Please enter two matching passwords           |
-            | mr    |a@b.c  | pword123 | pword12   | Please enter two matching passwords           |
-            | mr    |a@b.c  | pword123 | pword1234 | Please enter two matching passwords           |
+            | user       |email | pword    | confirm  | response |
+            | su_test_3  |a@b.c | password | password | Account Created |
+            | su_test_3  |a@b.c | password | password | A user with the username su_test_3 already exists |

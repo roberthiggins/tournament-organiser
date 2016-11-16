@@ -64,7 +64,10 @@ var TournamentDrawPagePage = React.createClass({
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
                 this.setState(result);
-            }.bind(this));
+            }.bind(this))
+            .fail(function(result) {
+                this.setState(result.responseJSON);
+                }.bind(this));
     },
     componentWillUnmount: function() {
         this.serverRequest.abort();
@@ -77,7 +80,7 @@ var TournamentDrawPagePage = React.createClass({
                       mission={this.state.mission}
                       round={this.state.round}
                       tourn={this.state.tournament} />
-            : <div>{msg}</div>;
+                : <div>{msg}</div>;
 
         return (
             <div>{widget}</div>

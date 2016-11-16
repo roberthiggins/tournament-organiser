@@ -25,45 +25,21 @@ var MissionField = React.createClass({
     }
 });
 
-var MissionForm = React.createClass({
+var TournamentMissionsPage = React.createClass({
     getInitialState: function () {
-        return ({message: "", missions: []});
-    },
-    propTypes: {
-        submitHandler: React.PropTypes.func.isRequired
+        return ({error: "", message: "", missions: []});
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
             function (result) {
                 this.setState(result);
-            }.bind(this));
+                }.bind(this))
+            .fail(function(res) {
+                this.setState(res.responseJSON);
+                }.bind(this));
     },
     componentWillUnmount: function() {
         this.serverRequest.abort();
-    },
-    render: function() {
-        var missions = this.state.missions.map(function(mission, idx){
-                return (
-                    <MissionField name={"Round " + (idx + 1)}
-                                  id={"missions_" + idx}
-                                  val={mission}
-                                  key={idx} />);
-            });
-        if (!missions.length) {return null;}
-
-        return (
-            <form onSubmit={this.props.submitHandler}>
-                {this.state.message ? <div>{this.state.message}</div> : null}
-                {missions}
-                <button type="submit">Set</button>
-            </form>
-        );
-    }
-});
-
-var TournamentMissionsPage = React.createClass({
-    getInitialState: function () {
-        return ({message: ""});
     },
     handleSubmit: function (e) {
         e.preventDefault();
@@ -76,12 +52,26 @@ var TournamentMissionsPage = React.createClass({
             });
     },
     render: function() {
+        var missions = this.state.missions.map(function(mission, idx){
+                return (
+                    <MissionField name={"Round " + (idx + 1)}
+                                  id={"missions_" + idx}
+                                  val={mission}
+                                  key={idx} />);
+                }),
+            form = missions.length ?
+                <form onSubmit={this.handleSubmit}>
+                    {missions}
+                    <button type="submit">Set</button>
+                </form>
+                : null;
+
         return (
             <div>
                 <h2>Missions</h2>
-                {this.state.message ?
-                    <div>{this.state.message}</div> :
-                    <MissionForm submitHandler={this.handleSubmit} />}
+                {this.state.message ? <div>{this.state.message}</div> : null}
+                {this.state.error ? <div>{this.state.error}</div> : null}
+                {form}
             </div>
         );
     }

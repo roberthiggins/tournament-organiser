@@ -99,8 +99,8 @@ class Tournament(object):
             - details - dict of keys to put into the DAO
         """
         if self.get_dao() is not None:
-            raise RuntimeError('A tournament with name {} already exists! \
-            Please choose another name'.format(self.tournament_id))
+            raise RuntimeError('A tournament with name {} already exists! ' \
+            'Please choose another name'.format(self.tournament_id))
 
         dao = TournamentDAO(self.tournament_id)
         dao.to_username = details.pop('to_username')
@@ -332,8 +332,8 @@ class Tournament(object):
         rounds = self.get_dao().rounds.count()
 
         if missions is None or len(missions) != rounds:
-            raise ValueError('Tournament {} has {} rounds. \
-                You submitted missions {}'.\
+            raise ValueError('Tournament {} has {} rounds. ' \
+                'You submitted missions {}'.\
                 format(self.tournament_id, rounds, missions))
 
         for i, mission in enumerate(missions):

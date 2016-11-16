@@ -11,10 +11,6 @@ Feature: List Entries for a tournament
         Given I am on "/tournament/ranking_test/entries"
         Then I should see "Entries:" appear
         Then I should see "ranking_test P1" appear
-        Then I should see "ranking_test_player_2" appear
-        Then I should see "ranking_test_player_3" appear
-        Then I should see "ranking_test_player_4" appear
-        Then I should see "ranking_test_player_5" appear
 
     @javascript
     Scenario: A tournament with no entries
@@ -22,12 +18,6 @@ Feature: List Entries for a tournament
         Then I should see "There are no entries yet. Be the first!" appear
         Then I follow "Be the first!"
         Then I am on "/tournament/empty_tournament/register"
-
-    @javascript
-    Scenario: A logged-out user
-        Given I am on "/logout"
-        Then I am on "/tournament/ranking_test/entries"
-        Then I should be on "/login"
 
     @javascript
     Scenario: A non-existent tournament

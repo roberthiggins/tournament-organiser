@@ -48,9 +48,9 @@ def create():
         'first_name': optional_values.get('first_name', None),
         'last_name': optional_values.get('last_name', None),
     })
-    return '<p>Account created! You submitted the following \
-        fields:</p><ul><li>User Name: {}</li><li>Email: {}\
-        </li></ul>'.format(g.user.username, email)
+    return '<p>Account created! You submitted the following fields:</p>' \
+        '<ul><li>User Name: {}</li><li>Email: {}</li></ul>'.\
+        format(g.user.username, email)
 
 @USER.route('', methods=['GET'])
 @requires_auth

@@ -54,8 +54,8 @@ class User(object):
             raise ValueError('Please enter two matching passwords')
 
         if self.exists_in_db:
-            raise ValueError('A user with the username {} already exists! \
-                Please choose another name'.format(self.username))
+            raise ValueError('A user with the username {} already exists! ' \
+                'Please choose another name'.format(self.username))
 
         db.session.add(
             Account(self.username, email, first_name, last_name))
