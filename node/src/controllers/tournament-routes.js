@@ -3,7 +3,8 @@ var Category      = require("../models/score-categories"),
     DAOAmbassador = require("../lib/dao-ambassador"),
     express       = require('express'),
     router        = express.Router(),
-    users         = require("./users");
+    users         = require("./users"),
+    authUser      = [users.injectUserIntoRequest, users.ensureAuthenticated];
 
 
 router.route("/tournaments")
@@ -19,40 +20,33 @@ router.route("/tournaments/content")
     });
 
 router.route("/tournament/create")
-    .get(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res) {
-            res.render("basic", {
-                src_loc: "/tournamentCreate.js",
-                subtitle: "Add a Tournament"
+    .get(authUser, function(req, res) {
+        res.render("basic", {
+            src_loc: "/tournamentCreate.js",
+            subtitle: "Add a Tournament"
             });
         })
-    .post(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res){
-
-            try {
-                var cleanCats = Category.cleanCategories(req.body.categories);
-                DAOAmbassador.postToDAORequest(
-                    req,
-                    res,
-                    "/tournament",
-                    {
-                        inputTournamentName: req.body.name,
-                        inputTournamentDate: req.body.date,
-                        rounds: req.body.rounds || 0,
-                        score_categories: cleanCats
-                    },
-                    function success(result) {
-                        res.status(200).json(JSON.parse(result));
-                    });
-            }
-            catch (err) {
-                res.status(400).json({error: err});
-                return;
-            }
+    .post(authUser, function(req, res){
+        try {
+            var cleanCats = Category.cleanCategories(req.body.categories);
+            DAOAmbassador.postToDAORequest(
+                req,
+                res,
+                "/tournament",
+                {
+                    inputTournamentName: req.body.name,
+                    inputTournamentDate: req.body.date,
+                    rounds: req.body.rounds || 0,
+                    score_categories: cleanCats
+                },
+                function success(result) {
+                    res.status(200).json(JSON.parse(result));
+                });
+        }
+        catch (err) {
+            res.status(400).json({error: err});
+            return;
+        }
         });
 
 router.route("/tournament/:tournament")
@@ -62,16 +56,13 @@ router.route("/tournament/:tournament")
             subtitle: req.params.tournament
         });
     })
-    .post(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res){
-            DAOAmbassador.postToDAORequest(
-                req,
-                res,
-                "/tournament/" + req.params.tournament + "/register/" +
-                req.user.username,
-                {});
+    .post(authUser, function(req, res){
+        DAOAmbassador.postToDAORequest(
+            req,
+            res,
+            "/tournament/" + req.params.tournament + "/register/" +
+            req.user.username,
+            {});
         });
 router.route("/tournament/:tournament/content")
     .get(function(req, res) {
@@ -111,24 +102,18 @@ router.route("/tournament/:tournament/rankings/content")
     });
 
 router.route("/tournament/:tournament/rounds")
-    .get(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res) {
-            res.render("basic", {
-                src_loc: "/tournamentRounds.js",
-                subtitle: "Set Round for " + req.params.tournament
+    .get(authUser, function(req, res) {
+        res.render("basic", {
+            src_loc: "/tournamentRounds.js",
+            subtitle: "Set Round for " + req.params.tournament
             });
         })
-    .post(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res){
-            DAOAmbassador.postToDAORequest(
-                req,
-                res,
-                "/tournament/" + req.params.tournament,
-                {rounds: req.body.rounds});
+    .post(authUser, function(req, res){
+        DAOAmbassador.postToDAORequest(
+            req,
+            res,
+            "/tournament/" + req.params.tournament,
+            {rounds: req.body.rounds});
         });
 router.route("/tournament/:tournament/rounds/content")
     .get(function(req, res) {
@@ -171,41 +156,35 @@ router.route("/tournament/:tournament/round/:round/draw/content")
                 res.status(200).json(responseDict);
             },
             function(responseBody) {
-                res.status(200).json({error: responseBody});
+                res.status(400).json({error: responseBody});
             });
     });
 
 router.route("/tournament/:tournament/categories")
-    .get(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res) {
-            res.render("basic", {
-                src_loc: "/tournamentCategories.js",
-                subtitle: "Set Categories for " + req.params.tournament
+    .get(authUser, function(req, res) {
+        res.render("basic", {
+            src_loc: "/tournamentCategories.js",
+            subtitle: "Set Categories for " + req.params.tournament
             });
         })
-    .post(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res){
-
-            try {
-                var cleanCats = Category.cleanCategories(req.body.categories);
-                DAOAmbassador.postToDAORequest(
-                    req,
-                    res,
-                    "/tournament/" + req.params.tournament,
-                    {score_categories: cleanCats});
-            }
-            catch (err) {
-                res.status(400).json({error: err});
-                return;
-            }
+    .post(authUser, function(req, res){
+        try {
+            var cleanCats = Category.cleanCategories(req.body.categories);
+            DAOAmbassador.postToDAORequest(
+                req,
+                res,
+                "/tournament/" + req.params.tournament,
+                {score_categories: cleanCats});
+        }
+        catch (err) {
+            res.status(400).json({error: err});
+            return;
+        }
         });
 router.route("/tournament/:tournament/categories/content")
-    .get(function(req, res) {
-        var url = "/tournament/" + req.params.tournament + "/score_categories";
+    .get(authUser, function(req, res) {
+        var url = "/tournament/" + req.params.tournament +
+            "/score_categories";
 
         DAOAmbassador.getFromDAORequest(
             req,
@@ -215,7 +194,8 @@ router.route("/tournament/:tournament/categories/content")
                 var responseDict = {
                         instructions: "Set the score categories for "
                             + req.params.tournament
-                            + " here. For example, \"Battle\", \"Sports\", etc.",
+                            + " here. For example, \"Battle\", "
+                            + "\"Sports\", etc.",
                         tournament: req.params.tournament
                     },
                     categories = JSON.parse(responseBody) || [],
@@ -250,46 +230,39 @@ router.route("/tournament/:tournament/categories/content")
     });
 
 router.route("/tournament/:tournament/missions")
-    .get(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res) {
-            res.render("basic", {
-                src_loc: "/tournamentMissions.js",
-                subtitle: "Set Missions for " + req.params.tournament
+    .get(authUser, function(req, res) {
+        res.render("basic", {
+            src_loc: "/tournamentMissions.js",
+            subtitle: "Set Missions for " + req.params.tournament
             });
         })
-    .post(
-        users.injectUserIntoRequest,
-        users.ensureAuthenticated,
-        function(req, res){
+    .post(authUser, function(req, res){
+        var url = "/tournament/" + req.params.tournament,
+            missionList = function(postData) {
 
-            var url = "/tournament/" + req.params.tournament,
-                missionList = function(postData) {
+                var idx = 0,
+                    missions = [],
+                    missionsInPost = true;
 
-                    var idx = 0,
-                        missions = [],
-                        missionsInPost = true;
-
-                    while (missionsInPost) {
-                        var mission = postData["missions_" + idx];
-                        if (typeof mission !== "undefined") {
-                            missions.push(mission);
-                            idx = idx +1;
-                        }
-                        else {
-                            missionsInPost = false;
-                        }
+                while (missionsInPost) {
+                    var mission = postData["missions_" + idx];
+                    if (typeof mission !== "undefined") {
+                        missions.push(mission);
+                        idx = idx +1;
                     }
+                    else {
+                        missionsInPost = false;
+                    }
+                }
 
-                    return missions;
-                },
-                postData = {missions: missionList(req.body)};
+                return missions;
+            },
+            postData = {missions: missionList(req.body)};
 
-            DAOAmbassador.postToDAORequest(req, res, url, postData);
+        DAOAmbassador.postToDAORequest(req, res, url, postData);
         });
 router.route("/tournament/:tournament/missions/content")
-    .get(function(req, res) {
+    .get(authUser, function(req, res) {
         var url = "/tournament/" + req.params.tournament + "/missions";
 
         DAOAmbassador.getFromDAORequest(
