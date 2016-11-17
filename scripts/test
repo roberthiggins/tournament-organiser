@@ -1,6 +1,7 @@
 #! /bin/bash
 pylint $(find . -iname "*.py")
 eslint node test/dao/functionality
+eslint node test/web/functionality
 
 # Build all containers and run all tests
 cp config/dev/docker-compose.yml docker-compose.yml
@@ -25,4 +26,5 @@ docker-compose run apitest
 # System Tests
 bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
+docker-compose run systemtest_functionality
 docker-compose run systemtest_usability

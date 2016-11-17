@@ -70,6 +70,13 @@ systemtestnode:
         file: docker-compose.base.yml
         service: systemtestnode
 
+systemtest_functionality:
+    extends:
+        file: docker-compose.base.yml
+        service: systemtest_functionality
+    links:
+        - systemtestnode
+
 systemtest_usability:
     extends:
         file: docker-compose.base.yml

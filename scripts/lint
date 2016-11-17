@@ -2,3 +2,4 @@
 
 pylint $(find . -iname "*.py")
 eslint node test/dao/functionality
+eslint node test/web/functionality

@@ -76,6 +76,10 @@ systemtestdaoserver:
         file: docker-passwords.yml
         service: dbpasswords
 
+systemtest_functionality:
+    build: test/web/functionality
+    container_name: web_functionality
+
 systemtest_usability:
     build: test/web/usability
     container_name: web_usability

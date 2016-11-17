@@ -39,9 +39,10 @@ script:
 
     - bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
     - bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
+    - docker-compose run systemtest_functionality
+
     - docker-compose up --build -d selenium
     - docker inspect selenium
     - docker-compose run systemtest_usability
-
 
     - pylint $(find . -iname "*.py")
