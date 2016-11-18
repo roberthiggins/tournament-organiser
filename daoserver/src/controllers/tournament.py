@@ -93,6 +93,7 @@ def register():
     """
     POST to apply for entry to a tournament.
     """
+    exists = g.tournament.details() # pylint: disable=unused-variable
     rego = TournamentRegistration(g.username, g.tournament_id)
     rego.add_to_db()
     g.tournament.confirm_entries()
