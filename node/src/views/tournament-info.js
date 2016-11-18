@@ -34,8 +34,7 @@ var TournamentInfoPage = React.createClass({
     handleSubmit: function(e) {
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
-        var _this = this,
-            tournament = $("input#tournament").val();
+        var _this = this;
 
         var checkRedirect = function(xhr) {
             if (xhr.responseText && typeof xhr.responseJSON === "undefined") {
@@ -48,7 +47,7 @@ var TournamentInfoPage = React.createClass({
             return false;
         }
 
-        $.post(window.location, { tournament: tournament})
+        $.post(window.location)
             .done(function (res, status, xhr) {
                 if (checkRedirect(xhr)) {
                     return false;
