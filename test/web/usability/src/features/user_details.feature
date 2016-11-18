@@ -4,28 +4,12 @@ Feature: See information about a user
     I need to be able to see the details on file about me
 
     @javascript
-    Scenario Outline: See information about myself
+    Scenario Outline: See some messages
         Given I am authenticated as "<user>" using "password"
         Given I am on "/user/ranking_test_player_1"
-        Then I should see "User details for ranking_test_player_1:" appear
-        Then I should see "Username: ranking_test_player_1" appear
-        Then I should see "Email: ranking_test_player_1@bar.com" appear
-        Then I should see "First Name: ranking_test" appear
-        Then I should see "Last Name: P1" appear
+        Then I should see "<message>" appear
 
         Examples:
-            |user                  |
-            |ranking_test_player_1 |
-            |superman              |
-
-    @javascript
-    Scenario Outline: Auth
-        Given I am authenticated as "<user>" using "password"
-        Given I am on "/user/ranking_test_player_1"
-        Then I should see "Permission denied for <user>" appear
-
-        Examples:
-            |user                  |
-            |ranking_test_player_2 |
-            |ranking_test_to       |
-            |charlie_murphy        |
+            |user                  | message                                     |
+            |ranking_test_player_1 | User details for ranking_test_player_1      |
+            |ranking_test_player_2 | Permission denied for ranking_test_player_2 |

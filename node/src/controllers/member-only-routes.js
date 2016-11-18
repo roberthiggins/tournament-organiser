@@ -34,7 +34,7 @@ router.route("/user/:user/content")
             "/user/" + req.params.user,
             function(resp) {
                 res.status(200).json({user: JSON.parse(resp)});
-            });
-    })
+                });
+        });
 
 module.exports = router;

@@ -14,13 +14,18 @@ Feature: Register for a Tournament
         Then I should see "register_test_1" appear
         When I follow "register_test_1"
         Then I should see "Apply to play in register_test_1" appear
+        Then I should see "Confirmed Entries: 1" appear
+        Then I should see "Date: 2222-06-01" appear
 
     @javascript
-    Scenario: I visit the register page via the URL
-        Given I am on "/tournament/register_test_1"
-        Then I should see "Date: 2222-06-01" appear
-        Then I should see "Confirmed Entries: 0" appear
-        Then I should see "Apply to play in register_test_1" appear
+    Scenario Outline: I visit the register page and see some messages
+        Given I am on "/tournament/<tourn>"
+        Then I should see "<message>" appear
+
+        Examples:
+            | tourn           | message                              |
+            | register_test_1 | Apply to play in register_test_1     |
+            | foo             | Tournament foo not found in database |
 
     @javascript
     Scenario Outline: I try to apply
@@ -32,9 +37,9 @@ Feature: Register for a Tournament
         Then I should see "register_test_player_1" appear
 
         Examples:
-            | tournament      | response                                     |
-            | register_test_1 | Application submitted                        |
-            | register_test_2 | Application submitted                        |
+            | tournament      | response              |
+            | register_test_1 | Application Submitted |
+            | register_test_2 | Application Submitted |
 
     @javascript
     Scenario: I try to apply to a tournament twice
@@ -47,8 +52,3 @@ Feature: Register for a Tournament
         When I wait for "Apply to play in register_test_3" to appear
         When I press "Apply to play in register_test_3"
         Then I should see "register_test_3 clashes with register_test_2" appear
-
-    @javascript
-    Scenario: I check the number of entries
-        Given I am on "/tournament/register_test_1"
-        Then I should see "Confirmed Entries: 1" appear

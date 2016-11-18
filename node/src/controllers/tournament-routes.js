@@ -113,10 +113,10 @@ router.route("/tournament/:tournament/rounds")
             req,
             res,
             "/tournament/" + req.params.tournament,
-            {rounds: req.body.rounds});
+            {rounds: req.body.rounds || ""});
         });
 router.route("/tournament/:tournament/rounds/content")
-    .get(function(req, res) {
+    .get(authUser, function(req, res) {
         var url = "/tournament/" + req.params.tournament;
 
         DAOAmbassador.getFromDAORequest(req, res, url,
@@ -127,7 +127,7 @@ router.route("/tournament/:tournament/rounds/content")
                 res.status(200).json(responseDict);
             },
             function(responseBody) {
-                res.status(200).json({error: responseBody});
+                res.status(400).json({error: responseBody});
             });
     });
 
