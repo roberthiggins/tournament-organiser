@@ -4,11 +4,8 @@ describe("Get a list of entries from a tournament", function () {
         injector = require("./data_injector"),
         API = process.env.API_ADDR;
 
-    injector.createTournament("entry_list_test", '2095-07-03');
-    injector.createUser("entry_list_test_player_1");
-    injector.createUser("entry_list_test_player_2");
-    injector.enterTournament("entry_list_test", "entry_list_test_player_1");
-    injector.enterTournament("entry_list_test", "entry_list_test_player_2");
+    injector.createTournament("entry_list_test", '2095-07-03', null, null, null,
+        ["entry_list_test_player_1", "entry_list_test_player_2"]);
     injector.createTournament("entry_list_test_empty", '2095-07-04');
 
     frisby.create("Details for existing tournament")

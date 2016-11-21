@@ -6,9 +6,7 @@ var frisby = require("frisby"),
 
 (function setup() {
     injector.createTournament(tournament, "2095-07-01", 3,
-        ["mission_1", "mission_2", "mission_3"]);
-    injector.createUser(p1);
-    injector.enterTournament(tournament, p1);
+        ["mission_1", "mission_2", "mission_3"], null, [p1]);
 })();
 
 describe("Normal behaviour", function () {

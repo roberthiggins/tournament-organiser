@@ -32,15 +32,12 @@ describe("Start the tournament", function () {
     var tourn = "start_test";
 
     injector.createTournament(tourn, "2063-03-17", 1, ["Mission the First"],
-        [["cat_1", 8, true, 4, 12, false, false]]);
+        [["cat_1", 8, true, 4, 12, false, false]],
+        ["start_test_player_1", "start_test_player_2"]);
 
     // Test people forcing a draw manually
-    injector.createUser("start_test_player_1");
-    injector.createUser("start_test_player_2");
     injector.createUser("start_test_player_3");
     injector.createUser("start_test_non_player");
-    injector.enterTournament(tourn, "start_test_player_1");
-    injector.enterTournament(tourn, "start_test_player_2");
 
     frisby.create("Begin tournament as player")
         .post(API + "tournament/" + tourn + "/start")

@@ -2,13 +2,11 @@ describe("Get info about tournament entries", function () {
     "use strict";
     var frisby = require("frisby"),
         injector = require("./data_injector"),
-        tournament = "entry_info_test",
+        tourn = "entry_info_test",
         entry = "entry_info_test_player",
-        API = process.env.API_ADDR + "tournament/" + tournament + "/entry/";
+        API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
 
-    injector.createUser(entry);
-    injector.createTournament(tournament, "2095-07-02");
-    injector.enterTournament(tournament, entry);
+    injector.createTournament(tourn, "2095-07-02", null, null, null, [entry]);
 
     frisby.create("Info about an entry")
         .get(API + entry)
@@ -26,7 +24,7 @@ describe("Get info about tournament entries", function () {
         .expectJSON(
             {
                 username: entry,
-                tournament_name: tournament,
+                tournament_name: tourn,
             }
         )
         .toss();
@@ -63,7 +61,7 @@ describe("Get info about tournament entries", function () {
         .expectJSON(
             {
                 username: entry,
-                tournament_name: tournament,
+                tournament_name: tourn,
             }
         )
         .toss();

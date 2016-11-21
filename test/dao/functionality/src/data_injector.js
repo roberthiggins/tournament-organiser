@@ -20,7 +20,7 @@ var postCategory = function(cat){
 
 // Inserts a new tournament
 exports.createTournament = function(tournament, date, rounds, missions,
-    scoreCategories) {
+    scoreCategories, players) {
     "use strict";
     var API = process.env.API_ADDR + "tournament",
         to = tournament + "_to",
@@ -42,6 +42,11 @@ exports.createTournament = function(tournament, date, rounds, missions,
         .addHeader("Authorization", exports.auth(to))
         .expectStatus(200)
         .toss();
+
+    (players || []).forEach(function(player) {
+        exports.createUser(player);
+        exports.enterTournament(tournament, player);
+        });
 };
 
 

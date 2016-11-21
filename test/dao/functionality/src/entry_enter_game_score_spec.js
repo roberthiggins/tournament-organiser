@@ -12,11 +12,7 @@ var setup = function setup(tourn, players) {
         [tourn + "_per_game_su", 1, false, 1, 5, true],
         [tourn + "_per_game_to", 1, false, 1, 5, true]
     ];
-    injector.createTournament(tourn, "2095-10-10", 1, null, categories);
-    (players || []).forEach(function(player) {
-        injector.createUser(player);
-        injector.enterTournament(tourn, player);
-        });
+    injector.createTournament(tourn, "2095-10-10", 1, null, categories, players);
     },
     postScore = function(tourn, api, player, gameId, msg, user, scoreKey,
         score, code, resp){

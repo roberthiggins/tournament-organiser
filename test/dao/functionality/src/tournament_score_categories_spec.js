@@ -9,7 +9,7 @@ describe("Empty categories", function () {
 
     injector.createTournament(tourn, "2095-07-05", null, null,
         [["cat_t_one", 8, true, 4, 12, false, false],
-         ["cat_t_two", 13, false, 3, 11, true, true]]);
+         ["cat_t_two", 13, false, 3, 11, true, true]], [tourn + "_player_1"]);
     frisby.create("GET a list of tournament categories")
         .get(API + "/score_categories")
         .expectStatus(200)
@@ -131,9 +131,6 @@ describe("Set categories permissions", function () {
     var tourn = "category_test_1",
         API = process.env.API_ADDR + "tournament/" + tourn,
         player = tourn + "_player_1";
-
-    injector.createUser(player);
-    injector.enterTournament(tourn, player);
 
     var authTestCategories = function(msg, user, code){
             frisby.create("POST categories as: " + msg)

@@ -18,10 +18,9 @@ describe("Test seeing and registering for a tournament", function () {
         player_2 = "register_test_player_2";
 
     injector.createTournament(tourn_1, "2222-06-01");
-    injector.createTournament(tourn_2, "2222-06-02");
-    injector.createUser(player_1);
+    injector.createTournament(tourn_2, "2222-06-02", null, null, null,
+        [player_1]);
     injector.createUser(player_2);
-    injector.enterTournament(tourn_2, player_1);
 
     frisby.create("See upcoming tournaments")
         .get(API, {inspectOnFailure: true})
