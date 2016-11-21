@@ -90,36 +90,6 @@ exports.jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
     return cat;
 };
 
-// Set the score categories
-exports.setCategories = function(tourn, categories){
-    "use strict";
-
-    var API = process.env.API_ADDR + "tournament/" + tourn,
-        postData = {score_categories: []};
-
-    categories.forEach(function(cat){
-        postData.score_categories.push(postCategory(cat));
-    });
-
-    frisby.create("set the score categories for " + tourn)
-        .post(API, postData, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", exports.auth("superuser"))
-        .expectStatus(200)
-        .toss();
-};
-
-// Set missions
-exports.setMissions = function(tourn, missions){
-    "use strict";
-    var API = process.env.API_ADDR + "tournament/" + tourn;
-
-    frisby.create("POST " + missions.length + " missions to setup")
-        .post(API, {missions: missions}, {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", exports.auth("superuser"))
-        .expectStatus(200)
-        .toss();
-};
-
 // Set number of rounds for a tournament
 exports.postRounds = function(tourn, rounds) {
     "use strict";
