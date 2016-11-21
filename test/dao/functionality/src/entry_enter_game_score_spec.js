@@ -7,8 +7,8 @@ var frisby = require("frisby"),
 
 (function setup() {
     injector.createUser("charlie_murphy");
-    injector.createTournament(tournament, "2095-10-10");
-    injector.setCategories(tournament, [
+
+    var categories = [
         [tournament + "_category_per_tournament_1", 1, true, 4, 15],
         [tournament + "_category_per_tournament_su", 1, true, 1, 5],
         [tournament + "_category_per_tournament_to", 1, true, 1, 5],
@@ -17,12 +17,12 @@ var frisby = require("frisby"),
         [tournament + "_category_per_game_opp", 1, false, 1, 5, false, true],
         [tournament + "_category_per_game_su", 1, false, 1, 5, true],
         [tournament + "_category_per_game_to", 1, false, 1, 5, true]
-    ]);
+    ];
+    injector.createTournament(tournament, "2095-10-10", 1, null, categories);
     injector.createUser(p1);
     injector.createUser(p2);
     injector.enterTournament(tournament, p1);
     injector.enterTournament(tournament, p2);
-    injector.postRounds("enter_score_test", 1);
 })();
 
 var postScore = function(msg, gameId, user, scoreKey, score, code, resp){

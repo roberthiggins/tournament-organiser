@@ -31,7 +31,7 @@ exports.createTournament = function(tournament, date, rounds, missions,
             inputTournamentName: tournament,
             inputTournamentDate: date,
             rounds: rounds || 0,
-            missions: missions || [],
+            missions: missions,
             score_categories: categories
         };
 
