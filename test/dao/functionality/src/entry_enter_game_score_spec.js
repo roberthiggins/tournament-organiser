@@ -5,10 +5,11 @@ var frisby = require("frisby"),
     p2 = tourn + "_p_2",
     API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
 
-var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
+var postScore = function(api, player, msg, gameId, user, scoreKey, score, code,
+        resp){
     var key = scoreKey ? scoreKey : "enter_score_test_category_per_game_1";
     frisby.create("POST score: " + msg)
-        .post(API + p1 + "/entergamescore",
+        .post(api + player + "/entergamescore",
             {
                 game_id: gameId,
                 key: key,
@@ -41,7 +42,6 @@ var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
     injector.enterTournament(tourn, p2);
 })();
 
-
 describe("Enter score for single game for an entry", function () {
     "use strict";
 
@@ -63,30 +63,32 @@ describe("Enter score for single game for an entry", function () {
                 .expectBodyContains("Could not verify your access level")
                 .toss();
 
-            postScore("Non-playing user", gameId, "charlie_murphy", null, 5,
+            var post = postScore.bind(this, API, p1);
+
+            post("Non-playing user", gameId, "charlie_murphy", null, 5,
                 403, "Permission denied");
-            postScore("Different entry", gameId, p2, null, 5, 403,
+            post("Different entry", gameId, p2, null, 5, 403,
                 "Permission denied");
-            postScore("Superuser", gameId, "superuser",
+            post("Superuser", gameId, "superuser",
                 "enter_score_test_category_per_game_su", 5, 200,
                 "Score entered for enter_score_test_p_1: 5");
-            postScore("TO", gameId, "enter_score_test_to",
+            post("TO", gameId, "enter_score_test_to",
                 "enter_score_test_category_per_game_to", 5, 200,
                 "Score entered for enter_score_test_p_1: 5");
-            postScore("Player", gameId, p1, null, 5, 200,
+            post("Player", gameId, p1, null, 5, 200,
                 "Score entered for enter_score_test_p_1: 5");
 
-            postScore("Player enters a score twice",gameId,  p1, null, 4, 400,
+            post("Player enters a score twice",gameId,  p1, null, 4, 400,
                 "4 not entered. Score is already set");
 
-            postScore("Score too low", gameId, p1, null, 0, 400,
+            post("Score too low", gameId, p1, null, 0, 400,
                 "Invalid score: 0");
-            postScore("Score too high", gameId, p1, null, 16, 400,
+            post("Score too high", gameId, p1, null, 16, 400,
                 "Invalid score: 16");
-            postScore("Fake category", gameId, p1,
+            post("Fake category", gameId, p1,
                 "enter_score_test_category_non_existent", 5, 400,
                 "Unknown category: enter_score_test_category_non_existent");
-            postScore("Per tournament category", gameId, p1,
+            post("Per tournament category", gameId, p1,
                 "enter_score_test_category_per_tournament_1", 5, 400,
                 "Cannot enter a per-tournament score " +
                 "(enter_score_test_category_per_tournament_1) for a game " +
@@ -101,12 +103,13 @@ describe("Oppostion scores", function() {
         .get(API + p1 + "/nextgame")
         .expectStatus(200)
         .afterJSON(function (body) {
-            var gameId = body.game_id;
-            postScore("P1 enters opp score", gameId, p1,
+            var gameId = body.game_id,
+                post = postScore.bind(this, API, p1);
+            post("P1 enters opp score", gameId, p1,
                 "enter_score_test_category_per_game_opp", 4, 200,
                 "Score entered for enter_score_test_p_2: 4"); // NB P2
 
-            postScore("P1 enters opp score again", gameId, p1,
+            post("P1 enters opp score again", gameId, p1,
                 "enter_score_test_category_per_game_opp", 4, 400,
                 "4 not entered. Score is already set");
         })
@@ -121,9 +124,9 @@ describe("Zero Sum scores", function () {
         .expectStatus(200)
         .afterJSON(function (body) {
             var gameId = body.game_id,
-                auth = injector.auth("enter_score_test_p_2");
-
-            postScore("P1 enters zero_sum score", gameId, p1,
+                auth = injector.auth("enter_score_test_p_2"),
+                post = postScore.bind(this, API, p1);
+            post("P1 enters zero_sum score", gameId, p1,
                 "enter_score_test_category_per_game_2", 4, 200,
                 "Score entered for enter_score_test_p_1: 4");
 
