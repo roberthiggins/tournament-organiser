@@ -5,6 +5,22 @@ var frisby = require("frisby"),
     p2 = tourn + "_p_2",
     API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
 
+var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
+    var key = scoreKey ? scoreKey : "enter_score_test_category_per_game_1";
+    frisby.create("POST score: " + msg)
+        .post(API + p1 + "/entergamescore",
+            {
+                game_id: gameId,
+                key: key,
+                value: score
+            },
+            {json: true, inspectOnFailure: true})
+        .addHeader("Authorization", injector.auth(user))
+        .expectStatus(code)
+        .expectBodyContains(resp)
+        .toss();
+};
+
 (function setup() {
     injector.createUser("charlie_murphy");
 
@@ -25,22 +41,6 @@ var frisby = require("frisby"),
     injector.enterTournament(tourn, p2);
 })();
 
-var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
-    var key = scoreKey ? scoreKey : "enter_score_test_category_per_game_1";
-    frisby.create("POST score: " + msg)
-        .post(API + p1 + "/entergamescore",
-            {
-                game_id: gameId,
-                key: key,
-                value: score
-            },
-            {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", "Basic " +
-            new Buffer(user + ":password").toString("base64"))
-        .expectStatus(code)
-        .expectBodyContains(resp)
-        .toss();
-};
 
 describe("Enter score for single game for an entry", function () {
     "use strict";
@@ -120,7 +120,8 @@ describe("Zero Sum scores", function () {
         .get(API + p2 + "/nextgame")
         .expectStatus(200)
         .afterJSON(function (body) {
-            var gameId = body.game_id;
+            var gameId = body.game_id,
+                auth = injector.auth("enter_score_test_p_2");
 
             postScore("P1 enters zero_sum score", gameId, p1,
                 "enter_score_test_category_per_game_2", 4, 200,
@@ -134,8 +135,7 @@ describe("Zero Sum scores", function () {
                         value: 2
                     },
                     {json: true})
-                .addHeader("Authorization", "Basic " + new Buffer(
-                    "enter_score_test_p_2:password").toString("base64"))
+                .addHeader("Authorization", auth)
                 .expectStatus(400)
                 .expectBodyContains("Invalid score: 2")
                 .toss();
@@ -148,8 +148,7 @@ describe("Zero Sum scores", function () {
                         value: 1
                     },
                     {json: true})
-                .addHeader("Authorization", "Basic " + new Buffer(
-                    "enter_score_test_p_2:password").toString("base64"))
+                .addHeader("Authorization", auth)
                 .expectStatus(200)
                 .expectBodyContains(
                     "Score entered for enter_score_test_p_2: 1")
