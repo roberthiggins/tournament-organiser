@@ -5,7 +5,7 @@ var frisby = require("frisby"),
     API = process.env.API_ADDR + "tournament/enter_score_test/entry/";
 
 var postScore = function(msg, user, key, score, code, resp){
-    var scoreKey = key ? key : "enter_score_test_category_per_tournament_1";
+    var scoreKey = key ? key : "enter_score_test_per_tourn_1";
     frisby.create("POST tournament score: " + msg)
         .post(API + p1 + "/entertournamentscore",
             {
@@ -26,7 +26,7 @@ describe("Enter a tournament score for an entry", function () {
     frisby.create("No auth enters a score")
         .post(API + "enter_score_test_p_1/entertournamentscore",
             {
-                key: "enter_score_test_category_1",
+                key: "enter_score_test_1",
                 value: 5
             },
             {json: true})
@@ -38,10 +38,10 @@ describe("Enter a tournament score for an entry", function () {
         403, "Permission denied");
     postScore("Different entry", p2, null, 5, 403, "Permission denied");
     postScore("Superuser", "superuser",
-        "enter_score_test_category_per_tournament_su", 5, 200,
+        "enter_score_test_per_tourn_su", 5, 200,
         "Score entered for enter_score_test_p_1: 5");
     postScore("TO", "enter_score_test_to",
-        "enter_score_test_category_per_tournament_to", 5, 200,
+        "enter_score_test_per_tourn_to", 5, 200,
         "Score entered for enter_score_test_p_1: 5");
     postScore("Player", p1, null, 5, 200,
         "Score entered for enter_score_test_p_1: 5");
@@ -51,9 +51,9 @@ describe("Enter a tournament score for an entry", function () {
 
     postScore("Score too low", p1, null, 0, 400, "Invalid score: 0");
     postScore("Score too high", p1, null, 16, 400, "Invalid score: 16");
-    postScore("Fake category", p1, "enter_score_test_category_non_existent",
-        5, 400, "Unknown category: enter_score_test_category_non_existent");
-    postScore("Per game category", p1, "enter_score_test_category_per_game_1",
-        5, 400, "enter_score_test_category_per_game_1 should be " +
+    postScore("Fake category", p1, "non_existent",
+        5, 400, "Unknown category: non_existent");
+    postScore("Per game category", p1, "enter_score_test_per_game_1",
+        5, 400, "enter_score_test_per_game_1 should be " +
         "entered per-tournament");
 });
