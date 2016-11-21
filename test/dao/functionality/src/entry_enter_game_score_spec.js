@@ -5,26 +5,7 @@ var frisby = require("frisby"),
     p2 = tourn + "_p_2",
     API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
 
-var postScore = function(api, player, msg, gameId, user, scoreKey, score, code,
-        resp){
-    var key = scoreKey ? scoreKey : "enter_score_test_category_per_game_1";
-    frisby.create("POST score: " + msg)
-        .post(api + player + "/entergamescore",
-            {
-                game_id: gameId,
-                key: key,
-                value: score
-            },
-            {json: true, inspectOnFailure: true})
-        .addHeader("Authorization", injector.auth(user))
-        .expectStatus(code)
-        .expectBodyContains(resp)
-        .toss();
-};
-
-(function setup() {
-    injector.createUser("charlie_murphy");
-
+var setup = function setup(tourn, players) {
     var categories = [
         [tourn + "_category_per_tournament_1", 1, true, 4, 15],
         [tourn + "_category_per_tournament_su", 1, true, 1, 5],
@@ -36,11 +17,30 @@ var postScore = function(api, player, msg, gameId, user, scoreKey, score, code,
         [tourn + "_category_per_game_to", 1, false, 1, 5, true]
     ];
     injector.createTournament(tourn, "2095-10-10", 1, null, categories);
-    injector.createUser(p1);
-    injector.createUser(p2);
-    injector.enterTournament(tourn, p1);
-    injector.enterTournament(tourn, p2);
-})();
+    (players || []).forEach(function(player) {
+        injector.createUser(player);
+        injector.enterTournament(tourn, player);
+        });
+    },
+    postScore = function(api, player, msg, gameId, user, scoreKey, score, code,
+        resp){
+        var key = scoreKey ? scoreKey : "enter_score_test_category_per_game_1";
+        frisby.create("POST score: " + msg)
+            .post(api + player + "/entergamescore",
+                {
+                    game_id: gameId,
+                    key: key,
+                    value: score
+                },
+                {json: true, inspectOnFailure: true})
+            .addHeader("Authorization", injector.auth(user))
+            .expectStatus(code)
+            .expectBodyContains(resp)
+            .toss();
+        };
+
+injector.createUser("charlie_murphy");
+setup(tourn, [p1, p2]);
 
 describe("Enter score for single game for an entry", function () {
     "use strict";
