@@ -1,9 +1,5 @@
 var frisby = require("frisby"),
-    injector = require("./data_injector"),
-    tourn = "enter_score_test",
-    p1 = tourn + "_p_1",
-    p2 = tourn + "_p_2",
-    API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
+    injector = require("./data_injector");
 
 var setup = function setup(tourn, players) {
     var categories = [
@@ -40,10 +36,15 @@ var setup = function setup(tourn, players) {
         };
 
 injector.createUser("charlie_murphy");
-setup(tourn, [p1, p2]);
 
 describe("Enter score for single game for an entry", function () {
     "use strict";
+
+    var tourn = "enter_score_test_1",
+        p1 = tourn + "_p_1",
+        p2 = tourn + "_p_2",
+        API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
+    setup(tourn, [p1, p2]);
 
     frisby.create("get game_id of next game for " + p1)
         .get(API + p1 + "/nextgame")
@@ -89,6 +90,13 @@ describe("Enter score for single game for an entry", function () {
 
 describe("Oppostion scores", function() {
     "use strict";
+
+    var tourn = "enter_score_test_2",
+        p1 = tourn + "_p_1",
+        p2 = tourn + "_p_2",
+        API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
+    setup(tourn, [p1, p2]);
+
     frisby.create("get game_id of next game for " + p2)
         .get(API + p1 + "/nextgame")
         .expectStatus(200)
@@ -108,6 +116,12 @@ describe("Oppostion scores", function() {
 
 describe("Zero Sum scores", function () {
     "use strict";
+
+    var tourn = "enter_score_test_3",
+        p1 = tourn + "_p_1",
+        p2 = tourn + "_p_2",
+        API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
+    setup(tourn, [p1, p2]);
 
     frisby.create("get game_id of next game for " + p2)
         .get(API + p2 + "/nextgame")
