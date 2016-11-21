@@ -1,28 +1,28 @@
 var frisby = require("frisby"),
     injector = require("./data_injector"),
-    tournament = "enter_score_test",
-    p1 = tournament + "_p_1",
-    p2 = tournament + "_p_2",
-    API = process.env.API_ADDR + "tournament/" + tournament + "/entry/";
+    tourn = "enter_score_test",
+    p1 = tourn + "_p_1",
+    p2 = tourn + "_p_2",
+    API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
 
 (function setup() {
     injector.createUser("charlie_murphy");
 
     var categories = [
-        [tournament + "_category_per_tournament_1", 1, true, 4, 15],
-        [tournament + "_category_per_tournament_su", 1, true, 1, 5],
-        [tournament + "_category_per_tournament_to", 1, true, 1, 5],
-        [tournament + "_category_per_game_1", 1, false, 4, 15, true],
-        [tournament + "_category_per_game_2", 1, false, 1, 5, true],
-        [tournament + "_category_per_game_opp", 1, false, 1, 5, false, true],
-        [tournament + "_category_per_game_su", 1, false, 1, 5, true],
-        [tournament + "_category_per_game_to", 1, false, 1, 5, true]
+        [tourn + "_category_per_tournament_1", 1, true, 4, 15],
+        [tourn + "_category_per_tournament_su", 1, true, 1, 5],
+        [tourn + "_category_per_tournament_to", 1, true, 1, 5],
+        [tourn + "_category_per_game_1", 1, false, 4, 15, true],
+        [tourn + "_category_per_game_2", 1, false, 1, 5, true],
+        [tourn + "_category_per_game_opp", 1, false, 1, 5, false, true],
+        [tourn + "_category_per_game_su", 1, false, 1, 5, true],
+        [tourn + "_category_per_game_to", 1, false, 1, 5, true]
     ];
-    injector.createTournament(tournament, "2095-10-10", 1, null, categories);
+    injector.createTournament(tourn, "2095-10-10", 1, null, categories);
     injector.createUser(p1);
     injector.createUser(p2);
-    injector.enterTournament(tournament, p1);
-    injector.enterTournament(tournament, p2);
+    injector.enterTournament(tourn, p1);
+    injector.enterTournament(tourn, p2);
 })();
 
 var postScore = function(msg, gameId, user, scoreKey, score, code, resp){
