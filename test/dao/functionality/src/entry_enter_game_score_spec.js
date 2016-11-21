@@ -45,7 +45,7 @@ setup(tourn, [p1, p2]);
 describe("Enter score for single game for an entry", function () {
     "use strict";
 
-    frisby.create("get game_id of next game for enter_score_test_p_1")
+    frisby.create("get game_id of next game for " + p1)
         .get(API + p1 + "/nextgame")
         .expectStatus(200)
         .afterJSON(function (body) {
@@ -71,12 +71,12 @@ describe("Enter score for single game for an entry", function () {
                 "Permission denied");
             post("Superuser", gameId, "superuser",
                 "enter_score_test_category_per_game_su", 5, 200,
-                "Score entered for enter_score_test_p_1: 5");
+                "Score entered for " + p1 + ": 5");
             post("TO", gameId, "enter_score_test_to",
                 "enter_score_test_category_per_game_to", 5, 200,
-                "Score entered for enter_score_test_p_1: 5");
+                "Score entered for " + p1 + ": 5");
             post("Player", gameId, p1, null, 5, 200,
-                "Score entered for enter_score_test_p_1: 5");
+                "Score entered for " + p1 + ": 5");
 
             post("Player enters a score twice",gameId,  p1, null, 4, 400,
                 "4 not entered. Score is already set");
@@ -99,7 +99,7 @@ describe("Enter score for single game for an entry", function () {
 
 describe("Oppostion scores", function() {
     "use strict";
-    frisby.create("get game_id of next game for enter_score_test_p_2")
+    frisby.create("get game_id of next game for " + p2)
         .get(API + p1 + "/nextgame")
         .expectStatus(200)
         .afterJSON(function (body) {
@@ -107,7 +107,7 @@ describe("Oppostion scores", function() {
                 post = postScore.bind(this, API, p1);
             post("P1 enters opp score", gameId, p1,
                 "enter_score_test_category_per_game_opp", 4, 200,
-                "Score entered for enter_score_test_p_2: 4"); // NB P2
+                "Score entered for " + p2 + ": 4"); // NB P2
 
             post("P1 enters opp score again", gameId, p1,
                 "enter_score_test_category_per_game_opp", 4, 400,
@@ -119,16 +119,16 @@ describe("Oppostion scores", function() {
 describe("Zero Sum scores", function () {
     "use strict";
 
-    frisby.create("get game_id of next game for enter_score_test_p_2")
+    frisby.create("get game_id of next game for " + p2)
         .get(API + p2 + "/nextgame")
         .expectStatus(200)
         .afterJSON(function (body) {
             var gameId = body.game_id,
-                auth = injector.auth("enter_score_test_p_2"),
+                auth = injector.auth(p2),
                 post = postScore.bind(this, API, p1);
             post("P1 enters zero_sum score", gameId, p1,
                 "enter_score_test_category_per_game_2", 4, 200,
-                "Score entered for enter_score_test_p_1: 4");
+                "Score entered for " + p1 + ": 4");
 
             frisby.create("player 2 enters a zero_sum score that is too high")
                 .post(API + p2 + "/entergamescore",
@@ -154,7 +154,7 @@ describe("Zero Sum scores", function () {
                 .addHeader("Authorization", auth)
                 .expectStatus(200)
                 .expectBodyContains(
-                    "Score entered for enter_score_test_p_2: 1")
+                    "Score entered for " + p2 + ": 1")
                 .toss();
 
         })
