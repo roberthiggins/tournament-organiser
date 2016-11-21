@@ -22,9 +22,9 @@ var setup = function setup(tourn, players) {
         injector.enterTournament(tourn, player);
         });
     },
-    postScore = function(api, player, gameId, msg, user, scoreKey, score, code,
-        resp){
-        var key = scoreKey ? scoreKey : "enter_score_test_per_game_1";
+    postScore = function(tourn, api, player, gameId, msg, user, scoreKey,
+        score, code, resp){
+        var key = scoreKey ? scoreKey : tourn + "_per_game_1";
         frisby.create("POST score: " + msg)
             .post(api + player + "/entergamescore",
                 {
@@ -55,7 +55,7 @@ describe("Enter score for single game for an entry", function () {
                 .post(API + p1 + "/entergamescore",
                     {
                         game_id: gameId,
-                        key: "enter_score_test_per_game_1",
+                        key: tourn + "_per_game_1",
                         value: 5
                     },
                     {json: true, inspectOnFailure: true})
@@ -63,13 +63,13 @@ describe("Enter score for single game for an entry", function () {
                 .expectBodyContains("Could not verify your access level")
                 .toss();
 
-            var post = postScore.bind(this, API, p1, gameId);
+            var post = postScore.bind(this, tourn, API, p1, gameId);
 
             post("Non-playing user", "charlie_murphy", null, 5, 403,
                 "Permission denied");
-            post("Superuser", "superuser", "enter_score_test_per_game_su", 5,
+            post("Superuser", "superuser", tourn + "_per_game_su", 5,
                 200, "Score entered for " + p1 + ": 5");
-            post("TO", "enter_score_test_to", "enter_score_test_per_game_to",
+            post("TO", tourn + "_to", tourn + "_per_game_to",
                 5, 200, "Score entered for " + p1 + ": 5");
             post("Player", p1, null, 5, 200, "Score entered for " + p1 + ": 5");
 
@@ -80,9 +80,9 @@ describe("Enter score for single game for an entry", function () {
             post("Score too high", p1, null, 16, 400, "Invalid score: 16");
             post("Fake category", p1, "non_existent", 5, 400,
                 "Unknown category: non_existent");
-            post("Per tournament category", p1, "enter_score_test_per_tourn_1",
-                5, 400, "Cannot enter a per-tournament score " +
-                "(enter_score_test_per_tourn_1) for a game (id: " + gameId + ")");
+            post("Per tournament category", p1, tourn + "_per_tourn_1",
+                5, 400, "Cannot enter a per-tournament score (" + tourn +
+                "_per_tourn_1) for a game (id: " + gameId + ")");
         })
         .toss();
 });
@@ -94,13 +94,13 @@ describe("Oppostion scores", function() {
         .expectStatus(200)
         .afterJSON(function (body) {
             var gameId = body.game_id,
-                post = postScore.bind(this, API, p1, gameId);
+                post = postScore.bind(this, tourn, API, p1, gameId);
             post("P1 enters opp score", p1,
-                "enter_score_test_per_game_opp", 4, 200,
+                tourn + "_per_game_opp", 4, 200,
                 "Score entered for " + p2 + ": 4"); // NB P2
 
             post("P1 enters opp score again", p1,
-                "enter_score_test_per_game_opp", 4, 400,
+                tourn + "_per_game_opp", 4, 400,
                 "4 not entered. Score is already set");
         })
         .toss();
@@ -115,15 +115,15 @@ describe("Zero Sum scores", function () {
         .afterJSON(function (body) {
             var gameId = body.game_id,
                 auth = injector.auth(p2),
-                post = postScore.bind(this, API, p1, gameId);
-            post("P1 enters zero_sum score", p1, "enter_score_test_per_game_2",
+                post = postScore.bind(this, tourn, API, p1, gameId);
+            post("P1 enters zero_sum score", p1, tourn + "_per_game_2",
                 4, 200, "Score entered for " + p1 + ": 4");
 
             frisby.create("player 2 enters a zero_sum score that is too high")
                 .post(API + p2 + "/entergamescore",
                     {
                         game_id: gameId,
-                        key: "enter_score_test_per_game_2",
+                        key: tourn + "_per_game_2",
                         value: 2
                     },
                     {json: true})
@@ -136,7 +136,7 @@ describe("Zero Sum scores", function () {
                 .post(API + p2 + "/entergamescore",
                     {
                         game_id: gameId,
-                        key: "enter_score_test_per_game_2",
+                        key: tourn + "_per_game_2",
                         value: 1
                     },
                     {json: true})
