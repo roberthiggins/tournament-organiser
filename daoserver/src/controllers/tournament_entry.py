@@ -180,3 +180,15 @@ def rank_entries():
         } for x in g.tournament.ranking_strategy.overall_ranking(
             g.tournament.get_entries())
     ]
+
+@ENTRY.route('/<username>/withdraw', methods=['POST'])
+@requires_auth
+@text_response
+@ensure_permission({'permission': 'MODIFY_APPLICATION'})
+def withdraw_entry():
+    """
+    POST to withdraw entry from the tournament
+    """
+    g.tournament.withdraw_entry(g.entry)
+    return 'Entry to {} withdrawn successfully'.\
+        format(g.tournament.tournament_id)

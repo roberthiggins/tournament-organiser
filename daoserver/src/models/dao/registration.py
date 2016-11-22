@@ -24,7 +24,8 @@ class TournamentRegistration(db.Model):
     turned_up = db.Column(db.Boolean, nullable=False, default=False)
     list_accept = db.Column(db.Boolean, nullable=False, default=False)
 
-    account = db.relationship(Account, backref='registrations')
+    account = db.relationship(Account, \
+        backref=db.backref('registrations', lazy='dynamic'))
     tournament = db.relationship(Tournament, backref='registrations')
 
     def __init__(self, player_id, tournament_name):

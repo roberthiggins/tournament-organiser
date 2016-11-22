@@ -417,6 +417,25 @@ class Tournament(object):
         """Update the basic details about a tournament in the db"""
         self._set_details(details)
 
+
+    @must_exist_in_db
+    @not_in_progress
+    def withdraw_entry(self, entry):
+        """
+        Withdraw an entry so they can no longer get scores, rankings, etc.
+
+        If the round 1 draw has not been done yet:
+            remove them from the list of entries
+        If the tournament has begun:
+            EXPLODE FOR NOW
+            TODO: Handle during tournament withdrawals
+        """
+        entry.account.registrations.\
+            filter_by(tournament_id=entry.tournament.id).delete()
+        db.session.delete(entry)
+        db.session.commit()
+
+
 def all_tournaments_with_permission(action, username):
     """Find all tournaments where user has action. Returns list"""
     all_tournaments = TournamentDAO.query.\
