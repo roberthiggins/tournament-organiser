@@ -75,6 +75,17 @@ BEGIN
     PERFORM add_player(tourn_name, tourn_id, 'permission_test_player');
 END $$;
 
+-- Make a tournament for the purposes of testing entries and withdrawals
+DO $$
+DECLARE
+    tourn_name varchar := 'entries_test';
+    tourn_id int := 0;
+BEGIN
+    -- Create a tournament that will be restricted
+    tourn_id := create_tournament(tourn_name, '3121-03-18');
+    PERFORM add_player(tourn_name, tourn_id, tourn_name || '_p_1');
+END $$;
+
 SELECT create_tournament('register_test_1', '2222-06-01');
 SELECT create_tournament('register_test_2', '2222-06-02');
 SELECT create_tournament('register_test_3', '2222-06-02');
