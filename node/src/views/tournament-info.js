@@ -66,6 +66,21 @@ var TournamentInfoPage = React.createClass({
                 _this.setState(res.responseJSON);
             });
     },
+    withdraw: function(e) {
+        // you are the devil! This controller crap should be in a separate file.
+        e.preventDefault();
+
+        $.post(window.location + "/entry/" + this.state.user + "/withdraw")
+            .done(function (res, status, xhr) {
+                this.setState({
+                    successText: xhr.responseJSON.message,
+                    error: ""
+                    });
+                }.bind(this))
+            .fail(function (res) {
+                this.setState(res.responseJSON);
+                }.bind(this));
+    },
     render: function() {
 
         var infoWidget = this.state.name && !this.state.successText ?
@@ -75,10 +90,15 @@ var TournamentInfoPage = React.createClass({
                  : null,
             applyWidget = infoWidget && !this.state.user ?
                 <form onSubmit={this.apply}>
-                    <input type="hidden" value={this.state.name}
-                           name="tournament" />
                     <button type="submit">
                         Apply to play in {this.state.name}
+                    </button>
+                </form>
+                : null,
+            withdrawWidget = this.state.user ?
+                <form onSubmit={this.withdraw}>
+                    <button type="submit">
+                        Withdraw from {this.state.name}
                     </button>
                 </form>
                 : null;
@@ -92,6 +112,7 @@ var TournamentInfoPage = React.createClass({
                 {applyWidget}
                 {this.state.user ?
                     <p>You have entered this tournament</p> : null}
+                {this.state.user ? withdrawWidget : null}
             </div>
         );
     }

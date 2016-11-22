@@ -167,4 +167,11 @@ router.route("/tournament/:tournament/entry/:username/nextgame/content")
             });
     });
 
+router.route("/tournament/:tournament/entry/:username/withdraw")
+    .post(needsUser, ensureEntryExists, function(req, res) {
+        var url = "/tournament/" + req.params.tournament + "/entry/"
+            + req.params.username + "/withdraw";
+        DAOAmbassador.postToDAORequest(req, res, url, {});
+        });
+
 module.exports = router;
