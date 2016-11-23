@@ -111,8 +111,8 @@ def tournament_details():
     """
     user = getattr(request.authorization, 'username', None)
     details = g.tournament.details()
-    details['user_entered'] = g.tournament.get_dao().entries.\
-        filter_by(player_id=user).count() == 1
+    if g.tournament.get_dao().entries.filter_by(player_id=user).count() == 1:
+        details['user'] = user
     return details
 
 @TOURNAMENT.route('/<tournament_id>', methods=['POST'])

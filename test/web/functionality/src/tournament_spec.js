@@ -51,8 +51,7 @@ describe("Tournament", function () {
             entries: Number,
             name: String,
             rounds: Number,
-            score_categories: Array,
-            user_entered: Boolean
+            score_categories: Array
             })
         .expectJSONTypes("score_categories.0", {
             name: String,
@@ -77,8 +76,7 @@ describe("Tournament", function () {
                 max_val: 15,
                 per_tournament: true,
                 percentage: 10,
-                }],
-            user_entered: false
+                }]
             })
         .toss();
 

@@ -20,7 +20,7 @@ var TournamentInfo = React.createClass({
 
 var TournamentInfoPage = React.createClass({
     getInitialState: function() {
-        return ({successText: "", error: ""});
+        return ({successText: "", error: "", user: null});
     },
     componentDidMount: function() {
         this.serverRequest = $.get(window.location + "/content",
@@ -34,7 +34,7 @@ var TournamentInfoPage = React.createClass({
     componentWillUnmount: function() {
         this.serverRequest.abort();
     },
-    handleSubmit: function(e) {
+    apply: function(e) {
         // you are the devil! This controller crap should be in a separate file.
         e.preventDefault();
         var _this = this;
@@ -73,8 +73,8 @@ var TournamentInfoPage = React.createClass({
                                  entries={this.state.entries}
                                  date={this.state.date} />
                  : null,
-            applyWidget = infoWidget && !this.state.user_entered ?
-                <form onSubmit={this.handleSubmit}>
+            applyWidget = infoWidget && !this.state.user ?
+                <form onSubmit={this.apply}>
                     <input type="hidden" value={this.state.name}
                            name="tournament" />
                     <button type="submit">
@@ -90,7 +90,7 @@ var TournamentInfoPage = React.createClass({
                 <p>{this.state.error}</p>
                 {infoWidget}
                 {applyWidget}
-                {this.state.user_entered ?
+                {this.state.user ?
                     <p>You have entered this tournament</p> : null}
             </div>
         );
