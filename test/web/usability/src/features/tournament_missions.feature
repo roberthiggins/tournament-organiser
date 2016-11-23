@@ -22,6 +22,9 @@ Feature: Set the missions through the web front end.
         When I fill in "missions_1" with "some_mission"
         When I press "Set"
         Then I should see "Tournament mission_test updated" appear
+        Given I am on "/tournament/mission_test/missions"
+        Then I wait for "Set the missions for mission_test here" to appear
+        Then the "missions_1" field should contain "some_mission"
 
     @javascript
     Scenario: I visit a non-existent tournament

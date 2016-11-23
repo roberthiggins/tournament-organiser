@@ -67,16 +67,24 @@ describe("Malformed Missions", function () {
     "use strict";
 
     var url = process.env.API_ADDR + "tournament/",
-        postMalformedMissions = function(msg, tourn, postData){
+        postMalformedMissions = function(msg, tourn, postData, error){
             frisby.create("POST malformed missions: " + msg)
                 .post(url + tourn, {missions: postData}, {json: true})
                 .addHeader("Authorization", injector.auth("superuser"))
                 .expectStatus(400)
+                .expectBodyContains(error)
                 .toss();
             };
-    postMalformedMissions("fake tourn", "not_real", ["m_1", "m_2", "m_3"]);
-    postMalformedMissions("dict", "mission_test", {});
-    postMalformedMissions("too few", "mission_test", ["m_1", "m_2"]);
-    postMalformedMissions("too many", "mission_test", ["1", "2", "3", "4"]);
-    postMalformedMissions("none", "mission_test", []);
+    postMalformedMissions("fake tourn", "not_real", ["m_1", "m_2", "m_3"],
+        "Tournament not_real not found in database");
+    postMalformedMissions("dict", "mission_test", {},
+        "Tournament mission_test has 3 rounds. You submitted missions []");
+    postMalformedMissions("none", "mission_test", [],
+        "Tournament mission_test has 3 rounds. You submitted missions []");
+    postMalformedMissions("too few", "mission_test", ["1", "2"],
+        "Tournament mission_test has 3 rounds. You submitted missions " +
+        "[\"1\", \"2\"]");
+    postMalformedMissions("too many", "mission_test", ["1", "2", "3", "4"],
+        "Tournament mission_test has 3 rounds. You submitted missions " +
+        "[\"1\", \"2\", \"3\", \"4\"]");
 });

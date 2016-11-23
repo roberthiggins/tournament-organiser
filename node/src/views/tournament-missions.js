@@ -43,13 +43,14 @@ var TournamentMissionsPage = React.createClass({
     },
     handleSubmit: function (e) {
         e.preventDefault();
-        var _this = this;
 
-        $.post(window.location,
-            $("form").serialize(),
-            function success(res) {
-                _this.setState(res);
+        var missions = $("form").serializeArray().map(function(input) {
+            return input.value || "";
             });
+
+        $.post(window.location, {missions: missions}, function success(res) {
+            this.setState(res);
+            }.bind(this));
     },
     render: function() {
         var missions = this.state.missions.map(function(mission, idx){

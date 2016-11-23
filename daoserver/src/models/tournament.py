@@ -4,6 +4,7 @@ Model of a tournament
 It holds a tournament object for housing of scoring strategies, etc.
 """
 from datetime import date, datetime
+from json import dumps
 
 from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
@@ -332,9 +333,9 @@ class Tournament(object):
         rounds = self.get_dao().rounds.count()
 
         if missions is None or len(missions) != rounds:
-            raise ValueError('Tournament {} has {} rounds. ' \
-                'You submitted missions {}'.\
-                format(self.tournament_id, rounds, missions))
+            raise ValueError('Tournament {} has {} rounds. You submitted ' \
+                'missions {}'.format(self.tournament_id, rounds,
+                                     dumps([x for x in missions])))
 
         for i, mission in enumerate(missions):
             rnd = self.get_round(i + 1).get_dao()

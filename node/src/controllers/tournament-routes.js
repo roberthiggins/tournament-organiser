@@ -235,33 +235,12 @@ router.route("/tournament/:tournament/missions")
             });
         })
     .post(authUser, function(req, res){
-        var url = "/tournament/" + req.params.tournament,
-            missionList = function(postData) {
-
-                var idx = 0,
-                    missions = [],
-                    missionsInPost = true;
-
-                while (missionsInPost) {
-                    var mission = postData["missions_" + idx];
-                    if (typeof mission !== "undefined") {
-                        missions.push(mission);
-                        idx = idx +1;
-                    }
-                    else {
-                        missionsInPost = false;
-                    }
-                }
-
-                return missions;
-            },
-            postData = {missions: missionList(req.body)};
 
         DAOAmbassador.postToDAORequest(
             req,
             res,
-            url,
-            postData,
+            "/tournament/" + req.params.tournament,
+            req.body,
             null,
             function(responseBody) {
                 res.status(400).json({error: responseBody});

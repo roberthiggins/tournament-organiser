@@ -53,11 +53,12 @@ describe("Bad submissions", function () {
     "use strict";
     utils.asUser("superman", "password", function(cookie) {
         frisby.create("POST a single mission only")
-            .post(API, {missions_0: "mission_1"},
+            .post(API, {missions: ["mission_1"]},
                 {json: true, inspectOnFailure: true})
             .addHeader("cookie", cookie)
             .expectStatus(400)
-            .expectJSON({error: "Tournament mission_test has 3 rounds. You submitted missions [u\'mission_1\']"})
+            .expectJSON({error: "Tournament mission_test has 3 rounds. " +
+                "You submitted missions [\"mission_1\"]"})
             .after(function() {
                 frisby.create("check that missions is NOT updated")
                     .get(API + "/content")
@@ -77,11 +78,9 @@ describe("POST missions", function () {
     "use strict";
     utils.asUser("superman", "password", function(cookie) {
         frisby.create("POST a correct mission list")
-            .post(process.env.API_ADDR + "tournament/mission_test_2/missions", {
-                missions_0: "mission_1",
-                missions_1: "Mission the Second",
-                missions_2: "Mission the Third"
-                }, {json: true, inspectOnFailure: true})
+            .post(process.env.API_ADDR + "tournament/mission_test_2/missions",
+                {missions: ["m_1", "m_2", "m_3"]},
+                {json: true, inspectOnFailure: true})
             .addHeader("cookie", cookie)
             .expectStatus(200)
             .expectJSON({message: "Tournament mission_test_2 updated"})
@@ -91,10 +90,7 @@ describe("POST missions", function () {
                         "tournament/mission_test_2/missions/content")
                     .addHeader("cookie", cookie)
                     .expectStatus(200)
-                    .expectJSON({missions: [
-                        "mission_1",
-                        "Mission the Second",
-                        "Mission the Third"]})
+                    .expectJSON({missions: ["m_1", "m_2", "m_3"]})
                     .toss();
                 })
             .toss();
