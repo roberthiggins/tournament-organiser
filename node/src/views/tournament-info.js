@@ -2,7 +2,7 @@
 var TournamentInfo = React.createClass({
     propTypes: {
         name: React.PropTypes.string.isRequired,
-        entries: React.PropTypes.Number,
+        entries: React.PropTypes.number,
         date: React.PropTypes.string
     },
     render: function() {
