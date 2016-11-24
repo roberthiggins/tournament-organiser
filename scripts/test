@@ -17,7 +17,7 @@ bash scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql
 docker-compose run apitest
 
-# System Tests
+# Web Tests
 bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
 bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
 docker-compose run systemtest_functionality
