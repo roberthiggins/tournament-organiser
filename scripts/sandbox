@@ -1,0 +1,13 @@
+#! /bin/bash
+
+./scripts/get-compose-files --dev
+
+SYSTEMS="database daoserver webserver"
+./scripts/clean-and-build --dev $SYSTEMS
+
+docker-compose up -d $SYSTEMS &> /dev/null
+
+# Add some data to database for use in browser
+docker exec daoserver bash -c '/webapp/wait-for-postgres.sh database bash'
+bash scripts/insert_into_db database database/data/dev/basic_functions.sql
+bash scripts/insert_into_db database database/data/dev/behaviour_test_data.sql
