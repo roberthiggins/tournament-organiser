@@ -1,13 +1,8 @@
 #! /bin/bash
 
-SYSTEMS="unittestdb unittest"
-# Build all containers and run all tests
 ./scripts/get-compose-files --dev
-docker-compose kill  &> /dev/null
-docker-compose rm -f &> /dev/null
+./scripts/clean-and-build --dev unittestdb unittest
 
-docker-compose pull  $SYSTEMS &> /dev/null
-docker-compose build $SYSTEMS &> /dev/null
 docker-compose up -d unittestdb &> /dev/null
 
 docker-compose run unittest

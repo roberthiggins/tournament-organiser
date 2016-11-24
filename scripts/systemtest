@@ -2,15 +2,11 @@
 
 SYSTEMS="systemtestdb systemtestdaoserver systemtestwebserver"
 TEST_SYSTEMS="systemtest_functionality systemtest_usability"
-# Build all containers and run all tests
+
 ./scripts/get-compose-files --dev
+./scripts/clean-and-build --dev $SYSTEMS $TEST_SYSTEMS
 
-docker-compose kill     &> /dev/null
-docker-compose rm -f    &> /dev/null
-
-docker-compose pull $SYSTEMS $TEST_SYSTEMS  &> /dev/null
-docker-compose build $SYSTEMS $TEST_SYSTEMS &> /dev/null
-docker-compose up -d $SYSTEMS               &> /dev/null
+docker-compose up -d $SYSTEMS &> /dev/null
 
 docker exec systemtestdaoserver bash -c '/webapp/wait-for-postgres.sh systemtestdb bash'
 bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql

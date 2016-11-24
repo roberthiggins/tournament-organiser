@@ -5,15 +5,17 @@ if [ ! -f docker-compose.yml ]; then
     exit 2
 fi
 
-# Remove all containers and get a basic install up
-# Where should build output be funnelled?
 ENV=${1:-"prod"}
-if [ "$ENV" == 'dev' ]; then
-    docker-compose kill &> /dev/null
-    docker-compose rm -f &> /dev/null
 
-    docker-compose pull  &> /dev/null
-    docker-compose build &> /dev/null
+if [ "$ENV" == '--dev' ]; then
+    shift
+    SYSTEMS=${@:-""}
+
+    docker-compose kill $SYSTEMS  &> /dev/null
+    docker-compose rm -f $SYSTEMS &> /dev/null
+
+    docker-compose pull  $SYSTEMS &> /dev/null
+    docker-compose build $SYSTEMS &> /dev/null
 else
 
     docker-compose kill
