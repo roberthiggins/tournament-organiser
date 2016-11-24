@@ -13,5 +13,5 @@ ENV NODE_PATH /usr/local/lib/node_modules/
 ADD src/ /opt/frisby/tests
 
 CMD jasmine-node \
-    --config API_ADDR "http://${SYSTEMTESTNODE_PORT_8000_TCP_ADDR}:${SYSTEMTESTNODE_PORT_8000_TCP_PORT}/" \
+    --config API_ADDR "http://${SYSTEMTESTWEBSERVER_PORT_8000_TCP_ADDR}:${SYSTEMTESTWEBSERVER_PORT_8000_TCP_PORT}/" \
     tests

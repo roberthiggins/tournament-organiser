@@ -17,9 +17,9 @@ daoserver:
         file: docker-passwords.yml
         service: dbpasswords
 
-node:
-    build: node
-    container_name: node
+webserver:
+    build: web
+    container_name: webserver
     ports:
         - "5005:8000"
 
@@ -84,9 +84,9 @@ systemtest_usability:
     build: test/web/usability
     container_name: web_usability
 
-systemtestnode:
-    build: node
-    container_name: systemtestnode
+systemtestwebserver:
+    build: web
+    container_name: systemtestwebserver
     ports:
         - "5105:8000"
 

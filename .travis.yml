@@ -16,12 +16,12 @@ install:
     - cp config/dev/docker-passwords.yml ./docker-passwords.yml
     - docker-compose build unittestdb
     - docker-compose up -d unittestdb
-    - docker-compose build database daoserver node
-    - docker-compose up -d database daoserver node
+    - docker-compose build database daoserver webserver
+    - docker-compose up -d database daoserver webserver
     - docker-compose build apitestdb apitestdaoserver
     - docker-compose up -d apitestdb apitestdaoserver
-    - docker-compose build systemtestdb systemtestdaoserver systemtestnode
-    - docker-compose up -d systemtestdb systemtestdaoserver systemtestnode
+    - docker-compose build systemtestdb systemtestdaoserver systemtestwebserver
+    - docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver
     - docker inspect unittestdb
     - docker inspect daoserver
     - docker inspect apitestdaoserver

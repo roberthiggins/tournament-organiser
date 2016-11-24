@@ -10,12 +10,12 @@ daoserver:
         file: docker-compose.base.yml
         service: daoserver
 
-node:
+webserver:
     links:
         - daoserver:daoserver
     extends:
         file: docker-compose.base.yml
-        service: node
+        service: webserver
 
 # Unit Test Specific
 unittestdb:
@@ -63,19 +63,19 @@ systemtestdaoserver:
         file: docker-compose.base.yml
         service: systemtestdaoserver
 
-systemtestnode:
+systemtestwebserver:
     links:
         - systemtestdaoserver:daoserver
     extends:
         file: docker-compose.base.yml
-        service: systemtestnode
+        service: systemtestwebserver
 
 systemtest_functionality:
     extends:
         file: docker-compose.base.yml
         service: systemtest_functionality
     links:
-        - systemtestnode
+        - systemtestwebserver
 
 systemtest_usability:
     extends:
@@ -84,11 +84,11 @@ systemtest_usability:
     links:
         - selenium
         - systemtestdaoserver
-        - systemtestnode
+        - systemtestwebserver
 
 selenium:
     extends:
         file: docker-compose.base.yml
         service: selenium
     links:
-        - systemtestnode
+        - systemtestwebserver

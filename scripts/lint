@@ -1,5 +1,5 @@
 #! /bin/bash
 
 pylint $(find . -iname "*.py")
-eslint node test/dao/functionality
-eslint node test/web/functionality
+eslint web test/dao/functionality
+eslint web test/web/functionality

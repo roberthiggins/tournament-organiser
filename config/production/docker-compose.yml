@@ -24,9 +24,9 @@ unittest:
         file: docker-compose.base.yml
         service: unittest
 
-node:
+webserver:
     links:
         - daoserver:daoserver
     extends:
         file: docker-compose.base.yml
-        service: node
+        service: webserver
