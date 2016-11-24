@@ -42,7 +42,7 @@ then
     docker create -v /dbdata --name dbstore postgres:9.3 bin/true
 fi
 
-cp config/production/docker-compose.yml docker-compose.yml
+./scripts/get-compose-files
 
 ./scripts/clean-and-build
 docker-compose up -d database daoserver webserver

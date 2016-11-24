@@ -3,8 +3,8 @@
 SYSTEMS="systemtestdb systemtestdaoserver systemtestwebserver"
 TEST_SYSTEMS="systemtest_functionality systemtest_usability"
 # Build all containers and run all tests
-cp config/dev/docker-compose.yml docker-compose.yml
-cp config/dev/docker-passwords.yml docker-passwords.yml
+./scripts/get-compose-files --dev
+
 docker-compose kill     &> /dev/null
 docker-compose rm -f    &> /dev/null
 
