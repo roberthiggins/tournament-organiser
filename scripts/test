@@ -1,20 +1,16 @@
 #! /bin/bash
-./scripts/lint
-
-# Build all containers and run all tests
 ./scripts/get-compose-files --dev
 ./scripts/clean-and-build --dev
-docker-compose up -d database daoserver webserver &> /dev/null
 
-docker-compose up -d unittestdb &> /dev/null
-docker-compose up -d apitestdb apitestdaoserver &> /dev/null
-docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver &> /dev/null
+docker-compose up -d unittestdb &> /dev/null &
+docker-compose up -d apitestdb apitestdaoserver &> /dev/null &
+docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver &> /dev/null &
+
+wait
+
+./scripts/lint
 
 docker-compose run unittest
-
-# Add some data to database for use in browser
-bash scripts/insert_into_db database database/data/dev/basic_functions.sql
-bash scripts/insert_into_db database database/data/dev/behaviour_test_data.sql
 
 # API Tests
 bash scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql
