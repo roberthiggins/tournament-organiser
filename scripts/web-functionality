@@ -1,15 +1,15 @@
 #! /bin/bash
 
-SYSTEMS="systemtestdb systemtestdaoserver systemtestwebserver"
-TEST_SYSTEMS="systemtest_functionality"
+SYSTEMS="web_func_db web_func_daoserver web_func_webserver"
+TEST_SYSTEMS="web_functionality"
 
 ./scripts/get-compose-files --dev
 ./scripts/clean-and-build --dev $SYSTEMS $TEST_SYSTEMS
 
 docker-compose up -d $SYSTEMS &> /dev/null
 
-docker exec systemtestdaoserver bash -c '/webapp/wait-for-postgres.sh systemtestdb bash'
-bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
-bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
+docker exec web_func_daoserver bash -c '/webapp/wait-for-postgres.sh web_func_db bash'
+bash scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql
+bash scripts/insert_into_db web_func_db database/data/dev/web_functionality_test_data.sql
 
-docker-compose run systemtest_functionality
+docker-compose run web_functionality

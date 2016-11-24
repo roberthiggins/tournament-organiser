@@ -12,18 +12,6 @@ daoserver:
         file: docker-compose.base.yml
         service: daoserver
 
-unittestdb:
-    extends:
-        file: docker-compose.base.yml
-        service: unittestdb
-
-unittest:
-    links:
-        - unittestdb:database
-    extends:
-        file: docker-compose.base.yml
-        service: unittest
-
 webserver:
     links:
         - daoserver:daoserver

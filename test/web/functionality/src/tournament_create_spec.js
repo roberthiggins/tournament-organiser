@@ -68,7 +68,7 @@ describe("Create a tournament", function () {
                         max_val: 10,
                         per_tournament: false,
                         percentage: 10,
-                        id: 11 },
+                        id: Number },
                     {   name: "bar",
                         opponent_score: false,
                         zero_sum: false,
@@ -76,7 +76,7 @@ describe("Create a tournament", function () {
                         max_val: 10,
                         per_tournament: false,
                         percentage: 10,
-                        id: 12 }
+                        id: Number }
                     ],
                 rounds: 1,
                 name: "test_tournament_creation",

@@ -1,0 +1,30 @@
+database:
+    container_name: web_use_db
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+daoserver:
+    build: daoserver
+    container_name: web_use_daoserver
+    command: bash /webapp/wait-for-postgres.sh web_use_db python -u app.py
+    ports:
+        - "5004:5000"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+webserver:
+    build: web
+    container_name: web_use_webserver
+    ports:
+        - "5106:8000"
+behat:
+    build: test/web/usability
+    container_name: web_usability
+
+selenium:
+    image: selenium/standalone-chrome
+    container_name: selenium
+    ports:
+        - "4444:4444"

@@ -14,7 +14,7 @@ Feature: Register for a Tournament
         Then I should see "register_test_1" appear
         When I follow "register_test_1"
         Then I should see "Apply to play in register_test_1" appear
-        Then I should see "Confirmed Entries: 1" appear
+        Then I should see "Confirmed Entries: 0" appear
         Then I should see "Date: 2222-06-01" appear
 
     @javascript

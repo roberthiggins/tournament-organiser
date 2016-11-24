@@ -5,7 +5,7 @@ Feature: Rank Entries Based on Scores
 
     @javascript
     Scenario: Bad targets
-        Given I am on "/tournament/northcon_2095/rankings"
+        Given I am on "/tournament/empty_tournament/rankings"
         Then I should see "There are no players entered for this event" appear
 
         Given I am on "/tournament/foo/rankings"

@@ -10,4 +10,4 @@ sleep 10
 
 # Add some data to database for use in browser
 bash scripts/insert_into_db database database/data/dev/basic_functions.sql
-bash scripts/insert_into_db database database/data/dev/behaviour_test_data.sql
+bash scripts/insert_into_db database database/data/dev/web_functionality_test_data.sql

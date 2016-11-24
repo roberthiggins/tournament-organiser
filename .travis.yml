@@ -19,12 +19,15 @@ install:
     - docker-compose up -d database daoserver webserver
     - docker-compose build apitestdb apitestdaoserver
     - docker-compose up -d apitestdb apitestdaoserver
-    - docker-compose build systemtestdb systemtestdaoserver systemtestwebserver
-    - docker-compose up -d systemtestdb systemtestdaoserver systemtestwebserver
+    - docker-compose build web_func_db web_func_daoserver web_func_webserver
+    - docker-compose up -d web_func_db web_func_daoserver web_func_webserver
+    - docker-compose build web_use_db web_use_daoserver web_use_webserver
+    - docker-compose up -d web_use_db web_use_daoserver web_use_webserver
     - docker inspect unittestdb
     - docker inspect daoserver
     - docker inspect apitestdaoserver
-    - docker inspect systemtestdaoserver
+    - docker inspect web_func_daoserver
+    - docker inspect web_use_daoserver
 script:
 
 
@@ -36,12 +39,14 @@ script:
     - docker-compose run apitest
 
 
-    - bash scripts/insert_into_db systemtestdb database/data/dev/basic_functions.sql
-    - bash scripts/insert_into_db systemtestdb database/data/dev/behaviour_test_data.sql
-    - docker-compose run systemtest_functionality
+    - bash scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql
+    - bash scripts/insert_into_db web_func_db database/data/dev/web_functionality_test_data.sql
+    - docker-compose run web_functionality
 
     - docker-compose up --build -d selenium
     - docker inspect selenium
-    - docker-compose run systemtest_usability
+    - bash scripts/insert_into_db web_use_db database/data/dev/basic_functions.sql
+    - bash scripts/insert_into_db web_use_db database/data/dev/web_usability_test_data.sql
+    - docker-compose run web_usability
 
     - pylint $(find . -iname "*.py")

@@ -49,7 +49,7 @@ describe("Get categories", function () {
                         max_val: 10,
                         per_tournament: false,
                         percentage: 15,
-                        id: 10 },
+                        id: Number },
                     {   name: "",
                         percentage: "",
                         per_tournament: false,

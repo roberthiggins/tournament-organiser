@@ -6,7 +6,7 @@ Feature: Enter a tournament score for a player
     @javascript
     Scenario Outline: I see some messages when I enter scores
         Given I am authenticated as "<auth>" using "password"
-        Given I am on "/tournament/painting_test/entry/stevemcqueen/enterscore"
+        Given I am on "/tournament/tourn_score_test/entry/stevemcqueen/enterscore"
         When I wait for "Enter score for stevemcqueen" to appear
         When I select "Fanciness" from "key"
         Then I fill in "value" with "<score>"

@@ -1,0 +1,19 @@
+database:
+    container_name: apitestdb
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+daoserver:
+    build: daoserver
+    container_name: apitestdaoserver
+    command: bash /webapp/wait-for-postgres.sh apitestdb python -u app.py
+    ports:
+        - "5002:5000"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+frisby:
+    build: test/dao/functionality
+    container_name: dao_func
