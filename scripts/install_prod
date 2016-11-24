@@ -45,6 +45,6 @@ fi
 ./scripts/get-compose-files
 
 ./scripts/clean-and-build
-docker-compose up -d database daoserver webserver
+docker-compose up -d --remove-orphans database daoserver webserver
 
 service apache2 restart
