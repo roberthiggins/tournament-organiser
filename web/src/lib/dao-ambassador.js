@@ -32,11 +32,14 @@ var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
         });
 
         DAOres.on("end", function() {
+            var meth = (method + "    ").substring(0, 4);
             if (typeof onSuccess === "function" && DAOres.statusCode === 200) {
-                winston.log("info", "Request to DAO succeeded", path);
+                winston.log("info", " " + meth + " Request to DAO succeeded",
+                    path);
                 onSuccess(body);
             } else if (typeof onFail === "function") {
-                winston.log("info", "Request to DAO failed.", path);
+                winston.log("ERROR", meth + " Request to DAO failed.", path,
+                    body);
                 onFail(body);
             }
         })
