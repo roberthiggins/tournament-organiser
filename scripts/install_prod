@@ -44,6 +44,7 @@ fi
 
 cp config/production/docker-compose.yml docker-compose.yml
 
-./scripts/install
+./scripts/clean-and-build
+docker-compose up -d database daoserver webserver
 
 service apache2 restart

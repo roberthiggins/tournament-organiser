@@ -14,8 +14,6 @@ if [ "$ENV" == 'dev' ]; then
 
     docker-compose pull  &> /dev/null
     docker-compose build &> /dev/null
-
-    docker-compose up -d database daoserver webserver &> /dev/null
 else
 
     docker-compose kill
@@ -23,6 +21,4 @@ else
 
     docker-compose pull
     docker-compose build
-
-    docker-compose up -d database daoserver webserver
 fi
