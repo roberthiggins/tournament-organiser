@@ -2,31 +2,27 @@
 ./scripts/get-compose-files --dev
 ./scripts/clean-and-build --dev
 
-docker-compose up -d unittestdb &> /dev/null &
-docker-compose up -d apitestdb apitestdaoserver &> /dev/null &
-docker-compose up -d web_func_db web_func_daoserver web_func_webserver &> /dev/null &
-docker-compose up -d web_use_db web_use_daoserver web_use_webserver &> /dev/null &
+UNIT="unittestdb"
+DAO="apitestdb apitestdaoserver"
+WEBFUNC="web_func_db web_func_daoserver web_func_webserver"
+WEBUSE="web_use_db web_use_daoserver web_use_webserver"
+SYSTEMS="$UNIT $DAO $WEBFUNC $WEBUSE"
 
+docker-compose up -d $SYSTEMS &> /dev/null
+
+echo "UNIT TESTS" && docker-compose run unittest
 wait
 
-./scripts/lint
+# Data Injection
+./scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql &> /dev/null && ./scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql &> /dev/null
 
-echo "UNITTESTS"
-docker-compose run unittest
+./scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql &> /dev/null && ./scripts/insert_into_db web_func_db database/data/dev/web_functionality_test_data.sql&> /dev/null
 
-# API Tests
-bash scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql &> /dev/null
-bash scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql &> /dev/null
-echo "DAO FUNCTIONALITY"
-docker-compose run apitest
+./scripts/insert_into_db web_use_db database/data/dev/basic_functions.sql &> /dev/null && ./scripts/insert_into_db web_use_db database/data/dev/web_usability_test_data.sql&> /dev/null
+wait
 
-# Web Tests
-echo "WEB FUNCTIONALITY"
-bash scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql &> /dev/null
-bash scripts/insert_into_db web_func_db database/data/dev/web_functionality_test_data.sql &> /dev/null
-docker-compose run web_functionality
-
-echo "WEB USEABILITY"
-bash scripts/insert_into_db web_use_db database/data/dev/basic_functions.sql &> /dev/null
-bash scripts/insert_into_db web_use_db database/data/dev/web_usability_test_data.sql &> /dev/null
-docker-compose run web_usability
+echo "LINTING" && ./scripts/lint &
+echo "DAO FUNCTIONALITY" && docker-compose run apitest &
+echo "WEB FUNCTIONALITY" && docker-compose run web_functionality &
+echo "WEB USEABILITY" && docker-compose run web_usability &
+wait
