@@ -25,5 +25,8 @@ RUN npm build
 # Expose the app port
 EXPOSE 3000
 
+HEALTHCHECK --interval=1s --timeout=1s \
+    CMD curl --fail http://localhost:8000/ || exit 1
+
 # Start the app
 CMD npm run start
