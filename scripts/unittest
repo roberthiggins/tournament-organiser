@@ -3,6 +3,4 @@
 ./scripts/get-compose-files --dev
 ./scripts/clean-and-build --dev unittestdb unittest
 
-docker-compose up -d unittestdb &> /dev/null
-
 docker-compose run unittest
