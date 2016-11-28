@@ -24,4 +24,7 @@ WORKDIR webapp/
 # Add a script to allow waiting for the db
 ADD ./wait-for-postgres.sh ./wait-for-postgres.sh
 
+HEALTHCHECK --interval=1s --timeout=1s \
+    CMD curl --fail http://localhost:5000/ || exit 1
+
 CMD python -u app.py
