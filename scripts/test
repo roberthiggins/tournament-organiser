@@ -9,20 +9,27 @@ WEBUSE="web_use_db web_use_daoserver web_use_webserver"
 SYSTEMS="$UNIT $DAO $WEBFUNC $WEBUSE"
 
 docker-compose up -d $SYSTEMS &> /dev/null
-
-echo "UNIT TESTS" && docker-compose run unittest
 wait
 
 # Data Injection
-./scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql &> /dev/null && ./scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql &> /dev/null
-
-./scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql &> /dev/null && ./scripts/insert_into_db web_func_db database/data/dev/web_functionality_test_data.sql&> /dev/null
-
-./scripts/insert_into_db web_use_db database/data/dev/basic_functions.sql &> /dev/null && ./scripts/insert_into_db web_use_db database/data/dev/web_usability_test_data.sql&> /dev/null
+inject () {
+    ./wait-for-container $1 \
+        ./scripts/insert_into_db $2 database/data/dev/basic_functions.sql \
+            &> /dev/null && \
+        ./scripts/insert_into_db $2 database/data/dev/$3.sql &> /dev/null
+}
+inject apitestdaoserver apitestdb api_test_data
+inject web_func_daoserver web_func_db web_functionality_test_data
+inject web_use_daoserver web_use_db web_usability_test_data
 wait
 
+run () {
+    echo $1
+    ./wait-for-container $2 docker-compose run $3
+}
 echo "LINTING" && ./scripts/lint &
-echo "DAO FUNCTIONALITY" && docker-compose run apitest &
-echo "WEB FUNCTIONALITY" && docker-compose run web_functionality &
-echo "WEB USEABILITY" && docker-compose run web_usability &
+echo "UNIT TESTS" && docker-compose run unittest &
+run "DAO FUNCTIONALITY" apitestdaoserver apitest &
+run "WEB USEABILITY" web_use_webserver web_usability &
+run "WEB FUNCTIONALITY" web_func_daoserver web_functionality &
 wait

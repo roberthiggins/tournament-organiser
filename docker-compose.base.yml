@@ -12,7 +12,6 @@ daoserver:
     container_name: daoserver
     ports:
         - "5001:5000"
-    command: bash /webapp/wait-for-postgres.sh database python -u app.py
     extends:
         file: docker-passwords.yml
         service: dbpasswords

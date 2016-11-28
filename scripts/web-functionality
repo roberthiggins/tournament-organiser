@@ -8,8 +8,10 @@ TEST_SYSTEMS="web_functionality"
 
 docker-compose up -d $SYSTEMS &> /dev/null
 
-docker exec web_func_daoserver bash -c '/webapp/wait-for-postgres.sh web_func_db bash'
-bash scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql
-bash scripts/insert_into_db web_func_db database/data/dev/web_functionality_test_data.sql
+./wait-for-container web_func_daoserver \
+    ./scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql \
+        &> /dev/null && \
+    ./scripts/insert_into_db web_func_db \
+        database/data/dev/web_functionality_test_data.sql &> /dev/null
 
 docker-compose run web_functionality

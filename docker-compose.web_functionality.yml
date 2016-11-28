@@ -7,7 +7,6 @@ database:
 daoserver:
     build: daoserver
     container_name: web_func_daoserver
-    command: bash /webapp/wait-for-postgres.sh web_func_db python -u app.py
     ports:
         - "5003:5000"
     extends:
