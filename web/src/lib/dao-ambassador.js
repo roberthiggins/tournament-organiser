@@ -5,10 +5,10 @@ var logger = require("./logger");
 var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
                                 onFail) {
 
-    var http            = require("http"),
-        daoIP           = process.env["DAOSERVER_PORT_5000_TCP_ADDR"],
-        daoPort         = process.env["DAOSERVER_PORT_5000_TCP_PORT"],
-        opts            = {
+    var http    = require("http"),
+        daoIP   = process.env["DAOSERVER_PORT_5000_TCP_ADDR"],
+        daoPort = process.env["DAOSERVER_PORT_5000_TCP_PORT"],
+        opts    = {
             host: daoIP,
             port: daoPort,
             path: path,
