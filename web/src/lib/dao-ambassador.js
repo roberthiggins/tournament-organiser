@@ -1,5 +1,5 @@
 /* Ambassador-like module for interacting with the DAO */
-const winston = require("winston");
+var logger = require("./logger");
 
 // Make a request to the DAO server
 var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
@@ -34,19 +34,17 @@ var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
         DAOres.on("end", function() {
             var meth = (method + "    ").substring(0, 4);
             if (typeof onSuccess === "function" && DAOres.statusCode === 200) {
-                winston.log("info", " " + meth + " Request to DAO succeeded",
-                    path);
+                logger.info(" " + meth + " Request to DAO succeeded", path);
                 onSuccess(body);
             } else if (typeof onFail === "function") {
-                winston.log("ERROR", meth + " Request to DAO failed.", path,
-                    body);
+                logger.error(meth + " Request to DAO failed.", path, body);
                 onFail(body);
             }
         })
     });
 
     DAOreq.on("error", function(err) {
-        winston.log("error", "Problem with request to DAO", err.message);
+        logger.error("Problem with request to DAO", err.message);
     });
 
     return DAOreq;

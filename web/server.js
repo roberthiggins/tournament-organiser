@@ -1,6 +1,7 @@
 var bodyParser = require("body-parser"),
     express = require("express"),
     expressSession = require("express-session"),
+    logger = require("./src/lib/logger"),
     passport = require("passport");
 const app = express();
 
