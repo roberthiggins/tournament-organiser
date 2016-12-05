@@ -7,7 +7,10 @@ const app = express();
 
 // Logging (must be defined before the router)
 logger.debug("Overriding 'Express' logger");
-app.use(require("morgan")("combined", { "stream": logger.stream }));
+app.use(require("morgan")("combined", {
+    stream: logger.stream,
+    skip: function (req, res) { return req.headers.host.includes("localhost:") }
+    }));
 
 app.listen(process.env.PORT || 8000);
 
