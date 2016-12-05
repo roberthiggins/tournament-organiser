@@ -20,6 +20,7 @@ RUN npm install
 
 # Build the app
 ADD . $HOME/app
+RUN mkdir -p $HOME/app/log
 RUN npm build
 
 # Expose the app port

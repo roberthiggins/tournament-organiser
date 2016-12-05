@@ -5,6 +5,10 @@ var bodyParser = require("body-parser"),
     passport = require("passport");
 const app = express();
 
+// Logging (must be defined before the router)
+logger.debug("Overriding 'Express' logger");
+app.use(require("morgan")("combined", { "stream": logger.stream }));
+
 app.listen(process.env.PORT || 8000);
 
 // Additional middleware which will set headers that we need on each request.
