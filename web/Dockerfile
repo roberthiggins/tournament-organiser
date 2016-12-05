@@ -1,11 +1,12 @@
 # A node webserver
 
-FROM node:4
+FROM node
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
 # Create a nonroot user named app
-RUN useradd --user-group --create-home --shell /bin/false appuser &&\
-  npm install --global npm
+RUN useradd --user-group --create-home --shell /bin/false appuser
+RUN curl -L https://npmjs.org/install.sh | sh
+#RUN npm install --global npm ## This should work but https://github.com/npm/npm/issues/9863
 ENV HOME=/home/appuser
 
 # Prepare app directory
