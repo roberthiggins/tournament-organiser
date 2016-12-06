@@ -18,6 +18,10 @@ webserver:
     container_name: web_use_webserver
     ports:
         - "5106:8000"
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords
+
 behat:
     build: test/web/usability
     container_name: web_usability

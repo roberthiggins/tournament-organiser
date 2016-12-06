@@ -18,6 +18,9 @@ webserver:
     container_name: web_func_webserver
     ports:
         - "5105:8000"
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords
 
 frisby:
     build: test/web/functionality

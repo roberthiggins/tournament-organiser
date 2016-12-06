@@ -35,7 +35,7 @@ app.use(bodyParser.json());
 
 // Express sessions for session management
 app.use(expressSession({
-    secret: "mySecretKeyTODO", // TODO get something from env vars
+    secret: process.env.EXPRESS_SESSION,
     maxAge: 15 * 60 * 1000,
     resave: false,
     saveUninitialized: false

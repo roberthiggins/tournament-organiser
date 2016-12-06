@@ -21,3 +21,6 @@ webserver:
     container_name: webserver
     ports:
         - "5005:8000"
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords
