@@ -39,7 +39,7 @@ class User(object):
         """Convenience method to recover DAO"""
         return Account.query.filter_by(username=self.username).first()
 
-    def add_account(self, details):
+    def create(self, details):
         """Add an account"""
         email = details['email']
         password1 = details['password1']
@@ -63,6 +63,16 @@ class User(object):
         db.session.commit()
 
         self.exists_in_db = True
+
+    @must_exist_in_db
+    def read(self):
+        """ username and email for contact and identification"""
+        return {
+            'username': self.username,
+            'email': self.get_dao().contact_email,
+            'first_name' : self.get_dao().first_name,
+            'last_name' : self.get_dao().last_name,
+        }
 
     @must_exist_in_db
     def available_actions(self):
@@ -248,13 +258,3 @@ class User(object):
         if Account.query.filter_by(username=self.username).first() is None or \
         not check_auth(self.username, password):
             raise ValueError('Username or password incorrect')
-
-    @must_exist_in_db
-    def details(self):
-        """ username and email for contact and identification"""
-        return {
-            'username': self.username,
-            'email': self.get_dao().contact_email,
-            'first_name' : self.get_dao().first_name,
-            'last_name' : self.get_dao().last_name,
-        }

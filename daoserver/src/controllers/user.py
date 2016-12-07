@@ -41,7 +41,7 @@ def create():
     """POST to add an account"""
     optional_values = request.get_json() if request.get_json() is not None \
         else {'first_name': None, 'last_name': None}
-    g.user.add_account({
+    g.user.create({
         'email': email,
         'password1':  password1,
         'password2':  password2,
@@ -60,4 +60,4 @@ def user_details():
     """
     GET to get account details in json form
     """
-    return g.user.details()
+    return g.user.read()

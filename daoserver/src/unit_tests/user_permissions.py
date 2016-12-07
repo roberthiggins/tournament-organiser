@@ -28,10 +28,6 @@ class UserPermissions(AppSimulatingTest):
         self.db.session.commit()
         self.injector.accounts.add(self.acc_1)
 
-    def test_add_account(self):
-        self.assertFalse(Account.query.\
-            filter_by(username=self.acc_1).first().is_superuser)
-
     def test_is_organiser(self):
         """check if a user is an organiser"""
         checker = PermissionsChecker()
@@ -53,6 +49,9 @@ class UserPermissions(AppSimulatingTest):
 
     def test_superuser(self):
         """check if a user is an organiser"""
+        self.assertFalse(Account.query.\
+            filter_by(username=self.acc_1).first().is_superuser)
+
         checker = PermissionsChecker()
         Account.query.filter_by(username=self.acc_1).first().is_superuser = True
         self.injector.inject(self.tourn_1)
