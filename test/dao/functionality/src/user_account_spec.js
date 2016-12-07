@@ -1,4 +1,5 @@
 var frisby = require("frisby"),
+    injector = require("./data_injector"),
     API = process.env.API_ADDR;
 
 
@@ -17,8 +18,7 @@ describe("Signing up and seeing user details", function () {
         .after(function(){
             frisby.create("See user details")
                 .get(API + "user/sign_up_user")
-                .addHeader("Authorization", "Basic " +
-                    new Buffer("superuser:password").toString("base64"))
+                .addHeader("Authorization", injector.auth("superuser"))
                 .expectStatus(200)
                 .expectHeaderContains("content-type", "application/json")
                 .expectJSONTypes({
@@ -47,8 +47,7 @@ describe("Signing up and seeing user details", function () {
         .after(function(){
             frisby.create("See user details")
                 .get(API + "user/capt_no_name")
-                .addHeader("Authorization", "Basic " +
-                    new Buffer("superuser:password").toString("base64"))
+                .addHeader("Authorization", injector.auth("superuser"))
                 .expectStatus(200)
                 .expectHeaderContains("content-type", "application/json")
                 .expectJSONTypes({
@@ -73,15 +72,13 @@ describe("User Accounts - unhappy path", function () {
 
     frisby.create("Malformed")
         .get(API + "user/")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("superuser:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(404)
         .toss();
 
     frisby.create("Look for a user who doesn't exist")
         .get(API + "user/jim_bob_noname")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("superuser:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("superuser"))
         .expectStatus(400)
         .expectHeaderContains("content-type", "text/html")
         .expectBodyContains("Cannot find user jim_bob_noname")
@@ -94,8 +91,7 @@ describe("User Accounts - unhappy path", function () {
 
     frisby.create("See user details with bad auth")
         .get(API + "user/charlie_murphy")
-        .addHeader("Authorization", "Basic " +
-            new Buffer("noone:password").toString("base64"))
+        .addHeader("Authorization", injector.auth("noone"))
         .expectStatus(401)
         .toss();
 });
