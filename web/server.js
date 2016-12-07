@@ -9,7 +9,7 @@ const app = express();
 logger.debug("Overriding 'Express' logger");
 app.use(require("morgan")("combined", {
     stream: logger.stream,
-    skip: function (req, res) { return req.headers.host.includes("localhost:") }
+    skip: function (req) { return req.headers.host.includes("localhost:") }
     }));
 
 app.listen(process.env.PORT || 8000);
