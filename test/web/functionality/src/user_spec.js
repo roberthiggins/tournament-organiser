@@ -35,12 +35,12 @@ describe("Login with bad details", function () {
 describe("Login twice", function () {
     "use strict";
     utils.asUser("superman", "password", function() {
-         frisby.create("second login")
+        frisby.create("second login")
             .post(process.env.API_ADDR + "login",
                 {username: "charlie_murphy", password: "password"})
             .expectStatus(200)
             .toss();
-       });
+        });
 });
 
 describe("Sign Up Page", function () {
