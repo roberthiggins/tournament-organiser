@@ -75,6 +75,25 @@ class User(object):
         }
 
     @must_exist_in_db
+    def update(self, details):
+        """Update user details"""
+
+        dao = self.get_dao()
+        email = details.get('email', dao.contact_email)
+        first_name = details.get('first_name', dao.first_name)
+        last_name = details.get('last_name', dao.last_name)
+
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            raise ValueError('This email does not appear valid')
+
+        dao.contact_email = email
+        dao.first_name = first_name
+        dao.last_name = last_name
+
+        db.session.add(dao)
+        db.session.commit()
+
+    @must_exist_in_db
     def available_actions(self):
         """
         Returns a list of actions the user can perform

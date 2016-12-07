@@ -35,3 +35,22 @@ class UserTests(AppSimulatingTest):
 
     def test_get_next_tournament(self):
         compare(User(self.player).get_next_tournament().name, 'today')
+
+    def test_update(self):
+        User(self.player).update({})
+        User(self.player).update({'first_name': 'foo'})
+        User(self.player).update({'last_name': 'foo'})
+        User(self.player).update({'email': 'a@b.c'})
+
+        self.assertRaises(ValueError, User(self.player).update, {'email': ''})
+        self.assertRaises(ValueError, User(self.player).update, {'email': 'f'})
+
+        details_to_set = {
+            'username': self.player,
+            'email': 'b@c.d',
+            'first_name' : 'first',
+            'last_name' : 'last'
+        }
+
+        User(self.player).update(details_to_set)
+        compare(User(self.player).read(), details_to_set)

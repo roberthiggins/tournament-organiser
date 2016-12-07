@@ -52,6 +52,23 @@ def create():
         '<ul><li>User Name: {}</li><li>Email: {}</li></ul>'.\
         format(g.user.username, email)
 
+# pylint: disable=undefined-variable
+@USER.route('', methods=['PUT'])
+@requires_auth
+@ensure_permission({'permission': 'USER_DETAILS'})
+@json_response
+def update():
+    """POST to add an account"""
+    details = {}
+    if request.get_json().get('email', None) is not None:
+        details['email'] = request.get_json().get('email')
+    if request.get_json().get('first_name', None) is not None:
+        details['first_name'] = request.get_json().get('first_name')
+    if request.get_json().get('last_name', None) is not None:
+        details['last_name'] = request.get_json().get('last_name')
+    g.user.update(details)
+    return user_details()
+
 @USER.route('', methods=['GET'])
 @requires_auth
 @ensure_permission({'permission': 'USER_DETAILS'})
