@@ -123,20 +123,32 @@ class User(object):
 
         return [x for x in strip_none(categories) if len(x['actions']) > 0]
 
+    # pylint: disable=too-many-arguments
+    def action(self, text, act, username=False, tourn=None, rnd=None):
+        """Make a dict containing action info ready for outside consumers"""
+        base_obj = {
+            'text': text,
+            'action': act
+        }
+        if username:
+            base_obj['username'] = self.username
+        if tourn is not None:
+            base_obj['tournament'] = tourn
+        if rnd is not None:
+            base_obj['round'] = rnd
+
+        return base_obj
+
     def get_feedback_actions(self):
         """Get the admin actions the user can perform"""
         return {
             'title': 'Feedback',
-            'actions': strip_none([
-                {'text': 'Place Feedback', 'action': 'place_feedback'},
-            ])
+            'actions': [self.action('Place Feedback', 'place_feedback')]
         }
-        # {'text': 'about players', 'action': 'player_info'},
-        # {'text': 'about to', 'action': 'to_info'},
-        # {'text': 'about tournie', 'action': 'tournament_info'},
-        # {'text': 'Update my player details',
-        #  'action': 'update_details',
-        #  'username': self.username},
+        # self.action('about players', 'player_info'),
+        # self.action('about to', 'to_info'),
+        # self.action('about tournie', 'tournament_info'),
+        # self.action('Update my player details', 'update_details', True)
 
     @must_exist_in_db
     def get_display_name(self):
@@ -151,23 +163,17 @@ class User(object):
         return {
             'title': 'Account',
             'actions': strip_none([
-                {'text': 'See your user details',
-                 'action': 'user_details',
-                 'username': self.username},
-                {'text': 'Logout',
-                 'action': 'logout'},
+                self.action('See your user details', 'user_details', True),
+                self.action('Logout', 'logout'),
             ])
         }
         # Get applications to update
-        # {'text': 'Update application',
-        #  'action': 'update_application'},
+        # self.action('Update application', 'update_application'),
         # Get applications
-        # {'text': 'See application status',
-        #  'action': 'update_application'},
+        # self.action('See application status', 'update_application'),
         # Upcoming tournaments
-        # {'text': 'See upcoming tournaments for user user_1',
-        #  'action': 'upcoming_tournaments',
-        #  'username': self.username},
+        # self.action('See upcoming tournaments for user user_1',
+        #             'upcoming_tournaments', True)
 
     def get_last_tournament(self):
         """The last tournament for the user"""
@@ -190,28 +196,22 @@ class User(object):
         modifiable_tournaments = all_tournaments_with_permission(
             PERMISSIONS.get('MODIFY_TOURNAMENT'),
             self.username)
-        set_rounds = [{
-            'text': 'Set num rounds for {}'.format(x),
-            'action': 'set_rounds',
-            'tournament': x
-        } for x in modifiable_tournaments]
+        set_rounds = [
+            self.action('Set num rounds for {}'.format(x), 'set_rounds',
+                        tourn=x) for x in modifiable_tournaments]
 
         # Find all tournaments that can have their missions set
-        set_mission_actions = [{
-            'text': 'Set missions for {}'.format(x),
-            'action': 'set_missions',
-            'tournament': x
-        } for x in modifiable_tournaments]
+        set_mission_actions = [
+            self.action('Set missions for {}'.format(x), 'set_missions',
+                        tourn=x) for x in modifiable_tournaments]
 
         # Find all tournaments that can have their score_categories set
-        set_cats = [{
-            'text': 'Set scoring categories for {}'.format(x),
-            'action': 'set_score_categories',
-            'tournament': x
-        } for x in modifiable_tournaments]
+        set_cats = [
+            self.action('Set scoring categories for {}'.format(x),
+                        'set_score_categories', tourn=x) \
+            for x in modifiable_tournaments]
 
-        actions = \
-            [{'text': 'Create a Tournament', 'action': 'create_tournament'}] \
+        actions = [self.action('Create a Tournament', 'create_tournament')] \
             + set_rounds + set_cats + set_mission_actions
 
         return {
@@ -222,50 +222,41 @@ class User(object):
     def get_play_actions(self):
         """Get all the actions for playing in tournaments"""
 
-        last_tourn = self.get_last_tournament()
-        next_tourn = self.get_next_tournament()
-        next_game = {'text': 'Get next game',
-                     'action': 'next_game',
-                     'tournament': next_tourn.name} \
-            if next_tourn is not None else None
+        last_t = self.get_last_tournament()
+        next_t = self.get_next_tournament()
+        next_game = self.action('Get next game', 'next_game', \
+            tourn=next_t.name) if next_t is not None else None
         tourn_rounds = [x for x in \
-                range(1, Tournament(next_tourn.name).get_dao().rounds.count())]\
-            if next_tourn is not None else []
+                range(1, Tournament(next_t.name).get_dao().rounds.count())]\
+            if next_t is not None else []
 
-        draws = [{'text': 'Get the draw for {} round {}'.\
-                          format(next_tourn.name, x),
-                  'action': 'get_draw',
-                  'tournament': next_tourn.name,
-                  'round': x
-                 } for x in tourn_rounds]
+        draws = [
+            self.action('Get the draw for {} round {}'.format(next_t.name, x),
+                        'get_draw', tourn=next_t.name, rnd=x) \
+            for x in tourn_rounds]
 
         submits = [
-            {'text': 'See upcoming tournaments',
-             'action': 'tournament_list'},
-            {'text': 'Submit a tournament score for {}'.format(next_tourn.name),
+            self.action('See upcoming tournaments', 'tournament_list'),
+            {'text': 'Submit a tournament score for {}'.format(next_t.name),
              'action': 'enter_tournament_score',
-             'tournament': next_tourn.name,
-             'username': self.username} if next_tourn is not None else None,
-            {'text': 'Submit a game score for {}'.format(next_tourn.name),
+             'tournament': next_t.name,
+             'username': self.username} if next_t is not None else None,
+            {'text': 'Submit a game score for {}'.format(next_t.name),
              'action': 'enter_game_score',
-             'tournament': next_tourn.name,
-             'username': self.username} if next_tourn is not None else None,
-            {'text': 'See total scores for {}'.format(last_tourn.name),
+             'tournament': next_t.name,
+             'username': self.username} if next_t is not None else None,
+            {'text': 'See total scores for {}'.format(last_t.name),
              'action': 'get_rankings',
-             'tournament': last_tourn.name} if last_tourn is not None else None,
+             'tournament': last_t.name} if last_t is not None else None,
         ]
         # Table layout
-        # {'text': 'Get the table layout',
-        #  'action': 'table_layout'},
+        # self.action('Get the table layout', 'table_layout'),
         # Opponent army list
-        # {'text': 'Get an opponent army list',
-        #  'action': 'get_opponent'},
+        # self.action('Get an opponent army list', 'get_opponent'),
         # Time remaining
-        # {'text': 'Get the time remaining in the round',
-        #  'action': 'get_clock'},
+        # self.action('Get the time remaining in the round', 'get_clock'),
         # Previous games
-        # {'text': 'Review previous games',
-        #  'action': 'see_previous_games'}
+        # self.action('Review previous games', 'see_previous_games')
 
         return {
             'title': 'Play',
