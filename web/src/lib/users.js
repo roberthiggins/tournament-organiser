@@ -1,6 +1,6 @@
 /* Functions for assisting with user login and auth. */
 
-var DAOAmbassador = require("../lib/dao-ambassador"),
+var DAOAmbassador = require("./dao-ambassador"),
     passport      = require("passport"),
     LocalStrategy = require("passport-local").Strategy,
     winston       = require("winston");

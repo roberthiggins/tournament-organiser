@@ -2,7 +2,7 @@
 var DAOAmbassador = require("../lib/dao-ambassador"),
     express       = require('express'),
     router        = express.Router(),
-    users         = require("./users");
+    users         = require("../lib/users");
 
 
 var ensureEntryExists = function(req, res, next) {

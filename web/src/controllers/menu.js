@@ -2,7 +2,7 @@ var DAOAmbassador = require("../lib/dao-ambassador"),
     express       = require("express"),
     Menu          = require("../models/menu"),
     router        = express.Router(),
-    users         = require("./users");
+    users         = require("../lib/users");
 
 router.route("/content")
     .get(users.injectUserIntoRequest, function(req, res) {

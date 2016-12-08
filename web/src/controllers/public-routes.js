@@ -1,7 +1,7 @@
 // Publicly available routes
 var express = require('express'),
     router  = express.Router(),
-    users   = require("./users");
+    users   = require("../lib/users");
 
 
 // Home

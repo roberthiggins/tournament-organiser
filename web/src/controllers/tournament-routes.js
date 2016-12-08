@@ -3,7 +3,7 @@ var Category      = require("../models/score-categories"),
     DAOAmbassador = require("../lib/dao-ambassador"),
     express       = require('express'),
     router        = express.Router(),
-    users         = require("./users"),
+    users         = require("../lib/users"),
     authUser      = [users.injectUserIntoRequest, users.ensureAuthenticated];
 
 

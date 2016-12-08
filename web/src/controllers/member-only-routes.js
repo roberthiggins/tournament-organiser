@@ -4,7 +4,7 @@ var DAOAmbassador  = require("../lib/dao-ambassador"),
     express        = require('express'),
     feedback       = require("./feedback"),
     router         = express.Router(),
-    users          = require("./users"),
+    users          = require("../lib/users"),
     injectAuthUser = [users.injectUserIntoRequest, users.ensureAuthenticated];
 
 router.route("/feedback")
@@ -25,7 +25,7 @@ router.route("/user/:user")
             src_loc: "/userDetails.js",
             subtitle: "User Details for " + req.user.username
         });
-    })
+    });
 router.route("/user/:user/content")
     .get(injectAuthUser, function(req, res) {
         DAOAmbassador.getFromDAORequest(
