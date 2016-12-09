@@ -2,15 +2,14 @@
 
 exports.placeFeedback = function(req, res) {
 
-    var DAOAmbassador = require("../lib/dao-ambassador");
-
-    DAOAmbassador.postToDAORequest(
-        req,
-        res,
-        "/feedback",
-        {inputFeedback: req.body.feedback},
-        undefined,
-        function(responseBody) {
+    require("../lib/dao-ambassador").request({
+        method: "POST",
+        request: req,
+        response: res,
+        URL: "/feedback",
+        data: {inputFeedback: req.body.feedback},
+        onFail: function(responseBody) {
             return res.status(400).json({message: responseBody});
+            }
         });
 };

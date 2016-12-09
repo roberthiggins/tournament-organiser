@@ -13,9 +13,14 @@ router.route("/tournaments")
     });
 router.route("/tournaments/content")
     .get(function(req, res) {
-        DAOAmbassador.getFromDAORequest(req, res, "/tournament/",
-            function(result) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: "/tournament/",
+            onSuccess: function(result) {
                 res.status(200).json(JSON.parse(result));
+                }
             });
     });
 
@@ -29,18 +34,20 @@ router.route("/tournament/create")
     .post(authUser, function(req, res){
         try {
             var cleanCats = Category.cleanCategories(req.body.categories);
-            DAOAmbassador.postToDAORequest(
-                req,
-                res,
-                "/tournament",
-                {
+            DAOAmbassador.request({
+                method: "POST",
+                request: req,
+                response: res,
+                URL: "/tournament",
+                data: {
                     inputTournamentName: req.body.name,
                     inputTournamentDate: req.body.date,
                     rounds: req.body.rounds || 0,
                     score_categories: cleanCats
-                },
-                function success(result) {
+                    },
+                onSuccess: function success(result) {
                     res.status(200).json(JSON.parse(result));
+                    }
                 });
         }
         catch (err) {
@@ -57,24 +64,24 @@ router.route("/tournament/:tournament")
         });
     })
     .post(authUser, function(req, res){
-        DAOAmbassador.postToDAORequest(
-            req,
-            res,
-            "/tournament/" + req.params.tournament + "/register/" +
-            req.user.username,
-            {});
+        DAOAmbassador.request({
+            method: "POST",
+            request: req,
+            response: res,
+            URL: "/tournament/" + req.params.tournament + "/register/" +
+                req.user.username,
+            });
         });
 router.route("/tournament/:tournament/content")
     .get(function(req, res) {
-        DAOAmbassador.getFromDAORequest(
-            req,
-            res,
-            "/tournament/" + req.params.tournament,
-            function(result) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: "/tournament/" + req.params.tournament,
+            onSuccess: function(result) {
                 res.status(200).json(JSON.parse(result));
-            },
-            function(responseBody) {
-                res.status(400).json({error: responseBody});
+                },
             });
     });
 
@@ -89,15 +96,20 @@ router.route("/tournament/:tournament/rankings/content")
     .get(function(req, res) {
         var url = "/tournament/" + req.params.tournament + "/entry/rank";
 
-        DAOAmbassador.getFromDAORequest(req, res, url,
-            function(responseBody) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: url,
+            onSuccess: function(responseBody) {
                 var responseDict = {entries: JSON.parse(responseBody)};
                 responseDict.tournament = req.params.tournament,
 
                 res.status(200).json(responseDict);
-            },
-            function(responseBody) {
+                },
+            onFail: function(responseBody) {
                 res.status(200).json({error: responseBody});
+                }
             });
     });
 
@@ -109,25 +121,29 @@ router.route("/tournament/:tournament/rounds")
             });
         })
     .post(authUser, function(req, res){
-        DAOAmbassador.postToDAORequest(
-            req,
-            res,
-            "/tournament/" + req.params.tournament,
-            {rounds: req.body.rounds || ""});
+        DAOAmbassador.request({
+            method: "POST",
+            request: req,
+            response: res,
+            URL: "/tournament/" + req.params.tournament,
+            data: {rounds: req.body.rounds || ""}
+            });
         });
 router.route("/tournament/:tournament/rounds/content")
     .get(authUser, function(req, res) {
         var url = "/tournament/" + req.params.tournament;
 
-        DAOAmbassador.getFromDAORequest(req, res, url,
-            function(responseBody) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: url,
+            onSuccess: function(responseBody) {
                 var responseDict = JSON.parse(responseBody);
                 responseDict.tournament = req.params.tournament,
 
                 res.status(200).json(responseDict);
-            },
-            function(responseBody) {
-                res.status(400).json({error: responseBody});
+                },
             });
     });
 
@@ -144,19 +160,18 @@ router.route("/tournament/:tournament/round/:round/draw/content")
         var url = "/tournament/" + req.params.tournament + "/rounds/"
                 + req.params.round;
 
-        DAOAmbassador.getFromDAORequest(
-            req,
-            res,
-            url,
-            function(responseBody) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: url,
+            onSuccess: function(responseBody) {
                 var responseDict = JSON.parse(responseBody);
                 responseDict.tournament = req.params.tournament,
                 responseDict.round = req.params.round;
 
                 res.status(200).json(responseDict);
-            },
-            function(responseBody) {
-                res.status(400).json({error: responseBody});
+                },
             });
     });
 
@@ -170,11 +185,13 @@ router.route("/tournament/:tournament/categories")
     .post(authUser, function(req, res){
         try {
             var cleanCats = Category.cleanCategories(req.body.categories);
-            DAOAmbassador.postToDAORequest(
-                req,
-                res,
-                "/tournament/" + req.params.tournament,
-                {score_categories: cleanCats});
+            DAOAmbassador.request({
+                method: "POST",
+                request: req,
+                response: res,
+                URL: "/tournament/" + req.params.tournament,
+                data: {score_categories: cleanCats}
+                });
         }
         catch (err) {
             res.status(400).json({error: err});
@@ -185,11 +202,12 @@ router.route("/tournament/:tournament/categories/content")
     .get(authUser, function(req, res) {
         var url = "/tournament/" + req.params.tournament + "/score_categories";
 
-        DAOAmbassador.getFromDAORequest(
-            req,
-            res,
-            url,
-            function(responseBody) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: url,
+            onSuccess: function(responseBody) {
                 var responseDict = {
                         instructions: "Set the score categories for " +
                             req.params.tournament +
@@ -224,6 +242,7 @@ router.route("/tournament/:tournament/categories/content")
                     });
 
                 res.status(200).json(responseDict);
+                }
             });
     });
 
@@ -236,25 +255,24 @@ router.route("/tournament/:tournament/missions")
         })
     .post(authUser, function(req, res){
 
-        DAOAmbassador.postToDAORequest(
-            req,
-            res,
-            "/tournament/" + req.params.tournament,
-            req.body,
-            null,
-            function(responseBody) {
-                res.status(400).json({error: responseBody});
+        DAOAmbassador.request({
+            method: "POST",
+            request: req,
+            response: res,
+            URL: "/tournament/" + req.params.tournament,
+            data: req.body,
             });
         });
 router.route("/tournament/:tournament/missions/content")
     .get(authUser, function(req, res) {
         var url = "/tournament/" + req.params.tournament + "/missions";
 
-        DAOAmbassador.getFromDAORequest(
-            req,
-            res,
-            url,
-            function(responseBody) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: url,
+            onSuccess: function(responseBody) {
                 var responseDict = {
                     missions: JSON.parse(responseBody),
                     tournament: req.params.tournament,
@@ -262,6 +280,7 @@ router.route("/tournament/:tournament/missions/content")
                                 + " here:"
                 };
                 res.status(200).json(responseDict);
+                }
             });
     });
 

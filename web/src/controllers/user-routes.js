@@ -15,13 +15,15 @@ router.route("/user/:user")
     });
 router.route("/user/:user/content")
     .get(injectAuthUser, function(req, res) {
-        DAOAmbassador.getFromDAORequest(
-            req,
-            res,
-            "/user/" + req.params.user,
-            function(resp) {
+        DAOAmbassador.request({
+            method: "GET",
+            request: req,
+            response: res,
+            URL: "/user/" + req.params.user,
+            onSuccess: function(resp) {
                 res.status(200).json({user: JSON.parse(resp)});
-                });
+                }
+            });
         });
 
 module.exports = router;

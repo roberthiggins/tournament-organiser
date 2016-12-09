@@ -62,7 +62,7 @@ var makeAuth = function (req) {
  * GET request to the DAO server.
  * Caller is responsible for attaching success and fail handlers
  */
-exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
+var getFromDAORequest = function(req, res, path, onSuccess, onFail) {
 
     var headers = {
             "Content-Type": "application/json",
@@ -78,7 +78,7 @@ exports.getFromDAORequest = function(req, res, path, onSuccess, onFail) {
  * POST request to the DAO server.
  * Caller is responsible for attaching success and fail handlers
  */
-exports.postToDAORequest = function(req, res, path, JSONData, onSuccess,
+var postToDAORequest = function(req, res, path, JSONData, onSuccess,
                                     onFail) {
 
     var postData = JSON.stringify(JSONData),
@@ -108,10 +108,9 @@ exports.postToDAORequest = function(req, res, path, JSONData, onSuccess,
  */
 exports.request = function(o) {
     if (o.method === "GET") {
-        exports.getFromDAORequest(o.request, o.response, o.URL, o.onSuccess,
-            o.onFail);
+        getFromDAORequest(o.request, o.response, o.URL, o.onSuccess, o.onFail);
     } else if (o.method === "POST") {
-        exports.postToDAORequest(o.request, o.response, o.URL, o.data || {},
+        postToDAORequest(o.request, o.response, o.URL, o.data || {},
             o.onSuccess || undefined, o.onFail || undefined);
     } else {
         throw "Request method required: GET, POST, PUT, etc.";

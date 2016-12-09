@@ -8,14 +8,15 @@ router.route("/content")
     .get(users.injectUserIntoRequest, function(req, res) {
 
         if (req.user) {
-            var url = "/user/" + req.user.username + "/actions";
 
-            DAOAmbassador.getFromDAORequest(
-                req,
-                res,
-                url,
-                function(body) {
-                    res.status(200).json(Menu.transform(JSON.parse(body)));
+            DAOAmbassador.request({
+                method: "GET",
+                request: req,
+                response: res,
+                URL: "/user/" + req.user.username + "/actions",
+                onSuccess: function(body) {
+                        res.status(200).json(Menu.transform(JSON.parse(body)));
+                    }
                 });
         }
         else {
