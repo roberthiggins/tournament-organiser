@@ -87,16 +87,11 @@ exports.signup = function(req, res) {
         return false;
     }
 
-    var userDetails = {
-            email: req.body.email,
-            password1: req.body.password1,
-            password2: req.body.password2
-        };
     DAOAmbassador.postToDAORequest(
         req,
         res,
         "/user/" + req.body.username,
-        userDetails,
+        req.body,
         undefined,
         function failure(responseBody) {
             res.status(400).json({error: responseBody});
