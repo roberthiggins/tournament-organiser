@@ -93,3 +93,27 @@ exports.postToDAORequest = function(req, res, path, JSONData, onSuccess,
     DAOreq.write(postData);
     DAOreq.end();
 };
+
+/*
+ * Make a request to the Daoserver. Takes arguments in an object
+ * {
+ *      method    - string   - "GET", "POST", etc.
+ *      URL       - string   - target (REQUIRED),
+ *      request   - object   - request object,
+ *      response  - object   - response object,
+ *      data      - object   - data to post
+ *      onSuccess - function - to run after 200,
+ *      onFail    - function - to run after failure code
+ * }
+ */
+exports.request = function(o) {
+    if (o.method === "GET") {
+        exports.getFromDAORequest(o.request, o.response, o.URL, o.onSuccess,
+            o.onFail);
+    } else if (o.method === "POST") {
+        exports.postToDAORequest(o.request, o.response, o.URL, o.data || {},
+            o.onSuccess || undefined, o.onFail || undefined);
+    } else {
+        throw "Request method required: GET, POST, PUT, etc.";
+    }
+};

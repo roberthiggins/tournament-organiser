@@ -52,16 +52,16 @@ passport.use('local-signin', new LocalStrategy(
                 inputUsername: username,
                 inputPassword: password
             };
-        DAOAmbassador.postToDAORequest(
-            null,
-            null,
-            "/user/" + req.body.username + "/login",
-            userDetails,
-            function success() {
+        DAOAmbassador.request({
+            method: "POST",
+            URL: "/user/" + req.body.username + "/login",
+            data: userDetails,
+            onSuccess: function success() {
                 return done(null, {username: username, password: password});
-            },
-            function failure(responseBody) {
+                },
+            onFail: function failure(responseBody) {
                 return done(null, false, {message: responseBody});
+                }
             });
     }
 ));
@@ -87,13 +87,14 @@ exports.signup = function(req, res) {
         return false;
     }
 
-    DAOAmbassador.postToDAORequest(
-        req,
-        res,
-        "/user/" + req.body.username,
-        req.body,
-        undefined,
-        function failure(responseBody) {
+    DAOAmbassador.request({
+        method: "POST",
+        request: req,
+        response: res,
+        URL: "/user/" + req.body.username,
+        data: req.body,
+        onFail: function failure(responseBody) {
             res.status(400).json({error: responseBody});
+            }
         });
 };
