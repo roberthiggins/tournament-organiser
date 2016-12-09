@@ -81,8 +81,8 @@ var getFromDAORequest = function(req, res, path, onSuccess, onFail) {
  * POST request to the DAO server.
  * Caller is responsible for attaching success and fail handlers
  */
-var postToDAORequest = function(req, res, path, JSONData, onSuccess,
-                                    onFail) {
+var postToDAORequest = function(req, res, path, method, JSONData, onSuccess,
+                                onFail) {
 
     var postData = JSON.stringify(JSONData),
         headers  = {
@@ -90,7 +90,7 @@ var postToDAORequest = function(req, res, path, JSONData, onSuccess,
             "Content-Length": Buffer.byteLength(postData),
             "Authorization": makeAuth(req)
         },
-        DAOreq   = DAORequestConfig(req, res, path, "POST", headers, onSuccess,
+        DAOreq   = DAORequestConfig(req, res, path, method, headers, onSuccess,
             onFail);
 
     DAOreq.write(postData);
@@ -112,8 +112,8 @@ var postToDAORequest = function(req, res, path, JSONData, onSuccess,
 exports.request = function(o) {
     if (o.method === "GET") {
         getFromDAORequest(o.request, o.response, o.URL, o.onSuccess, o.onFail);
-    } else if (o.method === "POST") {
-        postToDAORequest(o.request, o.response, o.URL, o.data || {},
+    } else if (o.method === "POST" || o.method === "PUT") {
+        postToDAORequest(o.request, o.response, o.URL, o.method, o.data || {},
             o.onSuccess || undefined, o.onFail || undefined);
     } else {
         throw "Request method required: GET, POST, PUT, etc.";
