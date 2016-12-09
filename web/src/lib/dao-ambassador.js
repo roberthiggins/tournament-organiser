@@ -50,6 +50,9 @@ var DAORequestConfig = function(req, res, path, method, headers, onSuccess,
     return DAOreq;
 };
 
+/*
+ * Add auth string to request
+ */
 var makeAuth = function (req) {
     var user = req && req.session && req.session.user ? req.session.user : null,
         auth = user ? "Basic " + new Buffer(user.username + ":" +
