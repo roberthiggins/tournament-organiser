@@ -23,11 +23,11 @@ install:
     - docker-compose up -d web_func_db web_func_daoserver web_func_webserver
     - docker-compose build web_use_db web_use_daoserver web_use_webserver
     - docker-compose up -d web_use_db web_use_daoserver web_use_webserver
-    - docker inspect unittestdb
-    - docker inspect daoserver
-    - docker inspect apitestdaoserver
-    - docker inspect web_func_daoserver
-    - docker inspect web_use_daoserver
+    - docker inspect unittestdb &> /dev/null
+    - docker inspect daoserver &> /dev/null
+    - docker inspect apitestdaoserver &> /dev/null
+    - docker inspect web_func_daoserver &> /dev/null
+    - docker inspect web_use_daoserver &> /dev/null
 script:
 
 
@@ -44,7 +44,7 @@ script:
     - docker-compose run web_functionality
 
     - docker-compose up --build -d selenium
-    - docker inspect selenium
+    - docker inspect selenium &> /dev/null
     - bash scripts/insert_into_db web_use_db database/data/dev/basic_functions.sql
     - bash scripts/insert_into_db web_use_db database/data/dev/web_usability_test_data.sql
     - docker-compose run web_usability
