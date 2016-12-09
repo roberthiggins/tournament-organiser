@@ -172,3 +172,115 @@ describe("Sign Up Values", function () {
             email: "a@b.c",
         });
 });
+
+describe("Auth for updating a user", function () {
+    var API = process.env.API_ADDR + "user/superman/update";
+
+    frisby.create("No auth to see page")
+        .get(API, {inspectOnFailure: true})
+        .expectStatus(200)
+        .expectBodyContains("login.js")
+        .toss();
+    frisby.create("No auth to see content")
+        .get(API + "/content", {inspectOnFailure: true})
+        .expectStatus(200)
+        .expectBodyContains("login.js")
+        .toss();
+    frisby.create("No auth to post")
+        .post(API, {}, {inspectOnFailure: true})
+        .expectStatus(302)
+        .expectBodyContains("/login?")
+        .toss();
+
+    utils.asUser("ranking_test_to", "password", function(cookie) {
+        frisby.create("other users cannot see details")
+            .get(API + "/content", {inspectOnFailure: true})
+            .addHeader("cookie", cookie)
+            .expectStatus(400)
+            .expectJSON({error: "Permission denied for ranking_test_to"})
+            .toss();
+        });
+    utils.asUser("ranking_test_to", "password", function(cookie) {
+        frisby.create("other users cannot update")
+            .post(API, {}, {inspectOnFailure: true})
+            .addHeader("cookie", cookie)
+            .expectStatus(400)
+            .expectJSON({error: "Permission denied for ranking_test_to"})
+            .toss();
+        });
+});
+
+describe("Updating a user", function () {
+    "use strict";
+    var user = "user_update_test",
+        pword = "password",
+        API = process.env.API_ADDR + "user/" + user + "/update";
+
+    frisby.create("Create user to view")
+        .post(process.env.API_ADDR + "signup", {
+            username: user,
+            email: "a@b.c",
+            password1: pword,
+            password2: pword})
+        .expectStatus(200)
+        .after(function() {
+            utils.asUser(user, pword, function(cookie) {
+                frisby.create("See update page")
+                    .get(API, {inspectOnFailure: true})
+                    .addHeader("cookie", cookie)
+                    .expectStatus(200)
+                    .toss();
+
+                frisby.create("See update content")
+                    .get(API + "/content", {inspectOnFailure: true})
+                    .addHeader("cookie", cookie)
+                    .expectStatus(200)
+                    .expectJSON({
+                        user: {
+                            username: user,
+                            email: "a@b.c"
+                            }
+                        })
+                    .toss();
+                });
+            })
+        .toss();
+
+    user = "user_update_test_2";
+    API = process.env.API_ADDR + "user/" + user + "/update";
+    frisby.create("Create user to update")
+        .post(process.env.API_ADDR + "signup", {
+            username: user,
+            email: "a@b.c",
+            password1: pword,
+            password2: pword})
+        .expectStatus(200)
+        .after(function() {
+            utils.asUser(user, pword, function(cookie) {
+                frisby.create("post update content")
+                    .post(API, {
+                        email: "foo@bar.com",
+                        last_name: "bloggs"
+                        }, {inspectOnFailure: true, json: true})
+                    .addHeader("cookie", cookie)
+                    .expectStatus(200)
+                    .after(function () {
+                        frisby.create("See updated details")
+                            .get(API + "/content", {inspectOnFailure: true})
+                            .addHeader("cookie", cookie)
+                            .expectStatus(200)
+                            .expectJSON({
+                                user: {
+                                    username: user,
+                                    email: "foo@bar.com",
+                                    last_name: "bloggs"
+                                    }
+                                })
+                            .toss();
+
+                        })
+                    .toss();
+                });
+            })
+        .toss();
+});
