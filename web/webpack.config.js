@@ -26,6 +26,7 @@ module.exports = {
     tournamentRankings: './src/views/tournament-rankings.js',
     tournamentRounds: './src/views/tournament-rounds.js',
     userDetails: './src/views/user-details.js',
+    userUpdate: './src/views/user-update.js',
   },
   output: {
     path: './public',

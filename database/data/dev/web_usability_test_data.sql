@@ -73,3 +73,4 @@ SELECT create_tournament('register_test_1', '2222-06-01');
 SELECT create_tournament('register_test_2', '2222-06-02');
 SELECT create_tournament('register_test_3', '2222-06-02');
 SELECT create_user('register_test_player_1');
+SELECT create_user('user_update_test');
