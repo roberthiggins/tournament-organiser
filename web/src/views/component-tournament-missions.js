@@ -1,5 +1,4 @@
-var React = require("react");
-
+/* global React */
 
 var MissionField = React.createClass({
     propTypes: {

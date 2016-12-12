@@ -1,4 +1,4 @@
-var React = require("react");
+/* global React */
 
 var Checkbox = React.createClass({
     propTypes: {

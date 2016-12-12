@@ -1,5 +1,6 @@
-var React = require("react"),
-    Inputs = require("./component-inputs.js");
+/* global React */
+
+var Inputs = require("./component-inputs.js");
 
 var getCategories = function(categories, perTournamentScores) {
     if (!categories) {
