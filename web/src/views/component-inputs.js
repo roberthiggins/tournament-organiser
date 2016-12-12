@@ -24,12 +24,16 @@ var Checkbox = React.createClass({
 var TextField = React.createClass({
     propTypes: {
         changeHandler: React.PropTypes.func.isRequired,
+        helpText: React.PropTypes.string,
         id: React.PropTypes.string.isRequired,
         name: React.PropTypes.string.isRequired,
         value: React.PropTypes.oneOfType(
                 [React.PropTypes.string, React.PropTypes.number])
     },
     render: function() {
+        var help = this.props.helpText ?
+            <div className="helptext">{this.props.helpText}</div>
+            : null;
         return (
             <div className="form_field">
                 <label htmlFor={this.props.id}>{this.props.name}:</label>
@@ -38,6 +42,7 @@ var TextField = React.createClass({
                         id={this.props.id}
                         onChange={this.props.changeHandler}
                         value={this.props.value } />
+                {help}
             </div>
         );
     }
