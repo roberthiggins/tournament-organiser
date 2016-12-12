@@ -6,7 +6,7 @@ UPDATE=${1:-"no"}
 if [ "$UPDATE" == '--update' ]; then
     shift
 
-    docker-compose up -d webserver
+    docker-compose up --build -d webserver
 
 else
 
