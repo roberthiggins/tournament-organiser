@@ -207,6 +207,9 @@ class Tournament(object):
     @must_exist_in_db
     def get_missions(self):
         """Get all the missions for the tournament. List ordered by ordering"""
+        if self.get_dao().rounds.count() == 0:
+            raise ValueError('Please set the number of rounds for {} first'.\
+                format(self.tournament_id))
         return [x.get_mission()
                 for x in self.get_dao().rounds.order_by('ordering')]
 

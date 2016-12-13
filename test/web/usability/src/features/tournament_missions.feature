@@ -22,3 +22,9 @@ Feature: Set the missions through the web front end.
         Given I am authenticated as "superman" using "password"
         Given I am on "/tournament/foo/missions"
         Then I wait for "Tournament foo not found in database" to appear
+
+    @javascript
+    Scenario: I visit a tournament with no rounds set
+        Given I am authenticated as "superman" using "password"
+        Given I am on "/tournament/empty_tournament/missions"
+        Then I wait for "Please set the number of rounds for empty_tournament first" to appear

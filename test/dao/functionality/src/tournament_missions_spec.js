@@ -7,7 +7,17 @@ var frisby = require("frisby"),
 (function setup() {
     injector.createTournament(tournament, "2095-07-01", 3,
         ["mission_1", "mission_2", "mission_3"], null, [p1]);
+    injector.createTournament("empty_tournament", "2095-07-01");
 })();
+
+describe("Getting missions when rounds have not been set", function(){
+    "use strict";
+    frisby.create("No rounds set should throw an error")
+        .get(process.env.API_ADDR + "tournament/empty_tournament/missions")
+        .expectStatus(400)
+        .expectBodyContains("Please set the number of rounds for empty_tournament first")
+        .toss();
+});
 
 describe("Normal behaviour", function () {
     "use strict";
