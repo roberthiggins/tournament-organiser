@@ -164,6 +164,7 @@ class User(object):
             'title': 'Account',
             'actions': strip_none([
                 self.action('See your user details', 'user_details', True),
+                self.action('Update your details', 'user_update', True),
                 self.action('Logout', 'logout'),
             ])
         }

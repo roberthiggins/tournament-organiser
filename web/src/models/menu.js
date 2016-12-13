@@ -89,6 +89,10 @@ exports.transform = function(asJSON) {
                 case "user_details":
                     act.href = slug(null, null, "user/" + act.username);
                     break;
+                case "user_update":
+                    act.href = slug(null, null,
+                        "user/" + act.username + "/update");
+                    break;
             }
             delete act.action;
             delete act.tournament;
