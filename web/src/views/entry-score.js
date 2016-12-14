@@ -4,13 +4,12 @@ var Scores = require("./component-tournament-categories.js");
 var EnterScoreForm = React.createClass({
     propTypes: {
         categories:          React.PropTypes.array.isRequired,
-        submitHandler:       React.PropTypes.func.isRequired,
-        gameId:              React.PropTypes.number
+        submitHandler:       React.PropTypes.func.isRequired
     },
     render: function() {
         if (!this.props.categories.length) {
             return <Scores.scoreCategoryWidget
-                    categories={this.props.categories} />
+                    categories={this.props.categories} />;
         }
 
         return (
@@ -21,8 +20,6 @@ var EnterScoreForm = React.createClass({
                 </div>
                 <Scores.scoreCategoryWidget
                     categories={this.props.categories} />
-                <input type="hidden" name="gameId"
-                    defaultValue={this.props.gameId} />
                 <button type="submit">Enter Score</button>
             </form>
         );
@@ -64,8 +61,10 @@ var EnterScorePage = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
+        var data = $("form").serialize() + "&gameId=" + this.state.game_id;
+
         $.post(window.location,
-            $("form").serialize(),
+            data,
             function success(res) {
                 this.setState({
                     error: null,
@@ -86,8 +85,7 @@ var EnterScorePage = React.createClass({
                 {this.state.success || this.state.categories === null ?
                     null
                     : <EnterScoreForm submitHandler={this.handleSubmit}
-                                      categories={this.state.categories}
-                                      gameId={this.state.game_id} />}
+                                      categories={this.state.categories} />}
             </div>
         );
     }
