@@ -78,30 +78,5 @@ var InputList = React.createClass({
     }
 });
 
-// A widget for list score categories
-var ScoreCategories = React.createClass({
-    propTypes: {
-        categories: React.PropTypes.array.isRequired
-    },
-    render: function() {
-
-        var catsAsOptions = this.props.categories.map(function(cat, idx){
-                return (
-                    <option value={cat.name} key={idx}>
-                        {cat.name}
-                    </option>);
-                }),
-            displayElement = this.props.categories.length === 0 ?
-                <div>No score categories available</div>
-                : <div>
-                    <label htmlFor="key">Select a score category:</label>
-                    <select name="key" id="key">{catsAsOptions}</select>
-                </div>;
-
-        return (displayElement);
-    }
-});
-
 exports.handleStateChange = handleCategoryStateChange;
 exports.inputCategoryList = InputList;
-exports.scoreCategoryWidget = ScoreCategories;

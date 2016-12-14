@@ -21,6 +21,29 @@ var Checkbox = React.createClass({
     }
 });
 
+var Select = React.createClass({
+    propTypes: {
+        id: React.PropTypes.string.isRequired,
+        name: React.PropTypes.string.isRequired,
+        options: React.PropTypes.array.isRequired
+    },
+    render: function() {
+        var id = this.props.id,
+            renderedOpts = this.props.options.map(function(opt, idx){
+                return (
+                    <option value={opt.name} key={idx}>
+                        {opt.name}
+                    </option>);
+                });
+
+        return (
+            <div>
+                <label htmlFor={id}>{this.props.name}:</label>
+                <select name={id} id={id}>{renderedOpts}</select>
+            </div>);
+    }
+});
+
 var TextField = React.createClass({
     propTypes: {
         changeHandler: React.PropTypes.func.isRequired,
@@ -50,4 +73,5 @@ var TextField = React.createClass({
 
 
 exports.checkbox = Checkbox;
+exports.select = Select;
 exports.textField = TextField;

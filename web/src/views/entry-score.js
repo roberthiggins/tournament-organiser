@@ -1,6 +1,5 @@
 /* global $ React ReactDOM:true */
-var Scores = require("./component-tournament-categories.js"),
-    Inputs = require("./component-inputs");
+var Inputs = require("./component-inputs");
 
 var EnterScoreForm = React.createClass({
     propTypes: {
@@ -11,8 +10,7 @@ var EnterScoreForm = React.createClass({
     },
     render: function() {
         if (!this.props.categories.length) {
-            return <Scores.scoreCategoryWidget
-                    categories={this.props.categories} />;
+            return <div>"No score categories available"</div>;
         }
 
         return (
@@ -22,8 +20,9 @@ var EnterScoreForm = React.createClass({
                                   id="value"
                                   changeHandler={this.props.scoreChangeHandler}
                                   value={this.props.score || ""} />
-                <Scores.scoreCategoryWidget
-                    categories={this.props.categories} />
+                <Inputs.select id="key"
+                               name="Select a score category"
+                               options={this.props.categories} />
 
                 <button type="submit">Enter Score</button>
             </form>
