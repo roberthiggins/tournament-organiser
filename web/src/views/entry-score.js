@@ -1,10 +1,13 @@
 /* global $ React ReactDOM:true */
-var Scores = require("./component-tournament-categories.js");
+var Scores = require("./component-tournament-categories.js"),
+    Inputs = require("./component-inputs");
 
 var EnterScoreForm = React.createClass({
     propTypes: {
-        categories:          React.PropTypes.array.isRequired,
-        submitHandler:       React.PropTypes.func.isRequired
+        categories:         React.PropTypes.array.isRequired,
+        scoreChangeHandler: React.PropTypes.func.isRequired,
+        score:              React.PropTypes.number,
+        submitHandler:      React.PropTypes.func.isRequired,
     },
     render: function() {
         if (!this.props.categories.length) {
@@ -14,12 +17,14 @@ var EnterScoreForm = React.createClass({
 
         return (
             <form onSubmit={this.props.submitHandler}>
-                <div className="form_field">
-                    <label htmlFor="value">Score:</label>
-                    <input type="text" name="value" id="value" />
-                </div>
+
+                <Inputs.textField name="Score"
+                                  id="value"
+                                  changeHandler={this.props.scoreChangeHandler}
+                                  value={this.props.score || ""} />
                 <Scores.scoreCategoryWidget
                     categories={this.props.categories} />
+
                 <button type="submit">Enter Score</button>
             </form>
         );
@@ -32,6 +37,7 @@ var EnterScorePage = React.createClass({
             error: null,
             message: null,
             perTournament: false,
+            score: null,
             success: false,
             categories: null
         });
@@ -58,10 +64,17 @@ var EnterScorePage = React.createClass({
         this.contentRequest.abort();
         this.categoryRequest.abort();
     },
+    handleScoreChange: function(event) {
+        this.setState({score: event.target.value});
+    },
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var data = $("form").serialize() + "&gameId=" + this.state.game_id;
+        var data = {
+            gameId: this.state.game_id,
+            key: $("form select#key").find(":selected").text(),
+            value: this.state.score,
+            };
 
         $.post(window.location,
             data,
@@ -85,7 +98,9 @@ var EnterScorePage = React.createClass({
                 {this.state.success || this.state.categories === null ?
                     null
                     : <EnterScoreForm submitHandler={this.handleSubmit}
-                                      categories={this.state.categories} />}
+                                      categories={this.state.categories}
+                                      scoreChangeHandler={this.handleScoreChange}
+                                      score={this.state.score} />}
             </div>
         );
     }
