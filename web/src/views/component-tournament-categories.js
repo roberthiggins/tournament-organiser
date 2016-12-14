@@ -2,25 +2,6 @@
 
 var Inputs = require("./component-inputs.js");
 
-var getCategories = function(categories, perTournamentScores) {
-    if (!categories) {
-        return [];
-    }
-
-    return categories
-        .filter(function(cat) {
-            return perTournamentScores ?
-                cat.per_tournament
-                : !cat.per_tournament;
-        })
-        .map(function(cat, idx){
-            return (
-                <option value={cat.name} key={idx}>
-                    {cat.name}
-                </option>);
-        });
-};
-
 var handleCategoryStateChange = function(cats, event) {
     var idx = event.target.id.substr(0, 1),
         key = event.target.id.substr(2),
@@ -104,18 +85,23 @@ var ScoreCategories = React.createClass({
     },
     render: function() {
 
-        var displayElement = this.props.categories.length === 0 ?
-            <div>No score categories available</div>
-            : <div>
-                <label htmlFor="key">Select a score category:</label>
-                <select name="key" id="key">{this.props.categories}</select>
-            </div>;
+        var catsAsOptions = this.props.categories.map(function(cat, idx){
+                return (
+                    <option value={cat.name} key={idx}>
+                        {cat.name}
+                    </option>);
+                }),
+            displayElement = this.props.categories.length === 0 ?
+                <div>No score categories available</div>
+                : <div>
+                    <label htmlFor="key">Select a score category:</label>
+                    <select name="key" id="key">{catsAsOptions}</select>
+                </div>;
 
         return (displayElement);
     }
 });
 
-exports.getCategories = getCategories;
 exports.handleStateChange = handleCategoryStateChange;
 exports.inputCategoryList = InputList;
 exports.scoreCategoryWidget = ScoreCategories;

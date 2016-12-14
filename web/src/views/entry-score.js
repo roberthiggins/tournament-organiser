@@ -52,12 +52,15 @@ var EnterScorePage = React.createClass({
                 this.categoryRequest = $.get(
                     window.location + "/scorecategories",
                     function (res) {
-                        this.setState({
-                            categories: Scores.getCategories(res.categories,
-                                this.state.perTournament)
-                            });
-                    }.bind(this));
 
+                        var cats = res.categories.filter(function(cat) {
+                                return this.state.perTournament ?
+                                    cat.per_tournament
+                                    : !cat.per_tournament;
+                                }.bind(this));
+
+                        this.setState({categories: cats});
+                    }.bind(this));
                 }.bind(this));
     },
     componentWillUnmount: function() {
