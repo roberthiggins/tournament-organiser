@@ -36,7 +36,7 @@ var EnterScorePage = React.createClass({
             message: null,
             perTournament: false,
             success: false,
-            categories: []
+            categories: null
         });
     },
     componentDidMount: function() {
@@ -83,7 +83,7 @@ var EnterScorePage = React.createClass({
                 {this.state.error ?
                     <div>{this.state.error}</div>
                     : <div>{this.state.message}</div>}
-                {this.state.success ?
+                {this.state.success || this.state.categories === null ?
                     null
                     : <EnterScoreForm submitHandler={this.handleSubmit}
                                       categories={this.state.categories}
