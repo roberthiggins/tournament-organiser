@@ -6,12 +6,11 @@ It holds a tournament object for housing of scoring strategies, etc.
 from datetime import date, datetime
 from json import dumps
 
-from sqlalchemy.exc import DataError, IntegrityError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
-from models.dao.game_entry import GameEntrant
 from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtectedObject, ProtObjPerm
 from models.dao.registration import TournamentRegistration as Reg
@@ -19,7 +18,6 @@ from models.dao.score import ScoreCategory
 from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
-from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker
@@ -158,29 +156,10 @@ class Tournament(object):
     @must_exist_in_db
     def enter_score(self, entry_id, score_cat, score, game_id=None):
         """Enter a score for score_cat into self for entry."""
-        try:
-            game = TournamentGame.query.filter_by(id=game_id).first()
-        except DataError:
-            db.session.rollback()
-            raise TypeError('{} not entered. Game {} cannot be found'.\
-                format(score, game_id))
-        cat = db.session.query(ScoreCategory).filter_by(
-            tournament_id=self.tournament_id, name=score_cat).first()
-        if cat is None:
-            raise TypeError('Unknown category: {}'.format(score_cat))
+        Score(category=score_cat, entry_id=entry_id, game_id=game_id,
+              score=score, tournament=self).write()
 
-        if cat.opponent_score:
-            entry = game.entrants.filter(GameEntrant.entrant_id != entry_id).\
-                first().entrant
-        else:
-            entry = TournamentEntry.query.filter_by(id=entry_id).first()
-        if entry is None:
-            raise ValueError('Unknown entrant: {}'.format(entry_id))
-
-        Score(category=cat, entry=entry, game=game, score=score,
-              tournament=self.get_dao()).write()
-
-        return 'Score entered for {}: {}'.format(entry.player_id, score)
+        return 'Score entered for {}: {}'.format(entry_id, score)
 
 
     @must_exist_in_db

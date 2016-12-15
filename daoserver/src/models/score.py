@@ -1,22 +1,51 @@
 """
 Logic for scores goes here
 """
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.sql.expression import and_
 
 from models.dao.db_connection import db
+from models.dao.game_entry import GameEntrant
 from models.dao.score import Score as DAO, ScoreCategory, TournamentScore, \
 GameScore
+from models.dao.tournament_entry import TournamentEntry
+from models.dao.tournament_game import TournamentGame
 
 class Score(object):
     """Model for a score in a tournament or game"""
 
     def __init__(self, **args):
-        self.category = args['category']
-        self.entry = args['entry']
-        self.game = args['game']
-        self.score = int(args['score'])
-        self.tournament = args['tournament']
+        # pylint: disable=no-member
+        self.score = int(args.get('score'))
+        self.tournament = args.get('tournament').get_dao()
+        game_id = args.get('game_id', None)
+        try:
+            if game_id is not None:
+                self.game = TournamentGame.query.filter_by(id=game_id).first()
+                if self.game is None:
+                    raise DataError()
+            else:
+                self.game = None
+        except DataError:
+            db.session.rollback()
+            raise TypeError('{} not entered. Game {} cannot be found'.\
+                format(self.score, game_id))
+
+        self.category = ScoreCategory.query.filter_by(
+            tournament_id=self.tournament.name, name=args['category']).first()
+
+        if self.category is None:
+            raise TypeError('Unknown category: {}'.format(args['category']))
+
+        if self.category.opponent_score:
+            self.entry = self.game.entrants.filter(
+                GameEntrant.entrant_id != args['entry_id']).first().entrant
+        else:
+            self.entry = TournamentEntry.query.\
+                filter_by(id=args['entry_id']).first()
+        if self.entry is None:
+            raise ValueError('Unknown entrant: {}'.format(args['entry_id']))
+
 
     def get_dao(self):
         """Convenience method to recover TournamentDAO"""
