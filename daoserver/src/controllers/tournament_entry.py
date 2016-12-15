@@ -73,7 +73,8 @@ def enter_game_score():
         raise ValueError('Unknown player: {}'.format(g.username))
 
     # pylint: disable=undefined-variable
-    return g.tournament.enter_score(g.entry.id, key, value, game_id)
+    return Score(category=key, game_id=game_id, tournament=g.tournament,
+                 entry_id=g.entry.id, score=value).write()
 
 @ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
 @requires_auth
@@ -92,7 +93,8 @@ def enter_tournament_score():
         raise ValueError('Unknown player: {}'.format(g.username))
 
     # pylint: disable=undefined-variable
-    return g.tournament.enter_score(g.entry.id, key, value)
+    return Score(category=key, tournament=g.tournament, entry_id=g.entry.id,
+                 score=value).write()
 
 
 @ENTRY.route('/<username>', methods=['GET'])

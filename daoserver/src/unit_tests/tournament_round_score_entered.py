@@ -105,8 +105,10 @@ class TestScoreEntered(AppSimulatingTest):
 
         # A completed game
         game = self.get_game_by_round(entry_4_id, 1)
-        tourn.enter_score(entry_2_id, category_1.name, 2, game.id)
-        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
+        Score(category=category_1.name, game_id=game.id, tournament=tourn,
+              entry_id=entry_2_id, score=2).write()
+        Score(category=category_1.name, game_id=game.id, tournament=tourn,
+              entry_id=entry_4_id, score=4).write()
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
         self.assertTrue(entry_4_id in entrants)
@@ -114,7 +116,8 @@ class TestScoreEntered(AppSimulatingTest):
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
-        tourn.enter_score(entry_3_id, category_1.name, 3, game.id)
+        Score(category=category_1.name, game_id=game.id, tournament=tourn,
+              entry_id=entry_3_id, score=3).write()
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
         self.assertTrue(entry_3_id in entrants)
@@ -129,14 +132,16 @@ class TestScoreEntered(AppSimulatingTest):
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
-        tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
+        Score(category=category_1.name, game_id=game.id, tournament=tourn,
+              entry_id=entry_4_id, score=4).write()
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
         self.assertFalse(Score.is_score_entered(game))
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tournament_1)
-        tourn.enter_score(entry_5_id, category_1.name, 5, game.id)
+        Score(category=category_1.name, game_id=game.id, tournament=tourn,
+              entry_id=entry_5_id, score=5).write()
         self.assertTrue(Score.is_score_entered(game))
 
     @staticmethod

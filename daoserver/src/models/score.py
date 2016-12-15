@@ -147,3 +147,6 @@ class Score(object):
                 raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
                     format(self.score, self.entry.id))
             raise err
+
+        return 'Score entered for {}: {}'.\
+            format(self.entry.player_id, self.score)

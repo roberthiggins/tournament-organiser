@@ -22,7 +22,6 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
-from models.score import Score
 from models.table_strategy import ProtestAvoidanceStrategy
 from models.tournament_round import TournamentRound, DrawException
 
@@ -151,15 +150,6 @@ class Tournament(object):
             'rounds': self.get_dao().rounds.count(),
             'score_categories': self.get_score_categories(serialized=True)
         }
-
-
-    @must_exist_in_db
-    def enter_score(self, entry_id, score_cat, score, game_id=None):
-        """Enter a score for score_cat into self for entry."""
-        Score(category=score_cat, entry_id=entry_id, game_id=game_id,
-              score=score, tournament=self).write()
-
-        return 'Score entered for {}: {}'.format(entry_id, score)
 
 
     @must_exist_in_db
