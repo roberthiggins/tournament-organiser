@@ -61,32 +61,31 @@ class Score(object):
         return False
 
 
-    @staticmethod
-    def validate_score(score, category, entry, game=None):
+    def validate(self):
         """Validate an entered score. Returns True or raises Exception"""
-        invalid_score = ValueError('Invalid score: {}'.format(score))
-        score = int(score)
-        if score < category.min_val or score > category.max_val:
+        invalid_score = ValueError('Invalid score: {}'.format(self.score))
+        if self.score < self.category.min_val \
+        or self.score > self.category.max_val:
             raise invalid_score
 
-        if game is None and not category.per_tournament:
+        if self.game is None and not self.category.per_tournament:
             raise TypeError('{} should be entered per-tournament'.\
-                format(category.name))
+                format(self.category.name))
 
-        if game is not None and category.per_tournament:
+        if self.game is not None and self.category.per_tournament:
             raise TypeError('Cannot enter a per-tournament score '\
                 '({}) for a game (id: {})'.\
-                format(category.name, game.id))
+                format(self.category.name, self.game.id))
 
         # If zero sum we need to check the score entered by the opponent
-        if game is not None and category.zero_sum:
+        if self.game is not None and self.category.zero_sum:
             # pylint: disable=no-member
             game_scores = GameScore.query.join(DAO, ScoreCategory).\
-                    filter(and_(GameScore.game_id == game.id,
-                                ScoreCategory.name == category.name,
-                                GameScore.entry_id != entry.id)).all()
+                    filter(and_(GameScore.game_id == self.game.id,
+                                ScoreCategory.name == self.category.name,
+                                GameScore.entry_id != self.entry.id)).all()
             existing_score = sum([x.score.value for x in game_scores])
-            if existing_score + score > category.max_val:
+            if existing_score + self.score > self.category.max_val:
                 raise invalid_score
 
 
@@ -96,6 +95,7 @@ class Score(object):
 
         Expects: score - integer
         """
+        self.validate()
         if self.get_dao() is not None:
             raise ValueError('{} not entered. Score is already set'.\
                 format(self.score))

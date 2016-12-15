@@ -158,29 +158,28 @@ class Tournament(object):
     @must_exist_in_db
     def enter_score(self, entry_id, score_cat, score, game_id=None):
         """Enter a score for score_cat into self for entry."""
-        entry = TournamentEntry.query.filter_by(id=entry_id).first()
-        if entry is None:
-            raise ValueError('Unknown entrant: {}'.format(entry_id))
-
-        cat = db.session.query(ScoreCategory).filter_by(
-            tournament_id=self.tournament_id, name=score_cat).first()
         try:
             game = TournamentGame.query.filter_by(id=game_id).first()
         except DataError:
             db.session.rollback()
             raise TypeError('{} not entered. Game {} cannot be found'.\
                 format(score, game_id))
-        try:
-            Score.validate_score(score, cat, entry, game)
-        except AttributeError:
+        cat = db.session.query(ScoreCategory).filter_by(
+            tournament_id=self.tournament_id, name=score_cat).first()
+        if cat is None:
             raise TypeError('Unknown category: {}'.format(score_cat))
 
         if cat.opponent_score:
-            entry = game.entrants.filter(GameEntrant.entrant_id != entry.id).\
+            entry = game.entrants.filter(GameEntrant.entrant_id != entry_id).\
                 first().entrant
+        else:
+            entry = TournamentEntry.query.filter_by(id=entry_id).first()
+        if entry is None:
+            raise ValueError('Unknown entrant: {}'.format(entry_id))
 
         Score(category=cat, entry=entry, game=game, score=score,
               tournament=self.get_dao()).write()
+
         return 'Score entered for {}: {}'.format(entry.player_id, score)
 
 
