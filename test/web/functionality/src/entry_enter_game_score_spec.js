@@ -70,12 +70,12 @@ describe("Enter some scores", function () {
             };
 
     badValues("enter_score_test_player_2", "password",
-        {key: "Fair Play", value: 5},
+        {category: "Fair Play", score: 5},
         "Other user",
         "Permission denied for enter_score_test_player_2 to perform enter_score on tournament enter_score_test");
 
     badValues("enter_score_test_player_5", "password",
-        {key: "Fair Play", value: 0},
+        {category: "Fair Play", score: 0},
         "Invalid score",
         "Invalid score: 0");
 
@@ -86,8 +86,8 @@ describe("Enter some scores", function () {
             .afterJSON(function(json) {
                 var scoreInfo = {
                         gameId: json.game_id,
-                        key: "Fair Play",
-                        value: 5};
+                        category: "Fair Play",
+                        score: 5};
 
                 frisby.create("Enter good score")
                     .post(API, scoreInfo)
@@ -102,7 +102,7 @@ describe("Enter some scores", function () {
         });
 
     badValues("enter_score_test_player_5", "password",
-        {key: "Fair Play", value: 5},
+        {category: "Fair Play", score: 5},
         "Enter score twice",
         "5 not entered. Score is already set");
 

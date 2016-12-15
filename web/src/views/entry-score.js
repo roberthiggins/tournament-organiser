@@ -17,10 +17,10 @@ var EnterScoreForm = React.createClass({
             <form onSubmit={this.props.submitHandler}>
 
                 <Inputs.textField name="Score"
-                                  id="value"
+                                  id="score"
                                   changeHandler={this.props.scoreChangeHandler}
                                   value={this.props.score || ""} />
-                <Inputs.select id="key"
+                <Inputs.select id="category"
                                name="Select a score category"
                                options={this.props.categories} />
 
@@ -74,8 +74,8 @@ var EnterScorePage = React.createClass({
 
         var data = {
             gameId: this.state.game_id,
-            key: $("form select#key").find(":selected").text(),
-            value: this.state.score,
+            category: $("form select#category").find(":selected").text(),
+            score: this.state.score,
             };
 
         $.post(window.location,

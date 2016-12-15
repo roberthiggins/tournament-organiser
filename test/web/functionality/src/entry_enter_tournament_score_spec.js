@@ -62,24 +62,24 @@ describe("Enter some scores", function () {
             };
 
     badValues("charlie_murphy", "password",
-        {key: "Fanciness", value: 3},
+        {category: "Fanciness", score: 3},
         "Other user",
         "Permission denied for charlie_murphy to perform enter_score on tournament painting_test");
 
     badValues("rick_james", "password",
-        {key: "Fanciness", value: 3},
+        {category: "Fanciness", score: 3},
         "Invalid score",
         "Invalid score: 3");
 
     badValues("rick_james", "password",
-        {key: "Fanciness", value: 16},
+        {category: "Fanciness", score: 16},
         "Invalid score",
         "Invalid score: 16");
 
     utils.asUser("rick_james", "password", function(cookie) {
         var scoreInfo = {
-            key: "Fanciness",
-            value: 5};
+            category: "Fanciness",
+            score: 5};
 
         frisby.create("Enter good score")
             .post(API, scoreInfo)
@@ -92,7 +92,7 @@ describe("Enter some scores", function () {
         });
 
     badValues("rick_james", "password",
-        {key: "Fanciness", value: 6},
+        {category: "Fanciness", score: 6},
         "Enter score twice",
         "6 not entered. Score is already set");
 });

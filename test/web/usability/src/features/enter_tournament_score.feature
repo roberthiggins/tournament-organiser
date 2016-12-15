@@ -9,8 +9,8 @@ Feature: Enter a tournament score for a player
         Given I am on "/tournament/tourn_score_test/entry/stevemcqueen/enterscore"
         When I wait for "Enter score for stevemcqueen" to appear
         When I wait for "Select a score category" to appear
-        When I select "Fanciness" from "key"
-        Then I fill in "value" with "<score>"
+        When I select "Fanciness" from "category"
+        Then I fill in "score" with "<score>"
         Then I press "Enter Score"
         Then I should see "<content>" appear
         Examples:
