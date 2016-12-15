@@ -24,7 +24,7 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
-from models.score import validate_score, write_score
+from models.score import Score
 from models.table_strategy import ProtestAvoidanceStrategy
 from models.tournament_round import TournamentRound, DrawException
 
@@ -171,7 +171,7 @@ class Tournament(object):
             raise TypeError('{} not entered. Game {} cannot be found'.\
                 format(score, game_id))
         try:
-            validate_score(score, cat, entry, game)
+            Score.validate_score(score, cat, entry, game)
         except AttributeError:
             raise TypeError('Unknown category: {}'.format(score_cat))
 
@@ -179,7 +179,7 @@ class Tournament(object):
             entry = game.entrants.filter(GameEntrant.entrant_id != entry.id).\
                 first().entrant
 
-        write_score(self.get_dao(), entry, cat, score, game)
+        Score.write_score(self.get_dao(), entry, cat, score, game)
         return 'Score entered for {}: {}'.format(entry.player_id, score)
 
 

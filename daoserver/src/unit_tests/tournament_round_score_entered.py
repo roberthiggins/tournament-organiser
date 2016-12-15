@@ -11,7 +11,7 @@ from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound
 
-from models.score import is_score_entered
+from models.score import Score
 from models.tournament import Tournament
 from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args
@@ -78,7 +78,7 @@ class TestScoreEntered(AppSimulatingTest):
             player_id='{}_player_{}'.format(self.tournament_1, 1),
             tournament_id=self.tournament_1).first().id
         game = self.get_game_by_round(entry_1_id, 1)
-        self.assertRaises(AttributeError, is_score_entered, game)
+        self.assertRaises(AttributeError, Score.is_score_entered, game)
 
 
     def test_score_entered(self):
@@ -110,7 +110,7 @@ class TestScoreEntered(AppSimulatingTest):
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
         self.assertTrue(entry_4_id in entrants)
-        self.assertTrue(is_score_entered(game))
+        self.assertTrue(Score.is_score_entered(game))
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
@@ -118,7 +118,7 @@ class TestScoreEntered(AppSimulatingTest):
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
         self.assertTrue(entry_3_id in entrants)
-        self.assertTrue(is_score_entered(game))
+        self.assertTrue(Score.is_score_entered(game))
 
         # Ensure the rd2 game entry_4 vs. entry_5 is listed as not scored. This
         # will force a full check. entry_5's score hasn't been entered.
@@ -132,12 +132,12 @@ class TestScoreEntered(AppSimulatingTest):
         tourn.enter_score(entry_4_id, category_1.name, 4, game.id)
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
-        self.assertFalse(is_score_entered(game))
+        self.assertFalse(Score.is_score_entered(game))
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tournament_1)
         tourn.enter_score(entry_5_id, category_1.name, 5, game.id)
-        self.assertTrue(is_score_entered(game))
+        self.assertTrue(Score.is_score_entered(game))
 
     @staticmethod
     def get_game_by_round(entry_id, round_num):

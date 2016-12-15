@@ -8,7 +8,7 @@ from controllers.request_helpers import json_response, \
 enforce_request_variables, requires_auth, text_response, ensure_permission
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
-from models.score import is_score_entered
+from models.score import Score
 from models.tournament import Tournament
 from models.user import User
 
@@ -125,7 +125,7 @@ def get_next_game():
     games = sorted(games, key=lambda game: game.tournament_round.ordering)
 
     for game in games:
-        if not is_score_entered(game):
+        if not Score.is_score_entered(game):
             return {
                 'game_id': game.id,
                 'mission': game.tournament_round.get_mission(),
