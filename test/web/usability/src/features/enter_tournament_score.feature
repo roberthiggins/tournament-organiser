@@ -14,6 +14,6 @@ Feature: Enter a tournament score for a player
         Then I press "Enter Score"
         Then I should see "<content>" appear
         Examples:
-            |auth          |score | content                            |
-            |rick_james    | 3    | Permission denied                  |
-            |stevemcqueen  | 5    | Score entered for stevemcqueen: 5  |
+            | auth         | score | content                            |
+            | rick_james   | 3     | Permission denied                  |
+            | stevemcqueen | 5     | Score entered for stevemcqueen: 5  |
