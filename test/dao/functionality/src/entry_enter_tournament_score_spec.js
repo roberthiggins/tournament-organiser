@@ -4,13 +4,13 @@ var frisby = require("frisby"),
     p2 = tourn + "_p_2",
     API = process.env.API_ADDR + "tournament/" + tourn + "/entry/";
 
-var postScore = function(api, player, user, msg, key, score, code, resp){
-    var scoreKey = key ? key : tourn + "_per_tourn_1";
+var postScore = function(api, player, user, msg, cat, score, code, resp) {
+    var scoreKey = cat ? cat : tourn + "_per_tourn_1";
     frisby.create("POST tournament score: " + msg)
         .post(api + player + "/score",
             {
-                key: scoreKey,
-                value: score
+                category: scoreKey,
+                score: score
             },
             {json: true, inspectOnFailure: true})
         .addHeader("Authorization", "Basic " +
@@ -26,8 +26,8 @@ describe("Enter a tournament score for an entry", function () {
     frisby.create("No auth enters a score")
         .post(API + p1 + "/score",
             {
-                key: tourn,
-                value: 5
+                category: tourn,
+                score: 5
             },
             {json: true})
         .expectStatus(401)

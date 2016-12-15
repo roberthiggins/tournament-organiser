@@ -59,7 +59,7 @@ def get_entry_id(tournament_id, username):
 @requires_auth
 @text_response
 @ensure_permission({'permission': 'ENTER_SCORE'})
-@enforce_request_variables('key', 'value')
+@enforce_request_variables('category', 'score')
 def enter_score():
     """
     POST to enter a score for a player in a game.
@@ -73,8 +73,9 @@ def enter_score():
         raise ValueError('Unknown player: {}'.format(g.username))
 
     # pylint: disable=undefined-variable
-    return Score(category=key, tournament=g.tournament, entry_id=g.entry.id, \
-        score=value, game_id=request.get_json().get('game_id', None)).write()
+    return Score(entry_id=g.entry.id, tournament=g.tournament, score=score, \
+        category=category, game_id=request.get_json().get('game_id', None)).\
+        write()
 
 
 @ENTRY.route('/<username>', methods=['GET'])

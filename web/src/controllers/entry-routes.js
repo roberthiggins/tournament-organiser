@@ -59,9 +59,9 @@ router.route("/tournament/:tournament/entry/:username/entergamescore")
         var url = "/tournament/" + req.params.tournament + "/entry/"
             + req.params.username + "/score",
             postData = {
-                key:     req.body.key,
-                value:   req.body.value,
-                game_id: req.body.gameId
+                category: req.body.key,
+                score:    req.body.value,
+                game_id:  req.body.gameId
             };
         DAOAmbassador.request({
             method: "POST",
@@ -118,8 +118,8 @@ router.route("/tournament/:tournament/entry/:username/enterscore")
         var url = "/tournament/" + req.params.tournament + "/entry/"
             + req.params.username + "/score",
             postData = {
-                key:    req.body.key,
-                value:  req.body.value
+                category: req.body.key,
+                score:    req.body.value
             };
         DAOAmbassador.request({
             method: "POST",

@@ -16,13 +16,13 @@ var setup = function setup(tourn, players) {
     },
     postScore = function(tourn, api, player, gameId, msg, user, scoreKey,
         score, code, resp){
-        var key = scoreKey ? scoreKey : tourn + "_per_game_1";
+        var category = scoreKey ? scoreKey : tourn + "_per_game_1";
         frisby.create("POST score: " + msg)
             .post(api + player + "/score",
                 {
                     game_id: gameId,
-                    key: key,
-                    value: score
+                    category: category,
+                    score: score
                 },
                 {json: true, inspectOnFailure: true})
             .addHeader("Authorization", injector.auth(user))
@@ -52,8 +52,8 @@ describe("Enter score for single game for an entry", function () {
                 .post(API + p1 + "/score",
                     {
                         game_id: gameId,
-                        key: tourn + "_per_game_1",
-                        value: 5
+                        category: tourn + "_per_game_1",
+                        score: 5
                     },
                     {json: true, inspectOnFailure: true})
                 .expectStatus(401)
@@ -133,8 +133,8 @@ describe("Zero Sum scores", function () {
                 .post(API + p2 + "/score",
                     {
                         game_id: gameId,
-                        key: tourn + "_per_game_2",
-                        value: 2
+                        category: tourn + "_per_game_2",
+                        score: 2
                     },
                     {json: true})
                 .addHeader("Authorization", auth)
@@ -146,8 +146,8 @@ describe("Zero Sum scores", function () {
                 .post(API + p2 + "/score",
                     {
                         game_id: gameId,
-                        key: tourn + "_per_game_2",
-                        value: 1
+                        category: tourn + "_per_game_2",
+                        score: 1
                     },
                     {json: true})
                 .addHeader("Authorization", auth)
