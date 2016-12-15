@@ -56,18 +56,20 @@ router.route("/tournament/:tournament/entry/:username/entergamescore")
         });
     })
     .post(needsUser, ensureEntryExists, function(req, res) {
-        var url = "/tournament/" + req.params.tournament + "/entry/"
-            + req.params.username + "/score",
-            postData = {
-                category: req.body.category,
-                score:    req.body.score,
-                game_id:  req.body.gameId
-            };
+        var postData = req.body;
+        postData.scores = postData.scores.map(function(dict) {
+            if (dict.hasOwnProperty("gameId")) {
+                dict.game_id = dict.gameId;
+                delete dict.gameId;
+            }
+            return dict;
+            });
         DAOAmbassador.request({
             method: "POST",
             request: req,
             response: res,
-            URL: url,
+            URL: "/tournament/" + req.params.tournament + "/entry/"
+                + req.params.username + "/score",
             data: postData,
             });
         });
@@ -115,18 +117,13 @@ router.route("/tournament/:tournament/entry/:username/enterscore")
         });
     })
     .post(needsUser, ensureEntryExists, function(req, res) {
-        var url = "/tournament/" + req.params.tournament + "/entry/"
-            + req.params.username + "/score",
-            postData = {
-                category: req.body.category,
-                score:    req.body.score
-            };
         DAOAmbassador.request({
             method: "POST",
             request: req,
             response: res,
-            URL: url,
-            data: postData
+            URL: "/tournament/" + req.params.tournament + "/entry/"
+                + req.params.username + "/score",
+            data: req.body
             });
         });
 router.route("/tournament/:tournament/entry/:username/enterscore/scorecategories")

@@ -87,9 +87,11 @@ exports.enterScore = function(per_tourn, tourn, api, player, gameId, user, msg,
     frisby.create("POST score: " + msg)
         .post(api + player + "/score",
             {
+            scores: [{
                 game_id: gameId,
                 category: category,
                 score: score
+                }]
             },
             {json: true, inspectOnFailure: true})
         .addHeader("Authorization", exports.auth(user))

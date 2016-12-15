@@ -48,18 +48,19 @@ describe("Enter some scores", function () {
     "use strict";
     var API = process.env.API_ADDR + "tournament/enter_score_test/" +
         "entry/enter_score_test_player_5/entergamescore",
-        badValues = function(user, pass, postData, name, msg) {
+        badValues = function(user, pass, postScore, name, msg) {
 
             utils.asUser(user, pass, function(cookie) {
                 frisby.create("get game_id")
                     .get(API + "/content")
                     .addHeader("cookie", cookie)
                     .afterJSON(function(json) {
-                        var scoreInfo = postData;
+                        var scoreInfo = postScore;
                         scoreInfo.gameId = json.game_id;
 
                         frisby.create(name)
-                            .post(API, scoreInfo)
+                            .post(API, {scores: [scoreInfo]},
+                                {json: true, inspectOnFailure: true})
                             .addHeader("cookie", cookie)
                             .expectStatus(400)
                             .expectJSON({error: msg})
@@ -85,12 +86,13 @@ describe("Enter some scores", function () {
             .addHeader("cookie", cookie)
             .afterJSON(function(json) {
                 var scoreInfo = {
-                        gameId: json.game_id,
-                        category: "Fair Play",
-                        score: 5};
+                    gameId: json.game_id,
+                    category: "Fair Play",
+                    score: 5};
 
                 frisby.create("Enter good score")
-                    .post(API, scoreInfo)
+                    .post(API, {scores: [scoreInfo]},
+                        {json: true, inspectOnFailure: true})
                     .addHeader("cookie", cookie)
                     .expectStatus(200)
                     .expectJSON({

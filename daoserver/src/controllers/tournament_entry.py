@@ -4,8 +4,8 @@ Controller for entries in tournaments
 from decimal import Decimal as Dec
 from flask import Blueprint, g, request
 
-from controllers.request_helpers import json_response, \
-enforce_request_variables, requires_auth, text_response, ensure_permission
+from controllers.request_helpers import json_response, requires_auth, \
+text_response, ensure_permission
 from models.dao.account import Account
 from models.dao.tournament_entry import TournamentEntry
 from models.score import Score
@@ -59,8 +59,7 @@ def get_entry_id(tournament_id, username):
 @requires_auth
 @text_response
 @ensure_permission({'permission': 'ENTER_SCORE'})
-@enforce_request_variables('category', 'score')
-def enter_score():
+def enter_scores():
     """
     POST to enter a score for a player in a game.
 
@@ -72,10 +71,12 @@ def enter_score():
     if not g.entry:
         raise ValueError('Unknown player: {}'.format(g.username))
 
-    # pylint: disable=undefined-variable
-    return Score(entry_id=g.entry.id, tournament=g.tournament, score=score, \
-        category=category, game_id=request.get_json().get('game_id', None)).\
-        write()
+    messages = [Score(entry_id=g.entry.id, tournament=g.tournament, \
+        score=x['score'], category=x['category'], \
+        game_id=x.get('game_id', None)). write() \
+        for x in request.get_json().get('scores')]
+
+    return messages[0] if len(messages) == 1 else messages
 
 
 @ENTRY.route('/<username>', methods=['GET'])
