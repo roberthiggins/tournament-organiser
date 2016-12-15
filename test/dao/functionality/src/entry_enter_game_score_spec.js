@@ -18,7 +18,7 @@ var setup = function setup(tourn, players) {
         score, code, resp){
         var key = scoreKey ? scoreKey : tourn + "_per_game_1";
         frisby.create("POST score: " + msg)
-            .post(api + player + "/entergamescore",
+            .post(api + player + "/score",
                 {
                     game_id: gameId,
                     key: key,
@@ -49,7 +49,7 @@ describe("Enter score for single game for an entry", function () {
             var gameId = body.game_id;
 
             frisby.create("No auth enters a score")
-                .post(API + p1 + "/entergamescore",
+                .post(API + p1 + "/score",
                     {
                         game_id: gameId,
                         key: tourn + "_per_game_1",
@@ -130,7 +130,7 @@ describe("Zero Sum scores", function () {
                 4, 200, "Score entered for " + p1 + ": 4");
 
             frisby.create("player 2 enters a zero_sum score that is too high")
-                .post(API + p2 + "/entergamescore",
+                .post(API + p2 + "/score",
                     {
                         game_id: gameId,
                         key: tourn + "_per_game_2",
@@ -143,7 +143,7 @@ describe("Zero Sum scores", function () {
                 .toss();
 
             frisby.create("player enters a zero_sum score acceptably")
-                .post(API + p2 + "/entergamescore",
+                .post(API + p2 + "/score",
                     {
                         game_id: gameId,
                         key: tourn + "_per_game_2",

@@ -7,7 +7,7 @@ var frisby = require("frisby"),
 var postScore = function(api, player, user, msg, key, score, code, resp){
     var scoreKey = key ? key : tourn + "_per_tourn_1";
     frisby.create("POST tournament score: " + msg)
-        .post(api + player + "/entertournamentscore",
+        .post(api + player + "/score",
             {
                 key: scoreKey,
                 value: score
@@ -24,7 +24,7 @@ describe("Enter a tournament score for an entry", function () {
     "use strict";
 
     frisby.create("No auth enters a score")
-        .post(API + p1 + "/entertournamentscore",
+        .post(API + p1 + "/score",
             {
                 key: tourn,
                 value: 5

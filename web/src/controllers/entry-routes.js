@@ -57,7 +57,7 @@ router.route("/tournament/:tournament/entry/:username/entergamescore")
     })
     .post(needsUser, ensureEntryExists, function(req, res) {
         var url = "/tournament/" + req.params.tournament + "/entry/"
-            + req.params.username + "/entergamescore",
+            + req.params.username + "/score",
             postData = {
                 key:     req.body.key,
                 value:   req.body.value,
@@ -116,7 +116,7 @@ router.route("/tournament/:tournament/entry/:username/enterscore")
     })
     .post(needsUser, ensureEntryExists, function(req, res) {
         var url = "/tournament/" + req.params.tournament + "/entry/"
-            + req.params.username + "/entertournamentscore",
+            + req.params.username + "/score",
             postData = {
                 key:    req.body.key,
                 value:  req.body.value

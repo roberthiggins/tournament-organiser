@@ -2,7 +2,7 @@
 Controller for entries in tournaments
 """
 from decimal import Decimal as Dec
-from flask import Blueprint, g
+from flask import Blueprint, g, request
 
 from controllers.request_helpers import json_response, \
 enforce_request_variables, requires_auth, text_response, ensure_permission
@@ -55,12 +55,12 @@ def get_entry_id(tournament_id, username):
             format(username, tournament_id))
 
 
-@ENTRY.route('/<username>/entergamescore', methods=['POST'])
+@ENTRY.route('/<username>/score', methods=['POST'])
 @requires_auth
 @text_response
 @ensure_permission({'permission': 'ENTER_SCORE'})
-@enforce_request_variables('key', 'value', 'game_id')
-def enter_game_score():
+@enforce_request_variables('key', 'value')
+def enter_score():
     """
     POST to enter a score for a player in a game.
 
@@ -73,28 +73,8 @@ def enter_game_score():
         raise ValueError('Unknown player: {}'.format(g.username))
 
     # pylint: disable=undefined-variable
-    return Score(category=key, game_id=game_id, tournament=g.tournament,
-                 entry_id=g.entry.id, score=value).write()
-
-@ENTRY.route('/<username>/entertournamentscore', methods=['POST'])
-@requires_auth
-@text_response
-@ensure_permission({'permission': 'ENTER_SCORE'})
-@enforce_request_variables('key', 'value')
-def enter_tournament_score():
-    """
-    POST to enter a score for a player in a tournament.
-
-    Expects:
-        - key - the category e.g. painting, round_6_battle
-        - value - the score. Integer
-    """
-    if not g.entry:
-        raise ValueError('Unknown player: {}'.format(g.username))
-
-    # pylint: disable=undefined-variable
-    return Score(category=key, tournament=g.tournament, entry_id=g.entry.id,
-                 score=value).write()
+    return Score(category=key, tournament=g.tournament, entry_id=g.entry.id, \
+        score=value, game_id=request.get_json().get('game_id', None)).write()
 
 
 @ENTRY.route('/<username>', methods=['GET'])
