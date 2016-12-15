@@ -78,6 +78,26 @@ exports.enterTournament = function(tournament, username) {
         .toss();
 };
 
+// Enter a score. You can specify a response code and message
+exports.enterScore = function(per_tourn, tourn, api, player, gameId, user, msg,
+    scoreKey, score, code, resp){
+
+    var append = per_tourn ? "_per_tourn_1" : "_per_game_1",
+        category = scoreKey ? scoreKey : tourn + append;
+    frisby.create("POST score: " + msg)
+        .post(api + player + "/score",
+            {
+                game_id: gameId,
+                category: category,
+                score: score
+            },
+            {json: true, inspectOnFailure: true})
+        .addHeader("Authorization", exports.auth(user))
+        .expectStatus(code)
+        .expectBodyContains(resp)
+        .toss();
+};
+
 // A json blob for a single score category
 exports.jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
     var cat = {
