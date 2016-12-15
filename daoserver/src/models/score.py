@@ -11,6 +11,28 @@ GameScore
 class Score(object):
     """Model for a score in a tournament or game"""
 
+    def __init__(self, **args):
+        self.category = args['category']
+        self.entry = args['entry']
+        self.game = args['game']
+        self.score = int(args['score'])
+        self.tournament = args['tournament']
+
+    def get_dao(self):
+        """Convenience method to recover TournamentDAO"""
+        # pylint: disable=no-member
+        if self.category.per_tournament:
+            return TournamentScore.query.join(DAO).join(ScoreCategory).filter(
+                and_(TournamentScore.entry_id == self.entry.id,
+                     TournamentScore.tournament_id == self.tournament.id,
+                     ScoreCategory.id == self.category.id)).first()
+
+        return GameScore.query.join(DAO).filter(
+            and_(GameScore.entry_id == self.entry.id,
+                 GameScore.game_id == self.game.id,
+                 DAO.score_category_id == self.category.id)).first()
+
+
     @staticmethod
     def is_score_entered(game_dao):
         """
@@ -68,50 +90,31 @@ class Score(object):
                 raise invalid_score
 
 
-    @staticmethod
-    def write_score(tournament, entry, category, score, game=None):
+    def write(self):
         """
         Enters a score for category into tournament for player.
 
-        Expects: All fields required
-            - score - integer
-
-        Returns: Nothing on success. Throws ValueErrors and RuntimeErrors when
-            there is an issue inserting the score.
+        Expects: score - integer
         """
-        # pylint: disable=no-member
-        # Has it already been entered?
-        if game is None:
-            existing_score = TournamentScore.query.join(DAO).\
-                join(ScoreCategory).\
-                filter(and_(
-                    TournamentScore.entry_id == entry.id,
-                    TournamentScore.tournament_id == tournament.id,
-                    ScoreCategory.id == category.id)).first()
-        else:
-            existing_score = GameScore.query.join(DAO).\
-                filter(and_(GameScore.entry_id == entry.id, \
-                            GameScore.game_id == game.id,
-                            DAO.score_category_id == category.id)).first()
-
-        if existing_score is not None:
-            raise ValueError(
-                '{} not entered. Score is already set'.format(score))
+        if self.get_dao() is not None:
+            raise ValueError('{} not entered. Score is already set'.\
+                format(self.score))
 
         try:
-            score_dao = DAO(entry.id, category.id, score)
+            score_dao = DAO(self.entry.id, self.category.id, self.score)
             db.session.add(score_dao)
             db.session.flush()
 
-            if game is not None:
-                db.session.add(GameScore(entry.id, game.id, score_dao.id))
-            else:
+            if self.game is not None:
                 db.session.add(
-                    TournamentScore(entry.id, tournament.id, score_dao.id))
+                    GameScore(self.entry.id, self.game.id, score_dao.id))
+            else:
+                db.session.add(TournamentScore(self.entry.id, \
+                    self.tournament.id, score_dao.id))
             db.session.commit()
         except IntegrityError as err:
             db.session.rollback()
             if 'is not present in table "entry"' in err.__repr__():
                 raise AttributeError('{} not entered. Entry {} doesn\'t exist'.\
-                    format(score, entry.id))
+                    format(self.score, self.entry.id))
             raise err

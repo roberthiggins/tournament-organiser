@@ -179,7 +179,8 @@ class Tournament(object):
             entry = game.entrants.filter(GameEntrant.entrant_id != entry.id).\
                 first().entrant
 
-        Score.write_score(self.get_dao(), entry, cat, score, game)
+        Score(category=cat, entry=entry, game=game, score=score,
+              tournament=self.get_dao()).write()
         return 'Score entered for {}: {}'.format(entry.player_id, score)
 
 
