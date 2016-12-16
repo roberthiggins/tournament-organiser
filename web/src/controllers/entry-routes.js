@@ -48,31 +48,36 @@ router.route("/tournament/:tournament/entries/content")
             });
     });
 
+var getScorePage = function(req, res) {
+    res.render("basic", {
+        src_loc: "/entryScore.js",
+        subtitle: "Enter score for " + req.params.username
+    });
+};
+
+var postScore = function(req, res) {
+    var postData = req.body;
+    postData.scores = postData.scores.map(function(dict) {
+        if (dict.hasOwnProperty("gameId")) {
+            dict.game_id = dict.gameId;
+            delete dict.gameId;
+        }
+        return dict;
+        });
+
+    DAOAmbassador.request({
+        method: "POST",
+        request: req,
+        response: res,
+        URL: "/tournament/" + req.params.tournament + "/entry/"
+            + req.params.username + "/score",
+        data: postData,
+        });
+};
+
 router.route("/tournament/:tournament/entry/:username/entergamescore")
-    .get(needsUser, function(req, res) {
-        res.render("basic", {
-            src_loc: "/entryScore.js",
-            subtitle: "Enter score for " + req.params.username
-        });
-    })
-    .post(needsUser, ensureEntryExists, function(req, res) {
-        var postData = req.body;
-        postData.scores = postData.scores.map(function(dict) {
-            if (dict.hasOwnProperty("gameId")) {
-                dict.game_id = dict.gameId;
-                delete dict.gameId;
-            }
-            return dict;
-            });
-        DAOAmbassador.request({
-            method: "POST",
-            request: req,
-            response: res,
-            URL: "/tournament/" + req.params.tournament + "/entry/"
-                + req.params.username + "/score",
-            data: postData,
-            });
-        });
+    .get(needsUser, getScorePage)
+    .post(needsUser, ensureEntryExists, postScore);
 router.route("/tournament/:tournament/entry/:username/entergamescore/scorecategories")
     .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
         DAOAmbassador.request({
@@ -110,22 +115,8 @@ router.route("/tournament/:tournament/entry/:username/entergamescore/content")
     });
 
 router.route("/tournament/:tournament/entry/:username/enterscore")
-    .get(needsUser, function(req, res) {
-        res.render("basic", {
-            src_loc: "/entryScore.js",
-            subtitle: "Enter score for " + req.params.username
-        });
-    })
-    .post(needsUser, ensureEntryExists, function(req, res) {
-        DAOAmbassador.request({
-            method: "POST",
-            request: req,
-            response: res,
-            URL: "/tournament/" + req.params.tournament + "/entry/"
-                + req.params.username + "/score",
-            data: req.body
-            });
-        });
+    .get(needsUser, getScorePage)
+    .post(needsUser, ensureEntryExists, postScore);
 router.route("/tournament/:tournament/entry/:username/enterscore/scorecategories")
     .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
         DAOAmbassador.request({
