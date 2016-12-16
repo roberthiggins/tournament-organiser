@@ -75,24 +75,27 @@ var postScore = function(req, res) {
         });
 };
 
+var getScoreCategories = function(req, res) {
+    DAOAmbassador.request({
+        method: "GET",
+        request: req,
+        response: res,
+        URL: "/tournament/" + req.params.tournament + "/score_categories",
+        onSuccess: function(responseBody) {
+            res.status(200).json({categories: JSON.parse(responseBody)});
+            },
+        onFail: function(responseBody) {
+            res.status(200).json({error: responseBody});
+            }
+        });
+};
+
 router.route("/tournament/:tournament/entry/:username/entergamescore")
     .get(needsUser, getScorePage)
     .post(needsUser, ensureEntryExists, postScore);
+
 router.route("/tournament/:tournament/entry/:username/entergamescore/scorecategories")
-    .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
-        DAOAmbassador.request({
-            method: "GET",
-            request: req,
-            response: res,
-            URL: "/tournament/" + req.params.tournament + "/score_categories",
-            onSuccess: function(responseBody) {
-                res.status(200).json({categories: JSON.parse(responseBody)});
-                },
-            onFail: function(responseBody) {
-                res.status(200).json({error: responseBody});
-                }
-            });
-    })
+    .get(users.injectUserIntoRequest, ensureEntryExists, getScoreCategories);
 router.route("/tournament/:tournament/entry/:username/entergamescore/content")
     .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
         DAOAmbassador.request({
@@ -118,20 +121,7 @@ router.route("/tournament/:tournament/entry/:username/enterscore")
     .get(needsUser, getScorePage)
     .post(needsUser, ensureEntryExists, postScore);
 router.route("/tournament/:tournament/entry/:username/enterscore/scorecategories")
-    .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
-        DAOAmbassador.request({
-            method: "GET",
-            request: req,
-            response: res,
-            URL:  "/tournament/" + req.params.tournament + "/score_categories",
-            onSuccess: function(responseBody) {
-                res.status(200).json({categories: JSON.parse(responseBody)});
-            },
-            onFail: function(responseBody) {
-                res.status(200).json({error: responseBody});
-                }
-            });
-    })
+    .get(users.injectUserIntoRequest, ensureEntryExists, getScoreCategories);
 router.route("/tournament/:tournament/entry/:username/enterscore/content")
     .get(users.injectUserIntoRequest, ensureEntryExists, function(req, res) {
         res.status(200).json({
