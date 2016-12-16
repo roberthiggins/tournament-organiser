@@ -1,0 +1,4 @@
+#! /bin/bash
+
+pylint $(find . -iname "*.py")
+eslint web test/dao/functionality/src test/web/functionality/src

@@ -1,0 +1,18 @@
+doctype html
+html(lang=en)
+    head
+        meta(charset=UTF-8)
+        title
+            | Tournament Organiser: Page Not Found
+        link(href='/style.css', rel='stylesheet', type='text/css')
+    body
+        div#container
+            div#main_content_top
+            div#main_content
+                div#content.content
+                    | Page Not Found
+                    | 
+                    = ' ' + url ? url : ''
+                div#menu.menu
+                div#clear
+            div#main_content_bottom

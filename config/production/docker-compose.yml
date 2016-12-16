@@ -1,0 +1,20 @@
+database:
+    volumes_from:
+        - dbstore
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+daoserver:
+    links:
+        - database:database
+    extends:
+        file: docker-compose.base.yml
+        service: daoserver
+
+webserver:
+    links:
+        - daoserver:daoserver
+    extends:
+        file: docker-compose.base.yml
+        service: webserver

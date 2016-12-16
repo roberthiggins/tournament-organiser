@@ -1,0 +1,26 @@
+#! /bin/bash
+
+if [ ! -f docker-compose.yml ]; then
+    echo "Compose File Not Found!"
+    exit 2
+fi
+
+ENV=${1:-"prod"}
+
+if [ "$ENV" == '--dev' ]; then
+    shift
+    SYSTEMS=${@:-""}
+
+    docker-compose kill $SYSTEMS  &> /dev/null
+    docker-compose rm -f $SYSTEMS &> /dev/null
+
+    docker-compose pull  $SYSTEMS &> /dev/null
+    docker-compose build $SYSTEMS &> /dev/null
+else
+
+    docker-compose kill
+    docker-compose rm -f
+
+    docker-compose pull
+    docker-compose build
+fi

@@ -1,0 +1,3 @@
+alias eit='exit'
+
+alias unit-tests='python -m unittest discover -s unit_tests --pattern=*.py'

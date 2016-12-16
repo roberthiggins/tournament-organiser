@@ -1,0 +1,113 @@
+database:
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+daoserver:
+    links:
+        - database:database
+    extends:
+        file: docker-compose.base.yml
+        service: daoserver
+
+webserver:
+    links:
+        - daoserver:daoserver
+    extends:
+        file: docker-compose.base.yml
+        service: webserver
+
+# Unit Test Specific
+unittestdb:
+    extends:
+        file: docker-compose.unittest.yml
+        service: database
+
+unittest:
+    links:
+        - unittestdb:database
+    extends:
+        file: docker-compose.unittest.yml
+        service: unittest
+
+# API Test Specific
+apitestdb:
+    extends:
+        file: docker-compose.dao_functionality.yml
+        service: database
+
+apitestdaoserver:
+    links:
+        - apitestdb:database
+    extends:
+        file: docker-compose.dao_functionality.yml
+        service: daoserver
+
+apitest:
+    links:
+        - apitestdaoserver
+    extends:
+        file: docker-compose.dao_functionality.yml
+        service: frisby
+
+# Web Useability
+web_use_db:
+    extends:
+        file: docker-compose.web_usability.yml
+        service: database
+
+web_use_daoserver:
+    links:
+        - web_use_db:database
+    extends:
+        file: docker-compose.web_usability.yml
+        service: daoserver
+
+web_use_webserver:
+    links:
+        - web_use_daoserver:daoserver
+    extends:
+        file: docker-compose.web_usability.yml
+        service: webserver
+
+web_usability:
+    extends:
+        file: docker-compose.web_usability.yml
+        service: behat
+    links:
+        - selenium
+        - web_use_webserver
+
+selenium:
+    extends:
+        file: docker-compose.web_usability.yml
+        service: selenium
+    links:
+        - web_use_webserver
+
+# Web Functionality
+web_func_db:
+    extends:
+        file: docker-compose.web_functionality.yml
+        service: database
+
+web_func_daoserver:
+    links:
+        - web_func_db:database
+    extends:
+        file: docker-compose.web_functionality.yml
+        service: daoserver
+
+web_func_webserver:
+    links:
+        - web_func_daoserver:daoserver
+    extends:
+        file: docker-compose.web_functionality.yml
+        service: webserver
+
+web_functionality:
+    extends:
+        file: docker-compose.web_functionality.yml
+        service: frisby
+    links:
+        - web_func_webserver:webserver

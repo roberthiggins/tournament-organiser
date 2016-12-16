@@ -1,8 +1,8 @@
 h1. Developing the Website
 
 h2. Initial packages you'll need
-* sudo apt-get install -y git maven openjdk-7-jdk pylint
-* go install docker - see their website
+* sudo apt-get install -y git pylint
+* go install docker and docker-compose - see their website
 
 h3. Bandwidth
 The initial build will require a lot of guff to be downloaded (~2GB maybe).
@@ -10,75 +10,5 @@ The initial build will require a lot of guff to be downloaded (~2GB maybe).
 h2. Setup
 * Get the config file. This might include passwords so is not included in git
 (as that would go to github). You should get this from Higgins/an adult
-* ./scripts/install
-* You are done. To do it manually see below.
-
-h3. Manual Installation
-* Build the db servers:
-** cd <to_dir>/player_database
-** sudo docker build -t player_db .
-** cd <to_dir>/tournament_database
-** sudo docker build -t tournament_db .
-* Build the webserver:
-** cd <to_dir>/webserver
-** sudo docker build -t webserver .
-* Run these images to start the containers:
-** sudo docker run --name=player_db -d -P player_db
-** sudo docker run --name=tournament_db -d -P tournament_db
-** sudo docker run --name=webserver -d -p 5000:5000 --link=player_db --link=tournament_db webserver
-
-h2. Testing
-Currently there is a smoketest and behat skeleton.
-There is a test script @ scripts/test. You should just run this and you'll see all the output.
-
-h3. Behat Testing
-Behat is a tool for behaviour tests. This means that you script a little elf to run through scenarios in a browser. They then run through the tests, performing actions and expecting results. All features should have some behat tests associated with them. While in development you can use keywords to limit which tests actually get run by behat as the full suite might take some time. Behat tests are really good for testing whether something is functionally correct for the user.
-
-h3. Smoke Testing
-Smoke testing is basically a way to determine if the entire system is structurally compromised to the point where further tests are un-necessary. Essentially it tries to connect to all the systems involved to make sure they're up and running.
-
-h3. Unit Tests
-'''There are no unit tests currently'''
-Unit tests are tests on individual functions. These ensure that they are functionally correct on a much more fine-grained level than the behat tests (that test the final product). All functions should have a unit test associated with them.
-
-h3. View Tests
-'''There are no view tests currently'''
-View tests assert that the system ''looks'' correct for the user. This involves automated screenshots usually. There are a number of suites available for this. We should look into one once we start making the view pretty.
-
-h2. Adding new files
-
-If you want to add new files to the webserver you simply need to rebuild the
-container (manually or using scripts/install). Note that only the src directory
-gets mounted into the container. You can add other directories by altering the
-Dockerfile (c.f. the ADD commands at the bottom.
-
-h2. Connecting to the Player DB
-The recommended way to connect to the db is to enter the webserver container
-and then connect to the player_db container from there. Attach to the
-webserver and run the command:
-* sudo docker exec -i -t webserver /bin/bash
-* psql-db # This has been aliased
-# Notes: When we run the webserver we tell it to link to the player_db
-# container and this will insert some ENV variables into the web container
-# ('$DB_PORT_5432_TCP_ADDR', etc.). You will be asked the docker user
-# password to connect. You can find it in the Dockerfile of the player_database
-# directory.
-
-h2. Handy Commands
-
-h3. From your machine
-$ sudo docker exec -it webserver bash # Attach to a running box (webserver in this case)
-
-h3. From inside a container
-$ env # See the environment variables. This includes IPs, ports, passwords for linked containers.
-
-h2. How Java App is Built
-
-The install script builds the war.
-cd drawserver/drawbuilder
-mvn clean package
-# this creates a file at drawserver/drawbuilder/target/drawbuilder.war
-
-The Dockerfile takes the tomcat:8.0 image and adds another layer. This layer includes the newly minted war file in it's tomcat webapps dir (/usr/local/tomcat/webapps/drawbuilder.war)
-
-When you run the container from this new image, tomcat picks up that a war is in it dir and serves it for you. Thus you can visit it at <url>:<port>/drawbuilder
+* ./scripts/test
+* You are done. To do it manually see the script; it's pretty straight-forward.

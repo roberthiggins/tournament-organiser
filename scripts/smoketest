@@ -1,8 +1,0 @@
-# Build a container to run smoke tests on the other containers.
-pushd smoketester
-sudo docker build -t smoketester .
-popd
-
-sudo docker run -it --rm --link=webserver --link=daoserver --link=db --link=drawserver smoketester
-
-exit $?

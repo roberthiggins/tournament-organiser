@@ -1,0 +1,49 @@
+{
+  "name": "tournament-organiser",
+  "version": "1.0.0",
+  "description": "package file for eslint plugins",
+  "main": "NA",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roberthiggins/Tournament_Organizer-.git"
+  },
+  "author": "Robert Higgins",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/roberthiggins/Tournament_Organizer-/issues"
+  },
+  "homepage": "https://github.com/roberthiggins/Tournament_Organizer-#readme",
+  "devDependencies": {
+    "eslint": "^3.1.1",
+    "eslint-config-standard": "^5.3.5",
+    "eslint-plugin-promise": "^2.0.0",
+    "eslint-plugin-standard": "^2.0.0"
+  },
+  "eslintConfig": {
+    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    "env": {
+        "es6": true,
+        "browser": true,
+        "node": true,
+        "jasmine": true
+    },
+    "installedESLint": true,
+    "plugins": [
+        "react",
+        "standard",
+        "promise"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+#! /bin/bash
+
+./scripts/get-compose-files --dev
+./scripts/clean-and-build --dev unittestdb unittest
+
+docker-compose run unittest
