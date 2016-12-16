@@ -73,9 +73,11 @@ var EnterScorePage = React.createClass({
         e.preventDefault();
 
         var data = {
-            gameId: this.state.game_id,
-            category: $("form select#category").find(":selected").text(),
-            score: this.state.score,
+            scores: [{
+                gameId: this.state.game_id,
+                category: $("form select#category").find(":selected").text(),
+                score: this.state.score,
+                }]
             };
 
         $.post(window.location,
