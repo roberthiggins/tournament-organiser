@@ -79,26 +79,28 @@ exports.enterTournament = function(tournament, username) {
 };
 
 // Enter a score. You can specify a response code and message
-exports.enterScore = function(per_tourn, tourn, player, user, msg, scoreKey,
-    score, code, resp, gameId){
+exports.enterScore = function(per_tourn, tourn, player, user, msg, scores, code,
+    resp, gameId){
 
     var append = per_tourn ? "_per_tourn_1" : "_per_game_1",
-        category = scoreKey ? scoreKey : tourn + append,
         API = process.env.API_ADDR + "tournament/" + tourn + "/entry/" +
             player,
         postScore = function (gameId){
-            var req = frisby.create("POST score: " + msg)
-                .post(API + "/score",
-                    {
-                    scores: [{
+            var postData = {
+                scores: scores.map(function(pair){
+                    var category = pair[0] ? pair[0] : tourn + append;
+                    return {
                         game_id: gameId,
                         category: category,
-                        score: score
-                        }]
-                    },
-                    {json: true, inspectOnFailure: true})
-                .expectStatus(code)
-                .expectBodyContains(resp);
+                        score: pair[1]
+                        };
+                    })
+                },
+                req = frisby.create("POST score: " + msg)
+                    .post(API + "/score", postData,
+                        {json: true, inspectOnFailure: true})
+                    .expectStatus(code)
+                    .expectBodyContains(resp);
 
                 if (user) {
                     req.addHeader("Authorization", exports.auth(user));

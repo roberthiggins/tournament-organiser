@@ -33,28 +33,29 @@ describe("Enter score for single game for an entry", function () {
             var gameId = body.game_id,
                 post = injector.enterScore.bind(this, false, tourn, p1);
 
-            post(null, "No auth enters a score", null, 5, 401,
+            post(null, "No auth enters a score", [[null, 5]], 401,
                 "Could not verify your access level", gameId);
-            post("charlie_murphy", "Non-playing user", null, 5, 403,
+            post("charlie_murphy", "Non-playing user", [[null, 5]], 403,
                 "Permission denied", gameId);
-            post("superuser", "Superuser", tourn + "_per_game_su", 5,
+            post("superuser", "Superuser", [[tourn + "_per_game_su", 5]],
                 200, "Score entered for " + p1 + ": 5", gameId);
-            post(tourn + "_to", "TO", tourn + "_per_game_to",
-                5, 200, "Score entered for " + p1 + ": 5", gameId);
+            post(tourn + "_to", "TO", [[tourn + "_per_game_to", 5]], 200,
+                "Score entered for " + p1 + ": 5", gameId);
 
             post = injector.enterScore.bind(this, false, tourn, p1, p1);
 
-            post("Player", null, 5, 200, "Score entered for " + p1 + ": 5",
+            post("Player", [[null, 5]], 200, "Score entered for " + p1 + ": 5",
                 gameId);
 
-            post("Player enters a score twice", null, 4, 400,
+            post("Player enters a score twice", [[null, 4]], 400,
                 "4 not entered. Score is already set", gameId);
 
-            post("Score too low", null, 0, 400, "Invalid score: 0", gameId);
-            post("Score too high", null, 16, 400, "Invalid score: 16", gameId);
-            post("Fake category", "non_existent", 5, 400,
+            post("Score too low", [[null, 0]], 400, "Invalid score: 0", gameId);
+            post("Score too high", [[null, 16]], 400, "Invalid score: 16",
+                gameId);
+            post("Fake category", [["non_existent", 5]], 400,
                 "Unknown category: non_existent", gameId);
-            post("Per tournament category", tourn + "_per_tourn_1", 5, 400,
+            post("Per tournament category", [[tourn + "_per_tourn_1", 5]], 400,
                 "Cannot enter a per-tournament score (" + tourn +
                 "_per_tourn_1) for a game (id: " + gameId + ")", gameId);
         })
@@ -76,11 +77,11 @@ describe("Oppostion scores", function() {
         .afterJSON(function (body) {
             var gameId = body.game_id,
                 post = injector.enterScore.bind(this, false, tourn, p1, p1);
-            post("P1 enters opp score", tourn + "_per_game_opp", 4, 200,
+            post("P1 enters opp score", [[tourn + "_per_game_opp", 4]], 200,
                 "Score entered for " + p2 + ": 4", gameId); // NB P2
 
-            post("P1 enters opp score again", tourn + "_per_game_opp", 4, 400,
-                "4 not entered. Score is already set", gameId);
+            post("P1 enters opp score again", [[tourn + "_per_game_opp", 4]],
+                400, "4 not entered. Score is already set", gameId);
         })
         .toss();
 });
@@ -102,14 +103,14 @@ describe("Zero Sum scores", function () {
                 cat = tourn + "_per_game_2",
                 post = injector.enterScore.bind(this, false, tourn, p1);
 
-            post(p1, "P1 enters zero_sum score", cat, 4, 200,
+            post(p1, "P1 enters zero_sum score", [[cat, 4]], 200,
                 "Score entered for " + p1 + ": 4", gameId);
 
 
             post = injector.enterScore.bind(this, false, tourn, p2, p2);
-            post("P2 enters zero_sum score that is too high", cat, 2, 400,
+            post("P2 enters zero_sum score that is too high", [[cat, 2]], 400,
                 "Invalid score: 2", gameId);
-            post("P2 enters zero_sum score that is acceptable",cat, 1, 200,
+            post("P2 enters zero_sum score that is acceptable", [[cat, 1]], 200,
                 "Score entered for " + p2 + ": 1", gameId);
         })
         .toss();
