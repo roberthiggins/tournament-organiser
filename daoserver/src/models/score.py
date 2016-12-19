@@ -16,7 +16,11 @@ class Score(object):
 
     def __init__(self, **args):
         # pylint: disable=no-member
-        self.score = int(args.get('score'))
+        try:
+            self.score = int(args.get('score'))
+        except TypeError:
+            raise ValueError('Score not entered: {}'.format(args.get('score')))
+
         self.tournament = args.get('tournament').get_dao()
         game_id = args.get('game_id', None)
         try:

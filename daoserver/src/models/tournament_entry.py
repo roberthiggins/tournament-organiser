@@ -96,10 +96,10 @@ class TournamentEntry(object):
             - score - the score. Integer
         """
 
-        messages = [
-            Score(entry_id=self.get_dao().id, \
-                tournament=self.tournament, score=x['score'], \
-                category=x['category'], game_id=x.get('game_id', None)).\
-                write() for x in scores]
+        scores = [Score(entry_id=self.get_dao().id, tournament=self.tournament,
+                        score=x['score'], category=x['category'],
+                        game_id=x.get('game_id', None)) for x in scores]
 
-        return messages[0] if len(messages) == 1 else messages
+        messages = [s.write() for s in scores]
+
+        return messages[0] if len(messages) == 1 else '\n'.join(messages)
