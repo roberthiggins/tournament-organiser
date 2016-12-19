@@ -7,10 +7,8 @@ Feature: Enter a tournament score for a player
     Scenario Outline: I see some messages when I enter scores
         Given I am authenticated as "<auth>" using "password"
         Given I am on "/tournament/tourn_score_test/entry/stevemcqueen/enterscore"
-        When I wait for "Enter score for stevemcqueen" to appear
-        When I wait for "Select a score category" to appear
-        When I select "Fanciness" from "category"
-        Then I fill in "score" with "<score>"
+        When I wait for "Fanciness" to appear
+        Then I fill in "Fanciness" with "<score>"
         Then I press "Enter Score"
         Then I should see "<content>" appear
         Examples:

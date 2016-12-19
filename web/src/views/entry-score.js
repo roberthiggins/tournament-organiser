@@ -5,7 +5,6 @@ var EnterScoreForm = React.createClass({
     propTypes: {
         categories:         React.PropTypes.array.isRequired,
         scoreChangeHandler: React.PropTypes.func.isRequired,
-        score:              React.PropTypes.number,
         submitHandler:      React.PropTypes.func.isRequired,
     },
     render: function() {
@@ -13,16 +12,18 @@ var EnterScoreForm = React.createClass({
             return <div>"No score categories available"</div>;
         }
 
+        var inputs = this.props.categories.map(function(cat) {
+            return <Inputs.textField name={cat.name + " Score"}
+                id={cat.name}
+                key={cat.name}
+                changeHandler={this.props.scoreChangeHandler}
+                value={cat.score || ""} />;
+        }.bind(this));
+
         return (
             <form onSubmit={this.props.submitHandler}>
 
-                <Inputs.textField name="Score"
-                                  id="score"
-                                  changeHandler={this.props.scoreChangeHandler}
-                                  value={this.props.score || ""} />
-                <Inputs.select id="category"
-                               name="Select a score category"
-                               options={this.props.categories} />
+                <div>{inputs}</div>
 
                 <button type="submit">Enter Score</button>
             </form>
@@ -67,17 +68,28 @@ var EnterScorePage = React.createClass({
         this.categoryRequest.abort();
     },
     handleScoreChange: function(event) {
-        this.setState({score: event.target.value});
+        this.setState({categories: this.state.categories.map(function(cat) {
+            cat.score = cat.name === event.target.id ?
+                event.target.value : cat.score;
+            return cat;
+            })
+        });
     },
     handleSubmit: function (e) {
         e.preventDefault();
 
         var data = {
-            scores: [{
-                gameId: this.state.game_id,
-                category: $("form select#category").find(":selected").text(),
-                score: this.state.score,
-                }]
+            scores: this.state.categories
+                .filter(function(cat) {
+                    return cat.score !== null;
+                })
+                .map(function(cat) {
+                    return {
+                        gameId: this.state.game_id,
+                        category: cat.name,
+                        score: cat.score
+                    };
+                }.bind(this))
             };
 
         $.post(window.location,
@@ -102,9 +114,8 @@ var EnterScorePage = React.createClass({
                 {this.state.success || this.state.categories === null ?
                     null
                     : <EnterScoreForm submitHandler={this.handleSubmit}
-                                      categories={this.state.categories}
-                                      scoreChangeHandler={this.handleScoreChange}
-                                      score={this.state.score} />}
+                            categories={this.state.categories}
+                            scoreChangeHandler={this.handleScoreChange} />}
             </div>
         );
     }
