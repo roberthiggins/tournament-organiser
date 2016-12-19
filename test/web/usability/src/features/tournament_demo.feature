@@ -64,7 +64,7 @@ Feature: DEMO TOURNAMENT
     @javascript
     Scenario Outline: Players play and enter scores for round 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
+        Given I enter game score "Battle", "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p1  | 15    |
@@ -82,7 +82,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Players play and enter scores for round 2
         # P4 moved to pos 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
+        Given I enter game score "Battle", "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p4  | 15    |
@@ -100,7 +100,7 @@ Feature: DEMO TOURNAMENT
     Scenario Outline: Players play and enter scores for round 3
         # P4 moved to pos 1
         Given I am authenticated as "<username>" using "<username>_password"
-        Given I enter game score "<score>" for entry "<username>" in tournament "demo"
+        Given I enter game score "Battle", "<score>" for entry "<username>" in tournament "demo"
         Examples:
             | username | score |
             | demo_p3  | 11    |

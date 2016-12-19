@@ -112,12 +112,12 @@ class FeatureContext extends MinkContext
     }
 
     /**
-    * @Given /^I enter game score "([^"]*)" for entry "([^"]*)" in tournament "([^"]*)"$/
+    * @Given /^I enter game score "([^"]*)", "([^"]*)" for entry "([^"]*)" in tournament "([^"]*)"$/
     */
-    public function iEnterGameScore($score, $user, $tourn) {
+    public function iEnterGameScore($cat, $score, $user, $tourn) {
         $this->visit('/tournament/'.$tourn.'/entry/'.$user.'/entergamescore');
-        $this->iWaitForTextToAppear('Select a score category');
-        $this->fillField('score', $score);
+        $this->iWaitForTextToAppear($cat);
+        $this->fillField($cat, $score);
         $this->pressButton('Enter Score');
         $this->iWaitForTextToAppear('Score entered for '.$user.': '.$score);
     }
