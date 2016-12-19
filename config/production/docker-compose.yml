@@ -6,6 +6,8 @@ database:
         service: database
 
 daoserver:
+    environment:
+        TESTING: "False"
     links:
         - database:database
     extends:

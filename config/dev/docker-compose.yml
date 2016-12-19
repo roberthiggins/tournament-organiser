@@ -6,6 +6,8 @@ database:
 daoserver:
     links:
         - database:database
+    environment:
+        TESTING: "True"
     extends:
         file: docker-compose.base.yml
         service: daoserver

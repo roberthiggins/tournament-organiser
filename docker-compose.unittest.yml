@@ -8,6 +8,8 @@ unittest:
     build: daoserver
     container_name: unittest
     command: bash ./wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+    environment:
+        TESTING: "True"
     extends:
         file: docker-passwords.yml
         service: dbpasswords

@@ -9,6 +9,8 @@ daoserver:
     container_name: web_func_daoserver
     ports:
         - "5003:5000"
+    environment:
+        TESTING: "True"
     extends:
         file: docker-passwords.yml
         service: dbpasswords

@@ -22,6 +22,9 @@ from models.permissions import set_up_permissions
 def create_app():
     """Config for the app"""
     app = Flask(__name__)
+
+    app.config['TESTING'] = os.environ['TESTING']
+
     app.config['SQLALCHEMY_DATABASE_URI'] = \
         'postgresql://docker:{}@{}:{}/{}'.format(
             os.environ['DATABASE_PASSWORD'],
