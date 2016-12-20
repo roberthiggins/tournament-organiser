@@ -162,6 +162,6 @@ describe('Check that players are ranked correctly', function () {
         .get(API + 'not_a_tournament/entry/rank')
         .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
-        .expectBodyContains('Tournament not_a_tournament doesn\'t exist')
+        .expectBodyContains('Tournament not_a_tournament not found in database')
         .toss();
 });

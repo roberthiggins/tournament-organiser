@@ -28,12 +28,7 @@ from models.tournament_round import TournamentRound, DrawException
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
     def wrapped(self, *args, **kwargs): # pylint: disable=missing-docstring
-        if self.get_dao() is None:
-            print 'Tournament not found: {}'.format(self.tournament_id)
-            raise ValueError(
-                'Tournament {} not found in database'.format(
-                    self.tournament_id))
-        return func(self, *args, **kwargs)
+        return func(self.check_exists(), *args, **kwargs)
     return wrapped
 
 PROGRESS_EXCEPTION = ValueError('You cannot perform this action on a '\
@@ -62,6 +57,13 @@ class Tournament(object):
         self.ranking_strategy = RankingStrategy(tournament_id,
                                                 self.get_score_categories)
 
+    def check_exists(self):
+        """Check that this Tournament has a corresponding DAO"""
+        if self.get_dao() is None:
+            print 'Tournament not found: {}'.format(self.tournament_id)
+            raise ValueError('Tournament {} not found in database'.\
+                format(self.tournament_id))
+        return self
 
     def get_dao(self):
         """Convenience method to recover TournamentDAO"""
