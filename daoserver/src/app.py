@@ -4,6 +4,7 @@ Application for running the DAO API
 
 import datetime
 import os
+import traceback
 import jsonpickle
 
 from flask import Flask, make_response
@@ -58,8 +59,8 @@ def create_app():
     def input_error(err):
         """Input errors"""
         print '{}: {}'.format(type(err).__name__, err)
-        import traceback
-        traceback.print_exc()
+        if app.config['TESTING']:
+            traceback.print_exc()
         return make_response(str(err), 400)
 
     @app.errorhandler(Exception)
@@ -67,7 +68,6 @@ def create_app():
     def unknown_error(err):
         """All other exceptions are essentially just raised with logging"""
         print '{}: {}'.format(type(err).__name__, err)
-        import traceback
         traceback.print_exc()
         return make_response(str(err), 500)
 
