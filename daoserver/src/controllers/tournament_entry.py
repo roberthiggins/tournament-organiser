@@ -1,7 +1,6 @@
 """
 Controller for entries in tournaments
 """
-from decimal import Decimal as Dec
 from flask import Blueprint, g, request
 
 from controllers.request_helpers import json_response, requires_auth, \
@@ -59,38 +58,6 @@ def next_game():
 def schedule():
     """Get the scheule of games for username's entry"""
     return g.entry.get_schedule()
-
-@ENTRY.route('/rank', methods=['GET'])
-@json_response
-def rank_entries():
-    """
-    Rank all the entries in a tournament based on the scoring criteria for the
-    tournament.
-    The structure of the returned JSON blob will be as follows:
-    [
-        {
-            'username': 'homer',
-            'entry_id': 1,
-            'tournament_id': 'some_tournie',
-            'scores': {'round_1': 10, 'round_2': 4 },
-            'total_score': 23.50, # always 2dp
-            'ranking': 3
-        },
-    ]
-    """
-    tournament = Tournament(g.tournament_id)
-    # pylint: disable=line-too-long
-    return [
-        {
-            'username' : x.player_id,
-            'entry_id' : x.id,
-            'tournament_id' : g.tournament_id,
-            'scores' : x.score_info,
-            'total_score' : str(Dec(x.total_score).quantize(Dec('1.00'))),
-            'ranking': x.ranking
-        } for x in tournament.ranking_strategy.overall_ranking(
-            tournament.get_entries())
-    ]
 
 @ENTRY.route('/<username>/withdraw', methods=['POST'])
 @requires_auth

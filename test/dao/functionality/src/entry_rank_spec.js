@@ -4,7 +4,7 @@ describe('Check that players are ranked correctly', function () {
         API = process.env.API_ADDR + 'tournament/';
 
     frisby.create('Check that the rank_entries format is correct')
-        .get(API + 'rank_test/entry/rank')
+        .get(API + 'rank_test/rankings')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSONTypes('0',
@@ -27,7 +27,7 @@ describe('Check that players are ranked correctly', function () {
 
 
     frisby.create('Get rankings for a tournament')
-        .get(API + 'rank_test/entry/rank')
+        .get(API + 'rank_test/rankings')
         .expectStatus(200)
         .expectHeaderContains('content-type', 'application/json')
         .expectJSON([
@@ -159,7 +159,7 @@ describe('Check that players are ranked correctly', function () {
         .toss();
 
     frisby.create('Non-existent tournament')
-        .get(API + 'not_a_tournament/entry/rank')
+        .get(API + 'not_a_tournament/rankings')
         .expectStatus(400)
         .expectHeaderContains('content-type', 'text/html')
         .expectBodyContains('Tournament not_a_tournament not found in database')

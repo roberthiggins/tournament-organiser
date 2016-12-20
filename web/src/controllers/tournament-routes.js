@@ -94,7 +94,7 @@ router.route("/tournament/:tournament/rankings")
     })
 router.route("/tournament/:tournament/rankings/content")
     .get(function(req, res) {
-        var url = "/tournament/" + req.params.tournament + "/entry/rank";
+        var url = "/tournament/" + req.params.tournament + "/rankings";
 
         DAOAmbassador.request({
             method: "GET",
