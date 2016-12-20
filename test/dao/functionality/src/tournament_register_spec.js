@@ -39,6 +39,7 @@ describe("Test seeing and registering for a tournament", function () {
         .expectJSON("tournaments", [
             asJSON("1985-01-27", 5, "draw_test",             2, false),
             asJSON("2095-07-01", 0, "empty_tournament",      0, false),
+            asJSON("2095-10-10", 2, "enter_score_test_0",    1, false),
             asJSON("2095-10-10", 2, "enter_score_test_1",    1, false),
             asJSON("2095-10-10", 2, "enter_score_test_2",    1, false),
             asJSON("2095-10-10", 2, "enter_score_test_3",    1, false),

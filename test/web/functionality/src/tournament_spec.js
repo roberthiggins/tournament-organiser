@@ -148,7 +148,7 @@ describe("Non-Existent Tournament Entries", function () {
             .addHeader("cookie", cookie)
             .expectStatus(400)
             .expectJSONTypes({error: String})
-            .expectJSON({error: "Tournament not_a_tourn doesn't exist"})
+            .expectJSON({error: "Tournament not_a_tourn not found in database"})
             .toss();
         });
 });

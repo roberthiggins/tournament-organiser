@@ -9,7 +9,7 @@ Feature: Rank Entries Based on Scores
         Then I should see "There are no players entered for this event" appear
 
         Given I am on "/tournament/foo/rankings"
-        Then I should see "Tournament foo doesn't exist" appear
+        Then I should see "Tournament foo not found in database" appear
 
     @javascript
     Scenario: I get rankings when scores have been entered

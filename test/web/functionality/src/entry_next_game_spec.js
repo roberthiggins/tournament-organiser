@@ -25,7 +25,7 @@ describe("Bad targets", function () {
             .get(process.env.API_ADDR +
                 "tournament/foo/entry/next_game_test_player_5/nextgame/content")
             .expectStatus(200)
-            .expectJSON({error: "Tournament foo doesn't exist"})
+            .expectJSON({error: "Tournament foo not found in database"})
             .toss();
        });
 

@@ -10,9 +10,9 @@ Feature: List Entries for a tournament
         Then I should see "<message>" appear
 
         Examples:
-            | tourn        | message                              |
-            | entries_test | entries_test_p_1                     |
-            | not_a_thing  | Tournament not_a_thing doesn't exist |
+            | tourn        | message                                      |
+            | entries_test | entries_test_p_1                             |
+            | not_a_thing  | Tournament not_a_thing not found in database |
 
     @javascript
     Scenario: I enter the tournament from the page

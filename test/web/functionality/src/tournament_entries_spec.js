@@ -33,7 +33,7 @@ describe("Bad tournament", function () {
             .get(API + tourn + "/entries/content", {inspectOnFailure: true})
             .addHeader("cookie", cookie)
             .expectStatus(400)
-            .expectJSON({error: "Tournament foo doesn't exist"})
+            .expectJSON({error: "Tournament foo not found in database"})
             .toss();
     });
 });
