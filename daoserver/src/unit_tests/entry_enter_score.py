@@ -228,13 +228,9 @@ class EnterScore(AppSimulatingTest):
             category='not_a_key',
             score=5)
         # bad score - character
-        self.assertRaises(
-            ValueError,
-            Score,
-            tournament=Tournament(self.tourn_1),
-            entry_id=entry.id,
-            category=self.cat_1.name,
-            score='a')
+        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
+                      category=self.cat_1.name, score='a')
+        self.assertRaises(ValueError, score.validate)
         # bad score - low
         score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
                       category=self.cat_1.name, score=-1)

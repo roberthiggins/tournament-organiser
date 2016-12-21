@@ -30,7 +30,7 @@ class EnterScore(AppSimulatingTest):
 
         self.db.session.commit()
 
-    def test_enter_score_bad_values(self):
+    def enter_score_bad_values(self):
         """These should all fail for one reason or another"""
         entry = TournamentEntry.query.filter_by(
             player_id=self.player, tournament_id=self.tourn_1).first()
@@ -52,13 +52,9 @@ class EnterScore(AppSimulatingTest):
             category='not_a_key',
             score=5)
         # bad score - character
-        self.assertRaises(
-            ValueError,
-            Score,
-            tournament=Tournament(self.tourn_1),
-            entry_id=entry.id,
-            category=self.cat_1.name,
-            score='a')
+        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
+                      category=self.cat_1.name, score='a')
+        self.assertRaises(ValueError, score.write)
         # bad score - low
         score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
                       category=self.cat_1.name, score=-1)
@@ -95,7 +91,7 @@ class EnterScore(AppSimulatingTest):
         tournament_scores = len(TournamentScore.query.all())
         scores = len(ScoreDAO.query.all())
 
-        self.test_enter_score_bad_values()
+        self.enter_score_bad_values()
 
         compare(tournament_scores, len(TournamentScore.query.all()))
         compare(scores, len(ScoreDAO.query.all()))
