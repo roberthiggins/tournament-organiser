@@ -74,8 +74,7 @@ describe("Enter multiple scores", function () {
 
     setup(tourn, [p1, tourn + "_p_2"]);
 
-    post("Missing score", [[cat1, 5], [cat2, null]], 400,
-        "Score not entered: None");
+    post("Missing score", [[cat1, 5], [cat2, null]], 400, "Invalid score: None");
     post("Illegal score", [[cat1, 0], [cat2, 5]], 400, "Invalid score: 0");
     post("Multi Scores", [[cat1, 5], [cat2, 5]], 200, "Score entered for " + p1);
     post("Enter twice", [[cat1, 4]], 400, "4 not entered. Score is already set");

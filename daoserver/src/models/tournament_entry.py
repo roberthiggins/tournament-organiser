@@ -99,6 +99,8 @@ class TournamentEntry(object):
         scores = [Score(entry_id=self.get_dao().id, tournament=self.tournament,
                         score=x['score'], category=x['category'],
                         game_id=x.get('game_id', None)) for x in scores]
+        for score in scores:
+            score.validate()
 
         messages = [s.write() for s in scores]
 
