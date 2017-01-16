@@ -13,11 +13,14 @@ var EnterScoreForm = React.createClass({
         }
 
         var inputs = this.props.categories.map(function(cat) {
+            var helpText = "Enter a score between " + cat.min_val + " and " +
+                cat.max_val;
             return <Inputs.textField name={cat.name + " Score"}
                 id={cat.name}
                 key={cat.name}
                 changeHandler={this.props.scoreChangeHandler}
-                value={cat.score || ""} />;
+                value={cat.score || ""}
+                helpText={helpText} />;
         }.bind(this));
 
         return (
