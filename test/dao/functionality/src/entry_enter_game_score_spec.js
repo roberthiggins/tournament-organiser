@@ -57,8 +57,8 @@ describe("Enter score for single game for an entry: bad values", function () {
     post("Fake category", [["non_existent", 5]], 400,
         "Unknown category: non_existent");
     post("Per tournament category", [[tourn + "_per_tourn_1", 5]], 400,
-        "Cannot enter a per-tournament score (" + tourn +
-        "_per_tourn_1) for a game (id:");
+        "Cannot enter per-tournament score (" + tourn +
+        "_per_tourn_1) for game (id:");
 });
 
 describe("Oppostion scores", function() {
