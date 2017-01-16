@@ -14,6 +14,9 @@ from models.dao.tournament_game import TournamentGame
 class Score(object):
     """Model for a score in a tournament or game"""
 
+    GAME_AS_TOURN = '{} should be entered per-tournament'
+    GAME_NOT_FOUND = '{} not entered. Game {} cannot be found'
+
     def __init__(self, **args):
         # pylint: disable=no-member
         self.score = args.get('score', None)
@@ -28,8 +31,7 @@ class Score(object):
                 self.game = None
         except DataError:
             db.session.rollback()
-            raise TypeError('{} not entered. Game {} cannot be found'.\
-                format(self.score, game_id))
+            raise TypeError(self.GAME_NOT_FOUND.format(self.score, game_id))
 
         self.category = ScoreCategory.query.filter_by(
             tournament_id=self.tournament.name, name=args['category']).first()
@@ -103,8 +105,7 @@ class Score(object):
             raise invalid_score
 
         if self.game is None and not self.category.per_tournament:
-            raise TypeError('{} should be entered per-tournament'.\
-                format(self.category.name))
+            raise TypeError(self.GAME_AS_TOURN.format(self.category.name))
 
         if self.game is not None and self.category.per_tournament:
             raise TypeError('Cannot enter a per-tournament score '\
