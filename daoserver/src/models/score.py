@@ -16,6 +16,7 @@ class Score(object):
 
     GAME_AS_TOURN = '{} should be entered per-tournament'
     GAME_NOT_FOUND = '{} not entered. Game {} cannot be found'
+    TOURN_AS_GAME = 'Cannot enter per-tournament score ({}) for game (id: {})'
 
     def __init__(self, **args):
         # pylint: disable=no-member
@@ -108,9 +109,8 @@ class Score(object):
             raise TypeError(self.GAME_AS_TOURN.format(self.category.name))
 
         if self.game is not None and self.category.per_tournament:
-            raise TypeError('Cannot enter a per-tournament score '\
-                '({}) for a game (id: {})'.\
-                format(self.category.name, self.game.id))
+            raise TypeError(
+                self.TOURN_AS_GAME.format(self.category.name, self.game.id))
 
         # If zero sum we need to check the score entered by the opponent
         if self.game is not None and self.category.zero_sum:
