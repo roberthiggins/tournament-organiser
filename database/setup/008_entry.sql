@@ -1,5 +1,5 @@
-create table entry{
-	id 		integer serial not null  unique,
-	tourn_name	varchar unique references tournament(name),
-	is_accepted	bool not null 
-};
+create table entry (
+        id 		serial not null primary key,
+        player_id       varchar REFERENCES account(username),
+        tournament_id   varchar references tournament(name)
+);

@@ -1,0 +1,15 @@
+#! /bin/bash
+
+SYSTEMS="apitestdb apitestdaoserver"
+./scripts/get-compose-files --dev
+./scripts/clean-and-build --dev $SYSTEMS apitest
+
+docker-compose up -d $SYSTEMS &> /dev/null
+
+./wait-for-container apitestdaoserver \
+    ./scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql \
+        &> /dev/null && \
+    ./scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql \
+        &> /dev/null
+
+docker-compose run apitest

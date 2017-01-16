@@ -1,0 +1,52 @@
+# Travis CI build script. This gets run by github when a push is performed.
+# Note you should always push to dev and then pull from master once the tests
+# pass.
+
+sudo: required
+
+language: python
+
+services:
+    - docker
+
+install:
+    - pip install pylint
+
+    - bash scripts/get-compose-files --dev
+    - docker-compose build unittestdb
+    - docker-compose up -d unittestdb
+    - docker-compose build database daoserver webserver
+    - docker-compose up -d database daoserver webserver
+    - docker-compose build apitestdb apitestdaoserver
+    - docker-compose up -d apitestdb apitestdaoserver
+    - docker-compose build web_func_db web_func_daoserver web_func_webserver
+    - docker-compose up -d web_func_db web_func_daoserver web_func_webserver
+    - docker-compose build web_use_db web_use_daoserver web_use_webserver
+    - docker-compose up -d web_use_db web_use_daoserver web_use_webserver
+    - docker inspect unittestdb &> /dev/null
+    - docker inspect daoserver &> /dev/null
+    - docker inspect apitestdaoserver &> /dev/null
+    - docker inspect web_func_daoserver &> /dev/null
+    - docker inspect web_use_daoserver &> /dev/null
+script:
+
+
+    - docker-compose run unittest
+
+
+    - bash scripts/insert_into_db apitestdb database/data/dev/basic_functions.sql
+    - bash scripts/insert_into_db apitestdb database/data/dev/api_test_data.sql
+    - docker-compose run apitest
+
+
+    - bash scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql
+    - bash scripts/insert_into_db web_func_db database/data/dev/web_functionality_test_data.sql
+    - docker-compose run web_functionality
+
+    - docker-compose up --build -d selenium
+    - docker inspect selenium &> /dev/null
+    - bash scripts/insert_into_db web_use_db database/data/dev/basic_functions.sql
+    - bash scripts/insert_into_db web_use_db database/data/dev/web_usability_test_data.sql
+    - docker-compose run web_usability
+
+    - pylint $(find . -iname "*.py")

@@ -1,0 +1,18 @@
+#! /bin/bash
+
+DB="web_use_db"
+SYSTEMS="$DB web_use_daoserver web_use_webserver"
+TEST_SYSTEMS="web_usability"
+
+./scripts/get-compose-files --dev
+./scripts/clean-and-build --dev $SYSTEMS $TEST_SYSTEMS
+
+docker-compose up -d $SYSTEMS &> /dev/null
+
+./wait-for-container web_use_daoserver \
+    ./scripts/insert_into_db $DB database/data/dev/basic_functions.sql \
+        &> /dev/null && \
+    ./scripts/insert_into_db $DB \
+        database/data/dev/web_usability_test_data.sql &> /dev/null
+
+docker-compose run web_usability

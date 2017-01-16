@@ -1,0 +1,8 @@
+flask
+passlib
+psycopg2
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Testing
+jsonpickle
+testfixtures

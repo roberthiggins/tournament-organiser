@@ -1,0 +1,29 @@
+database:
+    container_name: web_func_db
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+daoserver:
+    build: daoserver
+    container_name: web_func_daoserver
+    ports:
+        - "5003:5000"
+    environment:
+        TESTING: "True"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+webserver:
+    build: web
+    container_name: web_func_webserver
+    ports:
+        - "5105:8000"
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords
+
+frisby:
+    build: test/web/functionality
+    container_name: web_functionality

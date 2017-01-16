@@ -1,0 +1,17 @@
+#! /bin/bash
+
+SYSTEMS="web_func_db web_func_daoserver web_func_webserver"
+TEST_SYSTEMS="web_functionality"
+
+./scripts/get-compose-files --dev
+./scripts/clean-and-build --dev $SYSTEMS $TEST_SYSTEMS
+
+docker-compose up -d $SYSTEMS &> /dev/null
+
+./wait-for-container web_func_daoserver \
+    ./scripts/insert_into_db web_func_db database/data/dev/basic_functions.sql \
+        &> /dev/null && \
+    ./scripts/insert_into_db web_func_db \
+        database/data/dev/web_functionality_test_data.sql &> /dev/null
+
+docker-compose run web_functionality

@@ -1,0 +1,22 @@
+database:
+    volumes_from:
+        - dbstore
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+daoserver:
+    environment:
+        TESTING: "False"
+    links:
+        - database:database
+    extends:
+        file: docker-compose.base.yml
+        service: daoserver
+
+webserver:
+    links:
+        - daoserver:daoserver
+    extends:
+        file: docker-compose.base.yml
+        service: webserver

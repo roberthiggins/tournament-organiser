@@ -1,0 +1,15 @@
+database:
+    container_name: unittestdb
+    extends:
+        file: docker-compose.base.yml
+        service: database
+
+unittest:
+    build: daoserver
+    container_name: unittest
+    command: bash ./wait-for-postgres.sh database python -m unittest discover -s unit_tests --pattern=*.py
+    environment:
+        TESTING: "True"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords

@@ -1,0 +1,24 @@
+#! /bin/bash
+
+SYSTEMS="database daoserver webserver"
+UPDATE=${1:-"no"}
+
+if [ "$UPDATE" == '--update' ]; then
+    shift
+
+    docker-compose up --build -d webserver
+
+else
+
+    ./scripts/get-compose-files --dev
+    ./scripts/clean-and-build --dev $SYSTEMS
+
+    docker-compose up -d $SYSTEMS &> /dev/null
+
+    # Add some data to database for use in browser
+    ./wait-for-container daoserver \
+        ./scripts/insert_into_db database \
+            database/data/dev/basic_functions.sql &> /dev/null && \
+        ./scripts/insert_into_db database \
+            database/data/dev/web_functionality_test_data.sql &> /dev/null
+fi

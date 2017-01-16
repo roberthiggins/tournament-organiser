@@ -1,9 +1,35 @@
-./scripts/install $@
+#! /bin/bash
+./scripts/get-compose-files --dev
+./scripts/clean-and-build --dev
 
-./scripts/smoketest
-if [ $? -ne 0 ]
-then
-  exit 1
-fi
+UNIT="unittestdb"
+DAO="apitestdb apitestdaoserver"
+WEBFUNC="web_func_db web_func_daoserver web_func_webserver"
+WEBUSE="web_use_db web_use_daoserver web_use_webserver"
+SYSTEMS="$UNIT $DAO $WEBFUNC $WEBUSE"
 
-./scripts/behaviourtest
+docker-compose up -d $SYSTEMS &> /dev/null
+wait
+
+# Data Injection
+inject () {
+    ./wait-for-container $1 \
+        ./scripts/insert_into_db $2 database/data/dev/basic_functions.sql \
+            &> /dev/null && \
+        ./scripts/insert_into_db $2 database/data/dev/$3.sql &> /dev/null
+}
+inject apitestdaoserver apitestdb api_test_data
+inject web_func_daoserver web_func_db web_functionality_test_data
+inject web_use_daoserver web_use_db web_usability_test_data
+wait
+
+run () {
+    echo $1
+    ./wait-for-container $2 docker-compose run $3
+}
+echo "LINTING" && ./scripts/lint &
+echo "UNIT TESTS" && docker-compose run unittest &
+run "DAO FUNCTIONALITY" apitestdaoserver apitest &
+run "WEB USEABILITY" web_use_webserver web_usability &
+run "WEB FUNCTIONALITY" web_func_daoserver web_functionality &
+wait

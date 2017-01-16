@@ -1,0 +1,26 @@
+database:
+    image: postgres:9.3
+    container_name: database
+    volumes:
+        - "./database/setup/:/docker-entrypoint-initdb.d"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+daoserver:
+    build: daoserver
+    container_name: daoserver
+    ports:
+        - "5001:5000"
+    extends:
+        file: docker-passwords.yml
+        service: dbpasswords
+
+webserver:
+    build: web
+    container_name: webserver
+    ports:
+        - "5005:8000"
+    extends:
+        file: docker-passwords.yml
+        service: webpasswords

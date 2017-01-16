@@ -1,0 +1,21 @@
+#!/bin/bash
+# Wait for a container to pass it's healthcheck
+
+set -e
+
+host="$1"
+shift
+cmd="$@"
+
+check () {
+    docker inspect --format "{{json .State.Health }}" $1 | \
+        grep '"Status":"healthy"'
+}
+
+until check $host &> /dev/null ; do
+  >&2 echo "Container $host uhealthy"
+  sleep 1
+done
+
+>&2 echo "Container $host healthy - executing command '$cmd'"
+exec $cmd

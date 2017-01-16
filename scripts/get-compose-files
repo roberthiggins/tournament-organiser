@@ -1,0 +1,14 @@
+#! /bin/bash
+
+ENV=${1:-"prod"}
+
+if [ "$ENV" == '--dev' ]; then
+
+    cp config/dev/docker-compose.yml docker-compose.yml
+    cp config/dev/docker-passwords.yml docker-passwords.yml
+
+else
+
+    cp config/production/docker-compose.yml docker-compose.yml
+
+fi
