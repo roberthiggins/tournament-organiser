@@ -2,7 +2,7 @@ This is a guide to how to install everything, form the ground up, in a prod envi
 
 #### First Time Only Install ####
 
-1. Provision a VPS. It should be a KVM. This guide is made with Ubuntu 16.04+ in mind
+1. Provision a VPS. It should be a KVM. This guide is made with Ubuntu 16.04+ in mind. Make sure you have a 'deploy' user that travis will use to deploy. Luna node has a public key for the deploy user at the moment.
 
 2. Jump on your new machine ssh ubuntu@to-prod (or something similar).
 

@@ -47,4 +47,4 @@ fi
 ./scripts/clean-and-build
 docker-compose up -d --remove-orphans database daoserver webserver
 
-service apache2 restart
+# service apache2 restart
