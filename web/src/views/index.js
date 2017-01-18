@@ -9,7 +9,7 @@ var IntroPage = React.createClass({
                 <p>Here you can play in or organise wargaming tournaments. Log in to see lists of tournaments you can enter or create your own.</p>
 
                 <h2>
-                    This site is currently under construction. It is in an alpha state only.
+                    This site is currently in a BETA state. Please report any issues to the github page: https://github.com/roberthiggins/tournament-organiser.
                 </h2>
                 <p>
                     <strong>Check out the Masters Rankings over at <a href="http://rankings.thefieldsofblood.com/region=1&amp;game=5">Fields of Blood</a>
