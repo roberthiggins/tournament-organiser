@@ -22,3 +22,5 @@ else
         ./scripts/insert_into_db database \
             database/data/dev/web_functionality_test_data.sql &> /dev/null
 fi
+
+echo "Sandbox available at: http://$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webserver):8000"
