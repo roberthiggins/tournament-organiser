@@ -114,7 +114,8 @@ var EnterScorePage = React.createClass({
                 {this.state.error ?
                     <div>{this.state.error}</div>
                     : <div>{this.state.message}</div>}
-                {this.state.success || this.state.categories === null ?
+                {this.state.success || this.state.categories === null
+                    || this.state.error ?
                     null
                     : <EnterScoreForm submitHandler={this.handleSubmit}
                             categories={this.state.categories}
