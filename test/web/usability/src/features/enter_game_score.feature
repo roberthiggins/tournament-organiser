@@ -15,3 +15,9 @@ Feature: Enter a score for a player
     Scenario: Show message when URL correct
         Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_5/entergamescore"
         Then I should see "Enter score for enter_score_test, Round 2" appear
+
+    @javascript
+    Scenario: See error
+        When I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
+        Then I should see "Next game not scheduled. Check with the TO." appear
+        Then I should not see "Battle" appear
