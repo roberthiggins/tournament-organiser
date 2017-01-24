@@ -62,23 +62,3 @@ describe("Enter a tournament score for an entry", function () {
     post("Per game category", [[tourn + "_per_game_1", 5]], 400,
         tourn + "_per_game_1 should be entered per-tournament");
 });
-
-describe("Enter tournament scores: bad values", function () {
-    "use strict";
-
-    var tourn = "enter_score_test_7",
-        p1 = tourn + "_p_1",
-        cat1 = tourn + "_per_tourn_1",
-        cat2 = tourn + "_per_tourn_2",
-        post = injector.enterScore.bind(this, true, tourn, p1, p1);
-
-    setup(tourn, [p1, tourn + "_p_2"]);
-
-    post("Missing score", [[cat1, 5], [cat2, null]], 400, "Invalid score: None");
-    post("Illegal score", [[cat1, 0], [cat2, 5]], 400, "Invalid score: 0");
-    post("Multi Scores", [[cat1, 5], [cat2, 5]], 200, "Score entered for " + p1);
-    post("Enter twice", [[cat1, 4]], 400, "4 not entered. Score is already set");
-    post("Enter twice", [[cat2, 4]], 400, "4 not entered. Score is already set");
-    post("Illegal score", [[cat2, 0], [cat2, 5]], 400, "Invalid score: 0");
-    post("Missing score", [[cat1, null]], 400, "Invalid score: None");
-});
