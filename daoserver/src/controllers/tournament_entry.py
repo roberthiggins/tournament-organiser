@@ -38,7 +38,7 @@ def list_entries():
 @ensure_permission({'permission': 'ENTER_SCORE'})
 def enter_scores():
     """Enter scores for a player in a game."""
-    return g.entry.set_scores(request.get_json().get('scores'))
+    return g.entry.set_scores(request.get_json().get('scores', None))
 
 @ENTRY.route('/<username>', methods=['GET'])
 @requires_auth

@@ -95,10 +95,12 @@ class TournamentEntry(object):
             - category - the category e.g. painting, round_6_battle
             - score - the score. Integer
         """
+        if scores is None or not any(scores):
+            raise ValueError(Score.INVALID_SCORE.format(None))
 
         scores = [Score(entry_id=self.get_dao().id, tournament=self.tournament,
-                        score=x['score'], category=x['category'],
-                        game_id=x.get('game_id', None)) for x in scores]
+                        **x) for x in scores]
+
         for score in scores:
             score.validate()
 
