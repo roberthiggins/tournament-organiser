@@ -20,8 +20,9 @@ describe("Content with auth", function () {
 
 describe("Bad targets", function () {
     "use strict";
-    utils.asUser("superman", "password", function() {
+    utils.asUser("superman", "password", function(cookie) {
          frisby.create("non-existent tournament")
+            .addHeader("cookie", cookie)
             .get(process.env.API_ADDR +
                 "tournament/foo/entry/next_game_test_player_5/nextgame/content")
             .expectStatus(200)
@@ -29,8 +30,9 @@ describe("Bad targets", function () {
             .toss();
        });
 
-    utils.asUser("superman", "password", function() {
+    utils.asUser("superman", "password", function(cookie) {
          frisby.create("non-existent entry")
+            .addHeader("cookie", cookie)
             .get(process.env.API_ADDR +
                 "tournament/next_game_test/entry/ranking_test_player_1" +
                 "/nextgame/content")
@@ -41,8 +43,9 @@ describe("Bad targets", function () {
             .toss();
        });
 
-    utils.asUser("superman", "password", function() {
+    utils.asUser("superman", "password", function(cookie) {
          frisby.create("non-existent user")
+            .addHeader("cookie", cookie)
             .get(process.env.API_ADDR +
                 "tournament/next_game_test/entry/noone/nextgame/content")
             .expectStatus(200)
