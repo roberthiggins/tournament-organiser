@@ -153,7 +153,7 @@ router.route("/tournament/:tournament/entry/:username/nextgame/content")
                 },
             onFail: function(responseBody) {
                 res.status(200).json({
-                    message: responseBody,
+                    error: responseBody,
                     nextgame: null
                     });
                 }

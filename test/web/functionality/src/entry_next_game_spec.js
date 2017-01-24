@@ -52,4 +52,43 @@ describe("Bad targets", function () {
             .expectJSON({error: "Unknown player: noone"})
             .toss();
        });
+
+    var player = "enter_score_test_player_3";
+    utils.asUser(player, "password", function(cookie) {
+         frisby.create("entry who has played all games")
+            .addHeader("cookie", cookie)
+            .get(process.env.API_ADDR +
+                "tournament/enter_score_test/entry/" + player +
+                "/nextgame/content", {inspectOnFailure: true})
+            .expectStatus(200)
+            .expectJSON({
+                error: "Next game not scheduled. Check with the TO.",
+                nextgame: null
+            })
+            .toss();
+       });
+});
+
+describe ("Happy path", function() {
+
+    var player = "enter_score_test_player_5";
+    utils.asUser(player, "password", function(cookie) {
+         frisby.create("get round two score entry page")
+            .addHeader("cookie", cookie)
+            .get(process.env.API_ADDR +
+                "tournament/enter_score_test/entry/" + player +
+                "/nextgame/content", {inspectOnFailure: true})
+            .expectStatus(200)
+            .expectJSON({
+                message: 'Next Game Info for enter_score_test_player_5',
+                nextgame: {
+                    game_id: 11,
+                    table: 2,
+                    mission: "TBA",
+                    round: 2,
+                    opponent: "enter_score_test_player_4"
+                }
+            })
+            .toss();
+       });
 });
