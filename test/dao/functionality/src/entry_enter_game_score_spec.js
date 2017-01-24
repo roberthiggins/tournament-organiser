@@ -43,24 +43,14 @@ describe("Enter score for single game for an entry: bad values", function () {
     var tourn = "enter_score_test_1",
         p1 = tourn + "_p_1",
         p2 = tourn + "_p_2",
-        post = injector.enterScore.bind(this, false, tourn, p1, p1),
-        cat = tourn + "_per_game_2";
+        badCat = tourn + "_per_tourn_1";
 
 
     setup(tourn, [p1, p2]);
 
-    post("Player", [[null, 5]], 200, "Score entered for " + p1 + ": 5");
-    post("Player enters a score twice", [[null, 4]], 400,
-        "4 not entered. Score is already set");
-
-    post("Score too low", [[null, 0]], 400, "Invalid score: 0");
-    post("Score too high", [[null, 16]], 400, "Invalid score: 16");
-    post("Fake category", [["non_existent", 5]], 400,
-        "Unknown category: non_existent");
-    post("Per tournament category", [[tourn + "_per_tourn_1", 5]], 400,
-        "Cannot enter per-tournament score (" + tourn +
-        "_per_tourn_1) for game (id:");
-    post("Missing score", [[cat, null]], 400, "Invalid score: None");
+    injector.enterScore(false, tourn, p1, p1, "Per tourn category",
+        [[badCat, 5]], 400,
+        "Cannot enter per-tournament score (" + badCat + ") for game (id:");
 });
 
 describe("Oppostion scores", function() {

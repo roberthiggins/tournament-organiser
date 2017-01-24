@@ -39,22 +39,6 @@ describe("Bad score formats should be rejected", function () {
                 }
             ]
         },
-        emptyScore = {
-            scores: [
-                {
-                    score: '',
-                    category: cat
-                }
-            ]
-        },
-        emptyCat = {
-            scores: [
-                {
-                    score: 1,
-                    category: ''
-                }
-            ]
-        },
         noKeys = {
             scores: [
                 {}
@@ -63,14 +47,45 @@ describe("Bad score formats should be rejected", function () {
         noScores = {
             scores: []
         },
-        nothing = {};
+        nothing = {},
+        emptyCat = {
+            scores: [
+                {
+                    score: 5,
+                    category: ''
+                }
+            ]
+        };
 
-    post("No cat",      noCat,      "Unknown category: None");
-    post("No score",    noScore,    "Invalid score: None");
-    post("Keys only",   keysOnly,   "Invalid score: None");
-    post("Empty score", emptyScore, "Invalid score: ");
-    post("Empty cat",   emptyCat,   "Unknown category: ");
-    post("No keys",     noKeys,     "Invalid score: None");
-    post("No Scores",   noScores,   "Invalid score: None");
-    post("Empty dict",  nothing,    "Invalid score: None");
+    post("No cat",     noCat,      "Unknown category: None");
+    post("No score",   noScore,    "Invalid score: None");
+    post("Keys only",  keysOnly,   "Invalid score: None");
+    post("No keys",    noKeys,     "Invalid score: None");
+    post("No Scores",  noScores,   "Invalid score: None");
+    post("Empty dict", nothing,    "Invalid score: None");
+
+    post("Empty cat",  emptyCat,   "Unknown category: ");
+});
+
+describe("Bad score values should be rejected", function () {
+    "use strict";
+
+    var tourn = "enter_score_test_7",
+        p1 = tourn + "_p_1",
+        cat1 = tourn + "_per_tourn_1",
+        cat2 = tourn + "_per_tourn_2",
+        post = injector.enterScore.bind(this, true, tourn, p1, p1),
+        cats = [
+            [cat1, 1, true, 4, 15],
+            [cat2, 1, true, 1, 5]
+        ];
+    injector.createTournament(tourn, "2095-10-10", 1, null, cats, [p1]);
+
+    post("Missing score", [[cat1, 5], [cat2, null]], 400, "Invalid score: None");
+    post("Too low", [[cat1, 0]], 400, "Invalid score: 0");
+    post("Too high", [[cat1, 16]], 400, "Invalid score: 16");
+    post("Multi Scores", [[cat1, 5], [cat2, 5]], 200, "Score entered for " + p1);
+    post("Enter twice", [[cat1, 4]], 400, "4 not entered. Score is already set");
+    post("Enter twice", [[cat2, 4]], 400, "4 not entered. Score is already set");
+    post("Fake category", [["non_", 5]], 400, "Unknown category: non_");
 });
