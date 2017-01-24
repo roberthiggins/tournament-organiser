@@ -23,6 +23,13 @@ class Score(object):
     def __init__(self, **args):
         # pylint: disable=no-member
         self.score = args.get('score', None)
+        if self.score is None:
+            raise ValueError(self.INVALID_SCORE.format(None))
+
+        category_arg = args.get('category')
+        if category_arg is None:
+            raise ValueError(self.INVALID_CATEGORY.format(None))
+
         self.tournament = args.get('tournament').get_dao()
         game_id = args.get('game_id', None)
         try:
@@ -37,10 +44,10 @@ class Score(object):
             raise TypeError(self.GAME_NOT_FOUND.format(self.score, game_id))
 
         self.category = ScoreCategory.query.filter_by(
-            tournament_id=self.tournament.name, name=args['category']).first()
+            tournament_id=self.tournament.name, name=category_arg).first()
 
         if self.category is None:
-            raise TypeError(self.INVALID_CATEGORY.format(args['category']))
+            raise ValueError(self.INVALID_CATEGORY.format(category_arg))
 
         if self.category.opponent_score:
             self.entry = self.game.entrants.filter(
@@ -101,7 +108,7 @@ class Score(object):
 
         try:
             score = int(self.score)
-        except TypeError:
+        except ValueError:
             raise invalid_score
 
         if score < self.category.min_val or score > self.category.max_val:

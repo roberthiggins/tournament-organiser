@@ -45,7 +45,7 @@ class EnterScore(AppSimulatingTest):
             score=5)
         # bad key
         self.assertRaises(
-            TypeError,
+            ValueError,
             Score,
             tournament=Tournament(self.tourn_1),
             entry_id=entry.id,
