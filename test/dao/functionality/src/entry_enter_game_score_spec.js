@@ -43,7 +43,8 @@ describe("Enter score for single game for an entry: bad values", function () {
     var tourn = "enter_score_test_1",
         p1 = tourn + "_p_1",
         p2 = tourn + "_p_2",
-        post = injector.enterScore.bind(this, false, tourn, p1, p1);
+        post = injector.enterScore.bind(this, false, tourn, p1, p1),
+        cat = tourn + "_per_game_2";
 
 
     setup(tourn, [p1, p2]);
@@ -59,6 +60,7 @@ describe("Enter score for single game for an entry: bad values", function () {
     post("Per tournament category", [[tourn + "_per_tourn_1", 5]], 400,
         "Cannot enter per-tournament score (" + tourn +
         "_per_tourn_1) for game (id:");
+    post("Missing score", [[cat, null]], 400, "Invalid score: None");
 });
 
 describe("Oppostion scores", function() {

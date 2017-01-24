@@ -63,7 +63,7 @@ describe("Enter a tournament score for an entry", function () {
         tourn + "_per_game_1 should be entered per-tournament");
 });
 
-describe("Enter multiple scores", function () {
+describe("Enter tournament scores: bad values", function () {
     "use strict";
 
     var tourn = "enter_score_test_7",
@@ -80,4 +80,5 @@ describe("Enter multiple scores", function () {
     post("Enter twice", [[cat1, 4]], 400, "4 not entered. Score is already set");
     post("Enter twice", [[cat2, 4]], 400, "4 not entered. Score is already set");
     post("Illegal score", [[cat2, 0], [cat2, 5]], 400, "Invalid score: 0");
+    post("Missing score", [[cat1, null]], 400, "Invalid score: None");
 });
