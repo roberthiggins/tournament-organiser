@@ -17,6 +17,8 @@ class Score(object):
     GAME_AS_TOURN = '{} should be entered per-tournament'
     GAME_NOT_FOUND = '{} not entered. Game {} cannot be found'
     TOURN_AS_GAME = 'Cannot enter per-tournament score ({}) for game (id: {})'
+    INVALID_CATEGORY = 'Unknown category: {}'
+    INVALID_SCORE = 'Invalid score: {}'
 
     def __init__(self, **args):
         # pylint: disable=no-member
@@ -38,7 +40,7 @@ class Score(object):
             tournament_id=self.tournament.name, name=args['category']).first()
 
         if self.category is None:
-            raise TypeError('Unknown category: {}'.format(args['category']))
+            raise TypeError(self.INVALID_CATEGORY.format(args['category']))
 
         if self.category.opponent_score:
             self.entry = self.game.entrants.filter(
@@ -95,7 +97,7 @@ class Score(object):
 
     def validate(self):
         """Validate an entered score. Returns True or raises Exception"""
-        invalid_score = ValueError('Invalid score: {}'.format(self.score))
+        invalid_score = ValueError(self.INVALID_SCORE.format(self.score))
 
         try:
             score = int(self.score)
