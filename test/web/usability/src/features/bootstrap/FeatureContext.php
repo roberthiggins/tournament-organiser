@@ -69,6 +69,27 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @Then /^I should not see "([^"]*)" appear$/
+     * @param $text
+     * @throws \Exception
+     *
+     * This waits 3 seconds and then checks that test hasn't appeared
+     */
+    public function iWaitForTextToNotAppear($text)
+    {
+        $this->getSession()->wait(3000);
+
+        try {
+            $this->assertPageNotContainsText($text);
+            return true;
+        }
+        catch(ResponseTextException $e) {
+            // NOOP
+        }
+        return false;
+    }
+
+    /**
      * @When /^I wait for "([^"]*)" to appear in field "([^"]*)"$/
      * @Then /^I should see "([^"]*)" appear in field "([^"]*)"$/
      * @param $text
