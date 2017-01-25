@@ -98,14 +98,26 @@ describe("Enter some scores", function () {
                     .expectJSON({
                         message: "Score entered for enter_score_test_player_5: 5"
                         })
+                    .afterJSON(function() {
+                        frisby.create("Enter same score again")
+                            .post(API, {scores: [scoreInfo]},
+                                {json: true, inspectOnFailure: true})
+                            .addHeader("cookie", cookie)
+                            .expectStatus(200)
+                            .expectJSON({
+                                message: "Score entered for enter_score_test_player_5: 5"
+                                })
+                            .toss();
+
+                    })
                     .toss();
                 })
             .toss();
         });
 
     badValues("enter_score_test_player_5", "password",
-        {category: "Fair Play", score: 5},
+        {category: "Fair Play", score: 4},
         "Enter score twice",
-        "5 not entered. Score is already set");
+        "4 not entered. Score is already set");
 
 });

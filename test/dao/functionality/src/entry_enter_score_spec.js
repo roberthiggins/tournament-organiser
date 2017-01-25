@@ -84,8 +84,10 @@ describe("Bad score values should be rejected", function () {
     post("Missing score", [[cat1, 5], [cat2, null]], 400, "Invalid score: None");
     post("Too low", [[cat1, 0]], 400, "Invalid score: 0");
     post("Too high", [[cat1, 16]], 400, "Invalid score: 16");
-    post("Multi Scores", [[cat1, 5], [cat2, 5]], 200, "Score entered for " + p1);
-    post("Enter twice", [[cat1, 4]], 400, "4 not entered. Score is already set");
-    post("Enter twice", [[cat2, 4]], 400, "4 not entered. Score is already set");
+    post("Multi Scores", [[cat1, 5], [cat2, 5]], 200, "Score entered for " +
+        p1 + ": 5\nScore entered for " + p1 + ": 5");
+    post("Enter twice", [[cat1, 5]], 200, "Score entered for " + p1);
+    post("Change", [[cat1, 4]], 400, "4 not entered. Score is already set");
+    post("Enter twice", [[cat2, 5]], 200, "Score entered for " + p1);
     post("Fake category", [["non_", 5]], 400, "Unknown category: non_");
 });
