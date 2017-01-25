@@ -14,6 +14,7 @@ from models.dao.tournament_round import TournamentRound
 
 from models.score import Score
 from models.tournament import Tournament
+from models.tournament_entry import TournamentEntry as EntryModel
 
 from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args as cat
@@ -294,3 +295,73 @@ class EnterScore(AppSimulatingTest):
         compare(game_scores, len(GameScore.query.all()))
         compare(tournament_scores, len(TournamentScore.query.all()))
         compare(scores, len(ScoreDAO.query.all()))
+
+
+class TestBulkScoreEntry(AppSimulatingTest):
+    """ Multiple scores can be updated for a single tournament_entry."""
+
+    player = 'enter_bulk_score_account'
+    tourn_name = 'enter_bulk_score_tournament'
+
+    def setUp(self):
+        super(TestBulkScoreEntry, self).setUp()
+        self.injector.inject(self.tourn_name, num_players=5)
+        self.tourn = Tournament(self.tourn_name)
+        self.injector.add_player(self.tourn_name, self.player)
+        self.cat_1 = ScoreCategory(tournament_id=self.tourn_name,
+                                   **cat('cat_1', 1, True, 0, 100))
+        self.db.session.add(self.cat_1)
+        self.cat_2 = ScoreCategory(tournament_id=self.tourn_name,
+                                   **cat('cat_2', 1, True, 0, 100))
+        self.db.session.add(self.cat_2)
+        self.db.session.commit()
+
+    def test_bulk_entry(self):
+        """Successfully update both scores at once"""
+        entry = EntryModel(self.tourn_name, self.player)
+
+        scores = [
+            {'category': 'cat_1', 'score': 1},
+            {'category': 'cat_2', 'score': 2},
+        ]
+
+        compare('Score entered for enter_bulk_score_account: 1\n' + \
+            'Score entered for enter_bulk_score_account: 2',
+                entry.set_scores(scores))
+
+    def test_partial_partial_entry(self):
+        """Successfully update both scores at once"""
+        entry = EntryModel(self.tourn_name, self.player)
+
+        scores = [
+            {'category': 'cat_2', 'score': 2},
+        ]
+
+        compare('Score entered for enter_bulk_score_account: 2',
+                entry.set_scores(scores))
+
+        scores = [
+            {'category': 'cat_1', 'score': 1},
+        ]
+        compare('Score entered for enter_bulk_score_account: 1',
+                entry.set_scores(scores))
+
+    def test_bad_partial_entry(self):
+        """Successfully update both scores at once"""
+        tournament_scores = len(TournamentScore.query.all())
+        entry = EntryModel(self.tourn_name, self.player)
+
+        scores = [
+            {'category': 'cat_1', 'score': None},
+            {'category': 'cat_2', 'score': 2},
+        ]
+        self.assertRaises(ValueError, entry.set_scores, scores)
+
+
+        scores = [
+            {'category': 'cat_2', 'score': 2},
+            {'category': 'cat_1', 'score': None},
+        ]
+        self.assertRaises(ValueError, entry.set_scores, scores)
+
+        compare(tournament_scores, len(TournamentScore.query.all()))
