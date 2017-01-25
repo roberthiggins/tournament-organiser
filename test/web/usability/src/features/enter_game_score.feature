@@ -10,6 +10,7 @@ Feature: Enter a score for a player
     Scenario: Shows an error when there is something wrong with URL
         Given I am on "/tournament/enter_score_test/entry/enter_score_test_p_non/entergamescore"
         Then I should see "Unknown player: enter_score_test_p_non" appear
+        Then I should not see "Battle" appear
 
     @javascript
     Scenario: Show message when URL correct
@@ -17,7 +18,12 @@ Feature: Enter a score for a player
         Then I should see "Enter score for enter_score_test, Round 2" appear
 
     @javascript
-    Scenario: See error
-        When I am on "/tournament/enter_score_test/entry/enter_score_test_player_1/entergamescore"
-        Then I should see "Next game not scheduled. Check with the TO." appear
-        Then I should not see "Battle" appear
+    Scenario: See the input boxes when error occurs on submit
+        Given I am on "/tournament/enter_score_test/entry/enter_score_test_player_5/entergamescore"
+        Then I should see "Enter score for enter_score_test, Round 2" appear
+        When I wait for "Battle" to appear
+        When I fill in "Battle" with "1000"
+        When I fill in "Fair Play" with "5"
+        Then I press "Enter Score"
+        Then I should see "Invalid Score: 1000" appear
+        Then I should see "Enter score for enter_score_test, Round 2" appear
