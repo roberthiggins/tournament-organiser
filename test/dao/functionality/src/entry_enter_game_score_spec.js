@@ -65,7 +65,7 @@ describe("Oppostion scores", function() {
     setup(tourn, [p1, p2]);
 
     post("Opp score", [[cat, 4]], 200, "Score entered for " + p2 + ": 4");
-    post("Enter again", [[cat, 4]], 400, "4 not entered. Score is already set");
+    post("Enter again", [[cat, 3]], 400, "3 not entered. Score is already set");
 });
 
 describe("Zero Sum scores", function () {

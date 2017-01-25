@@ -78,7 +78,7 @@ class Score(object):
     def is_score_entered(game_dao):
         """
         Determine if all the scores have been entered for this game.
-        Not that, if false, the result will be double checked and possibly
+        Note that, if false, the result will be double checked and possibly
         updated
         """
         if game_dao is not None and game_dao.score_entered:
@@ -140,7 +140,13 @@ class Score(object):
         Expects: score - integer
         """
         self.validate()
+
+        success = 'Score entered for {}: {}'.\
+            format(self.entry.player_id, self.score)
+
         if self.get_dao() is not None:
+            if self.get_dao().score.value == self.score:
+                return success
             raise ValueError('{} not entered. Score is already set'.\
                 format(self.score))
 
@@ -163,5 +169,4 @@ class Score(object):
                     format(self.score, self.entry.id))
             raise err
 
-        return 'Score entered for {}: {}'.\
-            format(self.entry.player_id, self.score)
+        return success

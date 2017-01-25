@@ -164,13 +164,13 @@ class TestScoreEntered(AppSimulatingTest):
                 and_(TournamentGame.tournament_round_id == round_dao.id,
                      TournamentEntry.id == entry_id)).first()
 
-class EnterScore(AppSimulatingTest):
+class TestEnterScore(AppSimulatingTest):
 
     player = 'enter_score_account'
     tourn_1 = 'enter_score_tournament'
 
     def setUp(self):
-        super(EnterScore, self).setUp()
+        super(TestEnterScore, self).setUp()
         self.injector.inject(self.tourn_1, num_players=5)
         tourn = Tournament(self.tourn_1)
         tourn.update({
@@ -329,6 +329,29 @@ class TestBulkScoreEntry(AppSimulatingTest):
             'Score entered for enter_bulk_score_account: 2',
                 entry.set_scores(scores))
 
+        compare('Score entered for enter_bulk_score_account: 1\n' + \
+            'Score entered for enter_bulk_score_account: 2',
+                entry.set_scores(scores))
+
+    def test_partial_full_entry(self):
+        """Successfully update both scores at once"""
+        entry = EntryModel(self.tourn_name, self.player)
+
+        scores = [
+            {'category': 'cat_2', 'score': 2},
+        ]
+
+        compare('Score entered for enter_bulk_score_account: 2',
+                entry.set_scores(scores))
+
+        scores = [
+            {'category': 'cat_1', 'score': 1},
+            {'category': 'cat_2', 'score': 2},
+        ]
+        compare('Score entered for enter_bulk_score_account: 1\n' + \
+            'Score entered for enter_bulk_score_account: 2',
+                entry.set_scores(scores))
+
     def test_partial_partial_entry(self):
         """Successfully update both scores at once"""
         entry = EntryModel(self.tourn_name, self.player)
@@ -344,6 +367,14 @@ class TestBulkScoreEntry(AppSimulatingTest):
             {'category': 'cat_1', 'score': 1},
         ]
         compare('Score entered for enter_bulk_score_account: 1',
+                entry.set_scores(scores))
+
+        scores = [
+            {'category': 'cat_1', 'score': 1},
+            {'category': 'cat_2', 'score': 2},
+        ]
+        compare('Score entered for enter_bulk_score_account: 1\n' + \
+            'Score entered for enter_bulk_score_account: 2',
                 entry.set_scores(scores))
 
     def test_bad_partial_entry(self):
