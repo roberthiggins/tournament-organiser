@@ -41,7 +41,7 @@ var EnterScorePage = React.createClass({
             message: null,
             perTournament: false,
             score: null,
-            success: false,
+            showForm: false,
             categories: null
         });
     },
@@ -62,7 +62,7 @@ var EnterScorePage = React.createClass({
                                     : !cat.per_tournament;
                                 }.bind(this));
 
-                        this.setState({categories: cats});
+                        this.setState({categories: cats, showForm: true});
                     }.bind(this));
                 }.bind(this));
     },
@@ -101,25 +101,25 @@ var EnterScorePage = React.createClass({
                 this.setState({
                     error: null,
                     message: res.message,
-                    success: true,
+                    showForm: false,
                     categories: []});
             }.bind(this))
             .fail(function (res) {
-                this.setState(res.responseJSON);
+                var state = res.responseJSON;
+                state.showForm = true;
+                this.setState(state);
             }.bind(this));
     },
     render: function() {
         return (
             <div>
-                {this.state.error ?
-                    <div>{this.state.error}</div>
-                    : <div>{this.state.message}</div>}
-                {this.state.success || this.state.categories === null
-                    || this.state.error ?
-                    null
-                    : <EnterScoreForm submitHandler={this.handleSubmit}
-                            categories={this.state.categories}
-                            scoreChangeHandler={this.handleScoreChange} />}
+                <div>{this.state.message}</div>
+                <div>{this.state.error}</div>
+                {this.state.showForm ?
+                    <EnterScoreForm submitHandler={this.handleSubmit}
+                        categories={this.state.categories}
+                        scoreChangeHandler={this.handleScoreChange} />
+                    : null}
             </div>
         );
     }
