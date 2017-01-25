@@ -107,11 +107,12 @@ class Score(object):
         invalid_score = ValueError(self.INVALID_SCORE.format(self.score))
 
         try:
-            score = int(self.score)
+            self.score = int(self.score)
         except ValueError:
             raise invalid_score
 
-        if score < self.category.min_val or score > self.category.max_val:
+        if self.score < self.category.min_val \
+        or self.score > self.category.max_val:
             raise invalid_score
 
         if self.game is None and not self.category.per_tournament:
@@ -129,7 +130,7 @@ class Score(object):
                                 ScoreCategory.name == self.category.name,
                                 GameScore.entry_id != self.entry.id)).all()
             existing_score = sum([x.score.value for x in game_scores])
-            if existing_score + score > self.category.max_val:
+            if existing_score + self.score > self.category.max_val:
                 raise invalid_score
 
 
