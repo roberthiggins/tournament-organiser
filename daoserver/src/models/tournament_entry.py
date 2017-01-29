@@ -62,7 +62,7 @@ class TournamentEntry(object):
                     'game_id': game.id,
                     'mission': game.tournament_round.get_mission(),
                     'round': game.tournament_round.ordering,
-                    'opponent': self.get_opponent(game),
+                    'opponent': self.get_opponent_id(game),
                     'table': game.table_num,
                 }
         raise ValueError("Next game not scheduled. Check with the TO.")
@@ -70,9 +70,14 @@ class TournamentEntry(object):
 
     def get_opponent(self, game):
         """Work out the opponent of username in the game"""
-        entrants = [x.entrant.player_id for x in game.entrants \
+        entrants = [x.entrant for x in game.entrants \
                     if x.entrant.player_id != self.get_dao().player_id]
-        return entrants[0] if len(entrants) else "BYE"
+        return entrants[0] if len(entrants) else None
+
+    def get_opponent_id(self, game):
+        """Work out the opponent_id of username in the game"""
+        opp = self.get_opponent(game)
+        return opp.player_id if opp is not None else "BYE"
 
     def get_schedule(self):
         """Get the scheule of games"""
@@ -82,7 +87,7 @@ class TournamentEntry(object):
             {
                 'game_id': game.id,
                 'round': game.tournament_round.ordering,
-                'opponent': self.get_opponent(game),
+                'opponent': self.get_opponent_id(game),
                 'table': game.table_num,
             } for game in games]
 
