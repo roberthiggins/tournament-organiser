@@ -87,7 +87,7 @@ describe("Enter some scores", function () {
             .afterJSON(function(json) {
                 var scoreInfo = {
                     gameId: json.game_id,
-                    category: "Fair Play",
+                    category: "Battle",
                     score: 5};
 
                 frisby.create("Enter good score")
@@ -106,6 +106,41 @@ describe("Enter some scores", function () {
                             .expectStatus(200)
                             .expectJSON({
                                 message: "Score entered for enter_score_test_player_5: 5"
+                                })
+                            .toss();
+
+                    })
+                    .toss();
+                })
+            .toss();
+        });
+
+    utils.asUser("enter_score_test_player_5", "password", function(cookie) {
+        frisby.create("get game_id")
+            .get(API + "/content")
+            .addHeader("cookie", cookie)
+            .afterJSON(function(json) {
+                var scoreInfo = {
+                    gameId: json.game_id,
+                    category: "Fair Play",
+                    score: 5};
+
+                frisby.create("Enter opponent score")
+                    .post(API, {scores: [scoreInfo]},
+                        {json: true, inspectOnFailure: true})
+                    .addHeader("cookie", cookie)
+                    .expectStatus(200)
+                    .expectJSON({
+                        message: "Score entered for enter_score_test_player_4: 5"
+                        })
+                    .afterJSON(function() {
+                        frisby.create("Enter same score again")
+                            .post(API, {scores: [scoreInfo]},
+                                {json: true, inspectOnFailure: true})
+                            .addHeader("cookie", cookie)
+                            .expectStatus(200)
+                            .expectJSON({
+                                message: "Score entered for enter_score_test_player_4: 5"
                                 })
                             .toss();
 
