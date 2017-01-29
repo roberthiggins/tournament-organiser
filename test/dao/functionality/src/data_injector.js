@@ -124,6 +124,29 @@ exports.enterScore = function(per_tourn, tourn, player, user, msg, scores, code,
     }
 };
 
+// Get the existing scores for a user
+exports.enteredScores = function(tourn, eid, user, comment, code, expected) {
+
+    var API = process.env.API_ADDR + "tournament/" + tourn + "/entry/" + eid +
+        "/scoresentered",
+        req = frisby.create("GET scores: " + comment)
+            .get(API, {inspectOnFailure: true})
+            .expectStatus(code);
+
+    if (typeof expected === "string") {
+        req.expectBodyContains(expected);
+    }
+    else if (typeof expected === "object") {
+        req.expectJSON(expected);
+    }
+
+    if (user) {
+        req.addHeader("Authorization", exports.auth(user));
+    }
+
+    req.toss();
+};
+
 // A json blob for a single score category
 exports.jsonCat = function(id, name, pct, per_tourn, min, max, z_sum, opp) {
     var cat = {

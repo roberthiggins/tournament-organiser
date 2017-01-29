@@ -91,6 +91,79 @@ class TournamentEntry(object):
                 'table': game.table_num,
             } for game in games]
 
+    def opp_score(self, game_score):
+        """
+        Returns the score or the corresponding score for the opponent if it is
+        an opponent-entered score
+        """
+        game = game_score.game
+        cat = game_score.score.score_category
+
+        if cat.opponent_score:
+            opp_scores = self.get_opponent(game).game_scores.\
+                filter_by(game_id=game.id).all()
+            for score in opp_scores:
+                if score.score.score_category.id == cat.id:
+                    return score
+            return None
+        return game_score
+
+    def get_game_entered_scores(self, game_id):
+        """Get the game scores for a game in dict format"""
+        per_g_cats = self.get_dao().tournament.score_categories.\
+            filter_by(per_tournament=False).all()
+        game_scores = [self.opp_score(x) for x in self.get_dao().game_scores.\
+            filter_by(game_id=game_id).all()]
+
+        template = dict((x.name, None) for x in per_g_cats)
+        template['game_id'] = game_id
+
+        scores = dict((x.score.score_category.name, x.score.value) \
+                      for x in game_scores)
+        template.update(scores)
+        return template
+
+    def get_tournament_entered_scores(self):
+        """Get all tournament scores in dict format"""
+        per_t_cats = self.get_dao().tournament.score_categories.\
+            filter_by(per_tournament=True).all()
+        template = dict((x.name, None) for x in per_t_cats)
+
+        scores = dict((x.score.score_category.name, x.score.value) \
+                      for x in self.get_dao().tournament_scores.all())
+
+        template.update(scores)
+        return template
+
+    def get_scores_entered(self):
+        """
+        Get the scores enterd by an entrant. Note that opponent_scored fields
+        will return the opponent's score
+
+        They will come in the format
+            {
+                per_tournament: {
+                    painting: 15
+                },
+                per_game: [
+                    {
+                        game_id: 12345,
+                        battle: 20,
+                        fair play: None
+                    },
+                ]
+            }
+
+        """
+        entries = sorted(self.get_dao().game_entries.all(),
+                         key=lambda ent: ent.game.tournament_round.ordering)
+
+        return {
+            'per_tournament': self.get_tournament_entered_scores(),
+            'per_game': [self.get_game_entered_scores(e.game.id) \
+                for e in entries]
+        }
+
     def set_scores(self, scores):
         """
         Enter scores

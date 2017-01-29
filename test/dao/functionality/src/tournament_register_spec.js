@@ -51,6 +51,7 @@ describe("Test seeing and registering for a tournament", function () {
             asJSON("2095-07-02", 1, "entry_info_test",       0, false),
             asJSON("2095-07-03", 2, "entry_list_test",       0, false),
             asJSON("2095-07-04", 0, "entry_list_test_empty", 0, false),
+            asJSON("2096-10-10", 5, "existing_score_test",   2, false),
             asJSON("2095-07-01", 1, "mission_test",          3, false),
             asJSON("2095-08-12", 5, "next_game_test",        2, false),
             asJSON("2432-03-17", 0, "no_rounds_test",        0, false),

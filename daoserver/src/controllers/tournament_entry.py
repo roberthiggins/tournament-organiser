@@ -32,6 +32,14 @@ def list_entries():
     return [User(ent.player_id).get_display_name() for ent in \
         TournamentEntryDAO.query.filter_by(tournament_id=g.tournament_id).all()]
 
+@ENTRY.route('/<username>/scoresentered', methods=['GET'])
+@requires_auth
+@json_response
+@ensure_permission({'permission': 'ENTER_SCORE'})
+def get_scores():
+    """Get the per_tournament scores already entered"""
+    return g.entry.get_scores_entered()
+
 @ENTRY.route('/<username>/score', methods=['POST'])
 @requires_auth
 @text_response
