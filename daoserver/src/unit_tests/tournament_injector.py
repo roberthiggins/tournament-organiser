@@ -125,7 +125,8 @@ class TournamentInjector(object):
         self.accounts = set()
 
 # pylint: disable=too-many-arguments
-def score_cat_args(name, pct, per_tourn, min_val, max_val, zero_sum=False):
+def score_cat_args(name, pct, per_tourn, min_val, max_val, zero_sum=False,
+                   opponent=False):
     """Convenience function to make a ScoreCategory args blob"""
     return {
         'name':           name,
@@ -133,4 +134,5 @@ def score_cat_args(name, pct, per_tourn, min_val, max_val, zero_sum=False):
         'per_tournament': per_tourn,
         'min_val':        min_val,
         'max_val':        max_val,
-        'zero_sum':       zero_sum}
+        'zero_sum':       zero_sum,
+        'opponent_score': opponent}
