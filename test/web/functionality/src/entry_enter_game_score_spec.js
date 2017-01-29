@@ -44,6 +44,15 @@ describe("Bad targets", function () {
         });
 });
 
+// Get the game id and run after
+var withGameId = function(api, cookie, after) {
+    frisby.create("get game_id")
+        .get(api)
+        .addHeader("cookie", cookie)
+        .afterJSON(after)
+        .toss();
+};
+
 describe("Enter some scores", function () {
     "use strict";
     var API = process.env.API_ADDR + "tournament/enter_score_test/" +
@@ -51,24 +60,20 @@ describe("Enter some scores", function () {
         badValues = function(user, pass, postScore, name, msg) {
 
             utils.asUser(user, pass, function(cookie) {
-                frisby.create("get game_id")
-                    .get(API + "/content")
-                    .addHeader("cookie", cookie)
-                    .afterJSON(function(json) {
-                        var scoreInfo = postScore;
-                        scoreInfo.gameId = json.game_id;
+                withGameId(API + "/content", cookie, function(json) {
+                    var scoreInfo = postScore;
+                    scoreInfo.gameId = json.game_id;
 
-                        frisby.create(name)
-                            .post(API, {scores: [scoreInfo]},
-                                {json: true, inspectOnFailure: true})
-                            .addHeader("cookie", cookie)
-                            .expectStatus(400)
-                            .expectJSON({error: msg})
-                            .toss();
-                        })
-                    .toss();
+                    frisby.create(name)
+                        .post(API, {scores: [scoreInfo]},
+                            {json: true, inspectOnFailure: true})
+                        .addHeader("cookie", cookie)
+                        .expectStatus(400)
+                        .expectJSON({error: msg})
+                        .toss();
                 });
-            };
+            });
+        };
 
     badValues("enter_score_test_player_2", "password",
         {category: "Fair Play", score: 5},
@@ -81,74 +86,63 @@ describe("Enter some scores", function () {
         "Invalid score: 0");
 
     utils.asUser("enter_score_test_player_5", "password", function(cookie) {
-        frisby.create("get game_id")
-            .get(API + "/content")
-            .addHeader("cookie", cookie)
-            .afterJSON(function(json) {
-                var scoreInfo = {
-                    gameId: json.game_id,
-                    category: "Battle",
-                    score: 5};
+        withGameId(API + "/content", cookie, function(json) {
+            var scoreInfo = {
+                gameId: json.game_id,
+                category: "Battle",
+                score: 5};
 
-                frisby.create("Enter good score")
-                    .post(API, {scores: [scoreInfo]},
-                        {json: true, inspectOnFailure: true})
-                    .addHeader("cookie", cookie)
-                    .expectStatus(200)
-                    .expectJSON({
-                        message: "Score entered for enter_score_test_player_5: 5"
-                        })
-                    .afterJSON(function() {
-                        frisby.create("Enter same score again")
-                            .post(API, {scores: [scoreInfo]},
-                                {json: true, inspectOnFailure: true})
-                            .addHeader("cookie", cookie)
-                            .expectStatus(200)
-                            .expectJSON({
-                                message: "Score entered for enter_score_test_player_5: 5"
-                                })
-                            .toss();
-
+            frisby.create("Enter good score")
+                .post(API, {scores: [scoreInfo]},
+                    {json: true, inspectOnFailure: true})
+                .addHeader("cookie", cookie)
+                .expectStatus(200)
+                .expectJSON({
+                    message: "Score entered for enter_score_test_player_5: 5"
                     })
-                    .toss();
+                .afterJSON(function() {
+                    frisby.create("Enter same score again")
+                        .post(API, {scores: [scoreInfo]},
+                            {json: true, inspectOnFailure: true})
+                        .addHeader("cookie", cookie)
+                        .expectStatus(200)
+                        .expectJSON({
+                            message: "Score entered for enter_score_test_player_5: 5"
+                            })
+                        .toss();
+
                 })
-            .toss();
+                .toss();
         });
+    });
 
     utils.asUser("enter_score_test_player_5", "password", function(cookie) {
-        frisby.create("get game_id")
-            .get(API + "/content")
-            .addHeader("cookie", cookie)
-            .afterJSON(function(json) {
-                var scoreInfo = {
-                    gameId: json.game_id,
-                    category: "Fair Play",
-                    score: 5};
+        withGameId(API + "/content", cookie, function(json) {
+            var scoreInfo = {
+                gameId: json.game_id,
+                category: "Fair Play",
+                score: 5},
+                message = "Score entered for enter_score_test_player_4: 5";
 
-                frisby.create("Enter opponent score")
-                    .post(API, {scores: [scoreInfo]},
-                        {json: true, inspectOnFailure: true})
-                    .addHeader("cookie", cookie)
-                    .expectStatus(200)
-                    .expectJSON({
-                        message: "Score entered for enter_score_test_player_4: 5"
-                        })
-                    .afterJSON(function() {
-                        frisby.create("Enter same score again")
-                            .post(API, {scores: [scoreInfo]},
-                                {json: true, inspectOnFailure: true})
-                            .addHeader("cookie", cookie)
-                            .expectStatus(200)
-                            .expectJSON({
-                                message: "Score entered for enter_score_test_player_4: 5"
-                                })
-                            .toss();
+            frisby.create("Enter opponent score")
+                .post(API, {scores: [scoreInfo]},
+                    {json: true, inspectOnFailure: true})
+                .addHeader("cookie", cookie)
+                .expectStatus(200)
+                .expectJSON({message: message})
+                .afterJSON(function() {
+                    frisby.create("Enter same score again")
+                        .post(API, {scores: [scoreInfo]},
+                            {json: true, inspectOnFailure: true})
+                        .addHeader("cookie", cookie)
+                        .expectStatus(200)
+                        .expectJSON({message: message})
+                        .toss();
 
-                    })
-                    .toss();
                 })
-            .toss();
+                .toss();
         });
+    });
 
     badValues("enter_score_test_player_5", "password",
         {category: "Fair Play", score: 4},
