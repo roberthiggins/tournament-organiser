@@ -205,7 +205,7 @@ BEGIN
     game_id := make_game(round_2_id, 2, ent_5_id, ent_5_name, ent_4_id, ent_4_name,  prot_act_id);
     PERFORM enter_score(game_id, ent_4_id, cat_1, 5);
     PERFORM enter_score(game_id, ent_4_id, cat_2, 5);
---    PERFORM enter_score(game_id, ent_5_id, cat_1, 15);
+    PERFORM enter_score(game_id, ent_5_id, cat_1, 15);
 --    PERFORM enter_score(game_id, ent_5_id, cat_2, 5);
 
     game_id := make_game(round_2_id, 3, ent_1_id, ent_1_name, ent_3_id, ent_3_name,  prot_act_id);
