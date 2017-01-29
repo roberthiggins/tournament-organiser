@@ -160,7 +160,7 @@ BEGIN
     INSERT INTO tournament_round VALUES(DEFAULT, tourn_name, 2, DEFAULT)                       RETURNING id INTO round_2_id;
 
     cat_1 = create_score_category(tourn_name, 'Battle', 90, FALSE, 0, 20, TRUE);
-    cat_2 = create_score_category(tourn_name, 'Fair Play', 10, FALSE, 1, 5, FALSE);
+    cat_2 = create_score_category(tourn_name, 'Fair Play', 10, FALSE, 1, 5, FALSE, TRUE);
 
     ent_1_id := add_player(tourn_name, tourn_id, ent_1_name, tourn_name, 'P1');
     INSERT INTO table_allocation VALUES(ent_1_id, 1, 1);
