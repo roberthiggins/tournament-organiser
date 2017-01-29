@@ -90,25 +90,22 @@ describe("Enter some scores", function () {
             var scoreInfo = {
                 gameId: json.game_id,
                 category: "Battle",
-                score: 5};
+                score: 15},
+                message = "Score entered for enter_score_test_player_5: 15";
 
             frisby.create("Enter good score")
                 .post(API, {scores: [scoreInfo]},
                     {json: true, inspectOnFailure: true})
                 .addHeader("cookie", cookie)
                 .expectStatus(200)
-                .expectJSON({
-                    message: "Score entered for enter_score_test_player_5: 5"
-                    })
+                .expectJSON({message: message})
                 .afterJSON(function() {
                     frisby.create("Enter same score again")
                         .post(API, {scores: [scoreInfo]},
                             {json: true, inspectOnFailure: true})
                         .addHeader("cookie", cookie)
                         .expectStatus(200)
-                        .expectJSON({
-                            message: "Score entered for enter_score_test_player_5: 5"
-                            })
+                        .expectJSON({message: message})
                         .toss();
 
                 })
