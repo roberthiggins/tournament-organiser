@@ -91,35 +91,40 @@ class TournamentEntry(object):
                 'table': game.table_num,
             } for game in games]
 
-    def opp_score(self, game_score):
+    def opp_score(self, score_category, game_id):
         """
         Returns the score or the corresponding score for the opponent if it is
         an opponent-entered score
         """
-        game = game_score.game
-        cat = game_score.score.score_category
+        game = self.get_dao().game_entries.filter_by(game_id=game_id).first().\
+            game
 
-        if cat.opponent_score:
-            opp_scores = self.get_opponent(game).game_scores.\
+        if score_category.opponent_score:
+            scores = self.get_opponent(game).game_scores.\
                 filter_by(game_id=game.id).all()
-            for score in opp_scores:
-                if score.score.score_category.id == cat.id:
-                    return score
-            return None
-        return game_score
+        else:
+            scores = self.get_dao().game_scores.filter_by(game_id=game.id).all()
+
+        for score in scores:
+            if score.score.score_category.id == score_category.id:
+                print 'returning score: {}'.format(score.score)
+                return score
+        return None
+
 
     def get_game_entered_scores(self, game_id):
         """Get the game scores for a game in dict format"""
         per_g_cats = self.get_dao().tournament.score_categories.\
             filter_by(per_tournament=False).all()
-        game_scores = [self.opp_score(x) for x in self.get_dao().game_scores.\
-            filter_by(game_id=game_id).all()]
-
         template = dict((x.name, None) for x in per_g_cats)
         template['game_id'] = game_id
 
+
+        entered_scores = [self.opp_score(x, game_id) for x in per_g_cats \
+            if self.opp_score(x, game_id) is not None]
+
         scores = dict((x.score.score_category.name, x.score.value) \
-                      for x in game_scores)
+                      for x in entered_scores)
         template.update(scores)
         return template
 

@@ -25,4 +25,24 @@ describe("See per_game scores", function () {
     "use strict";
 
     get(p1, "The player", 200, expected);
+
+    var p_4 = tourn + "_player_4",
+    p_4Expected = {
+        per_tournament: {},
+        per_game: [
+            { Battle: 20, game_id: Number, 'Fair Play': 5 },
+            { Battle: 5, game_id: Number, 'Fair Play': null }],
+            // They haven't entered sports for p_5
+    };
+    injector.enteredScores(tourn, p_4, p_4, p_4 + " scores", 200, p_4Expected);
+
+    var p_5 = tourn + "_player_5",
+    p_5Expected = {
+        per_tournament: {},
+        per_game: [
+            { Battle: 0, game_id: Number, 'Fair Play': 1 },
+            { Battle: 15, game_id: Number, 'Fair Play': 5 }],
+    };
+    injector.enteredScores(tourn, p_5, p_5, p_5 + " scores", 200, p_5Expected);
+
 });
