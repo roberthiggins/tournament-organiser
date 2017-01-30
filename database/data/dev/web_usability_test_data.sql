@@ -11,20 +11,8 @@ SELECT create_user('charlie_murphy');
 SELECT half_tournament_test_setup('ranking_test', '2095-08-12');
 SELECT half_tournament_test_setup('enter_score_test', '2295-11-11');
 SELECT half_tournament_test_setup('next_game_test', '2395-11-11');
+SELECT make_per_tournament_score_test();
 
-
-DO $$
-DECLARE
-    tourn_id int := 0;
-    tourn_name varchar := 'tourn_score_test';
-BEGIN
-    tourn_id := create_tournament(tourn_name, '2095-10-10');
-    UPDATE tournament SET in_progress = TRUE WHERE id = tourn_id;
-
-    PERFORM create_score_category(tourn_name, 'Fanciness', 10, TRUE, 4, 15);
-    PERFORM add_player(tourn_name, tourn_id, 'stevemcqueen');
-    PERFORM add_player(tourn_name, tourn_id, 'rick_james');
-END $$;
 
 -- Make a tournament for the purposes of testing missions
 DO $$
