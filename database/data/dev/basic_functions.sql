@@ -216,3 +216,28 @@ BEGIN
 
     RETURN 0;
 END $$;
+
+
+-- Make per tournament score test
+CREATE OR REPLACE FUNCTION make_per_tournament_score_test() RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+    tourn_id int := 0;
+    tourn_name varchar := 'per_tournament_score_test';
+    score_cat int := 0;
+    score_id int := 0;
+    ent_id int := 0;
+BEGIN
+    tourn_id := create_tournament(tourn_name, '2095-10-10');
+    UPDATE tournament SET in_progress = TRUE WHERE id = tourn_id;
+
+    score_cat = create_score_category(tourn_name, 'Fanciness', 10, TRUE, 4, 15);
+    PERFORM create_score_category(tourn_name, '3_foot_test', 10, TRUE, 4, 15);
+    ent_id = add_player(tourn_name, tourn_id, 'stevemcqueen');
+    PERFORM add_player(tourn_name, tourn_id, 'rick_james');
+
+    -- Give stevemcqueen a score
+    INSERT INTO score VALUES(DEFAULT, ent_id, score_cat, 6) RETURNING id INTO score_id;
+    INSERT INTO tournament_score VALUES(ent_id, tourn_id, score_id);
+
+    RETURN 0;
+END $$;

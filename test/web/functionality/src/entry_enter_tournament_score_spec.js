@@ -20,7 +20,8 @@ describe("Check auth for page", function () {
 
 describe("Bad targets", function () {
     "use strict";
-    var API = process.env.API_ADDR + "tournament/painting_test/entry/";
+    var API = process.env.API_ADDR +
+        "tournament/per_tournament_score_test/entry/";
     utils.asUser("superman", "password", function(cookie) {
         frisby.create("Non-user")
             .get(API + "james_rick/enterscore/content")
@@ -39,7 +40,7 @@ describe("Bad targets", function () {
             .expectStatus(200)
             .expectJSON({
                 error: "Entry for ranking_test_player_3 in tournament " +
-                    "painting_test not found"
+                    "per_tournament_score_test not found"
                 })
             .toss();
         });
@@ -47,7 +48,7 @@ describe("Bad targets", function () {
 
 describe("Enter some scores", function () {
     "use strict";
-    var API = process.env.API_ADDR + "tournament/painting_test/" +
+    var API = process.env.API_ADDR + "tournament/per_tournament_score_test/" +
             "entry/rick_james/enterscore",
         badValues = function(user, pass, postScore, name, msg) {
 
@@ -64,7 +65,7 @@ describe("Enter some scores", function () {
     badValues("charlie_murphy", "password",
         {category: "Fanciness", score: 3},
         "Other user",
-        "Permission denied for charlie_murphy to perform enter_score on tournament painting_test");
+        "Permission denied for charlie_murphy to perform enter_score on tournament per_tournament_score_test");
 
     badValues("rick_james", "password",
         {category: "Fanciness", score: 3},

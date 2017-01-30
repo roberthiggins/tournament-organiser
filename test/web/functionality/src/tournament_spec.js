@@ -44,7 +44,7 @@ describe("Tournament", function () {
         .toss();
 
     frisby.create("Tournament Details content")
-        .get(API + "painting_test/content")
+        .get(API + "per_tournament_score_test/content")
         .expectStatus(200)
         .expectJSONTypes({
             date: String,
@@ -66,7 +66,7 @@ describe("Tournament", function () {
         .expectJSON({
             date: "2095-10-10",
             entries: 2,
-            name: "painting_test",
+            name: "per_tournament_score_test",
             rounds: 0,
             score_categories: [{
                 name: "Fanciness",
