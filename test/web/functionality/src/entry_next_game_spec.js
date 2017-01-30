@@ -82,7 +82,7 @@ describe ("Happy path", function() {
             .expectJSON({
                 message: 'Next Game Info for enter_score_test_player_5',
                 nextgame: {
-                    game_id: 11,
+                    game_id: Number,
                     table: 2,
                     mission: "TBA",
                     round: 2,
