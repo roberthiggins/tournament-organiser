@@ -4,6 +4,7 @@ var Inputs = require("./component-inputs");
 var EnterScoreForm = React.createClass({
     propTypes: {
         categories:         React.PropTypes.array.isRequired,
+        opponent:           React.PropTypes.string,
         scoreChangeHandler: React.PropTypes.func.isRequired,
         submitHandler:      React.PropTypes.func.isRequired,
     },
@@ -14,8 +15,11 @@ var EnterScoreForm = React.createClass({
 
         var inputs = this.props.categories.map(function(cat) {
             var helpText = "Enter a score between " + cat.min_val + " and " +
-                cat.max_val;
-            return <Inputs.textField name={cat.name + " Score"}
+                    cat.max_val,
+                opp = this.props.opponent && cat.opponent_score ?
+                    " for " + this.props.opponent : "",
+                name = cat.name + " Score" + opp;
+            return <Inputs.textField name={name}
                 id={cat.name}
                 key={cat.name}
                 changeHandler={this.props.scoreChangeHandler}
@@ -118,7 +122,8 @@ var EnterScorePage = React.createClass({
                 {this.state.showForm ?
                     <EnterScoreForm submitHandler={this.handleSubmit}
                         categories={this.state.categories}
-                        scoreChangeHandler={this.handleScoreChange} />
+                        scoreChangeHandler={this.handleScoreChange}
+                        opponent={this.state.opponent} />
                     : null}
             </div>
         );
