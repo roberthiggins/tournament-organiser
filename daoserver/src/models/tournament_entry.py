@@ -107,7 +107,6 @@ class TournamentEntry(object):
 
         for score in scores:
             if score.score.score_category.id == score_category.id:
-                print 'returning score: {}'.format(score.score)
                 return score
         return None
 

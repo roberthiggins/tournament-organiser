@@ -192,7 +192,8 @@ class Tournament(object):
                 self.tournament_id, round_num))
 
         return TournamentRound(self.tournament_id, round_num,
-                               self.matching_strategy, self.table_strategy)
+                               self.matching_strategy.set_round(round_num),
+                               self.table_strategy)
 
     @must_exist_in_db
     def get_score_categories(self, serialized=False):
@@ -222,7 +223,7 @@ class Tournament(object):
     def make_draws(self):
         """Makes the draws for all rounds"""
         # If we can we determine all rounds
-        if self.matching_strategy.DRAW_FOR_ALL_ROUNDS:
+        if self.matching_strategy.draw_for_all_rounds:
             for rnd in range(0, self.get_dao().rounds.count()):
                 try:
                     self.get_round(rnd + 1).destroy_draw()

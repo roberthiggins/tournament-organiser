@@ -4,7 +4,18 @@ Module to make draws for tournaments
 
 from collections import deque
 
-class RoundRobin(object):
+class MatchingStrategy(object):
+    """
+    Strategy pattern for matching entries into games
+    """
+
+    draw_for_all_rounds = False
+
+    def match(self, entry_list):
+        """Do the draw"""
+        raise NotImplementedError()
+
+class RoundRobin(MatchingStrategy):
     """
     Each entry plays each other entry.
 
@@ -13,19 +24,25 @@ class RoundRobin(object):
     following entry, etc.
     """
 
-    DRAW_FOR_ALL_ROUNDS = True
+    draw_for_all_rounds = True
+    round_to_draw = 1
 
-    def match(self, round_to_draw, entry_list):
+    def set_round(self, round_num):
+        """Set the round to draw"""
+        self.round_to_draw = int(round_num)
+        return self
+
+    def match(self, entry_list):
         """
         Match the entrants into pairs.
 
         Returns: A list of Tuples - each is a pair of entrants.
         """
         entry_list = deque(entry_list)
-        entry_list.rotate(round_to_draw - 1)
-        return self.determine_matchup(list(entry_list), [])
+        entry_list.rotate(self.round_to_draw - 1)
+        return self._determine_matchup(list(entry_list), [])
 
-    def determine_matchup(self, singles, pairs):
+    def _determine_matchup(self, singles, pairs):
         """
         Determine match ups for a round robin tournie
         Algorithm:
@@ -46,4 +63,4 @@ class RoundRobin(object):
             return pairs
         else:
             pairs.append((singles[0], singles[-1]))
-            return self.determine_matchup(singles[1:-1], pairs)
+            return self._determine_matchup(singles[1:-1], pairs)

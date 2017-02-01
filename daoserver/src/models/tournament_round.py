@@ -89,7 +89,7 @@ class TournamentRound(object):
 
         rnd = self.get_dao()
 
-        match_ups = self.matching_strategy.match(rnd.ordering, entries)
+        match_ups = self.matching_strategy.match(entries)
         self.draw = self.table_strategy.determine_tables(match_ups)
         for match in self.draw:
 
