@@ -19,8 +19,7 @@ class DrawStrategyTests(AppSimulatingTest):
         self.injector.inject('dst', num_players=5)
 
         entries = Tournament('dst').get_entries()
-        matching_strategy = RoundRobin()
-        draw = matching_strategy.match(1, entries)
+        draw = RoundRobin().set_round(1).match(entries)
         compare(draw[0][0].player_id, 'dst_player_1')
         compare(draw[0][1].player_id, 'dst_player_5')
         compare(draw[1][0].player_id, 'dst_player_2')
@@ -28,7 +27,7 @@ class DrawStrategyTests(AppSimulatingTest):
         compare(draw[2][0].player_id, 'dst_player_3')
         compare(draw[2][1], 'BYE')
 
-        draw = matching_strategy.match(2, entries)
+        draw = RoundRobin().set_round(2).match(entries)
         compare(draw[0][0].player_id, 'dst_player_5')
         compare(draw[0][1].player_id, 'dst_player_4')
         compare(draw[1][0].player_id, 'dst_player_1')
@@ -36,7 +35,7 @@ class DrawStrategyTests(AppSimulatingTest):
         compare(draw[2][0].player_id, 'dst_player_2')
         compare(draw[2][1], 'BYE')
 
-        draw = matching_strategy.match(3, entries)
+        draw = RoundRobin().set_round(3).match(entries)
         compare(draw[0][0].player_id, 'dst_player_4')
         compare(draw[0][1].player_id, 'dst_player_3')
         compare(draw[1][0].player_id, 'dst_player_5')
@@ -44,7 +43,7 @@ class DrawStrategyTests(AppSimulatingTest):
         compare(draw[2][0].player_id, 'dst_player_1')
         compare(draw[2][1], 'BYE')
 
-        draw = matching_strategy.match(4, entries)
+        draw = RoundRobin().set_round(4).match(entries)
         compare(draw[0][0].player_id, 'dst_player_3')
         compare(draw[0][1].player_id, 'dst_player_2')
         compare(draw[1][0].player_id, 'dst_player_4')
@@ -52,7 +51,7 @@ class DrawStrategyTests(AppSimulatingTest):
         compare(draw[2][0].player_id, 'dst_player_5')
         compare(draw[2][1], 'BYE')
 
-        draw = matching_strategy.match(5, entries)
+        draw = RoundRobin().set_round(5).match(entries)
         compare(draw[0][0].player_id, 'dst_player_2')
         compare(draw[0][1].player_id, 'dst_player_1')
         compare(draw[1][0].player_id, 'dst_player_3')
@@ -60,7 +59,7 @@ class DrawStrategyTests(AppSimulatingTest):
         compare(draw[2][0].player_id, 'dst_player_4')
         compare(draw[2][1], 'BYE')
 
-        draw = matching_strategy.match(6, entries)
+        draw = RoundRobin().set_round(6).match(entries)
         compare(draw[0][0].player_id, 'dst_player_1')
         compare(draw[0][1].player_id, 'dst_player_5')
         compare(draw[1][0].player_id, 'dst_player_2')
