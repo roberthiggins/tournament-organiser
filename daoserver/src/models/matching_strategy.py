@@ -3,6 +3,7 @@ Module to make draws for tournaments
 """
 
 from collections import deque
+import itertools
 
 class MatchingStrategy(object):
     """
@@ -64,3 +65,80 @@ class RoundRobin(MatchingStrategy):
         else:
             pairs.append((singles[0], singles[-1]))
             return self._determine_matchup(singles[1:-1], pairs)
+
+
+class SwissChess(MatchingStrategy):
+    """
+    Entries are ranked and paired off.
+
+    Each potential draw is checked for the difference in points. The
+    permutation with the lowest difference is used.
+
+    Players cannot play each other more than once
+    No BYEs are allowed currently
+    """
+
+    def __init__(self, **args):
+        super(SwissChess, self)
+        self.rank_func = args.get('rank')
+        self.re_match = args.get('re_match')
+
+    # pylint: disable=unused-argument
+    def set_round(self, round_num):
+        """We don't care what the round is"""
+        return self
+
+    def match(self, entry_list):
+        """
+        Match the entrants into pairs.
+
+        Algorithm:
+            - All permutations of the player base are made
+            - All pairs are checked for repeat matchups
+                - a repeat discards the entire draw
+            - The difference in points is calculated for each pair
+            - The permutation with the lowest total difference is chosen
+
+        Returns: A list of Tuples - each is a pair of entrants.
+        """
+        entry_list = [{
+            'match_score': self.rank_func(x),
+            'name': x.player_id,
+            'entry': x
+            } for x in entry_list]
+        if len(entry_list) % 2 == 1:
+            entry_list.append({'match_score': 0, 'name': 'BYE', 'entry': 'BYE'})
+
+        possible_games = itertools.permutations(entry_list, 2)
+        possible_games = [x for x in possible_games if not self.re_match(x)]
+        possible_games = [x + \
+            (abs(int(x[0]['match_score']) - int(x[1]['match_score']))**2,) \
+            for x in possible_games]
+        possible_draws = itertools.permutations(possible_games,
+                                                len(entry_list) / 2)
+
+        legal_draws = [x for x in possible_draws if self._check_legal_draw(x)]
+        best_draw = sorted(legal_draws, cmp=lambda x, y: \
+            cmp(sum([i[2] for i in x]), sum([i[2] for i in y])))[0]
+
+        return [(game[0]['entry'], game[1]['entry']) for game in best_draw]
+
+    def pair_entries(self, singles, pairs):
+        """
+        Build a list of pairs from a list of entries.
+        """
+        if len(singles) == 0:
+            return pairs
+        elif len(singles) == 1:
+            pairs.append((singles[0]))
+            return pairs
+        else:
+            pairs.append((singles[0], singles[1]))
+            return self.pair_entries(singles[2:], pairs)
+
+    @staticmethod
+    def _check_legal_draw(draw):
+        """set of all players should equal num_games *2"""
+        ids = set([x[0]['name'] for x in draw])
+        ids = ids.union(set([x[1]['name'] for x in draw]))
+        return len(ids) == len(draw) * 2
