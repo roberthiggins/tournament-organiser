@@ -11,6 +11,7 @@ from sqlalchemy.sql.expression import and_
 
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
+from models.dao.game_entry import GameEntrant
 from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtectedObject, ProtObjPerm
 from models.dao.registration import TournamentRegistration as Reg
@@ -113,6 +114,24 @@ class Tournament(object):
 
         self._set_details(details)
         return self
+
+    @staticmethod
+    def check_re_match(game):
+        """Check whether game is a re-match"""
+        game = tuple([g for g in game if g['name'] != 'BYE'])
+        #check for the bye
+        p1_games = game[0]['entry'].game_entries.all()
+        if len(game) == 1:
+            for entry in p1_games:
+                if entry.game.entrants.count() == 1:
+                    return True
+            return False
+
+        p1_games = [g.game_id for g in p1_games]
+        if len(p1_games) > 0 and game[1]['entry'].game_entries.\
+            filter(GameEntrant.game_id.in_(p1_games)).count() > 0:
+            return True
+        return False
 
     @must_exist_in_db
     @not_in_progress
@@ -219,16 +238,15 @@ class Tournament(object):
     def make_draws(self):
         """Makes the draws for all rounds"""
         # If we can we determine all rounds
-        if self.draw.matching_strategy.draw_for_all_rounds:
-            for rnd in range(0, self.get_dao().rounds.count()):
-                try:
-                    model = self.get_round(rnd + 1)
-                    self.draw.set_round(model)
-                    self.draw.destroy_draw()
-                    self.draw.set_entries(self.get_entries())
-                    model.draw = self.draw.make_draw()
-                except DrawException:
-                    pass
+        for rnd in range(0, self.get_dao().rounds.count()):
+            try:
+                model = self.get_round(rnd + 1)
+                self.draw.set_round(model)
+                self.draw.destroy_draw()
+                self.draw.set_entries(self.get_entries())
+                model.draw = self.draw.make_draw()
+            except DrawException:
+                pass
 
 
     @must_exist_in_db
