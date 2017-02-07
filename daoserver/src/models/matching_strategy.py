@@ -111,6 +111,9 @@ class SwissChess(MatchingStrategy):
 
         possible_games = itertools.permutations(entry_list, 2)
         possible_games = [x for x in possible_games if not self.re_match(x)]
+        if len(possible_games) == 0:
+            return []
+
         possible_games = [x + \
             (abs(int(x[0]['match_score']) - int(x[1]['match_score']))**2,) \
             for x in possible_games]
