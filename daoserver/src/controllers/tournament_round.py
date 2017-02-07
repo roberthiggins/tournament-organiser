@@ -19,27 +19,8 @@ def get_tournament(endpoint, values):
 @json_response
 def get_round_info(round_id):
     """
-    GET the information about a round
+    GET draw and mission about a round
     """
-    no_draw = AttributeError('No draw is available')
-    rnd = g.tournament.get_round(round_id)
-
-    if rnd.draw is None:
-        rnd.make_draw(g.tournament.get_entries())
-        if rnd.draw is None:
-            raise no_draw
-
-    draw_info = [
-        {'table_number': t.table_number,
-         'entrants': [x if isinstance(x, str) else x.player_id \
-                      for x in t.entrants]
-        } for t in rnd.draw]
-
-    if not draw_info and rnd.get_dao().mission is None:
-        raise no_draw
-
-    # We will return all round info for all requests regardless of method
-    return {
-        'draw': draw_info,
-        'mission': rnd.get_dao().get_mission()
-    }
+    return g.tournament.draw.set_entries(g.tournament.get_entries()).\
+        set_round(g.tournament.get_round(round_id)).\
+        get_draw()
