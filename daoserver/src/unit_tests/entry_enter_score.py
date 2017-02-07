@@ -6,8 +6,7 @@ from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from models.dao.game_entry import GameEntrant
-from models.dao.score import ScoreCategory, TournamentScore, GameScore, \
-Score as ScoreDAO
+from models.dao.score import TournamentScore, GameScore, Score as ScoreDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound
@@ -86,11 +85,10 @@ class TestScoreEntered(AppSimulatingTest):
 
     def test_score_entered(self):
         tourn = Tournament(self.tourn_1)
-
-        score_args = cat('per_round', 50, False, 0, 100)
-        cat_1 = ScoreCategory(tournament_id=self.tourn_1, **score_args)
-        self.db.session.add(cat_1)
-        self.db.session.flush()
+        tourn.update({
+            'score_categories': [cat('per_round', 50, False, 0, 100)]
+        })
+        cat_1 = 'per_round'
 
         entry_2_id = TournamentEntry.query.filter_by(
             player_id='{}_player_{}'.format(self.tourn_1, 2),
@@ -107,9 +105,9 @@ class TestScoreEntered(AppSimulatingTest):
 
         # A completed game
         game = self.get_game_by_round(entry_4_id, 1)
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_2_id, score=2).write()
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_4_id, score=4).write()
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
@@ -118,7 +116,7 @@ class TestScoreEntered(AppSimulatingTest):
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_3_id, score=3).write()
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
@@ -134,7 +132,7 @@ class TestScoreEntered(AppSimulatingTest):
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_4_id, score=4).write()
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
@@ -142,7 +140,7 @@ class TestScoreEntered(AppSimulatingTest):
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tourn_1)
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_5_id, score=5).write()
         self.assertTrue(Score.is_score_entered(game))
 
@@ -166,7 +164,6 @@ class TestScoreEntered(AppSimulatingTest):
 
 class TestEnterScore(AppSimulatingTest):
 
-    player = 'enter_score_account'
     tourn_1 = 'enter_score_tournament'
 
     def setUp(self):
@@ -175,32 +172,22 @@ class TestEnterScore(AppSimulatingTest):
         tourn = Tournament(self.tourn_1)
         tourn.update({
             'rounds': 2,
-            'missions': ['foo_mission_1', 'foo_mission_2']
+            'missions': ['foo_mission_1', 'foo_mission_2'],
+            'score_categories': [cat('per_tournament', 50, True, 0, 100),
+                                 cat('per_round', 50, False, 0, 100)]
         })
-        self.injector.add_player(self.tourn_1, self.player)
-        score_args = cat('per_tournament', 50, True, 0, 100)
-
-        # per tournament category
-        self.cat_1 = ScoreCategory(tournament_id=self.tourn_1, **score_args)
-        self.db.session.add(self.cat_1)
-
-        # per round category
-        score_args['name'] = 'per_round'
-        score_args['per_tournament'] = False
-        self.category_2 = ScoreCategory(tournament_id=self.tourn_1,
-                                        **score_args)
-        self.db.session.add(self.category_2)
-        self.db.session.commit()
+        self.cat_1 = 'per_tournament'
+        self.cat_2 = 'per_round'
 
     def enter_score_bad_games(self):
         """These should all fail for one reason or another"""
-        entry = TournamentEntry.query.filter_by(
-            player_id=self.player, tournament_id=self.tourn_1).first()
+        entry = TournamentEntry.query.\
+            filter_by(tournament_id=self.tourn_1).first().id
 
         good_args = {
             'tournament': Tournament(self.tourn_1),
-            'entry_id': entry.id,
-            'category': self.category_2.name,
+            'entry_id': entry,
+            'category': self.cat_2,
             'score': 5
         }
         self.assertRaises(TypeError, Score, game_id='foo', **good_args)
@@ -209,8 +196,8 @@ class TestEnterScore(AppSimulatingTest):
 
     def enter_score_bad_values(self):
         """These should all fail for one reason or another"""
-        entry = TournamentEntry.query.filter_by(
-            player_id=self.player, tournament_id=self.tourn_1).first()
+        entry = TournamentEntry.query.\
+            filter_by(tournament_id=self.tourn_1).first().id
 
         # bad entry
         self.assertRaises(
@@ -218,27 +205,27 @@ class TestEnterScore(AppSimulatingTest):
             Score,
             tournament=Tournament(self.tourn_1),
             entry_id=10000000,
-            category=self.cat_1.name,
+            category=self.cat_1,
             score=5)
         # bad key
         self.assertRaises(
             ValueError,
             Score,
             tournament=Tournament(self.tourn_1),
-            entry_id=entry.id,
+            entry_id=entry,
             category='not_a_key',
             score=5)
         # bad score - character
-        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
-                      category=self.cat_1.name, score='a')
+        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry,
+                      category=self.cat_1, score='a')
         self.assertRaises(ValueError, score.validate)
         # bad score - low
-        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
-                      category=self.cat_1.name, score=-1)
+        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry,
+                      category=self.cat_1, score=-1)
         self.assertRaises(ValueError, score.write)
         # bad score - high
-        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
-                      category=self.cat_1.name, score=101)
+        score = Score(tournament=Tournament(self.tourn_1), entry_id=entry,
+                      category=self.cat_1, score=101)
         self.assertRaises(ValueError, score.write)
 
 
@@ -246,15 +233,15 @@ class TestEnterScore(AppSimulatingTest):
         """
         Enter a score for an entry
         """
-        entry = TournamentEntry.query.filter_by(
-            player_id=self.player, tournament_id=self.tourn_1).first()
+        entry = TournamentEntry.query.\
+            filter_by(tournament_id=self.tourn_1).first().id
         tourn = Tournament(self.tourn_1)
 
         # a one-off score
-        Score(category=self.cat_1.name, tournament=tourn, entry_id=entry.id,
+        Score(category=self.cat_1, tournament=tourn, entry_id=entry,
               score=0).write()
         scores = TournamentScore.query.\
-            filter_by(entry_id=entry.id, tournament_id=tourn.get_dao().id).all()
+            filter_by(entry_id=entry, tournament_id=tourn.get_dao().id).all()
         compare(len(scores), 1)
         compare(scores[0].score.value, 0)
 
@@ -264,23 +251,23 @@ class TestEnterScore(AppSimulatingTest):
         round_id = TournamentRound.query.\
             filter_by(tournament_name=self.tourn_1, ordering=2).first().id
         game_id = TournamentGame.query.join(GameEntrant).\
-            filter(and_(GameEntrant.entrant_id == entry.id,
+            filter(and_(GameEntrant.entrant_id == entry,
                         TournamentGame.tournament_round_id == round_id)).\
                 first().id
-        Score(category=self.category_2.name, tournament=tourn, game_id=game_id,
-              entry_id=entry.id, score=17).write()
+        Score(category=self.cat_2, tournament=tourn, game_id=game_id,
+              entry_id=entry, score=17).write()
         scores = GameScore.query.\
-            filter_by(entry_id=entry.id, game_id=game_id).all()
+            filter_by(entry_id=entry, game_id=game_id).all()
         compare(len(scores), 1)
         compare(scores[0].score.value, 17)
 
         # score already entered
-        score = Score(tournament=tourn, entry_id=entry.id, score=100,
-                      category=self.cat_1.name)
+        score = Score(tournament=tourn, entry_id=entry, score=100,
+                      category=self.cat_1)
         self.assertRaises(ValueError, score.write)
 
-        score = Score(tournament=tourn, entry_id=entry.id, score=100,
-                      category=self.category_2.name, game_id=game_id)
+        score = Score(tournament=tourn, entry_id=entry, score=100,
+                      category=self.cat_2, game_id=game_id)
         self.assertRaises(ValueError, score.write)
 
     def test_enter_score_cleanup(self):
@@ -306,15 +293,13 @@ class TestBulkScoreEntry(AppSimulatingTest):
     def setUp(self):
         super(TestBulkScoreEntry, self).setUp()
         self.injector.inject(self.tourn_name, num_players=5)
-        self.tourn = Tournament(self.tourn_name)
+        tourn = Tournament(self.tourn_name)
+        tourn.update({
+            'score_categories': [cat('cat_1', 1, True, 0, 100),
+                                 cat('cat_2', 1, True, 0, 100)]
+        })
+
         self.injector.add_player(self.tourn_name, self.player)
-        self.cat_1 = ScoreCategory(tournament_id=self.tourn_name,
-                                   **cat('cat_1', 1, True, 0, 100))
-        self.db.session.add(self.cat_1)
-        self.cat_2 = ScoreCategory(tournament_id=self.tourn_name,
-                                   **cat('cat_2', 1, True, 0, 100))
-        self.db.session.add(self.cat_2)
-        self.db.session.commit()
 
     def test_bulk_entry(self):
         """Successfully update both scores at once"""
