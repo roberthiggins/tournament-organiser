@@ -21,12 +21,12 @@ class DrawException(Exception):
 class TournamentDraw(object):
     """Matches players and tables throughout the tournament"""
 
-    def __init__(self):
+    def __init__(self, **args):
         # Num tables
         # Table strategy
         self.table_strategy = ProtestAvoidanceStrategy()
         # Draw Strategy
-        self.matching_strategy = RoundRobin()
+        self.matching_strategy = args.get('matching_strategy', RoundRobin())
         # Players
         self.current_round = None
         self.entries = []

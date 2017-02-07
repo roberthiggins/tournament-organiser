@@ -30,7 +30,8 @@ class TestScoreEntered(AppSimulatingTest):
         tourn = Tournament(self.tourn_1)
         tourn.update({
             'rounds': 2,
-            'missions': ['foo_mission_1', 'foo_mission_2']
+            'missions': ['foo_mission_1', 'foo_mission_2'],
+            'matching_strategy': 'round_robin'
         })
         tourn.make_draws()
 
