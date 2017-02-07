@@ -6,7 +6,7 @@ from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from models.dao.game_entry import GameEntrant
-from models.dao.score import ScoreCategory, GameScore, Score as ScoreDAO
+from models.dao.score import GameScore, Score as ScoreDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound
@@ -20,7 +20,6 @@ from unit_tests.tournament_injector import score_cat_args as cat
 # pylint: disable=no-member,missing-docstring
 class EnterScore(AppSimulatingTest):
 
-    player = 'enter_score_account'
     tourn_1 = 'enter_score_tournament'
 
     def setUp(self):
@@ -29,24 +28,19 @@ class EnterScore(AppSimulatingTest):
         tourn = Tournament(self.tourn_1)
         tourn.update({
             'rounds': 2,
-            'missions': ['foo_mission_1', 'foo_mission_2']
+            'missions': ['foo_mission_1', 'foo_mission_2'],
+            'score_categories': [cat('per_round', 50, False, 0, 100)]
         })
-        self.injector.add_player(self.tourn_1, self.player)
-
-        self.cat_1 = ScoreCategory(tournament_id=self.tourn_1,
-                                   **cat('per_round', 50, False, 0, 100))
-        self.db.session.add(self.cat_1)
-        self.db.session.commit()
+        self.cat_1 = 'per_round'
+        self.entry = TournamentEntry.query.\
+            filter_by(tournament_id=self.tourn_1).first().id
 
     def test_enter_score_bad_games(self):
         """These should all fail for one reason or another"""
-        entry = TournamentEntry.query.filter_by(
-            player_id=self.player, tournament_id=self.tourn_1).first()
-
         good_args = {
             'tournament': Tournament(self.tourn_1),
-            'entry_id': entry.id,
-            'category': self.cat_1.name,
+            'entry_id': self.entry,
+            'category': self.cat_1,
             'score': 5
         }
         self.assertRaises(TypeError, Score, game_id='foo', **good_args)
@@ -57,8 +51,6 @@ class EnterScore(AppSimulatingTest):
         """
         Enter a score for an entry
         """
-        entry = TournamentEntry.query.filter_by(
-            player_id=self.player, tournament_id=self.tourn_1).first()
         tourn = Tournament(self.tourn_1)
 
         # a per_round score
@@ -67,19 +59,19 @@ class EnterScore(AppSimulatingTest):
         round_id = TournamentRound.query.\
             filter_by(tournament_name=self.tourn_1, ordering=2).first().id
         game_id = TournamentGame.query.join(GameEntrant).\
-            filter(and_(GameEntrant.entrant_id == entry.id,
+            filter(and_(GameEntrant.entrant_id == self.entry,
                         TournamentGame.tournament_round_id == round_id)).\
                 first().id
-        Score(category=self.cat_1.name, tournament=tourn, game_id=game_id,
-              entry_id=entry.id, score=17).write()
+        Score(category=self.cat_1, tournament=tourn, game_id=game_id,
+              entry_id=self.entry, score=17).write()
         scores = GameScore.query.\
-            filter_by(entry_id=entry.id, game_id=game_id).all()
+            filter_by(entry_id=self.entry, game_id=game_id).all()
         compare(len(scores), 1)
         compare(scores[0].score.value, 17)
 
         # score already entered
-        score = Score(tournament=tourn, entry_id=entry.id, score=100,
-                      category=self.cat_1.name, game_id=game_id)
+        score = Score(tournament=tourn, entry_id=self.entry, score=100,
+                      category=self.cat_1, game_id=game_id)
         self.assertRaises(ValueError, score.write)
 
     def test_enter_score_cleanup(self):

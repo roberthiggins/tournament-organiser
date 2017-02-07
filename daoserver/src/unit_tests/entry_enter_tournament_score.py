@@ -4,7 +4,7 @@ Test entering scores for games in a tournament
 
 from testfixtures import compare
 
-from models.dao.score import ScoreCategory, TournamentScore, Score as ScoreDAO
+from models.dao.score import TournamentScore, Score as ScoreDAO
 from models.dao.tournament_entry import TournamentEntry
 
 from models.score import Score
@@ -21,14 +21,11 @@ class EnterScore(AppSimulatingTest):
     def setUp(self):
         super(EnterScore, self).setUp()
         self.injector.inject(self.tourn_1, num_players=5)
+        Tournament(self.tourn_1).update({
+            'score_categories': [cat('per_tournament', 50, True, 0, 100)]
+        })
         self.injector.add_player(self.tourn_1, self.player)
-
-        # per tournament category
-        self.cat_1 = ScoreCategory(tournament_id=self.tourn_1,
-                                   **cat('per_tournament', 50, True, 0, 100))
-        self.db.session.add(self.cat_1)
-
-        self.db.session.commit()
+        self.cat_1 = 'per_tournament'
 
     def enter_score_bad_values(self):
         """These should all fail for one reason or another"""
@@ -41,7 +38,7 @@ class EnterScore(AppSimulatingTest):
             Score,
             tournament=Tournament(self.tourn_1),
             entry_id=10000000,
-            category=self.cat_1.name,
+            category=self.cat_1,
             score=5)
         # bad key
         self.assertRaises(
@@ -53,15 +50,15 @@ class EnterScore(AppSimulatingTest):
             score=5)
         # bad score - character
         score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
-                      category=self.cat_1.name, score='a')
+                      category=self.cat_1, score='a')
         self.assertRaises(ValueError, score.write)
         # bad score - low
         score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
-                      category=self.cat_1.name, score=-1)
+                      category=self.cat_1, score=-1)
         self.assertRaises(ValueError, score.write)
         # bad score - high
         score = Score(tournament=Tournament(self.tourn_1), entry_id=entry.id,
-                      category=self.cat_1.name, score=101)
+                      category=self.cat_1, score=101)
         self.assertRaises(ValueError, score.write)
 
 
@@ -74,7 +71,7 @@ class EnterScore(AppSimulatingTest):
         tourn = Tournament(self.tourn_1)
 
         # a one-off score
-        Score(category=self.cat_1.name, tournament=tourn, entry_id=entry.id,
+        Score(category=self.cat_1, tournament=tourn, entry_id=entry.id,
               score=0).write()
         scores = TournamentScore.query.\
             filter_by(entry_id=entry.id, tournament_id=tourn.get_dao().id).all()
@@ -83,7 +80,7 @@ class EnterScore(AppSimulatingTest):
 
         # score already entered
         score = Score(tournament=tourn, entry_id=entry.id, score=100,
-                      category=self.cat_1.name)
+                      category=self.cat_1)
         self.assertRaises(ValueError, score.write)
 
     def test_enter_score_cleanup(self):

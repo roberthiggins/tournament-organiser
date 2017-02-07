@@ -6,7 +6,6 @@ from sqlalchemy.sql.expression import and_
 from testfixtures import compare
 
 from models.dao.game_entry import GameEntrant
-from models.dao.score import ScoreCategory
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound
@@ -81,11 +80,10 @@ class TestGames(AppSimulatingTest):
 
     def test_score_entered(self):
         tourn = Tournament(self.tourn_1)
-
-        score_args = cat('per_round', 50, False, 0, 100)
-        cat_1 = ScoreCategory(tournament_id=self.tourn_1, **score_args)
-        self.db.session.add(cat_1)
-        self.db.session.flush()
+        tourn.update({
+            'score_categories': [cat('per_round', 50, False, 0, 100)]
+        })
+        cat_1 = 'per_round'
 
         entry_2_id = TournamentEntry.query.filter_by(
             player_id='{}_player_{}'.format(self.tourn_1, 2),
@@ -102,9 +100,9 @@ class TestGames(AppSimulatingTest):
 
         # A completed game
         game = self.get_game_by_round(entry_4_id, 1)
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_2_id, score=2).write()
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_4_id, score=4).write()
         entrants = [x.entrant_id for x in game.entrants.all()]
         self.assertTrue(entry_2_id in entrants)
@@ -113,7 +111,7 @@ class TestGames(AppSimulatingTest):
 
         # A BYE will only have one entrant
         game = self.get_game_by_round(entry_3_id, 1)
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_3_id, score=3).write()
         entrants = [x.entrant_id for x in game.entrants.all()]
         compare(len(entrants), 1)
@@ -129,7 +127,7 @@ class TestGames(AppSimulatingTest):
 
         game = self.get_game_by_round(entry_4_id, 2)
         entrants = [x.entrant_id for x in game.entrants.all()]
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_4_id, score=4).write()
         self.assertTrue(entry_4_id in entrants)
         self.assertTrue(entry_5_id in entrants)
@@ -137,7 +135,7 @@ class TestGames(AppSimulatingTest):
 
         # Enter the final score for entry_5
         tourn = Tournament(self.tourn_1)
-        Score(category=cat_1.name, game_id=game.id, tournament=tourn,
+        Score(category=cat_1, game_id=game.id, tournament=tourn,
               entry_id=entry_5_id, score=5).write()
         self.assertTrue(Score.is_score_entered(game))
 

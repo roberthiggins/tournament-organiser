@@ -4,7 +4,6 @@ Test getting the scores entered by a entrant
 
 from testfixtures import compare
 
-from models.dao.score import ScoreCategory
 from models.dao.tournament_entry import TournamentEntry
 
 from models.tournament import Tournament
@@ -21,14 +20,11 @@ class TestPerTournamentScores(AppSimulatingTest):
     def setUp(self):
         super(TestPerTournamentScores, self).setUp()
         self.injector.inject(self.t_name, num_players=1)
-
-        score_args = cat('per_t_cat_1', 1, True, 0, 100)
-        cat_1 = ScoreCategory(tournament_id=self.t_name, **score_args)
-        score_args = cat('per_t_cat_2', 1, True, 0, 100)
-        cat_2 = ScoreCategory(tournament_id=self.t_name, **score_args)
-        self.db.session.add(cat_1)
-        self.db.session.add(cat_2)
-        self.db.session.commit()
+        tourn = Tournament(self.t_name)
+        tourn.update({
+            'score_categories': [cat('per_t_cat_1', 1, True, 0, 100),
+                                 cat('per_t_cat_2', 1, True, 0, 100)]
+        })
 
         dao = TournamentEntry.query.\
             filter_by(tournament_id=self.t_name).first()
@@ -65,14 +61,10 @@ class TestPerGameScores(AppSimulatingTest):
         tourn = Tournament(self.t_name)
         tourn.update({
             'rounds': 2,
-            'missions': ['mission_1', 'mission_2']
+            'missions': ['mission_1', 'mission_2'],
+            'score_categories': [cat('per_g_cat_1', 1, False, 0, 100),
+                                 cat('per_g_cat_2', 1, False, 0, 100)]
         })
-
-        args = cat('per_g_cat_1', 1, False, 0, 100)
-        self.db.session.add(ScoreCategory(tournament_id=self.t_name, **args))
-        args = cat('per_g_cat_2', 1, False, 0, 100)
-        self.db.session.add(ScoreCategory(tournament_id=self.t_name, **args))
-        self.db.session.commit()
 
         dao = TournamentEntry.query.\
             filter_by(tournament_id=self.t_name).first()
