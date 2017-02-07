@@ -19,11 +19,10 @@ from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_round import TournamentRound as TR
-from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
-from models.table_strategy import ProtestAvoidanceStrategy
-from models.tournament_round import TournamentRound, DrawException
+from models.tournament_draw import TournamentDraw, DrawException
+from models.tournament_round import TournamentRound
 
 def must_exist_in_db(func):
     """ A decorator that requires the tournament exists in the db"""
@@ -52,8 +51,7 @@ class Tournament(object):
 
     def __init__(self, tournament_id=None):
         self.tournament_id = tournament_id
-        self.matching_strategy = RoundRobin()
-        self.table_strategy = ProtestAvoidanceStrategy()
+        self.draw = TournamentDraw()
         self.ranking_strategy = RankingStrategy(tournament_id,
                                                 self.get_score_categories)
 
@@ -191,9 +189,7 @@ class Tournament(object):
             raise ValueError('Tournament {} does not have a round {}'.format(
                 self.tournament_id, round_num))
 
-        return TournamentRound(self.tournament_id, round_num,
-                               self.matching_strategy.set_round(round_num),
-                               self.table_strategy)
+        return TournamentRound(self.tournament_id, round_num)
 
     @must_exist_in_db
     def get_score_categories(self, serialized=False):
@@ -223,11 +219,14 @@ class Tournament(object):
     def make_draws(self):
         """Makes the draws for all rounds"""
         # If we can we determine all rounds
-        if self.matching_strategy.draw_for_all_rounds:
+        if self.draw.matching_strategy.draw_for_all_rounds:
             for rnd in range(0, self.get_dao().rounds.count()):
                 try:
-                    self.get_round(rnd + 1).destroy_draw()
-                    self.get_round(rnd + 1).make_draw(self.get_entries())
+                    model = self.get_round(rnd + 1)
+                    self.draw.set_round(model)
+                    self.draw.destroy_draw()
+                    self.draw.set_entries(self.get_entries())
+                    model.draw = self.draw.make_draw()
                 except DrawException:
                     pass
 
