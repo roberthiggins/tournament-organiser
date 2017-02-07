@@ -20,6 +20,7 @@ from models.dao.table_allocation import TableAllocation
 from models.dao.tournament import Tournament as TournamentDAO
 from models.dao.tournament_entry import TournamentEntry
 from models.dao.tournament_round import TournamentRound as TR
+from models.matching_strategy import RoundRobin, SwissChess
 from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
 from models.tournament_draw import TournamentDraw, DrawException
@@ -261,6 +262,7 @@ class Tournament(object):
             - rounds
             - score_categories
             - to_username
+            - matching_strategy: swiss_chess, round_robin
         """
         dao = self.get_dao()
 
@@ -277,6 +279,17 @@ class Tournament(object):
             for x in cats] if cats is not None else None
         if cats is not None and self.get_score_categories() != deserialised:
             self._set_score_categories(cats)
+
+        matching = details.get('matching_strategy', None)
+        if matching is not None:
+            if dao.in_progress:
+                raise PROGRESS_EXCEPTION
+            elif matching == 'swiss_chess':
+                match = SwissChess(rank=self.ranking_strategy.total_score,
+                                   re_match=self.check_re_match)
+                self.draw = TournamentDraw(matching_strategy=match)
+            elif matching == 'round_robin':
+                self.draw = TournamentDraw(matching_strategy=RoundRobin())
 
         rounds = details.get('rounds')
         if rounds is not None:
