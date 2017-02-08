@@ -1,4 +1,5 @@
 SELECT setup_permissions();
+SELECT setup_matching_strategies();
 
 SELECT half_tournament_test_setup('next_game_test', '2095-08-12');
 SELECT half_tournament_test_setup('rank_test', '1643-01-27');
