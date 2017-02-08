@@ -33,7 +33,6 @@ class TestScoreEntered(AppSimulatingTest):
             'missions': ['foo_mission_1', 'foo_mission_2'],
             'matching_strategy': 'round_robin'
         })
-        tourn.make_draws()
 
     def test_get_game_from_score(self):
         """
@@ -247,8 +246,6 @@ class TestEnterScore(AppSimulatingTest):
         compare(scores[0].score.value, 0)
 
         # a per_round score
-        tourn.make_draws()
-
         round_id = TournamentRound.query.\
             filter_by(tournament_name=self.tourn_1, ordering=2).first().id
         game_id = TournamentGame.query.join(GameEntrant).\

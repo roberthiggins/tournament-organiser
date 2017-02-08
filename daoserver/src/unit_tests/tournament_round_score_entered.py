@@ -29,7 +29,6 @@ class TestScoreEntered(AppSimulatingTest):
             'rounds': 2,
             'missions': ['foo_mission_1', 'foo_mission_2']
         })
-        tourn.make_draws()
 
     def test_get_game_from_score(self):
         """

@@ -54,8 +54,6 @@ class EnterScore(AppSimulatingTest):
         tourn = Tournament(self.tourn_1)
 
         # a per_round score
-        tourn.make_draws()
-
         round_id = TournamentRound.query.\
             filter_by(tournament_name=self.tourn_1, ordering=2).first().id
         game_id = TournamentGame.query.join(GameEntrant).\
