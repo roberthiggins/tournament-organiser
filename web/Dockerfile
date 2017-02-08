@@ -17,12 +17,12 @@ USER appuser
 
 # Install dependencies
 WORKDIR $HOME/app
-RUN npm install
+RUN npm install -q
 
 # Build the app
 ADD . $HOME/app
 RUN mkdir -p $HOME/app/log
-RUN npm build
+RUN npm build -q
 
 # Expose the app port
 EXPOSE 3000
