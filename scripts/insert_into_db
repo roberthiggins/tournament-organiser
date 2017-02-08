@@ -4,5 +4,5 @@ HOST=$1
 DATA_FILE=$2
 
 docker cp $DATA_FILE $HOST:.
-docker exec -it $HOST bash -c 'psql --file='$(basename $DATA_FILE)' -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
+docker exec -i $HOST bash -c 'psql --file='$(basename $DATA_FILE)' -d "$POSTGRES_DB" -U "$POSTGRES_USER" '
 
