@@ -3,8 +3,8 @@
 FROM node
 MAINTAINER Robert Higgins <robert.h.higgins@gmail.com>
 
-RUN npm install -g frisby
-RUN npm install -g jasmine-node
+RUN npm install -q -g frisby
+RUN npm install -q -g jasmine-node
 
 WORKDIR /opt/frisby/
 
