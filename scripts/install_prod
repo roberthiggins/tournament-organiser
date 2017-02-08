@@ -36,15 +36,28 @@ fi
 # Check if there is an available db store. If not then we make one for
 # persistent volumes.
 EXISTING_DB_STORE=$(docker ps -a | grep "dbstore$" | awk '{print $1}')
-if [[ -z "$EXISTING_DB_STORE" ]]
+MIGRATION_FILE="migration/dump.sql"
+if [[ -n "$EXISTING_DB_STORE" ]]
 then
-    message "Creating database store 'dbstore'"
-    docker create -v /dbdata --name dbstore postgres:9.3 bin/true
+    message "Migrating existing data"
+    mkdir -p migration
+    docker exec -it database bash -c ' pg_dump --data-only -U "$POSTGRES_USER" -d "$POSTGRES_DB" ' > $MIGRATION_FILE
+    docker rm dbstore_bak
+    docker rename dbstore dbstore_bak
 fi
+
+message "Creating database store 'dbstore'"
+docker create -v /dbdata --name dbstore postgres:9.3 bin/true
 
 ./scripts/get-compose-files
 
 ./scripts/clean-and-build
 docker-compose up -d --remove-orphans database daoserver webserver
+
+if [[ -f  migration/dump.sql ]]
+then
+    ./wait-for-container daoserver \
+        ./scripts/insert_into_db database $MIGRATION_FILE
+fi
 
 # service apache2 restart
