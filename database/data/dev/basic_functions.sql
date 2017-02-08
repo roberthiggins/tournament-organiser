@@ -60,6 +60,8 @@ BEGIN
 
     INSERT INTO tournament VALUES (DEFAULT, tourn_name, cast(tourn_date AS date), protect_object_id, tourn_name || '_to') RETURNING id INTO tourn_id;
 
+    INSERT INTO tournament_matching_strategy VALUEs(tourn_id, 'round_robin');
+
     RETURN tourn_id;
 END $$;
 
@@ -238,6 +240,15 @@ BEGIN
     -- Give stevemcqueen a score
     INSERT INTO score VALUES(DEFAULT, ent_id, score_cat, 6) RETURNING id INTO score_id;
     INSERT INTO tournament_score VALUES(ent_id, tourn_id, score_id);
+
+    RETURN 0;
+END $$;
+
+-- Adding the basic matching_strategy types
+CREATE OR REPLACE FUNCTION setup_matching_strategies() RETURNS int LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO matching_strategy VALUES ('round_robin');
+    INSERT INTO matching_strategy VALUES ('swiss_chess');
 
     RETURN 0;
 END $$;

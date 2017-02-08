@@ -1,4 +1,5 @@
 SELECT setup_permissions();
+SELECT setup_matching_strategies();
 -- Create a superuser
 SELECT create_user('superman', TRUE);
 

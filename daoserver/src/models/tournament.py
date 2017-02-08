@@ -12,6 +12,8 @@ from sqlalchemy.sql.expression import and_
 from models.authentication import PermissionDeniedException
 from models.dao.db_connection import db
 from models.dao.game_entry import GameEntrant
+from models.dao.matching_strategy import MatchingStrategy, \
+TournamentMatchingStrategy
 from models.dao.permissions import AccountProtectedObjectPermission, \
 ProtectedObject, ProtObjPerm
 from models.dao.registration import TournamentRegistration as Reg
@@ -23,7 +25,7 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin, SwissChess
 from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
-from models.tournament_draw import TournamentDraw
+from models.tournament_draw import TournamentDraw, DEFAULT_STRATEGY
 from models.tournament_round import TournamentRound
 
 def must_exist_in_db(func):
@@ -53,7 +55,6 @@ class Tournament(object):
 
     def __init__(self, tournament_id=None):
         self.tournament_id = tournament_id
-        self.matching_strategy = None
         self.ranking_strategy = RankingStrategy(tournament_id,
                                                 self.get_score_categories)
 
@@ -80,6 +81,7 @@ class Tournament(object):
         })
         Reg.query.filter_by(tournament_id=dao.id).delete()
         TournamentEntry.query.filter_by(tournament_id=dao.name).delete()
+        dao.matching_strategy.delete()
         db.session.delete(dao)
         db.session.flush()
         AccountProtectedObjectPermission.query.\
@@ -174,15 +176,18 @@ class Tournament(object):
     @must_exist_in_db
     def get_draw(self):
         """Get the tournament draw for this tournament, if it exists"""
+        tourn_match_strat = self.get_dao().matching_strategy.first()
+        if tourn_match_strat is None:
+            self._set_matching_strategy(DEFAULT_STRATEGY)
 
-        if self.matching_strategy == 'swiss_chess':
+        strat = tourn_match_strat.strategy.id
+
+        if strat == 'swiss_chess':
             match = SwissChess(rank=self.ranking_strategy.total_score,
                                re_match=self.check_re_match)
             return TournamentDraw(matching_strategy=match)
-        elif self.matching_strategy == 'round_robin':
+        elif strat == DEFAULT_STRATEGY:
             return TournamentDraw(matching_strategy=RoundRobin())
-
-        return TournamentDraw()
 
     @must_exist_in_db
     def get_entries(self):
@@ -279,9 +284,9 @@ class Tournament(object):
 
         matching = details.get('matching_strategy', None)
         if matching is not None:
-            if dao.in_progress:
-                raise PROGRESS_EXCEPTION
-            self.matching_strategy = matching
+            self._set_matching_strategy(matching)
+        elif dao.matching_strategy.first() is None:
+            self._set_matching_strategy(DEFAULT_STRATEGY)
 
         rounds = details.get('rounds')
         if rounds is not None:
@@ -321,6 +326,21 @@ class Tournament(object):
 
         self.get_dao().in_progress = True
         db.session.add(self.get_dao())
+        db.session.commit()
+
+    @must_exist_in_db
+    @not_in_progress
+    def _set_matching_strategy(self, strat):
+        """
+        Set the matching_strategy for entries
+
+        options: round_robin, swiss_chess
+        """
+        if strat not in set([x.id for x in MatchingStrategy.query.all()]):
+            raise ValueError
+
+        self.get_dao().matching_strategy.delete()
+        db.session.add(TournamentMatchingStrategy(self.get_dao().id, strat))
         db.session.commit()
 
     @must_exist_in_db

@@ -13,6 +13,8 @@ from models.matching_strategy import RoundRobin
 from models.permissions import PermissionsChecker, PERMISSIONS
 from models.table_strategy import ProtestAvoidanceStrategy
 
+DEFAULT_STRATEGY = 'round_robin'
+
 class DrawException(Exception):
     """For when a draw cannot be completed as scores entered already"""
     pass
