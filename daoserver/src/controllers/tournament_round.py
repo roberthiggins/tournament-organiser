@@ -21,6 +21,6 @@ def get_round_info(round_id):
     """
     GET draw and mission about a round
     """
-    return g.tournament.draw.set_entries(g.tournament.get_entries()).\
+    return g.tournament.get_draw().set_entries(g.tournament.get_entries()).\
         set_round(g.tournament.get_round(round_id)).\
         get_draw()

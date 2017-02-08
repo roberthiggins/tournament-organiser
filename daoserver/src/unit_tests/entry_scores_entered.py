@@ -69,7 +69,6 @@ class TestPerGameScores(AppSimulatingTest):
         dao = TournamentEntry.query.\
             filter_by(tournament_id=self.t_name).first()
         self.entry = EntryModel(self.t_name, dao.player_id)
-        tourn.make_draws()
         self.ent_1_g_1 = self.entry.get_next_game()
 
         # Enter scores for round 1

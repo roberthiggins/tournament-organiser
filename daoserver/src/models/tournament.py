@@ -23,7 +23,7 @@ from models.dao.tournament_round import TournamentRound as TR
 from models.matching_strategy import RoundRobin, SwissChess
 from models.permissions import PermissionsChecker
 from models.ranking_strategies import RankingStrategy
-from models.tournament_draw import TournamentDraw, DrawException
+from models.tournament_draw import TournamentDraw
 from models.tournament_round import TournamentRound
 
 def must_exist_in_db(func):
@@ -53,7 +53,7 @@ class Tournament(object):
 
     def __init__(self, tournament_id=None):
         self.tournament_id = tournament_id
-        self.draw = TournamentDraw()
+        self.matching_strategy = None
         self.ranking_strategy = RankingStrategy(tournament_id,
                                                 self.get_score_categories)
 
@@ -171,6 +171,18 @@ class Tournament(object):
             'score_categories': self.get_score_categories(serialized=True)
         }
 
+    @must_exist_in_db
+    def get_draw(self):
+        """Get the tournament draw for this tournament, if it exists"""
+
+        if self.matching_strategy == 'swiss_chess':
+            match = SwissChess(rank=self.ranking_strategy.total_score,
+                               re_match=self.check_re_match)
+            return TournamentDraw(matching_strategy=match)
+        elif self.matching_strategy == 'round_robin':
+            return TournamentDraw(matching_strategy=RoundRobin())
+
+        return TournamentDraw()
 
     @must_exist_in_db
     def get_entries(self):
@@ -236,21 +248,6 @@ class Tournament(object):
 
 
     @must_exist_in_db
-    def make_draws(self):
-        """Makes the draws for all rounds"""
-        # If we can we determine all rounds
-        for rnd in range(0, self.get_dao().rounds.count()):
-            try:
-                model = self.get_round(rnd + 1)
-                self.draw.set_round(model)
-                self.draw.destroy_draw()
-                self.draw.set_entries(self.get_entries())
-                model.draw = self.draw.make_draw()
-            except DrawException:
-                pass
-
-
-    @must_exist_in_db
     def _set_details(self, details):
         """
         Set details for the tournament. Exceptions will be thrown when
@@ -284,12 +281,7 @@ class Tournament(object):
         if matching is not None:
             if dao.in_progress:
                 raise PROGRESS_EXCEPTION
-            elif matching == 'swiss_chess':
-                match = SwissChess(rank=self.ranking_strategy.total_score,
-                                   re_match=self.check_re_match)
-                self.draw = TournamentDraw(matching_strategy=match)
-            elif matching == 'round_robin':
-                self.draw = TournamentDraw(matching_strategy=RoundRobin())
+            self.matching_strategy = matching
 
         rounds = details.get('rounds')
         if rounds is not None:
@@ -308,7 +300,6 @@ class Tournament(object):
 
         db.session.add(dao)
         db.session.commit()
-
 
     @must_exist_in_db
     @not_in_progress
@@ -365,7 +356,7 @@ class Tournament(object):
 
         db.session.commit()
 
-        self.make_draws()
+        self.get_draw().set_entries(self.get_entries()).make_draws(self)
 
 
     @must_exist_in_db

@@ -52,6 +52,19 @@ class TournamentDraw(object):
         TournamentGame.query.filter_by(tournament_round_id=rd_dao.id).delete()
         db.session.commit()
 
+    def make_draws(self, tourn):
+        """Makes the draws for all rounds"""
+        # If we can we determine all rounds
+        for rnd in range(0, tourn.get_dao().rounds.count()):
+            try:
+                model = tourn.get_round(rnd + 1)
+                self.set_round(model)
+                self.destroy_draw()
+                self.set_entries(self.entries)
+                model.draw = self.make_draw()
+            except DrawException:
+                pass
+
     def make_draw(self):
         """Finalise the draw, based on current round number"""
         if self.current_round is None:
