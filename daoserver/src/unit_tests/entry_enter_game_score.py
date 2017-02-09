@@ -24,9 +24,7 @@ class EnterScore(AppSimulatingTest):
 
     def setUp(self):
         super(EnterScore, self).setUp()
-        self.injector.inject(self.tourn_1, num_players=5)
-        tourn = Tournament(self.tourn_1)
-        tourn.update({
+        self.injector.inject(self.tourn_1, num_players=5).update({
             'rounds': 2,
             'missions': ['foo_mission_1', 'foo_mission_2'],
             'score_categories': [cat('per_round', 50, False, 0, 100)]

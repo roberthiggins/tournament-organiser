@@ -6,7 +6,6 @@ from testfixtures import compare
 
 from models.dao.tournament_entry import TournamentEntry
 
-from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry as EntryModel
 
 from unit_tests.app_simulating_test import AppSimulatingTest
@@ -19,9 +18,7 @@ class TestPerTournamentScores(AppSimulatingTest):
 
     def setUp(self):
         super(TestPerTournamentScores, self).setUp()
-        self.injector.inject(self.t_name, num_players=1)
-        tourn = Tournament(self.t_name)
-        tourn.update({
+        self.injector.inject(self.t_name, num_players=1).update({
             'score_categories': [cat('per_t_cat_1', 1, True, 0, 100),
                                  cat('per_t_cat_2', 1, True, 0, 100)]
         })
@@ -57,8 +54,7 @@ class TestPerGameScores(AppSimulatingTest):
 
     def setUp(self):
         super(TestPerGameScores, self).setUp()
-        self.injector.inject(self.t_name, num_players=4)
-        tourn = Tournament(self.t_name)
+        tourn = self.injector.inject(self.t_name, num_players=4)
         tourn.update({
             'rounds': 2,
             'missions': ['mission_1', 'mission_2'],

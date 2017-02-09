@@ -23,9 +23,7 @@ class TestScoreEntered(AppSimulatingTest):
     def setUp(self):
         super(TestScoreEntered, self).setUp()
 
-        self.injector.inject(self.tournament_1, num_players=5)
-        tourn = Tournament(self.tournament_1)
-        tourn.update({
+        self.injector.inject(self.tournament_1, num_players=5).update({
             'rounds': 2,
             'missions': ['foo_mission_1', 'foo_mission_2']
         })
@@ -81,12 +79,11 @@ class TestScoreEntered(AppSimulatingTest):
 
     def test_score_entered(self):
         # Add a score category
-        Tournament(self.tournament_1).update({
+        tourn = Tournament(self.tournament_1)
+        tourn.update({
             'score_categories': [score_cat_args('per_round', 50, False, 0, 100)]
         })
         category_1 = 'per_round'
-
-        tourn = Tournament(self.tournament_1)
 
         entry_2_id = TournamentEntry.query.filter_by(
             player_id='{}_player_{}'.format(self.tournament_1, 2),

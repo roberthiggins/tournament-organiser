@@ -23,9 +23,7 @@ class TestGames(AppSimulatingTest):
 
     def setUp(self):
         super(TestGames, self).setUp()
-        self.injector.inject(self.tourn_1, num_players=5)
-        tourn = Tournament(self.tourn_1)
-        tourn.update({
+        self.injector.inject(self.tourn_1, num_players=5).update({
             'rounds': 2,
             'missions': ['foo_mission_1', 'foo_mission_2']
         })

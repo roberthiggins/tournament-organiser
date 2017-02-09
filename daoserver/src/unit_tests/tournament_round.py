@@ -14,9 +14,8 @@ class SetRounds(AppSimulatingTest):
     def test_set_rounds(self):
         """change the number of rounds in a tournament"""
         name = 'test_set_rounds'
-        self.injector.inject(name)
+        tourn = self.injector.inject(name)
 
-        tourn = Tournament(name)
         tourn._set_rounds(6)
         self.assertTrue(tourn.details()['rounds'] == 6)
 
@@ -26,9 +25,8 @@ class SetRounds(AppSimulatingTest):
     def test_tournament_round_deletion(self):
         """Check that the rounds get deleted when rounds are reduced"""
         name = 'test_tournament_round_deletion'
-        self.injector.inject(name)
+        tourn = self.injector.inject(name)
 
-        tourn = Tournament(name)
         tourn.update({'rounds': 6})
         compare(
             len(TournamentRound.query.filter_by(tournament_name=name).all()),
@@ -42,8 +40,7 @@ class SetRounds(AppSimulatingTest):
     def test_get_missions(self):
         """get missions for the rounds"""
         name = 'test_get_missions'
-        self.injector.inject(name)
-        tourn = Tournament(name)
+        tourn = self.injector.inject(name)
         tourn.update({
             'rounds': 3,
             'missions': ['mission_1', 'mission_2', 'mission_3']
@@ -60,9 +57,8 @@ class SetRounds(AppSimulatingTest):
     def test_get_round(self):
         """Test the round getter"""
         name = 'test_get_round'
-        self.injector.inject(name)
+        tourn = self.injector.inject(name)
 
-        tourn = Tournament(name)
         tourn.update({'rounds': 2})
 
         self.assertTrue(tourn.get_round(1).get_dao().ordering == 1)
@@ -76,9 +72,8 @@ class SetRounds(AppSimulatingTest):
     def test_errors(self):
         """Illegal values"""
         name = 'test_errors'
-        self.injector.inject(name)
+        tourn = self.injector.inject(name)
 
-        tourn = Tournament(name)
         self.assertRaises(ValueError, tourn._set_rounds, 'foo')
         self.assertRaises(ValueError, tourn.update, {'rounds': 'foo'})
         self.assertRaises(ValueError, tourn._set_rounds, '')
@@ -86,8 +81,7 @@ class SetRounds(AppSimulatingTest):
         self.assertRaises(TypeError, tourn._set_rounds, None)
 
         name_2 = 'test_errors_2'
-        self.injector.inject(name_2)
-        tourn = Tournament(name_2)
+        tourn = self.injector.inject(name_2)
         self.assertRaises(ValueError, tourn._set_rounds, 'foo')
         self.assertRaises(ValueError, tourn.update, {'rounds': 'foo'})
         self.assertRaises(ValueError, tourn._set_rounds, '')
