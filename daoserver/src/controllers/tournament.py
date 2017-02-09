@@ -129,8 +129,7 @@ def register():
     rego = TournamentRegistration(g.username, g.tournament_id)
     rego.add_to_db()
     g.tournament.confirm_entries()
-    g.tournament.get_draw().set_entries(g.tournament.get_entries()).\
-        make_draws(g.tournament)
+    g.tournament.get_draw().make_draws(g.tournament)
 
     return 'Application Submitted'
 
