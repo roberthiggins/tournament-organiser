@@ -185,9 +185,10 @@ class Tournament(object):
         if strat == 'swiss_chess':
             match = SwissChess(rank=self.ranking_strategy.total_score,
                                re_match=self.check_re_match)
-            return TournamentDraw(matching_strategy=match)
+            draw = TournamentDraw(matching_strategy=match)
         elif strat == DEFAULT_STRATEGY:
-            return TournamentDraw(matching_strategy=RoundRobin())
+            draw = TournamentDraw(matching_strategy=RoundRobin())
+        return draw.set_entries(self.get_entries())
 
     @must_exist_in_db
     def get_entries(self):
@@ -376,7 +377,7 @@ class Tournament(object):
 
         db.session.commit()
 
-        self.get_draw().set_entries(self.get_entries()).make_draws(self)
+        self.get_draw().make_draws(self)
 
 
     @must_exist_in_db
