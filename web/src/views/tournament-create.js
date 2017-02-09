@@ -7,6 +7,7 @@ var TournamentDetailsWidget = React.createClass({
     propTypes: {
         details: React.PropTypes.object.isRequired,
         handleCategoryChange: React.PropTypes.func.isRequired,
+        handleMatchupChange: React.PropTypes.func.isRequired,
         handleRoundChange: React.PropTypes.func.isRequired,
         handleSubmit: React.PropTypes.func.isRequired
     },
@@ -21,6 +22,15 @@ var TournamentDetailsWidget = React.createClass({
                 <div className="form_field">
                     <label htmlFor="date">Tournament Date:</label>
                     <input type="text" name="date" id="date" />
+                </div>
+                <div className="form_field">
+                    <Inputs.select id="match_strategy"
+                        name="Matchup generation"
+                        value={this.props.details.matchup}
+                        changeHandler={this.props.handleMatchupChange}
+                        options={[
+                            {name: "Round Robin", val: "round_robin"},
+                            {name: "Swiss Chess", val: "swiss_chess"}]}/>
                 </div>
                 <div className="form_field">
                     <Inputs.textField value={this.props.details.rounds}
@@ -74,6 +84,7 @@ var TournamentCreatePage = React.createClass({
                              CategoryModel.emptyScoreCategory(),
                              CategoryModel.emptyScoreCategory()],
                 date: null,
+                matchup: null,
                 name: null,
                 rounds: 5
                 },
@@ -86,6 +97,9 @@ var TournamentCreatePage = React.createClass({
         details.categories = CategoryComponent.handleStateChange(
             this.state.details.categories, event)
         this.setState({details: details});
+    },
+    handleMatchupChange: function(event) {
+        this.setState({matchup:event.target.value});
     },
     handleRoundChange: function(event){
         var details = this.state.details;
@@ -101,7 +115,8 @@ var TournamentCreatePage = React.createClass({
                 categories: this.state.details.categories,
                 name: $("input#name").val(),
                 date: $("input#date").val(),
-                rounds: this.state.details.rounds
+                rounds: this.state.details.rounds,
+                matching_strategy: this.state.matchup
             },
             function success(res) {
                 var details = res;
@@ -139,6 +154,7 @@ var TournamentCreatePage = React.createClass({
                     null :
                     <TournamentDetailsWidget details={this.state.details}
                         handleCategoryChange={this.handleCategoryChange}
+                        handleMatchupChange={this.handleMatchupChange}
                         handleRoundChange={this.handleRoundChange}
                         handleSubmit={this.handleSubmit}/>}
             </div>

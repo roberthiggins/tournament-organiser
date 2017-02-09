@@ -42,6 +42,7 @@ router.route("/tournament/create")
                 data: {
                     inputTournamentName: req.body.name,
                     inputTournamentDate: req.body.date,
+                    matching_strategy: req.body.matching_strategy,
                     rounds: req.body.rounds || 0,
                     score_categories: cleanCats
                     },
