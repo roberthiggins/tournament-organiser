@@ -5,8 +5,11 @@ from testfixtures import compare
 
 from models.dao.tournament_round import TournamentRound
 from models.tournament import Tournament
+from models.tournament_entry import TournamentEntry
+from models.tournament_round import TournamentRound as TRoundModel
 
 from unit_tests.app_simulating_test import AppSimulatingTest
+from unit_tests.tournament_injector import score_cat_args as cat
 
 # pylint: disable=no-member,missing-docstring,protected-access
 class SetRounds(AppSimulatingTest):
@@ -87,3 +90,34 @@ class SetRounds(AppSimulatingTest):
         self.assertRaises(ValueError, tourn._set_rounds, '')
         self.assertRaises(ValueError, tourn.update, {'rounds': ''})
         self.assertRaises(TypeError, tourn._set_rounds, None)
+
+    def test_is_complete(self):
+        """Check that all the games are complete in the round"""
+        name = 'test_complete'
+        cat_1 = 'per_round'
+        tourn = self.injector.inject(name)
+        tourn.update({
+            'rounds': 2,
+            'score_categories': [cat(cat_1, 100, False, 0, 100)]
+        })
+
+        self.assertFalse(TRoundModel(name, 2).is_complete())
+        # Enter scores for round 1
+        for idx, ent in enumerate(tourn.get_dao().entries.all()):
+            self.assertFalse(TRoundModel(name, 1).is_complete())
+            model = TournamentEntry(name, ent.player_id)
+            game_id = model.get_next_game()['game_id']
+
+            model.set_scores([
+                {'game_id': game_id, 'category': cat_1, 'score': idx + 1},
+            ])
+        self.assertTrue(TRoundModel(name, 1).is_complete())
+        self.assertFalse(TRoundModel(name, 2).is_complete())
+
+    def test_get_ordering(self):
+        name = 'test_ordering'
+        self.injector.inject(name).update({'rounds': 5})
+        rnd = TRoundModel(name, 1)
+        compare(rnd.get_ordering(), 1)
+        rnd = TRoundModel(name, 2)
+        compare(rnd.get_ordering(), 2)

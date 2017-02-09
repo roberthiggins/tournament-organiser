@@ -10,6 +10,7 @@ from models.dao.permissions import ProtObjAction, ProtObjPerm
 from models.dao.tournament_game import TournamentGame
 from models.dao.tournament_round import TournamentRound as DAO
 from models.permissions import PermissionsChecker, PERMISSIONS
+from models.score import Score
 
 class TournamentRound(object):
     """A Collection of TournamentGame that constitute a round"""
@@ -54,3 +55,14 @@ class TournamentRound(object):
         return TournamentGame.query.join(DAO).filter(
             and_(DAO.ordering == self.ordering,
                  TournamentGame.table_num == table_num)).first()
+
+    def get_ordering(self):
+        """The round number"""
+        return self.get_dao().ordering
+
+    def is_complete(self):
+        """Are all the games for this round complete"""
+        for game in self.get_dao().games.all():
+            if not Score.is_score_entered(game):
+                return False
+        return True
