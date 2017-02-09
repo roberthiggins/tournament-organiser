@@ -6,7 +6,6 @@ Draw strategy unit tests
 from testfixtures import compare
 
 from models.matching_strategy import RoundRobin, SwissChess
-from models.tournament import Tournament
 from models.tournament_entry import TournamentEntry
 
 from unit_tests.app_simulating_test import AppSimulatingTest
@@ -18,9 +17,8 @@ class RoundRobinTests(AppSimulatingTest):
     def test_get_draw(self):
         """Test get_draw"""
 
-        self.injector.inject('dst', num_players=5)
+        entries = self.injector.inject('dst', num_players=5).get_entries()
 
-        entries = Tournament('dst').get_entries()
         draw = RoundRobin().set_round(1).match(entries)
         compare(draw[0][0].player_id, 'dst_player_1')
         compare(draw[0][1].player_id, 'dst_player_5')
@@ -111,9 +109,7 @@ class SwissChessTests(AppSimulatingTest):
 
     def test_match(self):
         """Test get_draw"""
-        tourn_id = 'dst'
-        self.injector.inject(tourn_id, num_players=6)
-        entries = Tournament(tourn_id).get_entries()
+        entries = self.injector.inject('dst', num_players=6).get_entries()
 
         draw = SwissChess(rank=self.round_1, re_match=self.re_match).\
             match(entries)
@@ -151,8 +147,7 @@ class SwissChessFitnessTests(AppSimulatingTest):
     def setUp(self):
         super(SwissChessFitnessTests, self).setUp()
         tourn_id = 'sct'
-        self.injector.inject(tourn_id, num_players=6)
-        tournament = Tournament(tourn_id)
+        tournament = self.injector.inject(tourn_id, num_players=6)
         tournament.update({
             'rounds': 2,
             'score_categories': [cat('c_1', 100, False, 0, 100)]
@@ -264,9 +259,7 @@ class SwissChessTestByes(AppSimulatingTest):
         matching_strategy = SwissChess(rank=self.round_1_scores,
                                        re_match=self.re_match_r_1)
 
-        tourn_id = 'sct_2'
-        self.injector.inject(tourn_id, num_players=5)
-        entries = Tournament(tourn_id).get_entries()
+        entries = self.injector.inject('sct_2', num_players=5).get_entries()
 
         draw = matching_strategy.match(entries)
         bye_player = [g for g in draw if g[1] == 'BYE'][0][0].player_id

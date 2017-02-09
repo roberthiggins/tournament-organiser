@@ -26,9 +26,7 @@ class TestScoreEntered(AppSimulatingTest):
 
     def setUp(self):
         super(TestScoreEntered, self).setUp()
-        self.injector.inject(self.tourn_1, num_players=5)
-        tourn = Tournament(self.tourn_1)
-        tourn.update({
+        self.injector.inject(self.tourn_1, num_players=5).update({
             'rounds': 2,
             'missions': ['foo_mission_1', 'foo_mission_2'],
             'matching_strategy': 'round_robin'
@@ -85,7 +83,7 @@ class TestScoreEntered(AppSimulatingTest):
 
     def test_score_entered(self):
         tourn = Tournament(self.tourn_1)
-        tourn.update({
+        Tournament(self.tourn_1).update({
             'score_categories': [cat('per_round', 50, False, 0, 100)]
         })
         cat_1 = 'per_round'
@@ -168,9 +166,7 @@ class TestEnterScore(AppSimulatingTest):
 
     def setUp(self):
         super(TestEnterScore, self).setUp()
-        self.injector.inject(self.tourn_1, num_players=5)
-        tourn = Tournament(self.tourn_1)
-        tourn.update({
+        self.injector.inject(self.tourn_1, num_players=5).update({
             'rounds': 2,
             'missions': ['foo_mission_1', 'foo_mission_2'],
             'score_categories': [cat('per_tournament', 50, True, 0, 100),
@@ -290,9 +286,7 @@ class TestBulkScoreEntry(AppSimulatingTest):
 
     def setUp(self):
         super(TestBulkScoreEntry, self).setUp()
-        self.injector.inject(self.tourn_name, num_players=5)
-        tourn = Tournament(self.tourn_name)
-        tourn.update({
+        self.injector.inject(self.tourn_name, num_players=5).update({
             'score_categories': [cat('cat_1', 1, True, 0, 100),
                                  cat('cat_2', 1, True, 0, 100)]
         })

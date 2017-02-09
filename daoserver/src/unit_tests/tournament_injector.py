@@ -43,7 +43,7 @@ class TournamentInjector(object):
 
         self.create_players(name, num_players)
 
-        return
+        return Tourn(name)
 
     def delete(self):
         """Remove all tournaments we have injected"""

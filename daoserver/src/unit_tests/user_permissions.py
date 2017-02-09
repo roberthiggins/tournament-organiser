@@ -9,7 +9,6 @@ from models.dao.account import Account, AccountSecurity
 from models.dao.permissions import ProtectedObject, ProtObjAction, \
 ProtObjPerm, AccountProtectedObjectPermission as AccountProtectedObjectPerm
 from models.permissions import PermissionsChecker
-from models.tournament import Tournament
 
 from unit_tests.app_simulating_test import AppSimulatingTest
 
@@ -122,9 +121,9 @@ class UserPermissions(AppSimulatingTest):
         """Test that users can have their permissions removed"""
 
         checker = PermissionsChecker()
-        self.injector.inject(self.tourn_1)
+        tourn_prot_obj = self.injector.inject(self.tourn_1).get_dao().\
+            protected_object
         player = '{}_player_1'.format(self.tourn_1)
-        tourn_prot_obj = Tournament(self.tourn_1).get_dao().protected_object
 
         checker.add_permission(player, 'modify_application', tourn_prot_obj)
         prot_objs = ProtectedObject.query.count()

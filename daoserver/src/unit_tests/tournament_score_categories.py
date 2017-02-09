@@ -5,7 +5,6 @@ Test entering scores for games in a tournament
 from testfixtures import compare
 
 from models.dao.score import ScoreCategory
-from models.tournament import Tournament
 
 from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args as cat
@@ -18,7 +17,7 @@ class ScoreCategoryTests(AppSimulatingTest):
     def setUp(self):
         super(ScoreCategoryTests, self).setUp()
 
-        self.injector.inject(self.tourn_1)
+        self.tournament = self.injector.inject(self.tourn_1)
         self.db.session.flush()
         self.db.session.commit()
 
@@ -26,8 +25,6 @@ class ScoreCategoryTests(AppSimulatingTest):
         self.cat_1 = cat('painting', 10, False, 1, 20)
         self.cat_2 = cat('cat_battle', 80, True, 1, 20)
         self.cat_3 = cat('cat_sports', 10, True, 1, 5)
-
-        self.tournament = Tournament(self.tourn_1)
 
     def test_categories_created(self):
         # Enter a cat

@@ -3,7 +3,6 @@ Setting the number of rounds in a tournament
 """
 from models.dao.registration import TournamentRegistration as Reg
 from models.dao.tournament_entry import TournamentEntry
-from models.tournament import Tournament
 
 from unit_tests.app_simulating_test import AppSimulatingTest
 from unit_tests.tournament_injector import score_cat_args
@@ -17,9 +16,8 @@ class TournamentInProgress(AppSimulatingTest):
         self.name = 'test_in_progress'
         self.player_1 = 'p1'
 
-        self.injector.inject(self.name, num_players=0)
+        self.tournament = self.injector.inject(self.name, num_players=0)
         self.injector.add_player(self.name, self.player_1)
-        self.tournament = Tournament(self.name)
         self.tournament.update({
             'rounds': 1,
             'missions': ['mission01'],
