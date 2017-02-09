@@ -109,7 +109,8 @@ class SwissChess(MatchingStrategy):
         if len(entry_list) % 2 == 1:
             entry_list.append({'match_score': 0, 'name': 'BYE', 'entry': 'BYE'})
 
-        possible_games = itertools.permutations(entry_list, 2)
+        possible_games = itertools.combinations(entry_list, 2)
+
         possible_games = [x for x in possible_games if not self.re_match(x)]
         if len(possible_games) == 0:
             return []
@@ -117,7 +118,7 @@ class SwissChess(MatchingStrategy):
         possible_games = [x + \
             (abs(int(x[0]['match_score']) - int(x[1]['match_score']))**2,) \
             for x in possible_games]
-        possible_draws = itertools.permutations(possible_games,
+        possible_draws = itertools.combinations(possible_games,
                                                 len(entry_list) / 2)
 
         legal_draws = [x for x in possible_draws if self._check_legal_draw(x)]
