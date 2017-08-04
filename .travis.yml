@@ -47,9 +47,9 @@ script:
     - docker inspect selenium &> /dev/null
     - bash scripts/insert_into_db web_use_db database/data/dev/basic_functions.sql
     - bash scripts/insert_into_db web_use_db database/data/dev/web_usability_test_data.sql
-    - docker-compose run web_usability
+      #    - docker-compose run web_usability
 
-    - pylint $(find . -iname "*.py")
+      # - pylint $(find . -iname "*.py")
 
 addons:
   ssh_known_hosts: 172.81.179.42
